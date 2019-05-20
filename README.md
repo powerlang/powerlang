@@ -1,6 +1,6 @@
 # Power Smalltalk
 
-Tis is the main Power Smalltalk repo, clone here and then execute the 
+This is the main Power Smalltalk repo, clone here and then execute the 
 `scripts/init-for-bootstrapping.sh` script to get all the others automatically loaded.
 
 This is Power Smalltalk. Below is our vision of what a modern Smalltalk design
