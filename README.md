@@ -1,9 +1,13 @@
 # Power Smalltalk
 
-This is the main Power Smalltalk repo, clone here and then execute the 
-`scripts/init-for-bootstrapping.sh` script to get all the others automatically loaded.
+This is the main Power Smalltalk repo, clone here and then execute the init script
 
-Finally, to open the development environment just do:
+```
+git clone git@github.com:melkyades/pst.git
+./scripts/init-for-bootstrapping.sh
+```
+
+to get all the others automatically loaded. Finally, to open the development environment just do:
 
 ```
 cd bootstrap
