@@ -2,17 +2,22 @@
 SCRIPT_PATH="$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )"
 ROOT_PATH=$SCRIPT_PATH/..
 
+DEFAULT="\e[39m"
 RED="\e[91m"
 GREEN="\e[92m"
 BLUE="\e[94m"
 MAGENTA="\e[95m"
+
 # clone pst source code 
 cd $ROOT_PATH
 mkdir -p src
 cd src
 if [ ! -d "kernel" ]
 then
-  git clone git@github.com:melkyades/kernel.git
+	echo -e ""
+	echo -e $GREEN"cloning Power Smalltalk kernel repository..."$DEFAULT
+	git clone git@github.com:melkyades/kernel.git
+	echo ""
 fi
 
 # setup a pharo image for bootstrapping
@@ -21,14 +26,20 @@ mkdir -p bootstrap
 cd bootstrap
 if [ ! -f "Pharo.image" ]
 then
-  curl https://get.pharo.org/70+vm | bash 
+	echo -e $GREEN"fetching pharo 7..."$DEFAULT
+	curl https://get.pharo.org/70+vm | bash 
+	echo ""
 fi
 
-./pharo Pharo.image ../scripts/pharo-setup-image.st
+if [ ! -f "PST.image" ]; then
+	echo -en $GREEN"configuring pharo for Power Smalltalk development..."$DEFAULT
+	./pharo Pharo.image ../scripts/pharo-setup-image.st
+	echo " done"
+fi
 
 if [ $? -eq 0 ]; then
-	echo -e $GREEN
-	echo "bootstrap image has been built, you can now open the development environment with:"
+	echo -e $MAGENTA
+	echo "bootstrap pharo has been built, you can now open the development environment:"
 	echo -e $BLUE
 	echo "> cd bootstrap"
 	echo "> ./pharo-ui PST.image"
