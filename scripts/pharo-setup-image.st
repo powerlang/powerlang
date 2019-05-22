@@ -14,7 +14,7 @@ Author useAuthor: 'PowerSmalltalkLoader' during: [
 SystemWindow closeTopWindow. "close HelpBrowser"
 GTPlayground openContents: '
 | kernel |
-kernel := ProyectSpec new 
+kernel := ProjectSpec new 
 	name: ''kernel'';
 	path: ''../src/kernel'' asFileReference;
 	load.
