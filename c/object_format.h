@@ -49,7 +49,6 @@ typedef struct small_header_t
 	}
 
 
-	
 	static const uint8_t Flag_isBytes      = 1;
 	static const uint8_t Flag_isArrayed    = 2;
 	static const uint8_t Flag_isNamed      = 4;
