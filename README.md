@@ -4,18 +4,19 @@ This is the main Power Smalltalk repo, clone here and then execute the init scri
 
 ```
 git clone git@github.com:melkyades/pst.git
-./scripts/init-for-bootstrapping.sh
+cd pst
+make -C bootstrap
 ```
 
 to get all the others automatically loaded. Finally, to open the development environment just do:
 
 ```
 cd bootstrap
-./pharo-ui PST.image
+./pharo-ui bootstrap.image
 ```
 
 This is Power Smalltalk. Below is our vision of what a modern Smalltalk design
-should look like, the direction in which we want to go. 
+should look like, the direction in which we want to go.
 
 `powerst` aims to be a clean, modern, minimal, modular, simple, portable, approachable
 Smalltalk implementation.

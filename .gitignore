@@ -1,0 +1,6 @@
+bootstrap/Pharo*
+bootstrap/pharo*
+bootstrap/icon-packs
+bootstrap/*.changes
+bootstrap/*.image
+PharoDebug.log
