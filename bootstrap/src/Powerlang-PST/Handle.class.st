@@ -12,7 +12,7 @@ Class {
 	#instVars : [
 		'runtime'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'meta accessing' }

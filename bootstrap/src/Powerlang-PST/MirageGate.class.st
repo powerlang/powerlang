@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'class'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #accessing }

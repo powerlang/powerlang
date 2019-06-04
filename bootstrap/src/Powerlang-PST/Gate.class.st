@@ -13,7 +13,7 @@ Class {
 	#instVars : [
 		'handle'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'instance creation' }

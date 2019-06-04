@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'storage'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'instance creation' }

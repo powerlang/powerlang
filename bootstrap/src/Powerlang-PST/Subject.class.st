@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'gate'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'as yet unclassified' }

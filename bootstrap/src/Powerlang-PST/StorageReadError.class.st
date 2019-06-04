@@ -1,5 +1,5 @@
 Class {
 	#name : #StorageReadError,
 	#superclass : #Object,
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }

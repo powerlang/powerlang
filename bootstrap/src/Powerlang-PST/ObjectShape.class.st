@@ -5,7 +5,7 @@ Class {
 		'name',
 		'fields'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'instance creation' }

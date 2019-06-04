@@ -9,7 +9,7 @@ Class {
 	#instVars : [
 		'shapes'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'instance creation' }

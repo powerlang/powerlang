@@ -1,7 +1,7 @@
 Class {
 	#name : #DirectGate,
 	#superclass : #Gate,
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #accessing }

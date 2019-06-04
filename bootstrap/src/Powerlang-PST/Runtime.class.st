@@ -9,7 +9,7 @@ Class {
 		'sources',
 		'shapeMap'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #private }

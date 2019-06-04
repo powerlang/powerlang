@@ -14,7 +14,7 @@ Class {
 		'objects',
 		'runtime'
 	],
-	#category : #'Powerlang-Metaphysics'
+	#category : #'Powerlang-PST-Metaphysics'
 }
 
 { #category : #'instance creation' }
