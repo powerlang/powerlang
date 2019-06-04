@@ -55,7 +55,7 @@ AstcodeTest >> test050instVarAssignment [
 	expression := assignment expression.
 	self
 		assert: assignee isIdentifier;
-		assert: assignee binding isInstanceVariable;
+		assert: assignee binding isInstVar;
 		assert: assignee binding index equals: 1;
 		assert: expression isIdentifier;
 		assert: expression binding isLiteral;

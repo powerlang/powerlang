@@ -26,6 +26,11 @@ ImageSegmentWriter >> encodedReferenceTo: anObject [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> image [
+	^stream contents
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> initialize [
 	offsets := IdentityDictionary new.
 	nextHash := 1

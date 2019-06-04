@@ -12,6 +12,11 @@ InstVarBinding class >> decodeUsing: anAstcodeDecoder [
 	^anAstcodeDecoder decodeInstVar
 ]
 
+{ #category : #testing }
+InstVarBinding >> assign: aValue within: anInterpreter [
+	^ anInterpreter receiver _gate setInstVarAt: index with: aValue
+]
+
 { #category : #accessing }
 InstVarBinding >> index [
 	^ index
@@ -20,6 +25,11 @@ InstVarBinding >> index [
 { #category : #accessing }
 InstVarBinding >> index: anInteger [
 	index := anInteger
+]
+
+{ #category : #testing }
+InstVarBinding >> isInstVar [
+	^true
 ]
 
 { #category : #testing }

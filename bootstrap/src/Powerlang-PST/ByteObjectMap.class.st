@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #accessing }
+ByteObjectMap >> asString [
+	^contents asString
+]
+
+{ #category : #accessing }
 ByteObjectMap >> contents [
 	^contents
 ]

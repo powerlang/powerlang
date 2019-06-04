@@ -2,13 +2,14 @@ Class {
 	#name : #SmalltalkKernel,
 	#superclass : #Object,
 	#instVars : [
+		'project',
 		'index',
 		'classes',
+		'objects',
+		'symbols',
 		'nilObj',
 		'trueObj',
-		'falseObj',
-		'objects',
-		'project'
+		'falseObj'
 	],
 	#category : #'Powerlang-PST-Building'
 }
@@ -29,31 +30,37 @@ SmalltalkKernel >> build [
 
 { #category : #initialization }
 SmalltalkKernel >> buildBehaviors [
-	|  b behavior |
+	| b behavior |
 	b := self instanceBehaviorOf: 'Behavior'.
 	classes
 		do: [ :class | 
 			behavior := class at: 'instanceBehavior'.
-			behavior behavior: b ]
+			behavior
+				behavior: b ]
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> buildClass: class from: definition [
-	| behavior superclass name ivars classIvars cvars pools |
+	| behavior superclass name ivars classIvars pools subclasses |
 	behavior := self newBehavior.
 	superclass := self classNamedOrNil: definition superclassName.
+	subclasses := project classes
+		select: [ :def | def superclass = definition name ]
+		thenCollect: [ :def | self classNamed: def name ].
+	subclasses := self newArray: subclasses.
 	name := self newString: definition name.
 	ivars := self newStringArray: definition instVars.
 	classIvars := self newStringArray: definition classInstVars.
-	cvars := self newStringArray: definition classVars.
 	pools := self newStringArray: definition sharedPools.
 	class
 		behavior: behavior;
 		at: 'superclass' put: superclass;
+		at: 'format' put: nilObj;
+		at: 'instanceVariables' put: ivars;
+		at: 'organization' put: nilObj;
 		at: 'name' put: name;
-		at: 'instVars' put: ivars;
-		at: 'classInstVars' put: classIvars;
-		at: 'cvars' put: cvars;
+		at: 'subclasses' put: subclasses;
+		at: 'classVariables' put: classIvars;
 		at: 'sharedPools' put: pools
 ]
 
@@ -109,15 +116,22 @@ SmalltalkKernel >> classNamedOrNil: aSymbol [
 ]
 
 { #category : #initialization }
+SmalltalkKernel >> classes [
+	^classes
+]
+
+{ #category : #initialization }
 SmalltalkKernel >> createEmptyClasses [
 	| class behavior |
 	project classes
 		do: [ :definition | 
 			class := self newNamed: definition name.
 			behavior := self newSlots
+				at: 'methods' put: nilObj;
+				at: 'next' put: nilObj;
 				at: 'class' put: class;
 				yourself.
-			class at: 'instanceBehavior' put: behavior.
+			class at: 'superclass' put: nilObj; at: 'instanceBehavior' put: behavior.
 			classes add: class ]
 ]
 
@@ -138,10 +152,10 @@ SmalltalkKernel >> createTrue [
 
 { #category : #initialization }
 SmalltalkKernel >> initialize [
-
 	index := Dictionary new.
 	classes := OrderedCollection new.
-	objects := OrderedCollection new
+	objects := OrderedCollection new.
+	symbols := OrderedDictionary new
 ]
 
 { #category : #initialization }
@@ -150,6 +164,14 @@ SmalltalkKernel >> instanceBehaviorOf: classname [
 	class := self classNamed: classname.
 	^class at: 'instanceBehavior'.
 
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> newArray: anArray [
+	| instance |
+	instance := self newTyped: 'Array'.
+	anArray do: [ :obj | instance add: obj ].
+	^ instance
 ]
 
 { #category : #initialization }
@@ -175,6 +197,24 @@ SmalltalkKernel >> newBytesTyped: classname contents: aByteObject [
 		contents: aByteObject
 ]
 
+{ #category : #initialization }
+SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
+	| method astcodes class selector format |
+	method := self newTyped: 'CompiledMethod'.
+	astcodes := self transferAstcodesFrom: anAstcode.
+	class := self classNamed: classname.
+	selector := self newSymbol: aSymbol.
+	format := self newSmallInteger: anInteger.
+	method
+		at: 'nativeCode' put: self nilObject;
+		at: 'astcodes' put: astcodes;
+		at: 'class' put: class;
+		at: 'selector' put: selector;
+		at: 'format' put: format;
+		at: 'source' put: self nilObject.
+	^ method
+]
+
 { #category : #'as yet unclassified' }
 SmalltalkKernel >> newNamed: aSymbol [
 	^ index at: aSymbol put: self newSlots
@@ -186,6 +226,11 @@ SmalltalkKernel >> newSlots [
 	| instance |
 	instance := SlotObjectMap new.
 	^ objects add: instance
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> newSmallInteger: anInteger [
+	^SmallintObjectMap new value: anInteger
 ]
 
 { #category : #initialization }
@@ -203,6 +248,14 @@ SmalltalkKernel >> newStringArray: strings [
 			bytes := self newString: s.
 			array add: bytes ].
 	^array
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> newSymbol: aSymbol [
+	| new |
+	symbols at: aSymbol ifPresent: [:s | ^s ].
+	new := self newBytesTyped: 'Symbol' contents: aSymbol.
+	^symbols at: aSymbol put: new
 ]
 
 { #category : #initialization }
@@ -228,6 +281,11 @@ SmalltalkKernel >> objects [
 ]
 
 { #category : #initialization }
+SmalltalkKernel >> project [
+	^project
+]
+
+{ #category : #initialization }
 SmalltalkKernel >> project: aProjectSpec [
 	project := aProjectSpec
 ]
@@ -248,7 +306,7 @@ SmalltalkKernel >> transferAstcodesFrom: anArray [
 	anArray
 		do: [ :elem | 
 			transferred := elem isSmallInteger
-				ifTrue: [ SmallintObjectMap new value:elem ]
+				ifTrue: [ self newSmallInteger: elem ]
 				ifFalse: [ self transferAstcodesFrom: elem ].
 			array add: transferred ].
 	^ array
