@@ -7,7 +7,6 @@ Author useAuthor: 'PowerSmalltalkLoader' during: [
                 createRepository.
 
     repo register.
-    (repo packageNamed: 'Powerlang') load.
     (repo packageNamed: 'Powerlang-PST') load.
 ].
 
