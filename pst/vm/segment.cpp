@@ -1,0 +1,68 @@
+/*
+ * Copyright (c) 2019 Javier Pimas, Jan Vrany
+
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#include <sys/mman.h>
+#include <unistd.h>
+#include "segment.h"
+
+static uintptr_t pagealign(uintptr_t addr) {
+    static int pagesize = -1;
+    if (pagesize == -1) {
+        pagesize = (int)sysconf(_SC_PAGESIZE);
+        ASSERT(pagesize != -1);
+    }
+    return pst::align(addr, pagesize);
+}
+
+namespace pst
+{
+
+segment *
+segment::alloc(uintptr_t base, size_t size) {
+    /*
+     * TODO: Following implementation is rubbish, in long run we should either
+     * use OMR port library or take hmm.h / hmm.c from Smalltalk/X jv-branch
+     * runtime.
+     * But it will do for now.
+     */
+
+    ASSERT(base == pagealign(base));
+    auto ptr = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
+    ASSERT(base == reinterpret_cast<uintptr_t>(ptr));
+    return reinterpret_cast<segment*>(ptr);
+}
+
+segment *
+segment::load(std::istream *data) {
+    segment_header header;
+
+    data->read(reinterpret_cast<char*>(&header), sizeof(header));
+
+    segment *segment = segment::alloc(header.base_address, header.size);
+
+    data->seekg(0, data->beg);
+    data->read(reinterpret_cast<char*>(segment), header.size);
+    return segment;
+}
+
+
+} // namespace pst

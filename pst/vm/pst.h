@@ -12,6 +12,10 @@ typedef unsigned char uchar;
 
 namespace pst {
 
+static inline uintptr_t align(uintptr_t value, int alignment) {
+    return ((value + (alignment-1)) & ~(alignment-1));
+}
+
 struct small_header_t;
 struct large_header_t;
 struct oop_t;

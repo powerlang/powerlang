@@ -44,8 +44,8 @@ typedef struct small_header_t
 
 	oop_t* slots() { return (oop_t*)((intptr_t)this + 8); }
 	small_header_t* actual_small_header()
-	{ 
-		(this->flags & Flag_isSmall) ? this : (small_header_t*)((uintptr_t)this) + 8;
+	{
+		return (this->flags & Flag_isSmall) ? this : (small_header_t*)((uintptr_t)this) + 8;
 	}
 
 
