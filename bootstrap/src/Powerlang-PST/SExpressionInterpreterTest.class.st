@@ -1,5 +1,5 @@
 Class {
-	#name : #AstcodeInterpreterTest,
+	#name : #SExpressionInterpreterTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'builder',
@@ -15,7 +15,7 @@ Class {
 }
 
 { #category : #tests }
-AstcodeInterpreterTest >> handleFor: anObjectMap [
+SExpressionInterpreterTest >> handleFor: anObjectMap [
 	| oid |
 	oid := writer offsetOf: anObjectMap.
 	^runtime handleOn: oid
@@ -23,7 +23,7 @@ AstcodeInterpreterTest >> handleFor: anObjectMap [
 ]
 
 { #category : #tests }
-AstcodeInterpreterTest >> injectMethod: anAstcode selector: selector for: classname [
+SExpressionInterpreterTest >> injectMethod: anAstcode selector: selector for: classname [
 	^ builder
 		newMethod: anAstcode
 		selector: selector
@@ -33,12 +33,12 @@ AstcodeInterpreterTest >> injectMethod: anAstcode selector: selector for: classn
 ]
 
 { #category : #tests }
-AstcodeInterpreterTest >> injectObject [
+SExpressionInterpreterTest >> injectObject [
 	^ builder newTyped: 'Object'
 ]
 
 { #category : #tests }
-AstcodeInterpreterTest >> invoke: method with: object [
+SExpressionInterpreterTest >> invoke: method with: object [
 	| m receiver |
 	m := self handleFor: method.
 	receiver := self handleFor: object.
@@ -46,7 +46,7 @@ AstcodeInterpreterTest >> invoke: method with: object [
 ]
 
 { #category : #running }
-AstcodeInterpreterTest >> setUp [
+SExpressionInterpreterTest >> setUp [
 	super setUp.
 	kernel := ProjectSpec new
 		name: 'kernel';
@@ -58,7 +58,7 @@ AstcodeInterpreterTest >> setUp [
 ]
 
 { #category : #tests }
-AstcodeInterpreterTest >> test100empty [
+SExpressionInterpreterTest >> test100empty [
 	| object astcodes method result original |
 	object := self injectObject.
 	astcodes := {MethodId. {IdentifierId. SelfId}}.	"foo self"
@@ -72,7 +72,7 @@ AstcodeInterpreterTest >> test100empty [
 ]
 
 { #category : #running }
-AstcodeInterpreterTest >> write [
+SExpressionInterpreterTest >> write [
 	| stream |
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
