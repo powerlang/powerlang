@@ -1,5 +1,5 @@
 Class {
-	#name : #AstNodeTypes,
+	#name : #SExpressionTypes,
 	#superclass : #SharedPool,
 	#classVars : [
 		'AssignmentId',
@@ -16,7 +16,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-AstNodeTypes class >> initialize [
+SExpressionTypes class >> initialize [
 	MethodId := 1.
 	BlockId := 2.
 	IdentifierId := 3.

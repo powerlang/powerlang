@@ -14,7 +14,7 @@ ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBNoClassCommentRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#Astcode)) #'2019-05-26T03:31:15.275028-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SExpression)) #'2019-05-26T03:31:15.275028-03:00') )
 ]
 
 { #category : #'code-critics' }

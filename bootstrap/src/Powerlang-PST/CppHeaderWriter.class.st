@@ -56,7 +56,7 @@ CppHeaderWriter >> writeAstcodeBindingTypes [
 
 { #category : #writing }
 CppHeaderWriter >> writeAstcodeNodeTypes [
-self writePoolAsEnum: AstNodeTypes
+self writePoolAsEnum: SExpressionTypes
 ]
 
 { #category : #writing }

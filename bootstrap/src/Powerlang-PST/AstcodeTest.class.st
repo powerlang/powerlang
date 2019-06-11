@@ -6,7 +6,7 @@ Class {
 	],
 	#pools : [
 		'AstBindingTypes',
-		'AstNodeTypes'
+		'SExpressionTypes'
 	],
 	#category : #'Powerlang-PST-Compiling-Tests'
 }

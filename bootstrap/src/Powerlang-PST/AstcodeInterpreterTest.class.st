@@ -9,7 +9,7 @@ Class {
 	],
 	#pools : [
 		'AstBindingTypes',
-		'AstNodeTypes'
+		'SExpressionTypes'
 	],
 	#category : #'Powerlang-PST-Metaphysics-Tests'
 }
