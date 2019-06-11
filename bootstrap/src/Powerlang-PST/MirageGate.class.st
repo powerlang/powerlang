@@ -21,7 +21,7 @@ MirageGate >> dispatch: aMessage [
 MirageGate >> dispatch: aMessage from: parentInterpreter [
 	| method interpreter |
 	method := self lookup: aMessage selector.
-	interpreter := AstcodeInterpreter
+	interpreter := SExpressionInterpreter
 		on: aMessage receiver
 		with: aMessage arguments
 		for: method.

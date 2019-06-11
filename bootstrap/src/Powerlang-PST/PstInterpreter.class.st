@@ -1,6 +1,6 @@
 Class {
 	#name : #PstInterpreter,
-	#superclass : #AstcodeInterpreter,
+	#superclass : #SExpressionInterpreter,
 	#classVars : [
 		'underprimitives'
 	],
