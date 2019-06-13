@@ -3,18 +3,31 @@
 # autoconf / cmake.
 #
 
+HOST   := $(shell ./config.guess | cut -d '-' -f 1,3)
+TARGET ?= $(HOST)
+CFLAGS ?= -ggdb3 -O0 -Wextra -Wall -Werror
+CXXFLAGS ?= $(CFLAGS) -std=c++11
+
+#
+# ===
+#
+BUILD = build/$(TARGET)
+
 INCLUDES=-I.
 
-CFLAGS=-std=c++11 -ggdb3 -O0 -Wextra -Wall -Werror $(INCLUDES)
-CXXFLAGS=$(CFLAGS)
-
 SOURCES=$(wildcard *.cpp)
-OBJECTS=$(patsubst %.cpp,%.o,$(SOURCES))
+OBJECTS=$(patsubst %.cpp,$(BUILD)/%.o,$(SOURCES))
 
-all: $(OBJECTS) s9
+all: $(OBJECTS) $(BUILD)/s9
 
-s9: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJECTS)
+$(BUILD):
+	mkdir -p $(BUILD)
+
+$(BUILD)/%.o: %.cpp $(BUILD)
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ -c $<
+
+$(BUILD)/s9: $(OBJECTS)
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS)
 
 clean:
-	rm $(OBJECTS) s9
+	rm -f $(OBJECTS) $(BUILD)/s9
