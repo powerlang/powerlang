@@ -11,7 +11,6 @@ Class {
 { #category : #specs }
 VarsListModel class >> defaultSpec [
 	^ SpecColumnLayout composed
-		add: #label height: self toolbarHeight;
 		add: #variables;
 		yourself
 ]

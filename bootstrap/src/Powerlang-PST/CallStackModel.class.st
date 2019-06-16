@@ -11,7 +11,6 @@ Class {
 { #category : #specs }
 CallStackModel class >> defaultSpec [
 	^ SpecColumnLayout composed
-		add: #label height: self toolbarHeight;
 		add: #frames;
 		yourself
 ]
@@ -24,8 +23,7 @@ CallStackModel >> frames [
 { #category : #initialization }
 CallStackModel >> initializeWidgets [
 	frames := self newList.
-	frames
-		displayBlock: [ :c | c name ].
+	frames displayBlock: [ :c | c ].
 	label := self newLabel.
 	label label: 'Call stack'.
 	self focusOrder add: frames
