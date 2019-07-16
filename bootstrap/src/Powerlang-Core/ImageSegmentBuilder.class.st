@@ -269,3 +269,16 @@ ImageSegmentBuilder >> writeTo: aStream [
 		write
 		
 ]
+
+{ #category : #writing }
+ImageSegmentBuilder >> writeToFile: file [
+	file asFileReference binaryWriteStreamDo: [ :stream |
+		"Bit stupid - we write into internal ByteArray backed stream and
+		then write it to real file. That's because WriteStream and ZnWriteStream
+		are not polymorphic. Sigh"
+
+		stream nextPutAll: self write.
+	]
+	
+		
+]

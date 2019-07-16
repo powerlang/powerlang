@@ -14,17 +14,37 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
-{ #category : #initialization }
-SmalltalkKernel >> allInstVarNamesOf: classmap [
-	| all current names ivars |
-	all := OrderedCollection new.
-	current := classmap.
-	[ current != nilObj ]
-		whileTrue: [ ivars := current at: 'instanceVariables'.
-			names := (1 to: ivars size) collect: [ :i | ivars arrayedAt: i ].
-			all addAll: names.
-			current := current at: 'superclass' ].
-	^ all
+{ #category : #writing }
+SmalltalkKernel class >> buildKernel: kernelDir segmentTo:  segmentFile [
+	"Build kernel segment and save to given file"
+	
+	| kernel builder | 
+	
+	kernel := ProjectSpec new 
+		name: 'kernel';
+		path: kernelDir asFileReference;
+		load.
+	builder := self new project: kernel; build.
+	segmentFile asFileReference binaryWriteStreamDo: [ :stream |
+		| writer |
+		
+		"Bit stupid - we write into internal ByteArray backed stream and
+		then write it to real file. That's because WriteStream and ZnWriteStream
+		are not polymorphic. Sigh"
+
+		writer := ImageSegmentWriter new.
+		writer stream: #[] writeStream.
+		writer baseAddress: 16r1ff10000.
+		writer objects: builder objects.
+		writer write.
+		
+		stream nextPutAll: writer contents.
+	]
+
+	"
+	SmalltalkKernel buildKernel: '../pst/kernel' segmentTo: '/tmp/pstkernel.img'
+	"
+
 ]
 
 { #category : #building }
@@ -54,21 +74,19 @@ SmalltalkKernel >> buildBehaviors [
 
 { #category : #initialization }
 SmalltalkKernel >> buildClass: class from: definition [
-	| behavior superclass name ivars classIvars pools subclasses format |
-	"st-80 behavior := self newBehavior."
-	behavior := (self classNamed: 'Class') at: 'instanceBehavior'.
+	| behavior superclass name ivars classIvars pools subclasses |
+	behavior := self newBehavior.
 	superclass := self classNamedOrNil: definition supername.
 	subclasses := definition subclasses collect: [ :def | self classNamed: def name ].
 	subclasses := self newArray: subclasses.
 	name := self newString: definition name.
-	format := self newSmallInteger: 0.
 	ivars := self newStringArray: definition instVarNames.
 	classIvars := self newStringArray: definition classVarNames.
 	pools := self newStringArray: definition sharedPools.
 	class
 		behavior: behavior;
 		at: 'superclass' put: superclass;
-		at: 'format' put: format;
+		at: 'format' put: nilObj;
 		at: 'instanceVariables' put: ivars;
 		at: 'organization' put: nilObj;
 		at: 'name' put: name;
@@ -103,7 +121,7 @@ SmalltalkKernel >> buildTestMethod [
 	| method behavior astcodes |
 	method := self newSlots.
 	behavior := self instanceBehaviorOf: 'CompiledMethod'.
-	astcodes := self transferArrayDeep: self testMethodAstcodes.
+	astcodes := self transferAstcodesFrom: self testMethodAstcodes.
 	method
 		behavior: behavior;
 		at: 'nativeCode' put: self nilObject;
@@ -163,11 +181,6 @@ SmalltalkKernel >> createTrue [
 	trueObj := self newSlots
 ]
 
-{ #category : #'as yet unclassified' }
-SmalltalkKernel >> falseObject [
-	^ falseObj
-]
-
 { #category : #initialization }
 SmalltalkKernel >> initialize [
 	index := Dictionary new.
@@ -182,21 +195,6 @@ SmalltalkKernel >> instanceBehaviorOf: classname [
 	class := self classNamed: classname.
 	^class at: 'instanceBehavior'.
 
-]
-
-{ #category : #'as yet unclassified' }
-SmalltalkKernel >> nameOf: anObject [
-	^ index keyAtValue: anObject ifAbsent: nil
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> new: classmap [
-	| behavior fields instance |
-	behavior := classmap at: 'instanceBehavior'.
-	fields := self allInstVarNamesOf: classmap.
-	instance := self newSlots behavior: behavior.
-	fields do: [ :name | instance at: name put: nilObj ].
-	^instance
 ]
 
 { #category : #initialization }
@@ -231,11 +229,6 @@ SmalltalkKernel >> newBytesTyped: classname contents: aByteObject [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> newClosure: aPCompiledBlock [
-	^ self newTyped: 'Closure'
-]
-
-{ #category : #initialization }
 SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
 	| method astcodes class selector format |
 	method := self newTyped: 'CompiledMethod'.
@@ -245,7 +238,7 @@ SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: 
 	format := self newSmallInteger: anInteger.
 	method
 		at: 'nativeCode' put: self nilObject;
-		at: 'semantics' put: astcodes;
+		at: 'astcodes' put: astcodes;
 		at: 'class' put: class;
 		at: 'selector' put: selector;
 		at: 'format' put: format;
@@ -336,33 +329,18 @@ SmalltalkKernel >> testMethodAstcodes [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> transferArrayDeep: anArray [
-	| copy behavior transferred |
-	copy := self newSlots.
-	behavior := self instanceBehaviorOf: 'Array'.
-	copy behavior: behavior.
-	anArray
-		do: [ :elem | 
-			transferred := elem isSmallInteger
-				ifTrue: [ self newSmallInteger: elem ]
-				ifFalse: [ self transferArrayDeep: elem ].
-			copy add: transferred ].
-	^ copy
-]
-
-{ #category : #initialization }
 SmalltalkKernel >> transferAstcodesFrom: anArray [
-	| copy behavior transferred |
-	copy := self newSlots.
+	| array behavior transferred |
+	array := self newSlots.
 	behavior := self instanceBehaviorOf: 'Array'.
-	copy behavior: behavior.
+	array behavior: behavior.
 	anArray
 		do: [ :elem | 
 			transferred := elem isSmallInteger
 				ifTrue: [ self newSmallInteger: elem ]
 				ifFalse: [ self transferAstcodesFrom: elem ].
-			copy add: transferred ].
-	^ copy
+			array add: transferred ].
+	^ array
 ]
 
 { #category : #initialization }
@@ -378,9 +356,4 @@ SmalltalkKernel >> transferObjectDeep: anObject [
 				ifFalse: [ self transferObjectDeep: elem ].
 			transferred add: slot ].
 	^ transferred
-]
-
-{ #category : #'as yet unclassified' }
-SmalltalkKernel >> trueObject [
-	^ trueObj
 ]

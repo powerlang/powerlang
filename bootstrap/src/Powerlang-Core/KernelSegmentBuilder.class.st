@@ -64,3 +64,12 @@ KernelSegmentBuilder >> nilObj [
 KernelSegmentBuilder >> trueObj [
 	^ trueObj
 ]
+
+{ #category : #writing }
+KernelSegmentBuilder >> writeTo: aStream [
+	ImageSegmentWriter new
+		stream: aStream;
+		objects: objects; 
+		baseAddress: 16r1ff10000;
+		write
+]

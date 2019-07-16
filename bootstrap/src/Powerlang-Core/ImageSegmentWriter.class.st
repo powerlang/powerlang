@@ -5,7 +5,9 @@ Class {
 		'stream',
 		'objects',
 		'offsets',
-		'nextHash'
+		'nextHash',
+		'baseAddress',
+		'toc'
 	],
 	#classVars : [
 		'WordSize'
@@ -19,10 +21,30 @@ ImageSegmentWriter class >> initialize [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> baseAddress [
+	"Return preferred base address for this segment."
+	^ baseAddress
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> baseAddress: anInteger [
+	"Set the preferred base address for this segment. 
+	 This is a hint only, loaders may load segment at
+	 different address but then loader must relocate.
+	"
+	baseAddress := anInteger
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> contents [
+	^stream contents
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> encodedReferenceTo: anObject [
 	anObject isImmediate
 		ifTrue: [ ^ anObject value * 2 + 1 ].
-	^ offsets at: anObject
+	^ baseAddress + (offsets at: anObject)
 ]
 
 { #category : #accessing }
@@ -33,7 +55,9 @@ ImageSegmentWriter >> image [
 { #category : #accessing }
 ImageSegmentWriter >> initialize [
 	offsets := IdentityDictionary new.
-	nextHash := 1
+	nextHash := 1.
+  baseAddress := 0.
+	toc := nil.
 ]
 
 { #category : #accessing }
@@ -72,8 +96,35 @@ ImageSegmentWriter >> offsetOf: anObjectMap [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> patchHeader [
+	"Now patch size and entrypoint in header"
+	| size |
+	
+	size := stream position.
+	stream position: 16.
+	stream 	uint64le: size.
+	toc notNil ifTrue:[
+		self writeReferenceTo: toc.
+	] ifFalse:[
+			stream uint64le: 0.
+	].
+	self assert: stream position == 32.
+	stream position: size.
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> stream: aWriteStream [
 	stream := aWriteStream
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> toc [
+	^ toc
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> toc: anObject [
+	toc := anObject 
 ]
 
 { #category : #accessing }
@@ -82,12 +133,19 @@ ImageSegmentWriter >> write [
 		writeSignature;
 		writeHeader;
 		layoutObjects;
-		writeObjects
+		writeObjects;
+		patchHeader
+		
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeHeader [
-	"TODO: write info about the contents"
+	"See segment.h for structure of a segment header"
+	stream 
+		uint64le: baseAddress; "Assumed Base Address"
+		uint64le: 0; "Size of a segment, will be patched later"
+		uint64le: 0. "Entry point reference, will be patched later"
+	self assert: stream position == 32
 ]
 
 { #category : #accessing }
