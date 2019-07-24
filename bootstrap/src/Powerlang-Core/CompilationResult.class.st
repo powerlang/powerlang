@@ -9,3 +9,8 @@ Class {
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
+
+{ #category : #accessing }
+CompilationResult >> compiler: aSmalltalkCompiler [
+	compiler := aSmalltalkCompiler
+]

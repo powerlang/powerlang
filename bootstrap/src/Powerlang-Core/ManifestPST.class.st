@@ -13,8 +13,28 @@ ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBIfTrueReturnsRuleV1FalsePositive [
+	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-24T02:26:09.214605-03:00') )
+]
+
+{ #category : #'code-critics' }
+ManifestPST class >> ruleRBLiteralArrayCharactersRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkScanner #isBinary: #false)) #'2019-07-24T02:26:44.802941-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBNoClassCommentRuleV1FalsePositive [
 	^ #(#(#(#RGClassDefinition #(#SExpression)) #'2019-05-26T03:31:15.275028-03:00') )
+]
+
+{ #category : #'code-critics' }
+ManifestPST class >> ruleRBReturnsIfTrueRuleV1FalsePositive [
+	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-24T02:27:55.345612-03:00') )
+]
+
+{ #category : #'code-critics' }
+ManifestPST class >> ruleRBSearchingLiteralRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkScanner #nextColon #false)) #'2019-07-24T02:24:50.040758-03:00') #(#(#RGClassDefinition #(#SmalltalkScanner)) #'2019-07-24T02:27:27.311656-03:00') )
 ]
 
 { #category : #'code-critics' }

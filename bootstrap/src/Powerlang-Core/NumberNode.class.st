@@ -3,3 +3,8 @@ Class {
 	#superclass : #LiteralNode,
 	#category : #'Powerlang-Core-SCompiler'
 }
+
+{ #category : #testing }
+NumberNode >> isNumberNode [
+	^true
+]
