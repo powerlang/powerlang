@@ -41,6 +41,16 @@ SmalltalkScanner >> canStartIdentifier: aCharacter [
 	^true
 ]
 
+{ #category : #accessing }
+SmalltalkScanner >> compiler [
+	^compiler
+]
+
+{ #category : #accessing }
+SmalltalkScanner >> compiler: aSmalltalkCompiler [
+	compiler := aSmalltalkCompiler
+]
+
 { #category : #scanning }
 SmalltalkScanner >> end [
 	^self buildToken: compiler endToken at: stream position + 1

@@ -14,6 +14,11 @@ EndToken >> position: aNumber [
 	super position: aNumber - 1
 ]
 
+{ #category : #accessing }
+EndToken >> prevPosition [
+	^stretch start
+]
+
 { #category : #evaluating }
 EndToken >> value: aString [
 	''

@@ -8,3 +8,8 @@ Class {
 NumberNode >> isNumberNode [
 	^true
 ]
+
+{ #category : #accessing }
+NumberNode >> negate [
+	value := value negated
+]

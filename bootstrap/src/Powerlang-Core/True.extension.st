@@ -9,3 +9,13 @@ True >> andNot: aBlock [
 True >> or: aBlock or: aBlock2 [
 	^self
 ]
+
+{ #category : #'*Powerlang-Core' }
+True >> or: aBlock or: aBlock2 or: aBlock3 [
+	^self
+]
+
+{ #category : #'*Powerlang-Core' }
+True >> orNot: aBlock [
+	^self
+]

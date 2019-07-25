@@ -13,6 +13,15 @@ SmalltalkScannerTest >> setUp [
 	scanner := SmalltalkScanner new
 ]
 
+{ #category : #numbers }
+SmalltalkScannerTest >> test0xNotation [
+	| node |
+	node := SmalltalkParser new parseExpression: '0x10'.
+	self assert: node statements first value = 16.
+	node := SmalltalkParser new parseExpression: '0X10'.
+	self assert: node statements first value = 16
+]
+
 { #category : #arrays }
 SmalltalkScannerTest >> testArrayStart [
 	| node |

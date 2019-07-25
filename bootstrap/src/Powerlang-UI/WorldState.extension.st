@@ -1,6 +1,6 @@
 Extension { #name : #WorldState }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-UI' }
 WorldState class >> pstClassBrowser [
 	| kernel |
 	kernel := ProjectSpec new
@@ -12,13 +12,13 @@ WorldState class >> pstClassBrowser [
 		openWithSpec
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-UI' }
 WorldState class >> pstDebug [
 	Debugger new openWithSpec.
 
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-UI' }
 WorldState class >> pstItemsOn: aBuilder [
 	<worldMenu>
 	(aBuilder item: #PST)
@@ -43,7 +43,7 @@ WorldState class >> pstItemsOn: aBuilder [
 				iconName: #image ]
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-UI' }
 WorldState class >> pstPlayground [
 	Playground new openWithSpec
 ]

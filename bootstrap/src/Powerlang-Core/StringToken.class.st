@@ -4,6 +4,19 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #converting }
+StringToken >> asIdentifierNode [
+	^compiler identifierNode
+		name: value;
+		stretch: stretch;
+		comments: comments
+]
+
+{ #category : #converting }
+StringToken >> asSelectorNode [
+	^compiler selectorNode symbol: value; stretch: stretch
+]
+
 { #category : #testing }
 StringToken >> hasSymbol [
 	^value isSymbol
@@ -15,6 +28,11 @@ StringToken >> isBinary [
 ]
 
 { #category : #testing }
+StringToken >> isDelimitedIdentifier [
+	^value first = ${
+]
+
+{ #category : #testing }
 StringToken >> isKeyword [
 	^value last = $:
 ]
@@ -22,4 +40,9 @@ StringToken >> isKeyword [
 { #category : #testing }
 StringToken >> isNameToken [
 	^(self isKeyword or: [self isBinary]) not
+]
+
+{ #category : #converting }
+StringToken >> isStringToken [
+	^true
 ]

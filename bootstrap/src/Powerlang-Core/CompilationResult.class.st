@@ -14,3 +14,13 @@ Class {
 CompilationResult >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler
 ]
+
+{ #category : #errors }
+CompilationResult >> error [
+	^error
+]
+
+{ #category : #errors }
+CompilationResult >> error: aCompilationError [
+	error := aCompilationError
+]

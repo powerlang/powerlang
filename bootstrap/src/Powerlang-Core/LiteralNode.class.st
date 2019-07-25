@@ -18,6 +18,11 @@ LiteralNode >> hasSymbol [
 ]
 
 { #category : #testing }
+LiteralNode >> isImmediate [
+	^true
+]
+
+{ #category : #testing }
 LiteralNode >> isLiteral [
 	^true
 ]
