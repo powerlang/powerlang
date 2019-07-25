@@ -7,7 +7,9 @@ Author useAuthor: 'PowerSmalltalkLoader' during: [
                 createRepository.
 
     repo register.
-    (repo packageNamed: 'Powerlang-PST') load.
+    (repo packageNamed: 'Powerlang-Core') load.
+    (repo packageNamed: 'Powerlang-UI') load.
+    (repo packageNamed: 'Powerlang-Tests') load.
 ].
 
 SystemWindow closeTopWindow. "close HelpBrowser"
