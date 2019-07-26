@@ -4,7 +4,7 @@ I am a Smalltalk expression, the minimal unit of Smalltalk semantics, expressed 
 Class {
 	#name : #SExpression,
 	#superclass : #Object,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SExpressions'
 }
 
 { #category : #visiting }
@@ -13,12 +13,46 @@ SExpression >> acceptVisitor: visitor [
 ]
 
 { #category : #visiting }
-SExpression >> printOn: aStream [
-	self printOn: aStream indent: 0
-
+SExpression >> isAssignment [
+	^false
 ]
 
 { #category : #visiting }
+SExpression >> isCascade [
+	^false
+]
+
+{ #category : #visiting }
+SExpression >> isIdentifier [
+	^false
+]
+
+{ #category : #visiting }
+SExpression >> isLiteral [
+	^false
+]
+
+{ #category : #visiting }
+SExpression >> isMessage [
+	^false
+]
+
+{ #category : #testing }
+SExpression >> isMethod [
+	^false
+]
+
+{ #category : #visiting }
+SExpression >> isReturn [
+	^false
+]
+
+{ #category : #testing }
+SExpression >> printOn: aStream [
+	self printOn: aStream indent: 0
+]
+
+{ #category : #testing }
 SExpression >> printOn: aStream indent: anInteger [
 	super printOn: aStream
 ]

@@ -12,7 +12,7 @@ Class {
 		'MethodId',
 		'ReturnId'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SExpressions'
 }
 
 { #category : #'class initialization' }
