@@ -198,6 +198,31 @@ AstcodeTest >> test030encodeUnaryMessage [
 ]
 
 { #category : #private }
+AstcodeTest >> test035encodeBinaryMessage [
+	| astcodes root return message receiver argument |
+	astcodes := self encode: 'm ^self foo: true'.
+	self
+		assert: astcodes
+			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}. {IdentifierId. TrueId}}}}.
+	root := self decode: astcodes of: method.
+	self
+		assert: root isMethod;
+		assert: root statements size = 1.
+	return := root statements first.
+	self assert: return isReturn.
+	message := return expression.
+	self assert: message isMessage.
+	receiver := message receiver.
+	argument := message arguments first.
+	self
+		assert: receiver isVariable;
+		assert: receiver binding isSelf;
+		assert: argument isVariable;
+		assert: argument binding isLiteral;
+		assert: argument binding value = true
+]
+
+{ #category : #private }
 AstcodeTest >> test050instVarAssignment [
 	| astcodes root assignment assignee expression |
 	astcodes := self encode: 'm name := true' in: Class.
