@@ -173,6 +173,14 @@ SmalltalkCompiler >> numericLiteralNode [
 ]
 
 { #category : #services }
+SmalltalkCompiler >> parseFragment [
+	headless := false.
+	self reset.
+	ast := self parser methodFragment.
+	result ast: ast
+]
+
+{ #category : #services }
 SmalltalkCompiler >> parseFragment: aString [
 	source := aString.
 	[self parseFragment; resolveSemantics] on: CompilationError do: [].

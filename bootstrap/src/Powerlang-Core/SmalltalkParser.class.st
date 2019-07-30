@@ -477,6 +477,16 @@ SmalltalkParser >> method [
 	^method
 ]
 
+{ #category : #productions }
+SmalltalkParser >> methodFragment [
+	| method |
+	self step.
+	method := self methodSignature.
+	method isNil ifTrue: [^nil].
+	[self addBodyTo: method] on: CompilationError do: [].
+	^method
+]
+
 { #category : #parsing }
 SmalltalkParser >> methodPragma [
 	self step.

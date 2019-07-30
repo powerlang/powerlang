@@ -18,6 +18,11 @@ ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBEmptyExceptionHandlerRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkParser #methodFragment #false)) #'2019-07-29T21:47:48.456702-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBIfTrueReturnsRuleV1FalsePositive [
 	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-24T02:26:09.214605-03:00') )
 ]
