@@ -4,9 +4,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #printing }
-NilBinding >> printOn: aStream [
-	aStream nextPutAll: 'NilId'
+{ #category : #accessing }
+NilBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeNil
+]
+
+{ #category : #accessing }
+NilBinding >> name [
+	^'nil'
 ]
 
 { #category : #evaluating }

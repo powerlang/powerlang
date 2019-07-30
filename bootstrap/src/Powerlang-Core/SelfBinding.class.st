@@ -4,12 +4,27 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #'as yet unclassified' }
-SelfBinding class >> decodeUsing: anAstcodeDecoder [
-	^ self new
+{ #category : #actions }
+SelfBinding >> beReferencedFrom: aScriptNode [
+	aScriptNode useSelf
+]
+
+{ #category : #testing }
+SelfBinding >> canBeAssigned [
+	^false
+]
+
+{ #category : #testing }
+SelfBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeSelf
 ]
 
 { #category : #testing }
 SelfBinding >> isSelf [
 	^true
+]
+
+{ #category : #accessing }
+SelfBinding >> name [
+	^'self'
 ]

@@ -4,9 +4,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #printing }
-TrueBinding >> printOn: aStream [
-	aStream nextPutAll: 'TrueId'
+{ #category : #accessing }
+TrueBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeTrue
+]
+
+{ #category : #accessing }
+TrueBinding >> name [
+	^'true'
 ]
 
 { #category : #evaluating }

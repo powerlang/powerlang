@@ -7,7 +7,7 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
-{ #category : #unclassified }
+{ #category : #initialization }
 SLiteral class >> decodeUsing: anAstcodeDecoder [
 	^anAstcodeDecoder decodeLiteral
 ]
@@ -33,24 +33,11 @@ SLiteral >> isLiteral [
 ]
 
 { #category : #visiting }
-SLiteral >> nativizeUsing: anAssembler for: messageNativizer [
-	anAssembler loadRwithPointer: value _oop; holdReferenceTo: value
-]
-
-{ #category : #printing }
-SLiteral >> printOn: aStream indent: anInteger [
-	aStream
-		tab: anInteger;
-		nextPutAll: 'Literal ';
-		print: value
-]
-
-{ #category : #evaluating }
 SLiteral >> value [
 	^value
 ]
 
-{ #category : #evaluating }
+{ #category : #visiting }
 SLiteral >> value: anObject [
 	value := anObject
 ]

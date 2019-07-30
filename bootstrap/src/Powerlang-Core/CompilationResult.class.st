@@ -11,6 +11,16 @@ Class {
 }
 
 { #category : #accessing }
+CompilationResult >> ast [
+	^ast
+]
+
+{ #category : #accessing }
+CompilationResult >> ast: aParseNode [
+	ast := aParseNode
+]
+
+{ #category : #accessing }
 CompilationResult >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler
 ]
@@ -23,4 +33,14 @@ CompilationResult >> error [
 { #category : #errors }
 CompilationResult >> error: aCompilationError [
 	error := aCompilationError
+]
+
+{ #category : #accessing }
+CompilationResult >> method [
+	^method
+]
+
+{ #category : #accessing }
+CompilationResult >> method: aCompiledMethod [
+	method := aCompiledMethod
 ]

@@ -12,6 +12,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+AssignmentNode >> acceptVisitor: visitor [
+	^visitor visitAssignment: self
+]
+
 { #category : #'adding / removing' }
 AssignmentNode >> assign: anIdentifierNode operator: aDelimiterToken [
 	assignees add: anIdentifierNode.

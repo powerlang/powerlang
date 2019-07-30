@@ -20,6 +20,11 @@ SBinding >> isAssociation [
 ]
 
 { #category : #testing }
+SBinding >> isClassBinding [
+	^false
+]
+
+{ #category : #testing }
 SBinding >> isInstVar [
 	^false
 ]

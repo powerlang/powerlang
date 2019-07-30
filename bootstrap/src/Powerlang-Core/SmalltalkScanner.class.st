@@ -303,3 +303,8 @@ SmalltalkScanner >> skipKeyword [
 		continue] whileTrue.
 	pos isNil ifFalse: [stream position: pos]
 ]
+
+{ #category : #accessing }
+SmalltalkScanner >> sourceCode: aString [
+	stream := aString readStream
+]

@@ -3,10 +3,16 @@ Class {
 	#superclass : #ParseNode,
 	#instVars : [
 		'receiver',
-		'messages'
+		'messages',
+		'optimized'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
+
+{ #category : #visiting }
+CascadeNode >> acceptVisitor: visitor [
+	^visitor visitCascade: self
+]
 
 { #category : #accessing }
 CascadeNode >> messages [

@@ -28,6 +28,11 @@ Token >> comments: aCollection [
 ]
 
 { #category : #accessing }
+Token >> compileWarning: aString [
+	compiler notify: aString at: self stretch
+]
+
+{ #category : #accessing }
 Token >> compiler [
 	^compiler
 ]
@@ -100,6 +105,11 @@ Token >> isDelimiter [
 
 { #category : #testing }
 Token >> isEnd [
+	^false
+]
+
+{ #category : #testing }
+Token >> isIdentifier [
 	^false
 ]
 

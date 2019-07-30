@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+BraceNode >> acceptVisitor: visitor [
+	^visitor visitBraceNode: self
+]
+
 { #category : #accessing }
 BraceNode >> elements [
 	^elements

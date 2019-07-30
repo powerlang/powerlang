@@ -4,9 +4,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #printing }
-FalseBinding >> printOn: aStream [
-	aStream nextPutAll: 'FalseId'
+{ #category : #accessing }
+FalseBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeFalse
+]
+
+{ #category : #accessing }
+FalseBinding >> name [
+	^'false'
 ]
 
 { #category : #evaluating }

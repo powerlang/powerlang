@@ -4,6 +4,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+NumberNode >> acceptVisitor: visitor [
+	^visitor visitNumberNode: self
+]
+
 { #category : #testing }
 NumberNode >> isNumberNode [
 	^true

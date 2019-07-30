@@ -6,6 +6,9 @@ Class {
 		'source',
 		'ast',
 		'result',
+		'headless',
+		'blocks',
+		'leaf',
 		'activeScript'
 	],
 	#category : #'Powerlang-Core-SCompiler'
@@ -18,6 +21,11 @@ SmalltalkCompiler >> activate: aScriptNode while: aBlock [
 	activeScript := aScriptNode.
 	aBlock value.
 	activeScript := current
+]
+
+{ #category : #accessing }
+SmalltalkCompiler >> activeScope [
+	^activeScript scope
 ]
 
 { #category : #accessing }
@@ -35,6 +43,22 @@ SmalltalkCompiler >> assignmentNode [
 	^AssignmentNode new compiler: self
 ]
 
+{ #category : #accessing }
+SmalltalkCompiler >> ast [
+	^ast
+]
+
+{ #category : #emitting }
+SmalltalkCompiler >> blockCount [
+	^blocks
+]
+
+{ #category : #emitting }
+SmalltalkCompiler >> blockIndex [
+	blocks := blocks + 1.
+	^blocks - 1
+]
+
 { #category : #nodes }
 SmalltalkCompiler >> blockNode [
 	^BlockNode new compiler: self
@@ -43,6 +67,11 @@ SmalltalkCompiler >> blockNode [
 { #category : #nodes }
 SmalltalkCompiler >> braceNode [
 	^BraceNode new compiler: self
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> buildMethod [
+	result method: ast buildMethod
 ]
 
 { #category : #nodes }
@@ -66,6 +95,17 @@ SmalltalkCompiler >> compilationError: aString stretch: aStretch [
 		compiler: self;
 		stretch: aStretch;
 		description: aString
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> compileMethod: aString [
+	source := aString.
+	frontend protect: [
+		self
+			parseMethod;
+			resolveSemantics;
+			buildMethod].
+	^result
 ]
 
 { #category : #nodes }
@@ -122,6 +162,11 @@ SmalltalkCompiler >> methodNode [
 	^MethodNode new compiler: self
 ]
 
+{ #category : #accessing }
+SmalltalkCompiler >> newScope [
+	^frontend newScope
+]
+
 { #category : #nodes }
 SmalltalkCompiler >> numericLiteralNode [
 	^NumberNode new compiler: self
@@ -134,9 +179,46 @@ SmalltalkCompiler >> parseFragment: aString [
 	^ast
 ]
 
+{ #category : #services }
+SmalltalkCompiler >> parseMethod [
+	headless := false.
+	self reset.
+	ast := self parser method.
+	result ast: ast
+]
+
+{ #category : #services }
+SmalltalkCompiler >> parseMethod: aString [
+	source := aString.
+	frontend protect: [self parseMethod; resolveSemantics].
+	^result
+]
+
+{ #category : #accessing }
+SmalltalkCompiler >> parser [
+	^SmalltalkParser new compiler: self
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> pragmaNode [
+	^PragmaNode new compiler: self
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> reset [
+	self resetResult.
+	leaf := true.
+	blocks := 0.
+]
+
 { #category : #private }
 SmalltalkCompiler >> resetResult [
 	result := CompilationResult new compiler: self
+]
+
+{ #category : #services }
+SmalltalkCompiler >> resolveSemantics [
+	ast acceptVisitor: SemanticVisitor new
 ]
 
 { #category : #accessing }

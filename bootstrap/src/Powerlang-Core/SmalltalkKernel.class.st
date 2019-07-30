@@ -43,14 +43,12 @@ SmalltalkKernel >> buildBehaviors [
 SmalltalkKernel >> buildClass: class from: definition [
 	| behavior superclass name ivars classIvars pools subclasses |
 	behavior := self newBehavior.
-	superclass := self classNamedOrNil: definition superclassName.
-	subclasses := project classes
-		select: [ :def | def superclass = definition name ]
-		thenCollect: [ :def | self classNamed: def name ].
+	superclass := self classNamedOrNil: definition supername.
+	subclasses := definition subclasses collect: [ :def | self classNamed: def name ].
 	subclasses := self newArray: subclasses.
 	name := self newString: definition name.
-	ivars := self newStringArray: definition instVars.
-	classIvars := self newStringArray: definition classInstVars.
+	ivars := self newStringArray: definition instVarNames.
+	classIvars := self newStringArray: definition classVarNames.
 	pools := self newStringArray: definition sharedPools.
 	class
 		behavior: behavior;
@@ -310,4 +308,19 @@ SmalltalkKernel >> transferAstcodesFrom: anArray [
 				ifFalse: [ self transferAstcodesFrom: elem ].
 			array add: transferred ].
 	^ array
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> transferObjectDeep: anObject [
+	| transferred behavior slot |
+	transferred := self newSlots.
+	behavior := self instanceBehaviorOf: anObject class name.
+	transferred behavior: behavior.
+	anObject
+		do: [ :elem | 
+			slot := elem isSmallInteger
+				ifTrue: [ self newSmallInteger: elem ]
+				ifFalse: [ self transferObjectDeep: elem ].
+			transferred add: slot ].
+	^ transferred
 ]

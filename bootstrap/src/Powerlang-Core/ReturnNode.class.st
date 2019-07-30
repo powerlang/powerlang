@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+ReturnNode >> acceptVisitor: visitor [
+	^visitor visitReturn: self
+]
+
 { #category : #accessing }
 ReturnNode >> expression [
 	^expression

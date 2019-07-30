@@ -4,6 +4,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #accessing }
+SuperBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeSuper
+]
+
 { #category : #testing }
 SuperBinding >> isSelf [
 	^false
@@ -12,4 +17,9 @@ SuperBinding >> isSelf [
 { #category : #testing }
 SuperBinding >> isSuper [
 	^true
+]
+
+{ #category : #accessing }
+SuperBinding >> name [
+	^'super'
 ]

@@ -7,7 +7,28 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #'instance creation' }
+AssociationBinding class >> on: anAssociation [
+	^self new association: anAssociation
+]
+
 { #category : #testing }
-AssociationBinding >> isAssociation [
-	^true
+AssociationBinding class >> usesSymbols [
+	^false
+]
+
+{ #category : #accessing }
+AssociationBinding >> association [
+	^association
+]
+
+{ #category : #accessing }
+AssociationBinding >> association: anAssociation [
+	association := anAssociation.
+	name := anAssociation key
+]
+
+{ #category : #accessing }
+AssociationBinding >> literal [
+	^association
 ]

@@ -7,6 +7,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+CascadeMessageNode >> acceptVisitor: visitor [
+	^visitor visitCascadeMessage: self
+]
+
 { #category : #accessing }
 CascadeMessageNode >> cascade: aCascadeNode [
 	cascade := aCascadeNode.

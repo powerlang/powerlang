@@ -31,7 +31,7 @@ ObjectShape >> initialize [
 { #category : #initialization }
 ObjectShape >> loadFrom: aClassDefinition [
 	name := aClassDefinition name asSymbol.
-	aClassDefinition allInstVars
+	aClassDefinition allInstVarNames
 		withIndexDo: [:ivarName :i | self indexOf: ivarName be: i]
 ]
 

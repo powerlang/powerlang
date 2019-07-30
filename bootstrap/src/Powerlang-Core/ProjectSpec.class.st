@@ -4,24 +4,39 @@ Class {
 	#instVars : [
 		'name',
 		'path',
-		'classes'
+		'module'
 	],
 	#category : #'Powerlang-Core-Specification'
 }
 
+{ #category : #'as yet unclassified' }
+ProjectSpec class >> kernel [
+		^ProjectSpec new
+		name: 'kernel';
+		path: '../src/kernel' asFileReference;
+		load.
+]
+
 { #category : #actions }
 ProjectSpec >> classNamed: aStringOrNil [
-	^classes at: aStringOrNil ifAbsent: nil
+	^module resolveClass: aStringOrNil
 ]
 
 { #category : #accessing }
 ProjectSpec >> classes [
-	^ classes values
+	^ module classes
+]
+
+{ #category : #actions }
+ProjectSpec >> compilerFor: classname [
+	| class |
+	class := self classNamed: classname.
+	^Compiler forClass: class
 ]
 
 { #category : #initialization }
 ProjectSpec >> initialize [
-	classes := OrderedDictionary new
+	module := ModuleSpec new
 ]
 
 { #category : #actions }
@@ -41,10 +56,10 @@ ProjectSpec >> loadClasses: names [
 ]
 
 { #category : #actions }
-ProjectSpec >> loadEmptyClass: name [
+ProjectSpec >> loadEmptyClass: classname [
 	| class |
-	class := ClassDefinition new name: name.
-	classes at: name put: class
+	class := ClassSpec new name: classname; module: module.
+	module addEmptyClass: class
 ]
 
 { #category : #accessing }
@@ -64,7 +79,7 @@ ProjectSpec >> parseClassDefinition: classname [
 	stream := filename asFileReference readStream.
 	parser := TonelParser on: stream.
 	definition := self classNamed: classname.
-	definition loadFrom: parser document within: self
+	definition fromTonel: parser document within: self
 ]
 
 { #category : #accessing }

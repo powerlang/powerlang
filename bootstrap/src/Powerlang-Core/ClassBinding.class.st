@@ -4,7 +4,12 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #printing }
-ClassBinding >> printOn: aStream [
-	aStream nextPutAll: 'ClassBindingId'
+{ #category : #testing }
+ClassBinding >> encodeUsing: anAstcodeEncoder [
+	anAstcodeEncoder encodeClassBinding: association
+]
+
+{ #category : #testing }
+ClassBinding >> isClassBinding [
+	^true
 ]

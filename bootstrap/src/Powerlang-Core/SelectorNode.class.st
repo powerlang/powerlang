@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+SelectorNode >> acceptVisitor: visitor [
+	^visitor visitSelector: self
+]
+
 { #category : #accessing }
 SelectorNode >> addKeyword: aSelectorNode [
 	keywords isNil ifTrue: [keywords := OrderedCollection new: 1].

@@ -4,10 +4,16 @@ Class {
 	#instVars : [
 		'selector',
 		'receiver',
-		'arguments'
+		'arguments',
+		'inlined'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
+
+{ #category : #visiting }
+MessageNode >> acceptVisitor: visitor [
+	^visitor visitMessage: self
+]
 
 { #category : #accessing }
 MessageNode >> arguments [
@@ -19,9 +25,19 @@ MessageNode >> arguments: aCollection [
 	arguments := aCollection
 ]
 
+{ #category : #'emitting - inlined' }
+MessageNode >> beInlined [
+	inlined := true
+]
+
 { #category : #testing }
 MessageNode >> isCascadeMessageNode [
 	^false
+]
+
+{ #category : #testing }
+MessageNode >> isInlined [
+	^inlined
 ]
 
 { #category : #testing }

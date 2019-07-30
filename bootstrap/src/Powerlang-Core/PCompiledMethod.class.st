@@ -1,0 +1,109 @@
+Class {
+	#name : #PCompiledMethod,
+	#superclass : #Array,
+	#type : #variable,
+	#instVars : [
+		'nativeCode',
+		'astcodes',
+		'class',
+		'selector',
+		'format',
+		'source'
+	],
+	#pools : [
+		'PCompiledMethodFlags'
+	],
+	#category : #'Powerlang-Core-PST'
+}
+
+{ #category : #'instance creation' }
+PCompiledMethod class >> new: anInteger [
+	^(super new: anInteger) initialize
+]
+
+{ #category : #constants }
+PCompiledMethod >> argumentCount [
+	^format bitsAt: ArgCount
+]
+
+{ #category : #constants }
+PCompiledMethod >> argumentCount: anInteger [
+	format := format bitsAt: ArgCount put: anInteger
+]
+
+{ #category : #constants }
+PCompiledMethod >> astcodes [
+	^astcodes
+]
+
+{ #category : #constants }
+PCompiledMethod >> astcodes: aCollection [
+	astcodes := aCollection
+]
+
+{ #category : #constants }
+PCompiledMethod >> blockCount [
+	^format bitsAt: BlockCount
+]
+
+{ #category : #constants }
+PCompiledMethod >> blockCount: anInteger [
+	format := format bitsAt: BlockCount put: anInteger
+]
+
+{ #category : #constants }
+PCompiledMethod >> blocks [
+	self hasBlocks ifFalse: [^#()].
+	^self select: [:literal | literal isBlock]
+]
+
+{ #category : #constants }
+PCompiledMethod >> classBinding [
+	^class
+]
+
+{ #category : #constants }
+PCompiledMethod >> classBinding: aClass [
+	class := aClass
+]
+
+{ #category : #constants }
+PCompiledMethod >> hasBlocks [
+	^self blockCount > 0
+]
+
+{ #category : #constants }
+PCompiledMethod >> initialize [
+	super initialize.
+	format := 0
+]
+
+{ #category : #constants }
+PCompiledMethod >> selector [
+	^selector
+]
+
+{ #category : #constants }
+PCompiledMethod >> selector: aSymbol [
+	selector := aSymbol
+]
+
+{ #category : #constants }
+PCompiledMethod >> source [
+	^source
+]
+
+{ #category : #constants }
+PCompiledMethod >> source: aString [
+	source := aString
+]
+
+{ #category : #constants }
+PCompiledMethod >> tempCount [
+	^format bitsAt: TempCount
+]
+
+{ #category : #constants }
+PCompiledMethod >> tempCount: anInteger [
+	format := format bitsAt: TempCount put: anInteger
+]

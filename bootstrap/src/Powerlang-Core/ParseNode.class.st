@@ -4,9 +4,19 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #visiting }
+ParseNode >> acceptVisitor: visitor [
+	^visitor visitParseNode: self
+]
+
 { #category : #enumerating }
 ParseNode >> allNodesDo: aBlock [
 	self nodesDo: aBlock includingDeclarations: true
+]
+
+{ #category : #accessing }
+ParseNode >> ast [
+	^compiler ast
 ]
 
 { #category : #testing }
@@ -20,7 +30,22 @@ ParseNode >> isBraceNode [
 ]
 
 { #category : #testing }
+ParseNode >> isEvaluable [
+	^false
+]
+
+{ #category : #testing }
 ParseNode >> isImmediate [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isMessageNode [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isMethod [
 	^false
 ]
 
@@ -31,6 +56,16 @@ ParseNode >> isReturn [
 
 { #category : #testing }
 ParseNode >> isSelector [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isSelf [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isSuper [
 	^false
 ]
 
@@ -49,6 +84,11 @@ ParseNode >> nodeWithLiteral: anObject [
 ParseNode >> nodesDetect: aBlock ifAbsent: absentBlock [
 	self nodesDo: [:node | (aBlock value: node) ifTrue: [ ^node ] ] includingDeclarations: false.
 	^absentBlock value
+]
+
+{ #category : #enumerating }
+ParseNode >> nodesDo: aBlock [
+	self nodesDo: aBlock includingDeclarations: false
 ]
 
 { #category : #enumerating }

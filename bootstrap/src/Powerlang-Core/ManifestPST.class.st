@@ -8,8 +8,13 @@ Class {
 }
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleAssertEqualSignIntoAssertEqualsV1FalsePositive [
+	^ #()
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#SmalltalkKernel)) #'2019-05-18T22:56:29.321173-03:00') #(#(#RGClassDefinition #(#ClassDefinition)) #'2019-05-20T12:59:59.672325-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SmalltalkKernel)) #'2019-05-18T22:56:29.321173-03:00') #(#(#RGClassDefinition #(#ClassDefinition)) #'2019-05-20T12:59:59.672325-03:00') #(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-28T14:14:22.801693-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -45,6 +50,11 @@ ManifestPST class >> ruleRBStringConcatenationRuleV1FalsePositive [
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBTempsReadBeforeWrittenRuleV1FalsePositive [
 	^ #(#(#(#RGMethodDefinition #(#ProjectSpec #load #false)) #'2019-05-22T01:07:44.263209-03:00') )
+]
+
+{ #category : #'code-critics' }
+ManifestPST class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
+	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-29T19:59:46.632993-03:00') )
 ]
 
 { #category : #'code-critics' }

@@ -1,9 +1,6 @@
 Class {
 	#name : #SBlock,
 	#superclass : #SScript,
-	#instVars : [
-		'capturedVariables'
-	],
 	#category : #'Powerlang-Core-SExpressions'
 }
 

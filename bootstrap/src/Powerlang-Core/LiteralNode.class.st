@@ -7,6 +7,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #testing }
+LiteralNode >> acceptVisitor: visitor [
+	^visitor visitLiteral: self
+]
+
 { #category : #private }
 LiteralNode >> beSymbol [
 	value := value asSymbol
@@ -15,6 +20,11 @@ LiteralNode >> beSymbol [
 { #category : #testing }
 LiteralNode >> hasSymbol [
 	^value isSymbol
+]
+
+{ #category : #testing }
+LiteralNode >> isEvaluable [
+	^true
 ]
 
 { #category : #testing }
