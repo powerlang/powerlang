@@ -148,7 +148,7 @@ ScriptScopeTest >> test010resolveClass [
 		assert: binding isGlobal;
 		assert: binding isClassBinding;
 		assert: binding name = #Point;
-		assert: binding association == (Smalltalk associationAt: #Point)
+		assert: binding association == (Smalltalk globals associationAt: #Point)
 ]
 
 { #category : #private }
@@ -166,7 +166,7 @@ ScriptScopeTest >> test010resolveGlobal [
 		assert: binding isGlobal;
 		deny: binding isClassBinding;
 		assert: binding name = #Smalltalk;
-		assert: binding association == (Smalltalk associationAt: #Smalltalk)
+		assert: binding association == (Smalltalk globals associationAt: #Smalltalk)
 ]
 
 { #category : #private }
@@ -385,7 +385,7 @@ ScriptScopeTest >> test055methodUseGlobal [
 	self
 		assert: global isClassBinding;
 		assert: global name = #Collection;
-		assert: global association = (Smalltalk associationAt: #Collection)
+		assert: global association = (Smalltalk globals associationAt: #Collection)
 ]
 
 { #category : #private }

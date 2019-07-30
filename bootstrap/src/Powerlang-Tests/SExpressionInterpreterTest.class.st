@@ -50,7 +50,7 @@ SExpressionInterpreterTest >> setUp [
 	super setUp.
 	kernel := ProjectSpec new
 		name: 'kernel';
-		path: '../src/kernel' asFileReference;
+		path: '../pst/kernel' asFileReference;
 		load.
 	builder := SmalltalkKernel new
 		project: kernel;
