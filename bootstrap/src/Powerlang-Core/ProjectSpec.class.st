@@ -13,7 +13,7 @@ Class {
 ProjectSpec class >> kernel [
 		^ProjectSpec new
 		name: 'kernel';
-		path: '../src/kernel' asFileReference;
+		path: '../pst/kernel' asFileReference;
 		load.
 ]
 
