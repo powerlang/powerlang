@@ -1,3 +1,10 @@
+Metacello new
+  baseline: 'Ring2';
+  repository: 'github://pavel-krivanek/Ring2/src';
+  load;
+  load: 'runtimeSupport';
+  load: 'calypso'.
+
 Author useAuthor: 'PowerSmalltalkLoader' during: [
     | repo |
     "Based on the same file from the pharo-vm project"
@@ -13,16 +20,7 @@ Author useAuthor: 'PowerSmalltalkLoader' during: [
 ].
 
 SystemWindow closeTopWindow. "close HelpBrowser"
-GTPlayground openContents: '
-| kernel |
-kernel := ProjectSpec new
-    name: ''kernel'';
-    path: ''../pst/kernel'' asFileReference;
-    load.
-
-ProjectBrowser new project: kernel; openWithSpec.
-Debugger new openWithSpec.
-'.
+GTPlayground openContents: 'README.md' asFileReference contents withSqueakLineEndings.
 
 (Smalltalk saveAs: (Smalltalk imageDirectory asFileReference) / 'bootstrap' )
     ifFalse: [ Smalltalk snapshot: false andQuit: true ].
