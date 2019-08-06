@@ -3,4 +3,7 @@ bootstrap/pharo*
 bootstrap/icon-packs
 bootstrap/*.changes
 bootstrap/*.image
-PharoDebug.log
+bootstrap/*.fuel
+bootstrap/*-Test.xml
+
+*.log

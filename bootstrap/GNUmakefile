@@ -12,5 +12,8 @@ bootstrap.image: pharo Pharo.image src scripts/bootstrap-setup.st
 	@echo "    ./pharo-ui bootstrap.image"
 	@echo ""
 
+test: bootstrap.image pharo
+	./pharo $< test --junit-xml-output Powerlang-Tests
+
 clean:
 	rm -rf Pharo* pharo* bootstrap.image icon-packs
