@@ -7,6 +7,14 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #initialization }
+SmallintObjectMap >> initializeWithDef: anRGBehavior size: size [
+	self assert: anRGBehavior name == #SmallInteger.
+	self assert: size == 0.
+	
+	behaviorDef := anRGBehavior.
+]
+
 { #category : #testing }
 SmallintObjectMap >> isImmediate [
 	^ true
@@ -14,7 +22,13 @@ SmallintObjectMap >> isImmediate [
 
 { #category : #accessing }
 SmallintObjectMap >> size [ 
-	^0
+	^ 0
+]
+
+{ #category : #validation }
+SmallintObjectMap >> validate [ 
+	super validate.
+	self assert: value isSmallInteger 
 ]
 
 { #category : #accessing }
