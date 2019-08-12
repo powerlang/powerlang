@@ -63,6 +63,26 @@ ObjectMap >> behaviorDef [
 	^ behaviorDef
 ]
 
+{ #category : #'reflective operations' }
+ObjectMap >> doesNotUnderstand: aMessage [ 
+	| sel |
+	
+	sel := aMessage selector.
+	sel isUnary ifTrue:[
+		(behaviorDef allInstVarNames includes: sel) ifTrue:[
+			^self slotNamed: sel.
+		].
+	].
+	(sel isKeyword and:[sel numArgs == 1])  ifTrue:[
+		sel := sel allButLast.
+		(behaviorDef allInstVarNames includes: sel) ifTrue:[
+			^self slotNamed: sel put: aMessage arguments first.
+		].		
+	].
+	^ super doesNotUnderstand: aMessage 
+
+]
+
 { #category : #initialization }
 ObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self subclassResponsibility

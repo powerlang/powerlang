@@ -49,6 +49,8 @@ ObjectMapTest >> test_01b [
 	self assert: (frac slotAt: 2) == frac.
 	self assert: (frac slotNamed: 'numerator') == null.
 	self assert: (frac slotNamed: 'denominator') == frac.
+	self assert: (frac numerator) == null.
+	self assert: (frac denominator) == frac.
 	
 	frac slotNamed: 'numerator' put: frac.
 	frac slotNamed: 'denominator' put: null.
@@ -56,6 +58,11 @@ ObjectMapTest >> test_01b [
 	self assert: (frac slotAt: 2) == null.
 	self assert: (frac slotNamed: 'numerator') == frac.
 	self assert: (frac slotNamed: 'denominator') == null.
+	
+	frac numerator: null.
+	frac denominator: frac.
+	self assert: (frac slotAt: 1) == null.
+	self assert: (frac slotAt: 2) == frac.
 	
 	self should: [ frac slotAt: 0 ] raise: Error.
 	self should: [ frac slotAt: 3 ] raise: Error.
