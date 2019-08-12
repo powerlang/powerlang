@@ -63,6 +63,15 @@ ObjectMap >> behaviorDef [
 	^ behaviorDef
 ]
 
+{ #category : #accessing }
+ObjectMap >> bodySizeInBytes [
+	"Return the size of object body(s) in bytes. 
+	 This DOES NOT INCLUDE any passing."
+	
+	^ self subclassResponsibility 
+
+]
+
 { #category : #'reflective operations' }
 ObjectMap >> doesNotUnderstand: aMessage [ 
 	| sel |
@@ -83,14 +92,53 @@ ObjectMap >> doesNotUnderstand: aMessage [
 
 ]
 
+{ #category : #accessing }
+ObjectMap >> headerSizeInBytes [
+	"Return the size of object header(s) in bytes. 
+	 This includes both small header and larget header (if any)."
+	
+	^ self isSmall ifTrue: [ 8 ] ifFalse: [ 16 ]
+
+]
+
 { #category : #initialization }
 ObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self subclassResponsibility
 ]
 
 { #category : #testing }
+ObjectMap >> isBytes [
+	^false
+]
+
+{ #category : #testing }
 ObjectMap >> isImmediate [ 
 	^false
+]
+
+{ #category : #testing }
+ObjectMap >> isPointers [
+	^false
+]
+
+{ #category : #testing }
+ObjectMap >> isSmall [
+	^self size < 256
+]
+
+{ #category : #accessing }
+ObjectMap >> oopSizeInBytes [
+	"Return a size of OOP (i.e., a reference to an object) in bytes."
+	
+	^ 8 "For now, 64bit only!"
+]
+
+{ #category : #printing }
+ObjectMap >> printOn: aStream [
+	super printOn: aStream.
+	aStream nextPutAll:'(a '.
+	aStream nextPutAll: behaviorDef name.
+	aStream nextPut: $).
 ]
 
 { #category : #accessing }
@@ -148,6 +196,22 @@ ObjectMap >> slotNamed: name put: value [
 		^self.		
 	].
 	^ self slotAt: index put: value
+]
+
+{ #category : #accessing }
+ObjectMap >> smallHeaderFlags [
+	"Return value of 'flags' field of small header"
+
+	self subclassResponsibility 
+]
+
+{ #category : #accessing }
+ObjectMap >> smallHeaderSize [
+	"Return value of 'size' field of small header"
+	 | size |
+	
+   size := self size.
+   ^ size < 256 ifTrue: [ size ] ifFalse: [ 0 ]
 ]
 
 { #category : #validation }

@@ -28,6 +28,15 @@ SlotObjectMap >> at: index put: value [
 	^slots at: behaviorDef instSize + index put: value
 ]
 
+{ #category : #accessing }
+SlotObjectMap >> bodySizeInBytes [
+	"Return the size of object body(s) in bytes. 
+	 This DOES NOT INCLUDE any passing."
+	
+	^ self size * self oopSizeInBytes
+
+]
+
 { #category : #initialization }
 SlotObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self assert: anRGBehavior notNil.
@@ -38,6 +47,11 @@ SlotObjectMap >> initializeWithDef: anRGBehavior size: size [
 	slots := Array new: (anRGBehavior instSize + size)
 	
 	
+]
+
+{ #category : #testing }
+SlotObjectMap >> isPointers [
+	^true
 ]
 
 { #category : #accessing }
@@ -70,6 +84,24 @@ SlotObjectMap >> slotAt: index put: value [
 	self assert: (index between: 1 and: behaviorDef instSize).
 	self assert: (value isKindOf: ObjectMap).
 	^slots at: index put: value
+]
+
+{ #category : #accessing }
+SlotObjectMap >> slots [
+	^ slots
+]
+
+{ #category : #accessing }
+SlotObjectMap >> smallHeaderFlags [
+	"Return value of 'flags' field of small header"
+
+	 | variable named small |
+	
+    variable := behaviorDef isVariable ifNil: [ 0 ] ifNotNil: [ 2 ].
+    named := behaviorDef instSize == 0 ifTrue: [ 0 ] ifFalse: [ 4 ].
+    small := self isSmall ifTrue: [ 16r80 ] ifFalse: [ 0 ].
+    ^ variable | named | small
+
 ]
 
 { #category : #validation }

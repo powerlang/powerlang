@@ -28,6 +28,20 @@ ByteObjectMap >> at: index put: value [
 	bytes at: index put: value
 ]
 
+{ #category : #accessing }
+ByteObjectMap >> bodySizeInBytes [
+	"Return the size of object body(s) in bytes. 
+	 This DOES NOT INCLUDE any passing."
+	
+	^ self size
+
+]
+
+{ #category : #accessing }
+ByteObjectMap >> bytes [
+	^ bytes
+]
+
 { #category : #initialization }
 ByteObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self assert: anRGBehavior notNil.
@@ -36,6 +50,11 @@ ByteObjectMap >> initializeWithDef: anRGBehavior size: size [
 	
 	behaviorDef := anRGBehavior.
 	bytes := ByteArray new: size
+]
+
+{ #category : #testing }
+ByteObjectMap >> isBytes [
+	^true
 ]
 
 { #category : #accessing }
@@ -47,6 +66,17 @@ ByteObjectMap >> size [
 	 For byte objects, this is a number of bytes. "
 	
 	^ bytes size
+]
+
+{ #category : #accessing }
+ByteObjectMap >> smallHeaderFlags [
+	"Return value of 'flags' field of small header"
+
+	| small |
+	
+	small := self isSmall ifTrue: [ 16r80 ] ifFalse: [ 0 ].
+	^ 1 | 2 | small
+
 ]
 
 { #category : #validation }

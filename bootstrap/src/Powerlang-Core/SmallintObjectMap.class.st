@@ -7,6 +7,15 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #accessing }
+SmallintObjectMap >> bodySizeInBytes [
+	"Return the size of object body(s) in bytes. 
+	 This DOES NOT INCLUDE any passing."
+	
+	^ self shouldNotImplement 
+
+]
+
 { #category : #initialization }
 SmallintObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self assert: anRGBehavior name == #SmallInteger.
@@ -23,6 +32,13 @@ SmallintObjectMap >> isImmediate [
 { #category : #accessing }
 SmallintObjectMap >> size [ 
 	^ 0
+]
+
+{ #category : #accessing }
+SmallintObjectMap >> smallHeaderFlags [
+	"Return value of 'flags' field of small header"
+
+	self shouldNotImplement 
 ]
 
 { #category : #validation }

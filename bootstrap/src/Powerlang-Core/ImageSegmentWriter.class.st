@@ -42,9 +42,10 @@ ImageSegmentWriter >> layoutObjects [
 	offset := stream position.
 	objects
 		do: [ :obj | 
-			offset := offset + obj headerByteSize.
+			offset := offset + obj headerSizeInBytes.
 			offsets at: obj put: offset.
-			offset := offset + obj slotByteSize ]
+			offset := offset + obj bodySizeInBytes.
+			offset := offset alignedTo: WordSize ]
 ]
 
 { #category : #accessing }
@@ -97,7 +98,7 @@ ImageSegmentWriter >> writeObjectBody: obj [
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectBytes: obj [
 	| current aligned |
-	stream nextBytesPutAll: obj contents.
+	stream nextBytesPutAll: obj bytes.
 	current := stream position.
 	aligned := current alignedTo: WordSize.
 	aligned - current timesRepeat: [ stream nextPut: 0 ]
@@ -113,24 +114,22 @@ ImageSegmentWriter >> writeObjectHeader: obj [
 	behavior := self encodedReferenceTo: obj behavior.
 	stream
 		uint16le: self nextHash;
-		nextPut: obj smallSizeField;
-		nextPut: obj flagsField;
+		nextPut: obj smallHeaderSize;
+		nextPut: obj smallHeaderFlags;
 		uint32le: behavior.
-	stream position != (self offsetOf: obj) ifTrue: [ self halt ]
+	self assert: stream position == (self offsetOf: obj)
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectSlots: obj [
-	| arrayed |
 	obj slots do: [ :slot | self writeReferenceTo: slot ].
-	arrayed := obj arrayed ifNil: [ ^self ].
-	arrayed do: [ :slot | self writeReferenceTo: slot ]
+
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeObjects [
 	objects
-		do: [ :obj | 
+		withIndexDo: [ :obj :idx | 
 			self
 				writeObjectHeader: obj;
 				writeObjectBody: obj ]
