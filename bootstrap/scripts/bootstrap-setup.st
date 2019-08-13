@@ -1,6 +1,6 @@
 Metacello new
   baseline: 'Ring2';
-  repository: 'github://pavel-krivanek/Ring2/src';
+  repository: 'github://janvrany/Ring2:p7/src';
   load;
   load: 'runtimeSupport';
   load: 'calypso'.
