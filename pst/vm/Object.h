@@ -20,25 +20,25 @@
  * SOFTWARE.
  */
 
-#include <fstream>
+#ifndef _OBJECT_H_
+#define _OBJECT_H_
 
-#include <ImageSegment.h>
+#include <object_format.h>
 
-int main(const int argc, const char **argv) {
-    if (argc != 2) {
-        printf("Usage: %s <KERNEL_SEGMENT>\n", argv[0]);
-        return 1;
-    }
-    std::ifstream segment_file (argv[1], std::ifstream::binary);
-    if (!segment_file) {
-        printf("No such file: %s\n", argv[0]);
-        return 1;
-    }
+namespace S9
+{
 
-    S9::ImageSegment *kernel = S9::ImageSegment::load(&segment_file);
+struct Object : private pst::oop_t
+{
+};
 
-    printf("Loaded kernel at %p, size %lu, TOC at %p\n",
-            kernel,
-            kernel->header.size,
-            kernel->header.toc);
+// Here we just need to make sure the struct Object is empty.
+// However, in C++, size of an empty struct / class is 1 byte,
+// hence the `... == 1`
+static_assert(sizeof(Object) == 1);
+
+
+typedef Object* OOP;
 }
+
+#endif /* _OBJECT_H_ */

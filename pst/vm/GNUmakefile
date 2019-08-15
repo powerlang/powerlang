@@ -23,7 +23,7 @@ all: $(OBJECTS) $(BUILD)/s9
 $(BUILD):
 	mkdir -p $(BUILD)
 
-$(BUILD)/%.o: %.cpp $(BUILD)
+$(BUILD)/%.o: %.cpp | $(BUILD)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ -c $<
 
 $(BUILD)/s9: $(OBJECTS)

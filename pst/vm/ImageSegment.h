@@ -25,13 +25,12 @@
 
 #include <cstdint>
 #include <iostream>
-#include "pst.h"
-#include "object_format.h"
+#include <Object.h>
 
-namespace pst
+namespace S9
 {
 
-typedef struct _segment_header
+typedef struct _ImageSegmentHeader
 {
     /**
      * Signature of a PST segment, must be following sequence:
@@ -44,7 +43,7 @@ typedef struct _segment_header
      * any other address in which case object references (including the
      * `entry_point_method` reference!) must be relocated prior use.
      */
-    uint64_t base_address;
+    uint64_t baseAddress;
     /**
      * Size of a segment including its header
      */
@@ -52,31 +51,31 @@ typedef struct _segment_header
     /**
      * A reference to an entry point method object.
      */
-    oop_t *entry_point_method;
-} segment_header;
+    OOP toc;
+} ImageSegmentHeader;
 
-static_assert(sizeof(segment_header) == 32/*bytes*/,
+static_assert(sizeof(ImageSegmentHeader) == 32/*bytes*/,
               "segment_header size not 32bytes");
 
 
-class segment
+class ImageSegment
 {
 public:
-    segment_header header;
+    ImageSegmentHeader header;
 
     /**
      * Allocate a new segment of given `size` at given `base` address.
-     * Contents of the swgment is zeroed.
+     * Contents of the segment is zeroed.
      */
-    static segment *alloc(uintptr_t base, size_t size);
+    static ImageSegment *alloc(uintptr_t base, size_t size);
 
     /**
      * Load a segment from given stream and return it. The stream should
-     * be positioned to the beggining of segment prior calling load()
+     * be positioned to the beginning of segment prior calling load()
      */
-    static segment *load(std::istream *data);
+    static ImageSegment *load(std::istream *data);
 };
 
-} // namespace pst
+} // namespace S9
 
 #endif // _SEGMENT_H_
