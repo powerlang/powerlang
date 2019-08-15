@@ -22,7 +22,9 @@
 
 #include <sys/mman.h>
 #include <unistd.h>
-#include "segment.h"
+
+#include <ImageSegment.h>
+#include <Util.h>
 
 static uintptr_t pagealign(uintptr_t addr) {
     static int pagesize = -1;
@@ -30,14 +32,14 @@ static uintptr_t pagealign(uintptr_t addr) {
         pagesize = (int)sysconf(_SC_PAGESIZE);
         ASSERT(pagesize != -1);
     }
-    return pst::align(addr, pagesize);
+    return S9::align(addr, pagesize);
 }
 
-namespace pst
+namespace S9
 {
 
-segment *
-segment::alloc(uintptr_t base, size_t size) {
+ImageSegment *
+ImageSegment::alloc(uintptr_t base, size_t size) {
     /*
      * TODO: Following implementation is rubbish, in long run we should either
      * use OMR port library or take hmm.h / hmm.c from Smalltalk/X jv-branch
@@ -48,16 +50,16 @@ segment::alloc(uintptr_t base, size_t size) {
     ASSERT(base == pagealign(base));
     auto ptr = mmap(reinterpret_cast<void*>(base), pagealign(size), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
     ASSERT(base == reinterpret_cast<uintptr_t>(ptr));
-    return reinterpret_cast<segment*>(ptr);
+    return reinterpret_cast<ImageSegment*>(ptr);
 }
 
-segment *
-segment::load(std::istream *data) {
-    segment_header header;
+ImageSegment *
+ImageSegment::load(std::istream *data) {
+    ImageSegmentHeader header;
 
     data->read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    segment *segment = segment::alloc(header.base_address, header.size);
+    ImageSegment *segment = ImageSegment::alloc(header.baseAddress, header.size);
 
     data->seekg(0, data->beg);
     data->read(reinterpret_cast<char*>(segment), header.size);

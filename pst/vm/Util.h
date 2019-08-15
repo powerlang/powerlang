@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2019 Javier Pimas, Jan Vrany
+/* Copyright (c) 2019 Javier Pimas, Jan Vrany
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +19,20 @@
  * SOFTWARE.
  */
 
-#include <fstream>
+#ifndef _UTILS_H_
+#define _UTILS_H_
 
-#include <ImageSegment.h>
+#include <cstdint>
 
-int main(const int argc, const char **argv) {
-    if (argc != 2) {
-        printf("Usage: %s <KERNEL_SEGMENT>\n", argv[0]);
-        return 1;
-    }
-    std::ifstream segment_file (argv[1], std::ifstream::binary);
-    if (!segment_file) {
-        printf("No such file: %s\n", argv[0]);
-        return 1;
-    }
+namespace S9
+{
 
-    S9::ImageSegment *kernel = S9::ImageSegment::load(&segment_file);
-
-    printf("Loaded kernel at %p, size %lu, TOC at %p\n",
-            kernel,
-            kernel->header.size,
-            kernel->header.toc);
+static inline uintptr_t
+align (uintptr_t value, int alignment)
+{
+    return ((value + (alignment - 1)) & ~(alignment - 1));
 }
+
+}
+
+#endif // _UTILS_H_
