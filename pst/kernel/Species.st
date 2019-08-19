@@ -9,17 +9,17 @@ Class {
 		'organization'
 	],
 	#classVars : [
-		'Flags', 'SpeciesFormatMasks'
+		'Flags'
 	],
 	#category : #Kernel
 }
 
 { #category : #'pool initialization' }
 Species class >> initializeSpeciesFormatMasks [
-	SpeciesFormatMasks := PoolDictionary new.
-	SpeciesFormatMasks
+	Flags := PoolDictionary new.
+	Flags
 		at: 'Variable' put: 16r100;
-		at: 'Bytes' put: 16r200
+		at: 'Pointers' put: 16r200
 ]
 
 
