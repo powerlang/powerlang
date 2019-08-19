@@ -43,6 +43,11 @@ SIdentifier >> isIdentifier [
 ]
 
 { #category : #visiting }
+SIdentifier >> isInstVar [
+	^binding isInstVar
+]
+
+{ #category : #visiting }
 SIdentifier >> isLiteral [
 	^binding isLiteral
 ]

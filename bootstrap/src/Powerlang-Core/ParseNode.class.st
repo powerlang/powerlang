@@ -30,6 +30,16 @@ ParseNode >> isBraceNode [
 ]
 
 { #category : #testing }
+ParseNode >> isCascade [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isCascadeMessage [
+	^false
+]
+
+{ #category : #testing }
 ParseNode >> isEvaluable [
 	^false
 ]

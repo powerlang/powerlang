@@ -40,6 +40,11 @@ SpeciesSpec >> instVarNames [
 	^instanceVariables
 ]
 
+{ #category : #accessing }
+SpeciesSpec >> instVarNames: aCollection [
+	instanceVariables := aCollection
+]
+
 { #category : #testing }
 SpeciesSpec >> isExtension [
 	^module extendedClasses includes: self

@@ -14,6 +14,73 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
+{ #category : #initialization }
+AstcodeEncoder class >> initializeBindingTypes [
+	"
+	self initializeBindingTypes
+	"
+	AstBindingTypes := PoolDictionary newConstantPool.
+	AstBindingTypes
+		at: 'NilId' put: 1;
+		at: 'TrueId' put: 2;
+		at: 'FalseId' put: 3;
+		at: 'ArgumentId' put: 4;
+		at: 'TemporaryId' put: 5;
+		at: 'SelfId' put: 6;
+		at: 'SuperId' put: 7;
+		at: 'InstVarId' put: 8;
+		at: 'ClassVarId' put: 9;
+		at: 'GlobalValueId' put: 10;
+		at: 'GlobalClassId' put: 11;
+		at: 'PoolVarId' put: 12;
+		at: 'ConstantPoolId' put: 13;
+		at: 'LoadRwithSelfId' put: 20;
+		at: 'LoadAwithSelfId' put: 21;
+		at: 'LoadRwithInstVarId' put: 22;
+		at: 'LoadAwithInstVarId' put: 23;
+		at: 'LoadRvisitingReceiverId' put: 24;
+		at: 'LoadAvisitingArgumentId' put: 25;
+		at: 'LoadRwithLiteralId' put: 26;
+		at: 'LoadAwithLiteralId' put: 27;
+		at: 'EnsureRisSmallIntegerId' put: 28;
+		at: 'EnsureAisSmallIntegerId' put: 29;
+		at: 'LoadRwithArgumentId' put: 30;
+		at: 'LoadAwithArgumentId' put: 31;
+		at: 'LoadRwithTemporaryId' put: 32;
+		at: 'LoadAwithTemporaryId' put: 33
+]
+
+{ #category : #initialization }
+AstcodeEncoder class >> initializeClosureElementTypes [
+	"
+	self initializeClosureElementTypes
+	"
+	ClosureElementTypes := PoolDictionary newConstantPool.
+	ClosureElementTypes
+		at: #Self put: 0;
+		at: #Argument put: 1;
+		at: #Environment put: 2;
+		at: #EnvironmentValue put: 3
+]
+
+{ #category : #initialization }
+AstcodeEncoder class >> initializeNodeTypes [
+	"
+	self initializeNodeTypes
+	"
+	AstNodeTypes := PoolDictionary newConstantPool.
+	AstNodeTypes
+		at: 'MethodId' put: 1;
+		at: 'BlockId' put: 2;
+		at: 'IdentifierId' put: 3;
+		at: 'LiteralId' put: 4;
+		at: 'MessageId' put: 5;
+		at: 'CascadeId' put: 6;
+		at: 'BraceId' put: 7;
+		at: 'AssignmentId' put: 8;
+		at: 'ReturnId' put: 9
+]
+
 { #category : #visiting }
 AstcodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |
@@ -36,8 +103,15 @@ AstcodeEncoder >> encodeArgument: anInteger env: environment [
 { #category : #visiting }
 AstcodeEncoder >> encodeClassBinding: association [
 	| index |
-	index := method indexOf: association ifAbsent: [self halt].
+	index := method indexOf: association ifAbsent: [self ASSERT: false].
 	stream nextPut: GlobalClassId; nextPut: index
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeClassVar: association [
+	| index |
+	index := method indexOf: association ifAbsent: [self ASSERT: false].
+	stream nextPut: ClassVarId; nextPut: index
 ]
 
 { #category : #visiting }
@@ -73,6 +147,13 @@ AstcodeEncoder >> encodeInstVar: index [
 { #category : #visiting }
 AstcodeEncoder >> encodeNil [
 	stream nextPut: NilId
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodePoolVar: association [
+	| index |
+	index := method indexOf: association ifAbsent: [self ASSERT: false].
+	stream nextPut: PoolVarId; nextPut: index
 ]
 
 { #category : #visiting }
@@ -173,9 +254,8 @@ AstcodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
 	selector := method indexOf: symbol.
 	self nextPut: selector.
 	selector = 0 ifTrue: [self nextPut: symbol].
-	self
-		nestedEncode: [aCascadeMessageNode arguments
-			do: [:arg | arg acceptVisitor: self]]
+	aCascadeMessageNode arguments do: [:arg | 
+		self nestedEncode: [arg acceptVisitor: self]]
 ]
 
 { #category : #visiting }
@@ -199,15 +279,19 @@ AstcodeEncoder >> visitMessage: aMessageNode [
 	selector := method indexOf: symbol.
 	self nextTypePut: MessageId; nextPut: selector.
 	selector = 0 ifTrue: [self nextPut: symbol].
-	self
-		nestedEncode: [aMessageNode receiver acceptVisitor: self];
-		nestedEncode: [aMessageNode arguments do: [:arg | arg acceptVisitor: self]].
+	self nestedEncode: [aMessageNode receiver acceptVisitor: self].
+	aMessageNode arguments do: [:arg | 
+		self nestedEncode: [arg acceptVisitor: self]].
 	
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitMethod: aMethodNode [
-	self nextTypePut: MethodId; visitScript: aMethodNode.
+	| pragma |
+	self nextTypePut: MethodId.
+	pragma := aMethodNode pragma.
+	pragma isUsed ifTrue: [ self nextTypePut: PragmaId; nextPut: pragma name ].
+	self visitScript: aMethodNode.
 	^stream contents
 ]
 

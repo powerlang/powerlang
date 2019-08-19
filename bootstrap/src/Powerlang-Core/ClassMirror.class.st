@@ -19,7 +19,7 @@ ClassMirror >> instanceClass [
 
 { #category : #'as yet unclassified' }
 ClassMirror >> localEquivalent [
-	^Smalltalk at: self localName asSymbol
+	^handle runtime objectModel at: self localName asSymbol
 ]
 
 { #category : #accessing }

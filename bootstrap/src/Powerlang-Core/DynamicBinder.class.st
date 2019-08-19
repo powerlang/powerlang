@@ -81,7 +81,7 @@ DynamicBinder >> printOn: aStream indent: anInteger [
 		nextPutAll: ': '.
 	type == GlobalBinding
 		ifTrue: [aStream nextPut: $…]
-		ifFalse: [contents keys asArray printLiteralOn: aStream]
+		ifFalse: [contents keys asArray printOn: aStream]
 ]
 
 { #category : #accessing }

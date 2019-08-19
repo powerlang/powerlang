@@ -7,7 +7,7 @@ Class {
 		'source',
 		'category',
 		'module',
-		'ast'
+		'compiled'
 	],
 	#category : #'Powerlang-Core-Specification'
 }
@@ -15,6 +15,11 @@ Class {
 { #category : #'instance creation' }
 MethodSpec class >> from: aCompiledMethod in: aCodeCorpus [
 	^self new module: aCodeCorpus; loadFromMethod: aCompiledMethod
+]
+
+{ #category : #'instance creation' }
+MethodSpec class >> fromDef: anMCMethodDefinition in: aCodeCorpus [
+	^self new module: aCodeCorpus; loadFromDefinition: anMCMethodDefinition
 ]
 
 { #category : #comparing }
@@ -26,7 +31,8 @@ MethodSpec >> = aMethodSpec [
 
 { #category : #converting }
 MethodSpec >> ast [
-	^ast ifNil: [ast := Compiler parseMethod: source in: class]
+	^Compiler parse: source in: class
+
 ]
 
 { #category : #accessing }
@@ -51,9 +57,32 @@ MethodSpec >> hash [
 	^class name hash hashWith: selector
 ]
 
+{ #category : #accessing }
+MethodSpec >> initializeLocalPool [
+	| ast pool assignment cascade elements |
+	ast := self ast.
+	assignment := ast statements detect: [ :s | 
+		s isAssign and: [ s assignees first binding isClassVariable ] ].
+	cascade := ast statements detect: [ :s | 
+		s isCascade and: [ s receiver binding isClassVariable ] ].
+	elements := cascade messages select: [ :s | s symbol = #at:put: ].
+	pool := PoolDictionary new.
+	elements 	do: [ :s | pool at: s arguments first value put: s arguments second value ].
+	self resolveClass classVarNamed: assignment assignees first name put: pool 
+]
+
 { #category : #testing }
 MethodSpec >> isExtension [
 	^class isExtension
+]
+
+{ #category : #accessing }
+MethodSpec >> loadFromDefinition: anMCMethodDefinition [
+	selector := anMCMethodDefinition selector.
+	class := module resolveClass: anMCMethodDefinition className.
+	source := anMCMethodDefinition source.
+	category := anMCMethodDefinition category.
+	category = 'pool initialization' ifTrue: [ self initializeLocalPool ]
 ]
 
 { #category : #accessing }
@@ -94,6 +123,12 @@ MethodSpec >> selector: aSymbol [
 	selector := aSymbol
 ]
 
+{ #category : #converting }
+MethodSpec >> sexpressions [
+	compiled ifNil: [compiled := Compiler compile: source in: class].
+	^compiled sexpressions
+]
+
 { #category : #accessing }
 MethodSpec >> source [
 	^source
@@ -102,7 +137,7 @@ MethodSpec >> source [
 { #category : #accessing }
 MethodSpec >> source: aString [
 	source := aString.
-	ast := nil
+	compiled := nil
 ]
 
 { #category : #accessing }

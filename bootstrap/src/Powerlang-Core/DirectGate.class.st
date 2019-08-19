@@ -10,7 +10,7 @@ DirectGate >> dispatch: aMessage from: parentInterpreter [
 	receiver := aMessage receiver.
 	method := handle runtime lookup: aMessage selector on: receiver.
 	method ifNil: [self ASSERT: false].
-	interpreter := SExpressionInterpreter
+	interpreter := PstInterpreter
 		on: receiver
 		with: aMessage arguments
 		for: method.

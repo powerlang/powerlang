@@ -21,6 +21,11 @@ Handle >> handleOn: objectId [
 ]
 
 { #category : #'meta accessing' }
+Handle >> isLocal [
+	^runtime isLocal
+]
+
+{ #category : #'meta accessing' }
 Handle >> objectHandleOn: objectId [
 	^ObjectHandle on: objectId within: runtime
 ]

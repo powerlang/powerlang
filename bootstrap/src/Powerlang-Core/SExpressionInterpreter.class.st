@@ -43,8 +43,8 @@ SExpressionInterpreter >> dispatchSpecial: message [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluate: anAstcode [
-	^self visitMethod: anAstcode
+SExpressionInterpreter >> evaluate: anSExpression [
+	^ self visitMethod: anSExpression
 ]
 
 { #category : #visiting }
@@ -96,9 +96,7 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 
 { #category : #visiting }
 SExpressionInterpreter >> visitAssociationVariable: anSIdentifier [
-	| handle |
-	handle := method literalAt: anSIdentifier binding index.
-	^self mirageOnLocalHandle: handle asAssociationMirror value
+	^ self mirageOnObject: anSIdentifier binding association value
 ]
 
 { #category : #visiting }
@@ -129,14 +127,7 @@ SExpressionInterpreter >> visitIdentifier: anSIdentifier [
 
 { #category : #visiting }
 SExpressionInterpreter >> visitInstanceVariable: anSIdentifier [
-	^ receiver _gate getInstVarAt: anSIdentifier binding index
-]
-
-{ #category : #visiting }
-SExpressionInterpreter >> visitLiteral: anSIdentifier [
-	| handle |
-	handle := method at: anSIdentifier binding index.
-	^ handle mirror
+	^ receiver _gate slotAt: anSIdentifier binding index
 ]
 
 { #category : #visiting }
@@ -145,8 +136,9 @@ SExpressionInterpreter >> visitMessage: anSMessage [
 	msgReceiver := anSMessage receiver acceptVisitor: self.
 	msgArguments := anSMessage arguments
 		collect: [ :code | code acceptVisitor: self ].
-	selector := method at: anSMessage selector.
-	message := Message
+	selector := anSMessage selector.
+	message := MessageSend
+		receiver: msgReceiver
 		selector: selector
 		arguments: msgArguments.
 	^ (self isSpecial: selector)
@@ -156,7 +148,10 @@ SExpressionInterpreter >> visitMessage: anSMessage [
 
 { #category : #visiting }
 SExpressionInterpreter >> visitMethod: anSMethod [
-	^self visitScript: anSMethod
+	| primitive |
+	primitive := anSMethod primitive.
+	primitive ifNotNil: [ ^ self visitPrimitive: primitive ].
+	^self visitScript: anSMethod.
 
 ]
 
@@ -171,8 +166,9 @@ SExpressionInterpreter >> visitReturn: anSReturn [
 SExpressionInterpreter >> visitScript: anSScript [
 	| result |
 	anSScript statements do: [:node | 
-		returned ifTrue: [returnValue].
-		result := node acceptVisitor: self].
+		result := node acceptVisitor: self.
+		returned ifTrue: [^returnValue]
+	].
 	^result
 ]
 

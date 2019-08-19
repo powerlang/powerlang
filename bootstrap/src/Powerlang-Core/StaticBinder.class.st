@@ -44,7 +44,7 @@ StaticBinder >> initialize [
 StaticBinder >> printOn: aStream indent: anInteger [
 	aStream tab: anInteger; nextPut: $<.
 	contents keys
-		do: [:name | name printLiteralOn: aStream]
+		do: [:name | name printOn: aStream]
 		separatedBy: [aStream space].
 	aStream nextPut: $>
 ]

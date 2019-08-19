@@ -10,6 +10,7 @@ Class {
 		'LiteralId',
 		'MessageId',
 		'MethodId',
+		'PragmaId',
 		'ReturnId'
 	],
 	#category : #'Powerlang-Core-SExpressions'
@@ -25,5 +26,6 @@ AstNodeTypes class >> initialize [
 	CascadeId := 6.
 	BraceId := 7.
 	AssignmentId := 8.
-	ReturnId := 9
+	ReturnId := 9.
+	PragmaId := 10
 ]

@@ -34,9 +34,7 @@ HeapModel class >> forSimulatedPst [
 		stream: stream;
 		objects: builder objects;
 		write.
-	runtime := Runtime forSimulatedPst: writer image.
-	runtime bridge findNilObject.
-	runtime loadShapesFrom: kernel.
+	runtime := Runtime forSimulatedPst: writer image with: kernel module.
 	labels := Dictionary new.
 	builder classes
 		do: [ :class | 

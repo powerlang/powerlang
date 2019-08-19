@@ -1,6 +1,9 @@
 Class {
 	#name : #SBlock,
 	#superclass : #SScript,
+	#instVars : [
+		'capturedVariables'
+	],
 	#category : #'Powerlang-Core-SExpressions'
 }
 
@@ -22,6 +25,16 @@ SBlock >> capturedVariables [
 { #category : #accessing }
 SBlock >> capturedVariables: aCollection [
 	capturedVariables := aCollection
+]
+
+{ #category : #initialization }
+SBlock >> initialize [
+	capturedVariables := #()
+]
+
+{ #category : #initialization }
+SBlock >> isInlined [
+	^true
 ]
 
 { #category : #unclassified }

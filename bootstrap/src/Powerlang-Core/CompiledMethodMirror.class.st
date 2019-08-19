@@ -115,7 +115,7 @@ CompiledMethodMirror >> selector [
 
 { #category : #accessing }
 CompiledMethodMirror >> size [
-	^ self basicSize - self fixedInstSize
+	^ handle size - self fixedInstSize
 ]
 
 { #category : #constants }

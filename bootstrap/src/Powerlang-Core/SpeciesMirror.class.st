@@ -60,12 +60,14 @@ SpeciesMirror >> instSize [
 	self isPointers
 		ifTrue: [	(self getInstVarNamed: #format) asLocalInteger & InstSize ]
 		ifFalse: [ 0 ]"
+
 	| vars s parents |
 	vars := self getInstVarNamed: #instanceVariables.
 	s := self superclass.
-	parents := s reflectsNil ifTrue: [ 0 ] ifFalse: [ s instSize ].
-	^parents + vars basicSize 
-	
+	parents := s reflectsNil
+		ifTrue: [ 0 ]
+		ifFalse: [ s instSize ].
+	^ parents + vars slotSize
 ]
 
 { #category : #'behavior protocol' }

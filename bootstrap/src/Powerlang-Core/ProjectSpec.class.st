@@ -62,6 +62,11 @@ ProjectSpec >> loadEmptyClass: classname [
 	module addEmptyClass: class
 ]
 
+{ #category : #initialization }
+ProjectSpec >> module [
+	^module
+]
+
 { #category : #accessing }
 ProjectSpec >> name [
 	^ name

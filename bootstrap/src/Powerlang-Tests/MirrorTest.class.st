@@ -46,9 +46,7 @@ MirrorTest >> setUp [
 		stream: stream;
 		objects: builder objects;
 		write.
-	runtime := Runtime forSimulatedPst: writer image.
-	runtime bridge findNilObject.
-	runtime loadShapesFrom: kernel
+	runtime := Runtime forSimulatedPst: writer image with: kernel module
 ]
 
 { #category : #tests }
@@ -70,7 +68,7 @@ MirrorTest >> test020nilBehaviorHandle [
 		assert: handle isSmall;
 		deny: handle isBytes;
 		deny: handle isArrayed;
-		assert: handle basicSize equals: 3
+		assert: handle size equals: 3
 ]
 
 { #category : #tests }
@@ -82,7 +80,7 @@ MirrorTest >> test030nilClassHandle [
 		assert: class isSmall;
 		deny: class isBytes;
 		deny: class isArrayed;
-		assert: class basicSize equals: 9.
+		assert: class size equals: 9.
 	name := class slotAt: 6.
 	self assert: name asLocalString equals: 'UndefinedObject'
 ]
@@ -106,5 +104,5 @@ MirrorTest >> testObjectMirrorBasics [
 		deny: class reflectsLargeObject;
 		deny: class reflectsNil.
 	definition := builder project classNamed: 'Class'.
-	self assert: class basicSize equals: definition allInstVars size
+	self assert: class size equals: definition allInstVarNames size
 ]

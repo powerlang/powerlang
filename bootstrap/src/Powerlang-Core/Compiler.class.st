@@ -10,6 +10,13 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #services }
+Compiler class >> compile: aString in: aClass [
+	| compiler |
+	compiler := self forClass: aClass.
+	^compiler compile: aString
+]
+
 { #category : #'instance creation' }
 Compiler class >> forClass: aClass [
 	^self new forClass: aClass

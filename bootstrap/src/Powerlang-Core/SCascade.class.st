@@ -18,6 +18,11 @@ SCascade >> acceptVisitor: visitor [
 	^visitor visitCascade: self
 ]
 
+{ #category : #testing }
+SCascade >> isCascade [
+	^true
+]
+
 { #category : #accessing }
 SCascade >> messages [
 	^messages

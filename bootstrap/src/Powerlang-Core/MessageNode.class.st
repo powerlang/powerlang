@@ -31,7 +31,7 @@ MessageNode >> beInlined [
 ]
 
 { #category : #testing }
-MessageNode >> isCascadeMessageNode [
+MessageNode >> isCascadeMessage [
 	^false
 ]
 

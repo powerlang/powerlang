@@ -36,8 +36,19 @@ ClassSpec >> classPool [
 ]
 
 { #category : #accessing }
+ClassSpec >> classVarNamed: aString put: anObject [
+	^classVariables at: aString put: anObject
+]
+
+{ #category : #accessing }
 ClassSpec >> classVarNames [
 	^classVariables keys
+]
+
+{ #category : #accessing }
+ClassSpec >> compiledMethodFor: selector [
+	methods detect: [ :m | m selector = selector] ifFound: [ :m | ^m ].
+	^self superclass ifNotNil: [:s | s compiledMethodFor: selector ]
 ]
 
 { #category : #accessing }
@@ -58,19 +69,25 @@ ClassSpec >> fromClass: aClass [
 
 { #category : #accessing }
 ClassSpec >> fromTonel: definitions within: aProjectSpec [
-	| declaration |
+	| declaration method |
 	declaration := definitions first.
 	instanceVariables := declaration instVarNames.
 	supername := declaration superclassName.
 	supername = 'nil' ifTrue: [ supername := nil ].
-	metaclass := MetaclassSpec new classBinding: self; module: module.
+	metaclass := MetaclassSpec new
+		classBinding: self;
+		module: module;
+		instVarNames: declaration classInstVarNames.
 	classVariables := Dictionary new.
-	declaration classInstVarNames do: [:cvar | classVariables at: cvar put: nil].
+	declaration classVarNames
+		do: [ :var | classVariables at: var put: nil ].
 	sharedPools := declaration classVarNames.
 	methods := OrderedCollection new.
 	definitions asOrderedCollection
 		removeFirst;
-		do: [ :m | methods add: m ]
+		do: [ :def | 
+			method := MethodSpec fromDef: def in: module.
+			methods add: method ]
 ]
 
 { #category : #accessing }

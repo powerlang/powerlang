@@ -69,11 +69,11 @@ MethodNode >> literals [
 	| literals v l |
 	literals := OrderedCollection new.
 	self nodesDo: [ :n |
-		n isLiteral ifTrue: [ v := n value. n isSmallInteger ifFalse: [ literals add: v] ].
+		n isLiteral ifTrue: [ v := n value. v isSmallInteger ifFalse: [ literals add: v] ].
 		n isMessageNode ifTrue: [ literals add: n symbol].
 		(n isIdentifier and: [ l := n binding literal. l notNil ])
 			ifTrue: [literals add: l].
-		n isBlockNode ifTrue: [ n buildBlock. ]
+		(n isBlockNode andNot: [n isInlined]) ifTrue: [ literals add: n buildBlock. ]
 	].
 	
 	^literals removeDuplicates
@@ -94,6 +94,16 @@ MethodNode >> needsEnvironment [
 MethodNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
 	(aBoolean and: [selector notNil]) ifTrue: [aBlock evaluateWith: selector]
+]
+
+{ #category : #accessing }
+MethodNode >> pragma [
+	^pragma
+]
+
+{ #category : #accessing }
+MethodNode >> pragma: anObject [
+	pragma := anObject
 ]
 
 { #category : #accessing }

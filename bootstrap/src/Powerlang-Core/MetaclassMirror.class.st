@@ -18,7 +18,7 @@ MetaclassMirror >> instanceClass [
 
 { #category : #constants }
 MetaclassMirror >> localEquivalent [
-	^(Smalltalk at: self instanceClass localName asSymbol) class
+	^(handle runtime objectModel at: self instanceClass localName asSymbol) metaclass
 ]
 
 { #category : #constants }

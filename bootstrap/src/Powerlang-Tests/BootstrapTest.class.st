@@ -2,19 +2,23 @@ Class {
 	#name : #BootstrapTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'builder'
+		'builder',
+		'writer',
+		'runtime',
+		'kernel'
 	],
 	#category : #'Powerlang-Tests-Building'
 }
 
 { #category : #running }
 BootstrapTest >> setUp [
-	| kernel |
 	kernel := ProjectSpec new
 		name: 'kernel';
 		path: '../pst/kernel' asFileReference;
 		load.
-	builder := SmalltalkKernel new project: kernel; build
+	builder := SmalltalkKernel new project: kernel; build.
+	runtime := Runtime forBootstrappingPst: builder.
+	runtime loadShapesFrom: kernel module
 ]
 
 { #category : #tests }
@@ -61,4 +65,17 @@ BootstrapTest >> test200writeTestMethod [
 	writer write.
 	offset := writer offsetOf: method.
 	offset halt
+]
+
+{ #category : #tests }
+BootstrapTest >> test500interpretMethodDictionaryCreation [
+	| md object class binding dict | 
+	md := builder classNamed: #MethodDictionary.
+	object := builder classNamed: #Object.
+	class := runtime handleOn: md.
+	binding := runtime handleOn: object.
+	dict := class mirage new classBinding: binding mirage.
+	self
+		assert: dict isMethodDictionary;
+		assert: dict size = 0
 ]

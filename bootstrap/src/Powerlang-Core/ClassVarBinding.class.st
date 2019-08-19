@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #testing }
+ClassVarBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeClassVar: association
+]
+
+{ #category : #testing }
 ClassVarBinding >> isClassVariable [
 	^true
 ]

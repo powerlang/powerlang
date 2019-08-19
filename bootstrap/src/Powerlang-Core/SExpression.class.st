@@ -23,7 +23,17 @@ SExpression >> isCascade [
 ]
 
 { #category : #visiting }
+SExpression >> isCascadeMessage [
+	^false
+]
+
+{ #category : #visiting }
 SExpression >> isIdentifier [
+	^false
+]
+
+{ #category : #testing }
+SExpression >> isInstVar [
 	^false
 ]
 

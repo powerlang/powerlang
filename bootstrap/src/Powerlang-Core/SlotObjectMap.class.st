@@ -86,10 +86,22 @@ SlotObjectMap >> printSpecialsOn: aStream [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> shallowCopy [
+	^self halt
+]
+
+{ #category : #accessing }
 SlotObjectMap >> size [
 	| variable |
 	variable := arrayed ifNil: [ 0 ] ifNotNil: [ arrayed size ].
 	^ slots size + variable
+]
+
+{ #category : #accessing }
+SlotObjectMap >> slotAtIndex: anInteger [
+	| key |
+	key := slots keyAtIndex: anInteger.
+	^slots at: key
 ]
 
 { #category : #accessing }

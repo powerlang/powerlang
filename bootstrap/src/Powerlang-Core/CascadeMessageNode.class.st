@@ -23,12 +23,13 @@ CascadeMessageNode >> from: aMessageNode [
 	arguments := aMessageNode arguments.
 	receiver := aMessageNode receiver.
 	selector := aMessageNode selector.
+	inlined := aMessageNode isInlined.
 	stretch := aMessageNode stretch.
 	comments := aMessageNode comments
 ]
 
 { #category : #testing }
-CascadeMessageNode >> isCascadeMessageNode [
+CascadeMessageNode >> isCascadeMessage [
 	^true
 ]
 

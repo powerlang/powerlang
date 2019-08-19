@@ -32,7 +32,7 @@ AstcodeTest >> encode: source [
 
 { #category : #private }
 AstcodeTest >> encode: source in: aSpecies [
-	| compiler visitor |
+	| compiler |
 	compiler := ProjectSpec kernel compilerFor: aSpecies name.
 	method := compiler compile: source.
 	^method astcodes
@@ -109,6 +109,24 @@ AstcodeTest >> test020encodeTrue [
 ]
 
 { #category : #private }
+AstcodeTest >> test021encodeClassVar [
+	| astcodes root identifier |
+	astcodes := self encode: 'm Flags' in: Class.
+	self assert: astcodes = {MethodId. {IdentifierId. ClassVarId. 1}}.
+	root := self decode: astcodes of: method.
+	self
+		assert: root isMethod;
+		assert: root statements size = 1.
+	identifier := root statements first.
+	self
+		assert: identifier isVariable;
+		assert: identifier binding isClassVar;
+		assert: identifier binding association class = Association;
+		assert: identifier binding association key = 'Flags';
+		assert: identifier binding association value class = PoolDictionary
+]
+
+{ #category : #private }
 AstcodeTest >> test021encodeInstVar [
 	| astcodes root identifier |
 	astcodes := self encode: 'm name' in: Class.
@@ -122,6 +140,24 @@ AstcodeTest >> test021encodeInstVar [
 		assert: identifier isVariable;
 		assert: identifier binding isInstVar;
 		assert: identifier binding index = 6
+]
+
+{ #category : #private }
+AstcodeTest >> test021encodePoolVar [
+	| astcodes root identifier |
+	astcodes := self encode: 'm Pointers' in: Class.
+	self assert: astcodes = {MethodId. {IdentifierId. PoolVarId. 1}}.
+	root := self decode: astcodes of: method.
+	self
+		assert: root isMethod;
+		assert: root statements size = 1.
+	identifier := root statements first.
+	self
+		assert: identifier isVariable;
+		assert: identifier binding isPoolVar;
+		assert: identifier binding association class = Association;
+		assert: identifier binding association key = 'Pointers';
+		assert: identifier binding association value = 16r200
 ]
 
 { #category : #private }
@@ -181,7 +217,7 @@ AstcodeTest >> test030encodeUnaryMessage [
 	astcodes := self encode: 'm ^self foo'.
 	self
 		assert: astcodes
-			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}. {}}}}.
+			= {MethodId. {ReturnId. true. {MessageId. 1. {IdentifierId. SelfId}}}}.
 	root := self decode: astcodes of: method.
 	self
 		assert: root isMethod;
@@ -223,6 +259,37 @@ AstcodeTest >> test035encodeBinaryMessage [
 ]
 
 { #category : #private }
+AstcodeTest >> test036encodeTernaryMessage [
+	| astcodes root return message receiver arg1 arg2 |
+	astcodes := self encode: 'm ^self foo: true bar: false'.
+	self
+		assert: astcodes = {MethodId. {ReturnId. true. {MessageId. 1.
+					{IdentifierId. SelfId}.
+					{IdentifierId. TrueId}.
+					{IdentifierId. FalseId}}}}.
+	root := self decode: astcodes of: method.
+	self
+		assert: root isMethod;
+		assert: root statements size = 1.
+	return := root statements first.
+	self assert: return isReturn.
+	message := return expression.
+	self assert: message isMessage.
+	receiver := message receiver.
+	arg1 := message arguments first.
+	arg2 := message arguments second.
+	self
+		assert: receiver isVariable;
+		assert: receiver binding isSelf;
+		assert: arg1 isVariable;
+		assert: arg1 binding isLiteral;
+		assert: arg1 binding value = true;
+		assert: arg2 isVariable;
+		assert: arg2 binding isLiteral;
+		assert: arg2 binding value = false
+]
+
+{ #category : #private }
 AstcodeTest >> test050instVarAssignment [
 	| astcodes root assignment assignee expression |
 	astcodes := self encode: 'm name := true' in: Class.
@@ -235,7 +302,7 @@ AstcodeTest >> test050instVarAssignment [
 		assert: root statements size = 1.
 	assignment := root statements first.
 	self
-		assert: assignment isAssign;
+		assert: assignment isAssignment;
 		assert: assignment assignees size = 1.
 	assignee := assignment assignees first.
 	expression := assignment expression.

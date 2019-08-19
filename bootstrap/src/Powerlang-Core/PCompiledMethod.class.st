@@ -89,6 +89,15 @@ PCompiledMethod >> selector: aSymbol [
 ]
 
 { #category : #constants }
+PCompiledMethod >> sexpressions [
+	| decoder |
+	decoder := AstcodeDecoder new
+		stream: astcodes readStream;
+		method: self.
+	^decoder decodeMethod
+]
+
+{ #category : #constants }
 PCompiledMethod >> source [
 	^source
 ]

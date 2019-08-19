@@ -61,6 +61,11 @@ Gate >> handleOn: objectHandle [
 	^handle handleOn: objectHandle
 ]
 
+{ #category : #accessing }
+Gate >> isLocal [
+	^handle isLocal
+]
+
 { #category : #private }
 Gate >> maneuvererOn: objectHandle [
 	^DirectGate subjectOn: objectHandle

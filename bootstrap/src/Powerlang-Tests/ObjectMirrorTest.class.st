@@ -4,16 +4,25 @@ Class {
 	#instVars : [
 		'storage'
 	],
-	#category : #'Powerlang-Core-Mirrors'
+	#category : #'Powerlang-Tests-Metaphysics'
 }
 
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
-	| writer pst |
-	self halt.
-	writer := ImageSegmentWriter new.
-	pst := writer write image.
-	^ (Runtime forSimulatedPst: pst)
+	| kernel builder stream writer |
+	kernel := ProjectSpec new
+		name: 'kernel';
+		path: '../pst/kernel' asFileReference;
+		load.
+	builder := SmalltalkKernel new
+		project: kernel;
+		build.
+	stream := #[] writeStream.
+	writer := ImageSegmentWriter new
+		stream: stream;
+		objects: builder objects;
+		write.
+	^ Runtime forSimulatedPst: writer image with: kernel module
 ]
 
 { #category : #private }
@@ -31,7 +40,7 @@ ObjectMirrorTest >> test010nilObjectHandle [
 ObjectMirrorTest >> test015nilObjectMirror [
 	| runtime handle mirror |
 	runtime := self runtime.
-	handle := runtime nilObject.
+	handle := runtime nil.
 	mirror := handle mirror.
 	self
 		assert: mirror = handle mirror;
@@ -47,16 +56,17 @@ ObjectMirrorTest >> test015nilObjectMirror [
 ObjectMirrorTest >> test040UndefinedObjectMirror [
 	| runtime nilMirror mirror |
 	runtime := self runtime.
-	nilMirror := runtime nilObject mirror.
+	nilMirror := runtime nil mirror.
 	mirror := nilMirror reflectedBehavior methodDictionary.
 	self
-		assert: mirror reflectsMethodDictionary;
-		assert: mirror classBinding localName equals: 'UndefinedObject'
+		assert: mirror reflectsMethodDictionary
 ]
 
 { #category : #private }
 ObjectMirrorTest >> test100findSmalltalk [
 	| smalltalk |
-	smalltalk := self runtime globalNamed: 'Smalltalk'.
-	self assert: smalltalk reflectedClass localName equals: 'SmalltalkSystem'
+	"smalltalk := self runtime globalNamed: 'Smalltalk'."
+	self
+		assert: smalltalk reflectedClass localName
+		equals: 'SmalltalkSystem'
 ]

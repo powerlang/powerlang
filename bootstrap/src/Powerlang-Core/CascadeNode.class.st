@@ -14,6 +14,11 @@ CascadeNode >> acceptVisitor: visitor [
 	^visitor visitCascade: self
 ]
 
+{ #category : #enumerating }
+CascadeNode >> isCascade [
+	^true
+]
+
 { #category : #accessing }
 CascadeNode >> messages [
 	^messages

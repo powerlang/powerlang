@@ -12,7 +12,7 @@ MessageInliner >> inline: aMessageNode [
 	| s |
 	message := aMessageNode.
 	message receiver isSuper ifTrue: [^self].
-	(message isCascadeMessageNode and: [message receiver isBlockNode])
+	(message isCascadeMessage and: [message receiver isBlockNode])
 		ifTrue: [^self].
 	s := message selector value.
 	s == #ifTrue: ifTrue: [^self inlineConditional].

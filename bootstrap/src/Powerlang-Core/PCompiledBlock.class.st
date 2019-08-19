@@ -80,3 +80,9 @@ PCompiledBlock >> tempCount [
 PCompiledBlock >> tempCount: anInteger [
 	format := format bitsAt: TempCount put: anInteger
 ]
+
+{ #category : #constants }
+PCompiledBlock >> value [
+	<primitive: BlockValue>
+	^self primitiveFailed
+]

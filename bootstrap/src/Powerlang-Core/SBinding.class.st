@@ -25,12 +25,22 @@ SBinding >> isClassBinding [
 ]
 
 { #category : #testing }
+SBinding >> isClassVar [
+	^false
+]
+
+{ #category : #testing }
 SBinding >> isInstVar [
 	^false
 ]
 
 { #category : #testing }
 SBinding >> isLiteral [
+	^false
+]
+
+{ #category : #testing }
+SBinding >> isPoolVar [
 	^false
 ]
 

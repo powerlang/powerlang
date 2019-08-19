@@ -7,11 +7,6 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
-{ #category : #testing }
-InstVarBinding >> assign: aValue within: anInterpreter [
-	^ anInterpreter receiver _gate setInstVarAt: index with: aValue
-]
-
 { #category : #actions }
 InstVarBinding >> beReferencedFrom: aScriptNode [
 	aScriptNode useSelf

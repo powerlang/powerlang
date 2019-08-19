@@ -24,6 +24,11 @@ SCascadeMessage >> arguments: aCollection [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> isCascadeMessage [
+	^true
+]
+
+{ #category : #accessing }
 SCascadeMessage >> selector [
 	^selector
 ]

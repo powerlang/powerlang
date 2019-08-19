@@ -79,8 +79,6 @@ SExpressionInterpreterTest >> write [
 		stream: stream;
 		objects: builder objects;
 		write.
+	runtime := Runtime forSimulatedPst: writer image with: kernel module.
 
-	runtime := Runtime forSimulatedPst: writer image.
-	runtime bridge findNilObject.
-	runtime loadShapesFrom: kernel
 ]

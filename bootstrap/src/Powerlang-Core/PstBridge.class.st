@@ -5,6 +5,16 @@ Class {
 }
 
 { #category : #initialization }
+PstBridge >> findFalseObject [
+	| s handle |
+	s := runtime storage.
+	handle := s class = SmalltalkKernel
+		ifTrue: [ s falseObject ]
+		ifFalse: [ self ASSERT: false ].
+	^ trueObj := ObjectHandle on: handle within: runtime
+]
+
+{ #category : #initialization }
 PstBridge >> findGlobalNamed: name [
 	| globals array |
 	globals := self smalltalk slotOf: #SmalltalkSystem named: #globals.
@@ -18,7 +28,7 @@ PstBridge >> findGlobalNamed: name [
 
 { #category : #initialization }
 PstBridge >> findNilObject [
-	^nilObj := ObjectHandle on: 16 within: runtime
+	^ nilObj := ObjectHandle on: 16 within: runtime
 ]
 
 { #category : #initialization }
@@ -37,10 +47,13 @@ PstBridge >> findRootObjects [
 	| class |
 	nilObj := self findNilObject.
 	class := nilObj mirror reflectedClass.
-	[class reflectsNil] whileFalse: [| name |
-		name := class name asLocalString.
-		self name: class as: name.
-		class := class superclass]
+	[ class reflectsNil ]
+		whileFalse: [ | name |
+			name := class name asLocalString.
+			self name: class as: name.
+			class := class superclass ].
+	self findRootClasses
+	"; findSmalltalk"
 ]
 
 { #category : #initialization }
@@ -49,4 +62,10 @@ PstBridge >> findSmalltalk [
 	smalltalk := self halt.
 	self name: smalltalk as: #Smalltalk.
 	^smalltalk
+]
+
+{ #category : #initialization }
+PstBridge >> findTrueObject [
+	self ASSERT: false.
+	^ trueObj := ObjectHandle on: 0 within: runtime
 ]

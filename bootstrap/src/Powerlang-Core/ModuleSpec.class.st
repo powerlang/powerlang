@@ -73,6 +73,11 @@ ModuleSpec >> allMethodsDo: aBlock [
 ]
 
 { #category : #accessing }
+ModuleSpec >> at: aString [
+	^classes at: aString
+]
+
+{ #category : #accessing }
 ModuleSpec >> classes [
 	^classes values
 ]

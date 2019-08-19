@@ -33,6 +33,16 @@ Mirror >> classMirrorOn: classHandle [
 ]
 
 { #category : #'meta accessing' }
+Mirror >> closureMirrorOn: closureHandle [
+	^ ClosureMirror on: closureHandle
+]
+
+{ #category : #'meta accessing' }
+Mirror >> compiledBlockMirrorOn: aCompiledBlockHandle [
+	^ CompiledBlockMirror on: aCompiledBlockHandle
+]
+
+{ #category : #'meta accessing' }
 Mirror >> compiledMethodMirrorOn: methodDictionaryHandle [
 	^CompiledMethodMirror on: methodDictionaryHandle
 ]

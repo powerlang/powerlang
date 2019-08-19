@@ -8,3 +8,8 @@ Class {
 SClassVarBinding class >> decodeUsing: anAstcodeDecoder [
 	^anAstcodeDecoder decodeClassVar
 ]
+
+{ #category : #testing }
+SClassVarBinding >> isClassVar [
+	^true
+]

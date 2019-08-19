@@ -41,19 +41,21 @@ SmalltalkKernel >> buildBehaviors [
 
 { #category : #initialization }
 SmalltalkKernel >> buildClass: class from: definition [
-	| behavior superclass name ivars classIvars pools subclasses |
-	behavior := self newBehavior.
+	| behavior superclass name ivars classIvars pools subclasses format |
+	"st-80 behavior := self newBehavior."
+	behavior := (self classNamed: 'Class') at: 'instanceBehavior'.
 	superclass := self classNamedOrNil: definition supername.
 	subclasses := definition subclasses collect: [ :def | self classNamed: def name ].
 	subclasses := self newArray: subclasses.
 	name := self newString: definition name.
+	format := self newSmallInteger: 0.
 	ivars := self newStringArray: definition instVarNames.
 	classIvars := self newStringArray: definition classVarNames.
 	pools := self newStringArray: definition sharedPools.
 	class
 		behavior: behavior;
 		at: 'superclass' put: superclass;
-		at: 'format' put: nilObj;
+		at: 'format' put: format;
 		at: 'instanceVariables' put: ivars;
 		at: 'organization' put: nilObj;
 		at: 'name' put: name;
@@ -88,7 +90,7 @@ SmalltalkKernel >> buildTestMethod [
 	| method behavior astcodes |
 	method := self newSlots.
 	behavior := self instanceBehaviorOf: 'CompiledMethod'.
-	astcodes := self transferAstcodesFrom: self testMethodAstcodes.
+	astcodes := self transferArrayDeep: self testMethodAstcodes.
 	method
 		behavior: behavior;
 		at: 'nativeCode' put: self nilObject;
@@ -148,6 +150,11 @@ SmalltalkKernel >> createTrue [
 	trueObj := self newSlots
 ]
 
+{ #category : #'as yet unclassified' }
+SmalltalkKernel >> falseObject [
+	^ falseObj
+]
+
 { #category : #initialization }
 SmalltalkKernel >> initialize [
 	index := Dictionary new.
@@ -162,6 +169,11 @@ SmalltalkKernel >> instanceBehaviorOf: classname [
 	class := self classNamed: classname.
 	^class at: 'instanceBehavior'.
 
+]
+
+{ #category : #'as yet unclassified' }
+SmalltalkKernel >> nameOf: anObject [
+	^ index keyAtValue: anObject ifAbsent: nil
 ]
 
 { #category : #initialization }
@@ -196,6 +208,11 @@ SmalltalkKernel >> newBytesTyped: classname contents: aByteObject [
 ]
 
 { #category : #initialization }
+SmalltalkKernel >> newClosure: aPCompiledBlock [
+	^ self newTyped: 'Closure'
+]
+
+{ #category : #initialization }
 SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
 	| method astcodes class selector format |
 	method := self newTyped: 'CompiledMethod'.
@@ -205,7 +222,7 @@ SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: 
 	format := self newSmallInteger: anInteger.
 	method
 		at: 'nativeCode' put: self nilObject;
-		at: 'astcodes' put: astcodes;
+		at: 'semantics' put: astcodes;
 		at: 'class' put: class;
 		at: 'selector' put: selector;
 		at: 'format' put: format;
@@ -296,18 +313,33 @@ SmalltalkKernel >> testMethodAstcodes [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> transferAstcodesFrom: anArray [
-	| array behavior transferred |
-	array := self newSlots.
+SmalltalkKernel >> transferArrayDeep: anArray [
+	| copy behavior transferred |
+	copy := self newSlots.
 	behavior := self instanceBehaviorOf: 'Array'.
-	array behavior: behavior.
+	copy behavior: behavior.
+	anArray
+		do: [ :elem | 
+			transferred := elem isSmallInteger
+				ifTrue: [ self newSmallInteger: elem ]
+				ifFalse: [ self transferArrayDeep: elem ].
+			copy add: transferred ].
+	^ copy
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> transferAstcodesFrom: anArray [
+	| copy behavior transferred |
+	copy := self newSlots.
+	behavior := self instanceBehaviorOf: 'Array'.
+	copy behavior: behavior.
 	anArray
 		do: [ :elem | 
 			transferred := elem isSmallInteger
 				ifTrue: [ self newSmallInteger: elem ]
 				ifFalse: [ self transferAstcodesFrom: elem ].
-			array add: transferred ].
-	^ array
+			copy add: transferred ].
+	^ copy
 ]
 
 { #category : #initialization }
@@ -323,4 +355,9 @@ SmalltalkKernel >> transferObjectDeep: anObject [
 				ifFalse: [ self transferObjectDeep: elem ].
 			transferred add: slot ].
 	^ transferred
+]
+
+{ #category : #'as yet unclassified' }
+SmalltalkKernel >> trueObject [
+	^ trueObj
 ]

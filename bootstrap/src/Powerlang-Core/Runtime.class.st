@@ -7,19 +7,40 @@ Class {
 		'objectFormat',
 		'bridge',
 		'sources',
-		'shapeMap'
+		'shapeMap',
+		'objectModel'
 	],
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
 { #category : #private }
-Runtime class >> forSimulatedPst: aByteArray [
+Runtime class >> forBootstrappingPst: aSmalltalkKernel [
+	^ self new
+		bridge: BootstrappedPstBridge new;
+		objectFormat: (BootstrapObjectFormat on: aSmalltalkKernel);
+		storage: aSmalltalkKernel;
+		loadBridge
+]
+
+{ #category : #private }
+Runtime class >> forLocalPharo [
+	^ self new
+		bridge: PharoBridge new;
+		objectFormat: PharoObjectFormat new;
+		loadBridge;
+		loadShapesFromImage
+]
+
+{ #category : #private }
+Runtime class >> forSimulatedPst: aByteArray with: aModuleSpec [
 	| adapter |
 	adapter := ByteArrayAdapter on: aByteArray.
 	^ self new
 		bridge: PstBridge new;
 		objectFormat: (DmrObjectFormat on: adapter);
-		storage: adapter
+		storage: adapter;
+		loadShapesFrom: aModuleSpec;
+		loadBridge
 ]
 
 { #category : #private }
@@ -38,16 +59,9 @@ Runtime >> bridge: aBridge [
 	bridge runtime: self
 ]
 
-{ #category : #storage }
-Runtime >> bytesOf: oid [
-	| size |
-	size := objectFormat sizeOf: oid.
-	^ self bytesOf: oid count: size
-]
-
-{ #category : #storage }
-Runtime >> bytesOf: oid count: size [
-	^ storage bytesAt: oid sized: size
+{ #category : #accessing }
+Runtime >> false [
+	^ bridge false
 ]
 
 { #category : #accessing }
@@ -72,18 +86,54 @@ Runtime >> initialize [
 ]
 
 { #category : #'object format' }
+Runtime >> integerHandle: anInteger [
+	| oid |
+	oid := objectFormat newInteger: anInteger.
+	^ self handleOn: oid
+]
+
+{ #category : #'object format' }
 Runtime >> integerOf: oid [
 	^objectFormat integerOf: oid
 ]
 
 { #category : #initialization }
-Runtime >> loadShapesFrom: aProjectSpec [
-	aProjectSpec classes do: [ :class | shapeMap load: class ]
+Runtime >> isLocal [
+	^objectModel == Smalltalk.
+
+]
+
+{ #category : #accessing }
+Runtime >> loadBridge [
+	bridge findRootObjects
+]
+
+{ #category : #initialization }
+Runtime >> loadShapesFrom: aModuleSpec [
+	objectModel := aModuleSpec.
+	aModuleSpec classes do: [ :class | shapeMap load: class ]
+]
+
+{ #category : #initialization }
+Runtime >> loadShapesFromImage [
+	| classes |
+	objectModel := Smalltalk.
+	classes := #(ClassDescription Class Metaclass) collect: [ :name | Smalltalk at: name ].
+	classes do: [ :class | shapeMap load: class ]
 ]
 
 { #category : #'meta accessing' }
 Runtime >> lookup: aSymbol on: aSubject [
 	^lookup lookup: aSymbol on: aSubject
+]
+
+{ #category : #'object format' }
+Runtime >> newClosureHandle: aPCompiledBlock [
+	| oid |
+	oid := objectFormat newClosure: aPCompiledBlock.
+	"should put a thing that lives in remote runtime, not a PCompiledBlock"
+	oid at: 'block' put: aPCompiledBlock.
+	^ self handleOn: oid
 ]
 
 { #category : #accessing }
@@ -98,17 +148,32 @@ Runtime >> objectFormat [
 
 { #category : #accessing }
 Runtime >> objectFormat: anObjectFormat [
-	^objectFormat := anObjectFormat
+	objectFormat := anObjectFormat
+]
+
+{ #category : #initialization }
+Runtime >> objectModel [
+	^objectModel
+]
+
+{ #category : #initialization }
+Runtime >> objectModel: aModuleSpec [
+	^objectModel := aModuleSpec
 ]
 
 { #category : #storage }
 Runtime >> slotOf: object at: index [
-	^storage slotOf: object at: index
+	^objectFormat slotOf: object at: index
 ]
 
 { #category : #storage }
 Runtime >> slotOf: object at: index put: value [
 	^ storage slotOf: object at: index put: value
+]
+
+{ #category : #accessing }
+Runtime >> storage [
+	^storage
 ]
 
 { #category : #accessing }
@@ -118,14 +183,17 @@ Runtime >> storage: anObject [
 
 { #category : #storage }
 Runtime >> stringOf: oid [
-	| size |
-	size := objectFormat sizeOf: oid.
-	^storage stringAt: oid sized: size
+	^objectFormat stringOf: oid
 ]
 
 { #category : #shapes }
 Runtime >> structureOf: type [
 	^shapeMap at: type
+]
+
+{ #category : #accessing }
+Runtime >> true [
+	^ bridge true
 ]
 
 { #category : #initialization }

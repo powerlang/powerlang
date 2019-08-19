@@ -44,7 +44,7 @@ SAssignment >> initialize [
 ]
 
 { #category : #testing }
-SAssignment >> isAssign [
+SAssignment >> isAssignment [
 	^true
 ]
 

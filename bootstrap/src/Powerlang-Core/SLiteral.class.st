@@ -14,22 +14,21 @@ SLiteral class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #visiting }
 SLiteral >> acceptVisitor: visitor [
-	^visitor visitLiteral: self
+	^ visitor visitLiteral: self
 ]
 
-{ #category : #printing }
-SLiteral >> encodeOn: aStream using: encoder [
-	| index |
-	index := encoder indexOf: value.
-	aStream
-		nextPutAll: '{LiteralId. ';
-		print: index;
-		nextPutAll: '}'
+{ #category : #visiting }
+SLiteral >> isLiteral [
+	^true
 ]
 
 { #category : #testing }
-SLiteral >> isLiteral [
-	^true
+SLiteral >> printOn: aStream indent: anInteger [
+	aStream
+		tab: anInteger;
+		nextPutAll: '{LiteralId. ';
+		print: value;
+		nextPutAll: '}'
 ]
 
 { #category : #visiting }

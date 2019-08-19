@@ -344,6 +344,17 @@ SmalltalkParser >> expression [
 	^expression
 ]
 
+{ #category : #private }
+SmalltalkParser >> ffiOrPrimitive: aMethodNode [
+	| tag |
+	tag := token value asLowercase.
+	tag last = $: ifFalse: [self invalidPrimitiveToken].
+	tag := tag allButLast.
+	token value: tag.
+	tag = 'primitive' ifTrue: [^self primitive].
+	self invalidPrimitiveToken
+]
+
 { #category : #binary }
 SmalltalkParser >> hasBinarySelector [
 	^(token isStringToken and: [token hasSymbol])
@@ -387,6 +398,11 @@ SmalltalkParser >> invalidArrayToken [
 { #category : #errors }
 SmalltalkParser >> invalidByteValue [
 	self error: 'value not between 0 and 255'
+]
+
+{ #category : #private }
+SmalltalkParser >> invalidPrimitiveToken [
+	self error: 'invalid primitive token'
 ]
 
 { #category : #private }
@@ -533,6 +549,15 @@ SmalltalkParser >> missingToken: aString [
 ]
 
 { #category : #private }
+SmalltalkParser >> namedPrimitive [
+	| name pragma |
+	token isNameToken ifFalse: [self invalidPrimitiveToken].
+	name := token value.
+	pragma := self buildNode: compiler pragmaNode at: token position.
+	^pragma primitive: 0 name: name
+]
+
+{ #category : #private }
 SmalltalkParser >> negativeNumber [
 	token := nil.
 	^self negativeNumberOrBinary; step
@@ -640,6 +665,17 @@ SmalltalkParser >> primary [
 	(token is: #'-') ifTrue: [^self negativeNumber].
 	(token is: #'<') ifTrue: [^self taggedNode].
 	^nil
+]
+
+{ #category : #private }
+SmalltalkParser >> primitive [
+	| primitive |
+	self step.
+	primitive := token isNumberNode
+		ifTrue: [self numberedPrimitive]
+		ifFalse: [self namedPrimitive].
+	self step.
+	^primitive
 ]
 
 { #category : #private }
@@ -797,4 +833,14 @@ SmalltalkParser >> validateLocalName: aSmalltalkToken [
 	aSmalltalkToken isDelimitedIdentifier ifTrue: [^self].
 	(aSmalltalkToken value includes: $.)
 		ifTrue: [self error: 'invalid embedded dot']
+]
+
+{ #category : #errors }
+SmalltalkParser >> warning: aString [
+	compiler warning: aString at: token position
+]
+
+{ #category : #errors }
+SmalltalkParser >> warning: aString at: position [
+	compiler warning: aString at: position
 ]

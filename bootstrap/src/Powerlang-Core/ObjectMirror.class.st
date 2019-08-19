@@ -25,6 +25,11 @@ ObjectMirror >> asBehaviorMirror [
 ]
 
 { #category : #'meta accessing' }
+ObjectMirror >> asBlockMirror [
+	^ self compiledBlockMirrorOn: handle
+]
+
+{ #category : #'meta accessing' }
 ObjectMirror >> asByteArray [
 	^self bytes
 ]
@@ -32,6 +37,11 @@ ObjectMirror >> asByteArray [
 { #category : #'meta accessing' }
 ObjectMirror >> asClassMirror [
 	^self classMirrorOn: handle
+]
+
+{ #category : #'meta accessing' }
+ObjectMirror >> asClosureMirror [
+	^ self closureMirrorOn: handle
 ]
 
 { #category : #'meta accessing' }
@@ -90,11 +100,6 @@ ObjectMirror >> basicFlags [
 	^handle basicFlags
 ]
 
-{ #category : #testing }
-ObjectMirror >> basicSize [
-	^handle basicSize
-]
-
 { #category : #'meta accessing' }
 ObjectMirror >> bytes [
 	^handle asLocalBytes
@@ -143,6 +148,11 @@ ObjectMirror >> getInstVarNamed: name [
 	index := handle indexOf: name for: self.
 	index = 0 ifTrue: [self error: 'instance variable not found'].
 	^self slotAt: index
+]
+
+{ #category : #comparing }
+ObjectMirror >> hash [
+	^ handle hash
 ]
 
 { #category : #'meta accessing' }
@@ -226,7 +236,7 @@ ObjectMirror >> reflectedBehavior [
 
 { #category : #'meta accessing' }
 ObjectMirror >> reflectedClass [
-	^self reflectedBehavior instanceClass
+	^handle getClass
 ]
 
 { #category : #nativizing }
@@ -236,7 +246,7 @@ ObjectMirror >> reflectsBytesObject [
 
 { #category : #nativizing }
 ObjectMirror >> reflectsInteger [
-	^handle oid odd
+	^handle isInteger
 ]
 
 { #category : #nativizing }
@@ -282,6 +292,11 @@ ObjectMirror >> slotOf: species named: name [
 	| index |
 	index := handle indexOf: name inStructureOf: species name asSymbol.
 	^self slotAt: index
+]
+
+{ #category : #testing }
+ObjectMirror >> slotSize [
+	^ handle size
 ]
 
 { #category : #private }

@@ -19,7 +19,7 @@ ObjectHandle >> = anObject [
 
 { #category : #'meta accessing' }
 ObjectHandle >> asLocalBytes [
-	^runtime bytesOf: oid
+	^runtime objectFormat bytesOf: oid
 ]
 
 { #category : #'meta accessing' }
@@ -43,15 +43,21 @@ ObjectHandle >> basicFlags [
 ]
 
 { #category : #'meta accessing' }
-ObjectHandle >> basicSize [
-	^runtime objectFormat smallSizeOf: oid
-]
-
-{ #category : #'meta accessing' }
 ObjectHandle >> getBehavior [
 	| behavior |
 	behavior := runtime objectFormat behaviorOf: oid.
 	^self handleOn: behavior
+]
+
+{ #category : #'meta accessing' }
+ObjectHandle >> getClass [
+	^runtime objectFormat classOf: self.
+
+]
+
+{ #category : #comparing }
+ObjectHandle >> hash [
+	^oid hash
 ]
 
 { #category : #'as yet unclassified' }
@@ -79,6 +85,11 @@ ObjectHandle >> isBytes [
 { #category : #'meta accessing' }
 ObjectHandle >> isFixed [
 	^self isArrayed not
+]
+
+{ #category : #comparing }
+ObjectHandle >> isInteger [
+	^runtime objectFormat isInteger: oid
 ]
 
 { #category : #'meta accessing' }
@@ -127,47 +138,18 @@ ObjectHandle >> oid: objectId [
 ]
 
 { #category : #'meta accessing' }
-ObjectHandle >> printFlagsOn: aStream [
-	| char |
-	aStream nextPut: $(.
-	char := self isSmall
-		ifTrue: [ $S ]
-		ifFalse: [ $L ].
-	aStream
-		nextPut: char;
-		space.
-	char := self isBytes
-		ifTrue: [ $B ]
-		ifFalse: [ $P ].
-	aStream
-		nextPut: char;
-		space.
-	char := self isFixed
-		ifTrue: [ $F ]
-		ifFalse: [ $A ].
-	aStream
-		nextPut: char;
-		nextPut: $)
-]
-
-{ #category : #'meta accessing' }
 ObjectHandle >> printOn: aStream [
-	| size |
-	aStream
-		nextPut: $@;
-		nextPutAll: oid hex;
-		nextPutAll: '[flags: 0x';
-		nextPutAll: self basicFlags printStringHex.
-	self printFlagsOn: aStream.
-aStream		nextPutAll: ', size: 0x';
-		nextPutAll: self size printStringHex;
-		nextPut: $].
+	| format size bytes |
+	format := runtime objectFormat.
+	format print: oid on: aStream.
 	self isBytes
 		ifFalse: [ ^ self ].
-	aStream cr.
-	size := self basicSize min: 128.
-	runtime bytesOf: oid count: size.
-	self asLocalBytes hexDumpOn: aStream max: 128
+	size := self size min: 128.
+	size < 30
+		ifTrue: [ aStream nextPutAll: ': ' ]
+		ifFalse: [ aStream cr ].
+	bytes := format bytesOf: oid count: size.
+	aStream print: bytes
 ]
 
 { #category : #'meta accessing' }

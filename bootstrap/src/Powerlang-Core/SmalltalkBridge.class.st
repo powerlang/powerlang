@@ -20,19 +20,7 @@ SmalltalkBridge >> false [
 ]
 
 { #category : #initialization }
-SmalltalkBridge >> findRootClasses [
-	self subclassResponsibility
-
-]
-
-{ #category : #initialization }
 SmalltalkBridge >> findRootObjects [
-	self subclassResponsibility
-
-]
-
-{ #category : #initialization }
-SmalltalkBridge >> findSmalltalk [
 	self subclassResponsibility
 
 ]
@@ -56,5 +44,6 @@ SmalltalkBridge >> true [
 
 { #category : #initialization }
 SmalltalkBridge >> update [
-	self findRootObjects; findRootClasses; findSmalltalk
+	self
+		findRootObjects
 ]

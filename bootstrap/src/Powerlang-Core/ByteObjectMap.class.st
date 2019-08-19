@@ -38,9 +38,9 @@ ByteObjectMap >> isBytes [
 
 { #category : #printing }
 ByteObjectMap >> printOn: aStream [
-	super printOn: aStream.
-	contents printOn: aStream.
-	aStream nextPutAll: ']'
+	aStream nextPutAll: '['.
+	behavior ifNil: [ aStream nextPutAll: 'no-behavior! ' ].
+	aStream print: contents; nextPutAll: ']'
 ]
 
 { #category : #accessing }

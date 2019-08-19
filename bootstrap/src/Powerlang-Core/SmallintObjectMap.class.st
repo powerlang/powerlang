@@ -14,7 +14,7 @@ SmallintObjectMap >> isImmediate [
 
 { #category : #accessing }
 SmallintObjectMap >> size [ 
-	self error: 'shouldn''t be asked for size'
+	^0
 ]
 
 { #category : #accessing }
