@@ -112,6 +112,19 @@ ImageSegmentBuilder >> initialize [
 ]
 
 { #category : #utilities }
+ImageSegmentBuilder >> makeArray: items [
+	| arrayObj index |
+	
+	arrayObj := self makeArraySize: items size.
+	index := 1.
+	items do:[:item | 
+		arrayObj at: index put: item.
+		index := index + 1.
+	].
+	^arrayObj
+]
+
+{ #category : #utilities }
 ImageSegmentBuilder >> makeArraySize: size [
 	^self makeInstanceOf: #Array size: size
 ]
@@ -277,6 +290,11 @@ ImageSegmentBuilder >> makeSymbol: value [
 	
 ]
 
+{ #category : #'building-private' }
+ImageSegmentBuilder >> makeTOC [
+	self notYetImplemented 
+]
+
 { #category : #acccessing }
 ImageSegmentBuilder >> nilObj [
 	self notYetImplemented 
@@ -302,6 +320,7 @@ ImageSegmentBuilder >> writeTo: aStream [
 	ImageSegmentWriter new
 		stream: aStream;
 		objects: objects; 
+		toc: tocObj;
 		write
 		
 ]

@@ -37,6 +37,7 @@ KernelSegmentBuilder >> genesis [
 	falseObj := self makeInstanceOf: #False.
 	
 	self makeClasses.
+	self makeTOC.
 	
 	self fixHierarchy.
 	self fixBehaviors.
@@ -55,6 +56,32 @@ KernelSegmentBuilder >> initialize [
 	
 ]
 
+{ #category : #building }
+KernelSegmentBuilder >> makeLoadAction [
+	| messageSendObj |
+	
+	messageSendObj := self makeInstanceOf: #MessageSend.
+	
+	"CRAP crap to be easily grepped.
+ 	 This obviously bogus, we should make an instance
+	 of BeeLoader and send it #start. But for now, comuting
+	 #gcd: is challenging enough."
+	
+	messageSendObj receiver: (self makeSmallInteger: 10).
+	messageSendObj selector: (self makeSymbol: #gcd:).
+	messageSendObj arguments: (self makeArray: { self makeSmallInteger: 15} ).
+	
+	^messageSendObj 
+]
+
+{ #category : #building }
+KernelSegmentBuilder >> makeTOC [
+	tocObj := self makeInstanceOf: #BeeModuleTOC.
+	tocObj classes: (self makeArray: classDef2ClassObjMap values).
+	tocObj actions: (self makeArray: { self makeLoadAction. self nilObj })
+	
+]
+
 { #category : #acccessing }
 KernelSegmentBuilder >> nilObj [
 	^ nilObj
@@ -70,6 +97,7 @@ KernelSegmentBuilder >> writeTo: aStream [
 	ImageSegmentWriter new
 		stream: aStream;
 		objects: objects; 
+		toc: tocObj;
 		baseAddress: 16r1ff10000;
 		write
 ]

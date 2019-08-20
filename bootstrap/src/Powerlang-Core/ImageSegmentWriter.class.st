@@ -6,6 +6,7 @@ Class {
 		'objects',
 		'offsets',
 		'nextHash',
+		'size',
 		'baseAddress',
 		'toc'
 	],
@@ -61,15 +62,14 @@ ImageSegmentWriter >> initialize [
 ]
 
 { #category : #accessing }
-ImageSegmentWriter >> layoutObjects [
-	| offset |
-	offset := stream position.
+ImageSegmentWriter >> layoutObjects [	
+	size := 32"Size of segment header".
 	objects
 		do: [ :obj | 
-			offset := offset + obj headerSizeInBytes.
-			offsets at: obj put: offset.
-			offset := offset + obj bodySizeInBytes.
-			offset := offset alignedTo: WordSize ]
+			size := size + obj headerSizeInBytes.
+			offsets at: obj put: size.
+			size := size + obj bodySizeInBytes.
+			size := size alignedTo: WordSize ].
 ]
 
 { #category : #accessing }
@@ -96,23 +96,6 @@ ImageSegmentWriter >> offsetOf: anObjectMap [
 ]
 
 { #category : #accessing }
-ImageSegmentWriter >> patchHeader [
-	"Now patch size and entrypoint in header"
-	| size |
-	
-	size := stream position.
-	stream position: 16.
-	stream 	uint64le: size.
-	toc notNil ifTrue:[
-		self writeReferenceTo: toc.
-	] ifFalse:[
-			stream uint64le: 0.
-	].
-	self assert: stream position == 32.
-	stream position: size.
-]
-
-{ #category : #accessing }
 ImageSegmentWriter >> stream: aWriteStream [
 	stream := aWriteStream
 ]
@@ -130,21 +113,20 @@ ImageSegmentWriter >> toc: anObject [
 { #category : #accessing }
 ImageSegmentWriter >> write [
 	self
-		writeSignature;
-		writeHeader;
 		layoutObjects;
-		writeObjects;
-		patchHeader
+		writeSignature;
+		writeHeader;		
+		writeObjects.
+		
 		
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeHeader [
 	"See segment.h for structure of a segment header"
-	stream 
-		uint64le: baseAddress; "Assumed Base Address"
-		uint64le: 0; "Size of a segment, will be patched later"
-		uint64le: 0. "Entry point reference, will be patched later"
+	stream uint64le: baseAddress. "Assumed Base Address"
+	stream uint64le: size. "Size of an segment"	
+	self writeReferenceTo: toc. "segment (module) TOC"	
 	self assert: stream position == 32
 ]
 
