@@ -111,11 +111,35 @@ ImageSegmentBuilder >> initialize [
 	kernel := self class kernel.
 ]
 
+{ #category : #utilities }
+ImageSegmentBuilder >> makeArraySize: size [
+	^self makeInstanceOf: #Array size: size
+]
+
 { #category : #'building-private' }
-ImageSegmentBuilder >> makeBehaviorFor: clsObj size: size [
-	| behaviorObj |
+ImageSegmentBuilder >> makeBehaviorFor: clsObj methods: methods [
+	| tableObj methodsObj behaviorObj |
 	
-	behaviorObj := self makeInstanceOf: #Behavior "size: size * 2".
+	tableObj := self makeInstanceOf: #InlinedHashTable size: methods size * 2.
+	methods withIndexDo: [ :methodDef :methodNo |
+		| methodObj selectorObj selectorIdx |
+		
+		methodObj := self makeMethodDef: methodDef.
+		selectorObj := methodObj selector.
+		
+		selectorIdx := ((methodNo - 1) * 2) + 1.
+		
+		tableObj at: selectorIdx put: selectorObj.
+		tableObj at: selectorIdx + 1 put: methodObj.		
+	].
+		
+	methodsObj := self makeInstanceOf: #MethodDictionary.
+	methodsObj tally: (self makeSmallInteger: methods size).
+	methodsObj table: tableObj.
+	
+	behaviorObj := self makeInstanceOf: #Behavior.
+	behaviorObj methods: methodsObj.
+	
 	^behaviorObj 
 ]
 
@@ -130,17 +154,17 @@ ImageSegmentBuilder >> makeClass: className [
 	self assert: clsDef metaclass instSize == 0.
 				
 	clsObj := self makeInstanceOf: #Class.
-	clsObj instanceBehavior: (self makeBehaviorFor: clsObj size: clsDef methods size).
+	classDef2ClassObjMap at: clsDef put: clsObj.
+	clsObj instanceBehavior: (self makeBehaviorFor: clsObj methods: clsDef methods).
 	clsObj name: (self makeSymbol: clsDef name).
 	
 	metaObj := self makeInstanceOf: #Metaclass.
-	metaObj instanceBehavior: (self makeBehaviorFor: metaObj size: clsDef metaclass methods size).
+	classDef2ClassObjMap at: clsDef metaclass put: metaObj.
+	metaObj instanceBehavior: (self makeBehaviorFor: metaObj methods: clsDef metaclass methods).
 	metaObj class: clsObj.
 	
 	clsObj behavior: metaObj.
-	
-	classDef2ClassObjMap at: clsDef put: clsObj.
-	classDef2ClassObjMap at: clsDef metaclass put: metaObj.
+		
 	^ clsObj.
 	
 ]
@@ -217,12 +241,24 @@ ImageSegmentBuilder >> makeInstanceOf: className size: size [
 			obj value: 0.
 		]
 	].
-	objects add: obj.
+	obj isImmediate ifFalse:[
+		objects add: obj.
+	].
 	^obj
 	
 	
 	
 	
+]
+
+{ #category : #'building-private' }
+ImageSegmentBuilder >> makeMethodDef: anRGMethod [
+	| methodObj |
+	
+	methodObj := self makeInstanceOf: #CompiledMethod size: 0.
+	methodObj class: (classDef2ClassObjMap at: anRGMethod methodClass).
+	methodObj selector: (self makeSymbol: anRGMethod selector).
+	^methodObj 
 ]
 
 { #category : #utilities }
