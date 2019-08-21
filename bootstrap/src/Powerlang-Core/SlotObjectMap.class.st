@@ -20,6 +20,11 @@ SlotObjectMap >> arrayed [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> arrayedAt: slotname [
+	^ arrayed at: slotname
+]
+
+{ #category : #accessing }
 SlotObjectMap >> at: slotname [
 	^slots at: slotname
 ]

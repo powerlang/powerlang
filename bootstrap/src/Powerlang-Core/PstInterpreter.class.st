@@ -90,13 +90,15 @@ PstInterpreter >> mirageOnObject: anObject [
 
 { #category : #visiting }
 PstInterpreter >> primitiveClosureValue [
-	| closure block sblock prev result |
+	| closure block sblock prev result interpreter next |
 	closure := receiver _gate handle.
 	block := closure mirror asClosureMirror block handle oid.
-	sblock := blocks at: block.
+	interpreter := self.
+	[ next := interpreter blocks. next includesKey: block] whileFalse: [ interpreter := interpreter parent ].
+	sblock := next at: block.
 	prev := environment.
 	environment := closure.
-	result := self visitScript: sblock.
+	result := interpreter visitScript: sblock.
 	environment := prev.
 	^result
 ]
@@ -125,9 +127,12 @@ PstInterpreter >> visitPrimitive: primitive [
 	gate := receiver _gate.
 	primitive = #Size
 		ifTrue: [ ^ returnValue := self mirageOnInteger: gate mirror size ].
-	primitive = #NewSize
+	primitive = #New
+		ifTrue: [ new := gate handle runtime new: gate handle oid.
+			^ returnValue := self mirageOnObject: new ].
+	primitive = #NewSized
 		ifTrue: [ new := gate handle target new: arguments first _gate handle target.
-			^ returnValue := self mirageOnInteger: new ].
+			^ returnValue := self mirageOnObject: new ].
 	primitive = #SmallIntegerMinus
 		ifTrue: [ left := receiver _gate handle target.
 			right := arguments first _gate handle target.
@@ -152,7 +157,7 @@ PstInterpreter >> visitPrimitive: primitive [
 		ifTrue: [ left := receiver _gate handle asLocalInteger.
 			right := arguments first _gate handle asLocalInteger.
 			^ returnValue := self mirageOnBoolean: left != right ].
-	primitive = #ClosureValue ifTrue: [ self primitiveClosureValue ].
+	primitive = #ClosureValue ifTrue: [ ^self primitiveClosureValue ].
 	primitive = #ReplaceFromTo
 		ifTrue: [ rcvr := receiver _gate handle target.
 			args := arguments collect: [ :arg | arg _gate asLocalCollection ].

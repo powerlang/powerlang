@@ -33,6 +33,11 @@ SExpressionInterpreter >> arguments: aCollection [
 ]
 
 { #category : #visiting }
+SExpressionInterpreter >> blocks [
+	^blocks
+]
+
+{ #category : #visiting }
 SExpressionInterpreter >> dispatch: message to: msgReceiver [
 	^ self subclassResponsibility
 ]
@@ -62,6 +67,11 @@ SExpressionInterpreter >> isSpecial: aSelectorMirror [
 { #category : #accessing }
 SExpressionInterpreter >> method: aCompiledMethod [
 	method := aCompiledMethod
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> parent [
+	^parent
 ]
 
 { #category : #visiting }

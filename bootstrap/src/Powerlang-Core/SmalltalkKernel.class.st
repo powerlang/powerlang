@@ -14,6 +14,19 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #initialization }
+SmalltalkKernel >> allInstVarNamesOf: classmap [
+	| all current names ivars |
+	all := OrderedCollection new.
+	current := classmap.
+	[ current != nilObj ]
+		whileTrue: [ ivars := current at: 'instanceVariables'.
+			names := (1 to: ivars size) collect: [ :i | ivars arrayedAt: i ].
+			all addAll: names.
+			current := current at: 'superclass' ].
+	^ all
+]
+
 { #category : #building }
 SmalltalkKernel >> build [
 	self
@@ -174,6 +187,16 @@ SmalltalkKernel >> instanceBehaviorOf: classname [
 { #category : #'as yet unclassified' }
 SmalltalkKernel >> nameOf: anObject [
 	^ index keyAtValue: anObject ifAbsent: nil
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> new: classmap [
+	| behavior fields instance |
+	behavior := classmap at: 'instanceBehavior'.
+	fields := self allInstVarNamesOf: classmap.
+	instance := self newSlots behavior: behavior.
+	fields do: [ :name | instance at: name put: nilObj ].
+	^instance
 ]
 
 { #category : #initialization }

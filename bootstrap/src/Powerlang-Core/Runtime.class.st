@@ -128,6 +128,13 @@ Runtime >> lookup: aSymbol on: aSubject [
 ]
 
 { #category : #'object format' }
+Runtime >> new: oid [
+	| instance |
+	instance := storage new: oid.
+	^ self handleOn: instance
+]
+
+{ #category : #'object format' }
 Runtime >> newClosureHandle: aPCompiledBlock [
 	| oid |
 	oid := objectFormat newClosure: aPCompiledBlock.

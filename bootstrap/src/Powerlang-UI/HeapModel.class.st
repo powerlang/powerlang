@@ -24,7 +24,7 @@ HeapModel class >> forSimulatedPst [
 	| kernel stream builder writer runtime labels |
 	kernel := ProjectSpec new
 		name: 'kernel';
-		path: '../src/kernel' asFileReference;
+		path: '../pst/kernel' asFileReference;
 		load.
 	builder := SmalltalkKernel new
 		project: kernel;
