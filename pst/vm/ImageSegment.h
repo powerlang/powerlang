@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <iostream>
 #include <Object.h>
+#include <Classes.h>
 
 namespace S9
 {
@@ -51,7 +52,8 @@ typedef struct _ImageSegmentHeader
     /**
      * A reference to an entry point method object.
      */
-    OOP toc;
+    OOP<Object> toc;
+
 } ImageSegmentHeader;
 
 static_assert(sizeof(ImageSegmentHeader) == 32/*bytes*/,

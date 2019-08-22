@@ -20,25 +20,29 @@
  * SOFTWARE.
  */
 
-#include <fstream>
+#include <Object.h>
 
-#include <ImageSegment.h>
+namespace S9
+{
 
-int main(const int argc, const char **argv) {
-    if (argc != 2) {
-        printf("Usage: %s <KERNEL_SEGMENT>\n", argv[0]);
-        return 1;
-    }
-    std::ifstream segment_file (argv[1], std::ifstream::binary);
-    if (!segment_file) {
-        printf("No such file: %s\n", argv[0]);
-        return 1;
-    }
+Object*
+Object::slot(uint32_t index)
+{
+    S9_ASSERT(!this->_isBytes());
+    S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
 
-    S9::ImageSegment *kernel = S9::ImageSegment::load(&segment_file);
+    Object** slot = (Object**)this + index;
 
-    printf("Loaded kernel at %p, size %lu, TOC at %p\n",
-            kernel,
-            kernel->header.size,
-            kernel->header.toc.get());
+    return *slot;
 }
+
+uint8_t
+Object::byte(uint32_t index) {
+    S9_ASSERT(this->_isBytes());
+    S9_ASSERT(/*index >= 0 &&*/index <= this->_size());
+    return *(((uint8_t*)this) + index);
+}
+
+} // namespace S9
+
+
