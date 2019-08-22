@@ -6,7 +6,7 @@
 HOST   := $(shell ./config.guess | cut -d '-' -f 1,3)
 TARGET ?= $(HOST)
 CFLAGS ?= -ggdb3 -O0 -Wextra -Wall -Werror
-CXXFLAGS ?= $(CFLAGS) -std=c++11
+CXXFLAGS ?= $(CFLAGS) -std=c++17
 DEPFLAGS ?= -MT $@ -MMD -MP -MF $(BUILD)/$*.d
 
 #
