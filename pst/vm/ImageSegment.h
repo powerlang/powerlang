@@ -23,13 +23,12 @@
 #ifndef _SEGMENT_H_
 #define _SEGMENT_H_
 
+#include <Classes.h>
+#include <Object.h>
 #include <cstdint>
 #include <iostream>
-#include <Object.h>
-#include <Classes.h>
 
-namespace S9
-{
+namespace S9 {
 
 typedef struct _ImageSegmentHeader
 {
@@ -56,26 +55,25 @@ typedef struct _ImageSegmentHeader
 
 } ImageSegmentHeader;
 
-static_assert(sizeof(ImageSegmentHeader) == 32/*bytes*/,
+static_assert(sizeof(ImageSegmentHeader) == 32 /*bytes*/,
               "segment_header size not 32bytes");
-
 
 class ImageSegment
 {
-public:
+  public:
     ImageSegmentHeader header;
 
     /**
      * Allocate a new segment of given `size` at given `base` address.
      * Contents of the segment is zeroed.
      */
-    static ImageSegment *alloc(uintptr_t base, size_t size);
+    static ImageSegment* alloc(uintptr_t base, size_t size);
 
     /**
      * Load a segment from given stream and return it. The stream should
      * be positioned to the beginning of segment prior calling load()
      */
-    static ImageSegment *load(std::istream *data);
+    static ImageSegment* load(std::istream* data);
 };
 
 } // namespace S9

@@ -22,8 +22,7 @@
 
 #include <Object.h>
 
-namespace S9
-{
+namespace S9 {
 
 Object*
 Object::slot(uint32_t index)
@@ -37,12 +36,11 @@ Object::slot(uint32_t index)
 }
 
 uint8_t
-Object::byte(uint32_t index) {
+Object::byte(uint32_t index)
+{
     S9_ASSERT(this->_isBytes());
-    S9_ASSERT(/*index >= 0 &&*/index <= this->_size());
+    S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
     return *(((uint8_t*)this) + index);
 }
 
 } // namespace S9
-
-

@@ -24,15 +24,14 @@
 
 #include <cstdint>
 
-namespace S9
-{
+namespace S9 {
 
 static inline uintptr_t
-align (uintptr_t value, int alignment)
+align(uintptr_t value, int alignment)
 {
     return ((value + (alignment - 1)) & ~(alignment - 1));
 }
 
-}
+} // namespace S9
 
 #endif // _UTILS_H_

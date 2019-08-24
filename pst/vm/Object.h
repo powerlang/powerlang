@@ -23,12 +23,11 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include <string>
 #include <Assert.h>
 #include <object_format.h>
+#include <string>
 
-namespace S9
-{
+namespace S9 {
 
 /**
  * Class `Object` represebt a smalltalk object on an object heap
@@ -49,7 +48,7 @@ namespace S9
  */
 struct Object : private pst::oop_t
 {
-public:
+  public:
     /**
      * Return a slot (pointer) of this object at given
      * index. Index starts at 0. This CAN be used to access
@@ -70,23 +69,20 @@ public:
      * (pointers) for pointer-indexed objects or number of
      * bytes without padding for byte-indexed objects.
      */
-    size_t size()
+    size_t size() { return this->_size(); }
+
+    class InvalidAccess
     {
-        return this->_size();
-    }
-
-
-    class InvalidAccess {
-    protected:
+      protected:
         std::string msg;
 
-    public:
-        InvalidAccess(const char *msg)
-            : msg(msg)
+      public:
+        InvalidAccess(const char* msg)
+          : msg(msg)
         {}
 
         InvalidAccess(std::string msg)
-            : msg(msg)
+          : msg(msg)
         {}
     };
 };
@@ -95,7 +91,6 @@ public:
 // However, in C++, size of an empty struct / class is 1 byte,
 // hence the `... == 1`
 static_assert(sizeof(Object) == 1);
-
 
 /**
  * (Template) class `OOP` represents a *reference* to a smalltalk
@@ -106,130 +101,121 @@ static_assert(sizeof(Object) == 1);
 template<typename T = Object>
 class OOP
 {
-public:
+  public:
+    /* Create a new NULL reference.  */
+    OOP()
+      : ptr(NULL)
+    {}
 
-/* Create a new NULL reference.  */
-OOP ()
- : ptr (NULL)
-{
-}
+    /* Create a new NULL reference.  Note that this is not explicit.  */
+    OOP(const std::nullptr_t)
+      : ptr(NULL)
+    {}
 
-/* Create a new NULL reference.  Note that this is not explicit.  */
-OOP (const std::nullptr_t)
- : ptr (NULL)
-{
-}
+    /* Create a new reference to an object `obj` */
+    OOP(Object* obj)
+      : ptr(reinterpret_cast<T*>(obj))
+    {}
 
-/* Create a new reference to an object `obj` */
-OOP (Object *obj)
- : ptr (reinterpret_cast<T*>(obj))
-{
-}
+    /* Create a new reference from another reference */
+    template<typename U>
+    OOP(OOP<U> oop)
+      : ptr(reinterpret_cast<T*>(oop.get()))
+    {}
 
-/* Create a new reference from another reference */
-template <typename U>
-OOP (OOP<U> oop)
- : ptr (reinterpret_cast<T*>(oop.get()))
-{
-}
+    /* Destroy this reference.  */
+    ~OOP() {}
 
-/* Destroy this reference.  */
-~OOP ()
-{
-}
+    /* Change this reference to bew object. Use with caution! */
+    void reset(T* obj) { ptr = obj; }
 
-/* Change this reference to bew object. Use with caution! */
-void reset (T *obj)
-{
- ptr = obj;
-}
+    /* Return referent */
+    T* get() const { return ptr; }
 
-/* Return referent */
-T *get () const
-{
- return ptr;
-}
+    /* Return referent, and stop managing this reference. */
+    T* release()
+    {
+        T* result = ptr;
 
-/* Return referent, and stop managing this reference. */
-T *release ()
-{
- T *result = ptr;
+        ptr = NULL;
+        return result;
+    }
 
- ptr = NULL;
- return result;
-}
+    /* Let users refer to members of the underlying pointer.  */
+    T* operator->() const { return ptr; }
 
-/* Let users refer to members of the underlying pointer.  */
-T *operator-> () const
-{
- return ptr;
-}
-
-private:
-
-T *ptr;
+  private:
+    T* ptr;
 };
 
 template<typename T>
-inline bool operator== (const OOP<T> &lhs,
-                     const OOP<T> &rhs)
+inline bool
+operator==(const OOP<T>& lhs, const OOP<T>& rhs)
 {
-return lhs.get () == rhs.get ();
+    return lhs.get() == rhs.get();
 }
 
 template<typename T>
-inline bool operator== (const OOP<T> &lhs, const T *rhs)
+inline bool
+operator==(const OOP<T>& lhs, const T* rhs)
 {
-return lhs.get () == rhs;
+    return lhs.get() == rhs;
 }
 
 template<typename T>
-inline bool operator== (const OOP<T> &lhs, const std::nullptr_t)
+inline bool
+operator==(const OOP<T>& lhs, const std::nullptr_t)
 {
-return lhs.get () == nullptr;
+    return lhs.get() == nullptr;
 }
 
 template<typename T>
-inline bool operator== (const T *lhs, const OOP<T> &rhs)
+inline bool
+operator==(const T* lhs, const OOP<T>& rhs)
 {
-return lhs == rhs.get ();
+    return lhs == rhs.get();
 }
 
 template<typename T>
-inline bool operator== (const std::nullptr_t, const OOP<T> &rhs)
+inline bool
+operator==(const std::nullptr_t, const OOP<T>& rhs)
 {
-return nullptr == rhs.get ();
+    return nullptr == rhs.get();
 }
 
 template<typename T>
-inline bool operator!= (const OOP<T> &lhs,
-                     const OOP<T> &rhs)
+inline bool
+operator!=(const OOP<T>& lhs, const OOP<T>& rhs)
 {
-return lhs.get () != rhs.get ();
+    return lhs.get() != rhs.get();
 }
 
 template<typename T>
-inline bool operator!= (const OOP<T> &lhs, const T *rhs)
+inline bool
+operator!=(const OOP<T>& lhs, const T* rhs)
 {
-return lhs.get () != rhs;
+    return lhs.get() != rhs;
 }
 
 template<typename T>
-inline bool operator!= (const OOP<T> &lhs, const std::nullptr_t)
+inline bool
+operator!=(const OOP<T>& lhs, const std::nullptr_t)
 {
-return lhs.get () != nullptr;
+    return lhs.get() != nullptr;
 }
 
 template<typename T>
-inline bool operator!= (const T *lhs, const OOP<T> &rhs)
+inline bool
+operator!=(const T* lhs, const OOP<T>& rhs)
 {
-return lhs != rhs.get ();
+    return lhs != rhs.get();
 }
 
 template<typename T>
-inline bool operator!= (const std::nullptr_t, const OOP<T> &rhs)
+inline bool
+operator!=(const std::nullptr_t, const OOP<T>& rhs)
 {
-return nullptr != rhs.get ();
+    return nullptr != rhs.get();
 }
 
 } // namespace S9

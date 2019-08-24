@@ -25,19 +25,19 @@
 
 #include <Object.h>
 
-#define DEFINE_CLASS(CLASSNAME, SUPERNAME, SLOTS) class CLASSNAME : public SUPERNAME { SLOTS };
-#define DEFINE_SLOT(SLOTNAME)   public: Object* s_ ## SLOTNAME;
+#define DEFINE_CLASS(CLASSNAME, SUPERNAME, SLOTS)                               \
+    class CLASSNAME : public SUPERNAME                                          \
+    {                                                                           \
+        SLOTS                                                                   \
+    };
+#define DEFINE_SLOT(SLOTNAME)                                                   \
+  public:                                                                       \
+    Object* s_##SLOTNAME;
 #define NIL S9::Object
 #include "Classes.def"
 #undef DEFINE_CLASS
 #undef NIL
 
-namespace S9
-{
-
-
-} // namespace S9
-
-
+namespace S9 {} // namespace S9
 
 #endif /* CLASSES_H_ */

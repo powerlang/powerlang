@@ -24,21 +24,23 @@
 
 #include <ImageSegment.h>
 
-int main(const int argc, const char **argv) {
+int
+main(const int argc, const char** argv)
+{
     if (argc != 2) {
         printf("Usage: %s <KERNEL_SEGMENT>\n", argv[0]);
         return 1;
     }
-    std::ifstream segment_file (argv[1], std::ifstream::binary);
+    std::ifstream segment_file(argv[1], std::ifstream::binary);
     if (!segment_file) {
         printf("No such file: %s\n", argv[0]);
         return 1;
     }
 
-    S9::ImageSegment *kernel = S9::ImageSegment::load(&segment_file);
+    S9::ImageSegment* kernel = S9::ImageSegment::load(&segment_file);
 
     printf("Loaded kernel at %p, size %lu, TOC at %p\n",
-            kernel,
-            kernel->header.size,
-            kernel->header.toc.get());
+           kernel,
+           kernel->header.size,
+           kernel->header.toc.get());
 }

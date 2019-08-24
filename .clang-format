@@ -1,0 +1,13 @@
+﻿---
+BasedOnStyle: Mozilla
+IndentWidth: '4'
+Language: Cpp
+Standard: Cpp11
+TabWidth: '4'
+UseTab: Never
+FixNamespaceComments: true
+ColumnLimit: 81
+SortIncludes: false
+SortUsingDeclarations: false
+ReflowComments: true
+...
