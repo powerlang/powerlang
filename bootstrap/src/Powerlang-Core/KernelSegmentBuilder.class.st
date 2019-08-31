@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'nilObj',
 		'trueObj',
-		'falseObj'
+		'falseObj',
+		'specialObjectsArrayObj'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -31,13 +32,27 @@ KernelSegmentBuilder >> genesis [
 	
 	https://github.com/russellallen/self/blob/2bcf2c4cab23f52bf68ac4f617020e748699a548/vm/src/any/memory/universe.cpp#L79
 	"
+	| placeholder |
 	
+	placeholder := Object new.
+	objects add: placeholder.
+
 	nilObj := self makeInstanceOf: #UndefinedObject.
 	trueObj := self makeInstanceOf: #True.
 	falseObj := self makeInstanceOf: #False.
+	specialObjectsArrayObj := self makeInstanceOf: #Array size: 5.
 	
+	objects remove: specialObjectsArrayObj.
+	objects replaceAll: placeholder with: specialObjectsArrayObj.
+		
 	self makeClasses.
 	self makeTOC.
+	
+	specialObjectsArrayObj at: 1 put: nilObj.
+	specialObjectsArrayObj at: 2 put: trueObj.
+	specialObjectsArrayObj at: 3 put: falseObj.
+ 	specialObjectsArrayObj at: 4 put: (classDef2ClassObjMap at: (kernel at: #SmallInteger)).
+	specialObjectsArrayObj at: 5 put: (self makeSymbol: #evaluate).
 	
 	self fixHierarchy.
 	self fixBehaviors.
