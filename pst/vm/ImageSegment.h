@@ -23,10 +23,12 @@
 #ifndef _SEGMENT_H_
 #define _SEGMENT_H_
 
-#include <Classes.h>
-#include <Object.h>
 #include <cstdint>
 #include <iostream>
+#include <iterator>
+
+#include <Object.h>
+#include <Classes.h>
 
 namespace S9 {
 
@@ -51,7 +53,7 @@ typedef struct _ImageSegmentHeader
     /**
      * A reference to an entry point method object.
      */
-    OOP<Object> toc;
+    OOP<VMObject> toc;
 
 } ImageSegmentHeader;
 

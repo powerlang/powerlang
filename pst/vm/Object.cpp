@@ -24,19 +24,19 @@
 
 namespace S9 {
 
-Object*
-Object::slot(uint32_t index)
+VMObject*
+VMObject::slot(uint32_t index)
 {
     S9_ASSERT(!this->_isBytes());
     S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
 
-    Object** slot = (Object**)this + index;
+    VMObject** slot = (VMObject**)this + index;
 
     return *slot;
 }
 
 uint8_t
-Object::byte(uint32_t index)
+VMObject::byte(uint32_t index)
 {
     S9_ASSERT(this->_isBytes());
     S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());

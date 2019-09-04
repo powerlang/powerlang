@@ -26,11 +26,25 @@
 #include <Assert.h>
 #include <object_format.h>
 #include <string>
+#include <Util.h>
 
 namespace S9 {
 
+typedef enum
+{
+    IsBytes = pst::small_header_t::Flag_isBytes,
+    IsVariable = pst::small_header_t::Flag_isArrayed,
+    IsNamed = pst::small_header_t::Flag_isNamed,
+    IsRemembered = pst::small_header_t::Flag_isRemembered,
+    IsWeak = pst::small_header_t::Flag_isWeak,
+    HasBeenSeen = pst::small_header_t::Flag_hasBeenSeen,
+    IsSecondGen = pst::small_header_t::Flag_isSecondGen,
+    IsSmall = pst::small_header_t::Flag_isSmall
+
+} VMObjectFlags;
+
 /**
- * Class `Object` represebt a smalltalk object on an object heap
+ * Class `VMObject` represent a smalltalk object on an object heap
  * and provides basic access to object contents.
  *
  * Note: within a C++ code, NEVER use raw pointer (i.e, `Object*`
@@ -46,16 +60,26 @@ namespace S9 {
  *
  * For details, see class `OOP` below.
  */
-struct Object : private pst::oop_t
+struct VMObject : private pst::oop_t
 {
   public:
+    VMObject* behavior()
+    {
+        return reinterpret_cast<VMObject*>(this->small_header()->behavior);
+    }
+
+    VMObjectFlags flags()
+    {
+        return (VMObjectFlags)(this->small_header()->flags);
+    }
+
     /**
      * Return a slot (pointer) of this object at given
      * index. Index starts at 0. This CAN be used to access
      * both named and indexed slots. This MUST be used only
      * with pointer-indexed objects.
      */
-    Object* slot(uint32_t index);
+    VMObject* slot(uint32_t index);
 
     /**
      * Return a byte of this object at given index. Index
@@ -90,7 +114,7 @@ struct Object : private pst::oop_t
 // Here we just need to make sure the struct Object is empty.
 // However, in C++, size of an empty struct / class is 1 byte,
 // hence the `... == 1`
-static_assert(sizeof(Object) == 1);
+static_assert(sizeof(VMObject) == 1);
 
 /**
  * (Template) class `OOP` represents a *reference* to a smalltalk
@@ -98,7 +122,7 @@ static_assert(sizeof(Object) == 1);
  * code - `OOP` are (will be) safe w.r.t moving GC.
  */
 
-template<typename T = Object>
+template<typename T = VMObject>
 class OOP
 {
   public:
@@ -113,7 +137,12 @@ class OOP
     {}
 
     /* Create a new reference to an object `obj` */
-    OOP(Object* obj)
+    OOP(VMObject* obj)
+      : ptr(reinterpret_cast<T*>(obj))
+    {}
+
+    /* Create a new reference to an object `obj` */
+    OOP(void* obj)
       : ptr(reinterpret_cast<T*>(obj))
     {}
 

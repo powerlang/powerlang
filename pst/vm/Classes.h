@@ -25,17 +25,20 @@
 
 #include <Object.h>
 
+typedef S9::VMObject VMObject;
 #define DEFINE_CLASS(CLASSNAME, SUPERNAME, SLOTS)                               \
-    class CLASSNAME : public SUPERNAME                                          \
+    namespace pst {                                                             \
+    struct CLASSNAME : public SUPERNAME                                         \
     {                                                                           \
         SLOTS                                                                   \
-    };
-#define DEFINE_SLOT(SLOTNAME)                                                   \
-  public:                                                                       \
-    Object* s_##SLOTNAME;
-#define NIL S9::Object
+    };                                                                          \
+    }
+#define DEFINE_SLOT(SLOTNAME) Object* s_##SLOTNAME;
+#define NIL VMObject
+
 #include "Classes.def"
 #undef DEFINE_CLASS
+#undef DEFINE_SLOT
 #undef NIL
 
 namespace S9 {} // namespace S9
