@@ -43,4 +43,13 @@ VMObject::byte(uint32_t index)
     return *(((uint8_t*)this) + index);
 }
 
+VMObject*
+VMObject::headerToObject(void* header)
+{
+    VMObject* obj = (VMObject*)((char*)header + sizeof(pst::small_header_t));
+    if (obj->behavior() == nullptr)
+        obj = (VMObject*)((char*)header + sizeof(pst::large_header_t));
+    return obj;
+}
+
 } // namespace S9

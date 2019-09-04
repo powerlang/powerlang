@@ -95,6 +95,24 @@ struct VMObject : private pst::oop_t
      */
     size_t size() { return this->_size(); }
 
+    /**
+     * Return size of an object in bytes, *excluding* header
+     * and excluding eventual alignment (for byte objects)
+     */
+    size_t sizeInBytes() { return this->_sizeInBytes(); }
+
+    /**
+     * Return aligned size of an object in bytes, *excluding* header.
+     *
+     */
+    size_t sizeInBytesAligned() { return align(this->sizeInBytes(), 8); }
+
+    /**
+     * Given a pointer to the beginning of an object header,
+     * return an OOP representing the object.
+     */
+    static VMObject* headerToObject(void* header);
+
     class InvalidAccess
     {
       protected:

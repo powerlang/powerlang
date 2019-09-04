@@ -62,8 +62,15 @@ static_assert(sizeof(ImageSegmentHeader) == 32 /*bytes*/,
 
 class ImageSegment
 {
+  private:
+    class iterator;
+
   public:
     ImageSegmentHeader header;
+
+    iterator begin() { return iterator((char*)this + sizeof(header)); }
+
+    iterator end() { return iterator((char*)this + header.size); }
 
     /**
      * Allocate a new segment of given `size` at given `base` address.
@@ -76,6 +83,70 @@ class ImageSegment
      * be positioned to the beginning of segment prior calling load()
      */
     static ImageSegment* load(std::istream* data);
+
+  private:
+    class iterator
+    {
+      public:
+        typedef OOP<VMObject> value_type;
+        typedef std::ptrdiff_t difference_type;
+        typedef value_type* pointer;
+        typedef value_type& reference;
+        typedef std::input_iterator_tag iterator_category;
+
+        explicit iterator(char* initial_hdr)
+          : current_hdr(initial_hdr)
+          , current(nullptr)
+        {}
+
+        value_type operator*() { return curr(); }
+
+        value_type operator->() { return curr(); }
+
+        bool operator==(const iterator& other) const
+        {
+            return current_hdr == other.current_hdr;
+        }
+        bool operator!=(const iterator& other) const
+        {
+            return !(*this == other);
+        }
+
+        // POSTFIX
+        iterator operator++(int)
+        {
+            iterator i = *this;
+            next();
+            return i;
+        }
+
+        // PREFIX
+        iterator operator++()
+        {
+            next();
+            return *this;
+        }
+
+      private:
+        value_type curr()
+        {
+            S9_ASSERT(current_hdr != nullptr);
+            if (current == nullptr) {
+                current = VMObject::headerToObject(current_hdr);
+            }
+            return current;
+        }
+
+        void next()
+        {
+            value_type obj = curr();
+            current = nullptr;
+            current_hdr = (char*)(obj.get()) + obj->sizeInBytesAligned();
+        }
+
+        char* current_hdr;
+        value_type current;
+    };
 };
 
 } // namespace S9
