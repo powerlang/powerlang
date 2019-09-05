@@ -195,16 +195,16 @@ class OOP
     T* ptr;
 };
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator==(const OOP<T>& lhs, const OOP<T>& rhs)
+operator==(const OOP<T>& lhs, const OOP<U>& rhs)
 {
     return lhs.get() == rhs.get();
 }
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator==(const OOP<T>& lhs, const T* rhs)
+operator==(const OOP<T>& lhs, const U* rhs)
 {
     return lhs.get() == rhs;
 }
@@ -216,30 +216,30 @@ operator==(const OOP<T>& lhs, const std::nullptr_t)
     return lhs.get() == nullptr;
 }
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator==(const T* lhs, const OOP<T>& rhs)
+operator==(const T* lhs, const OOP<U>& rhs)
 {
     return lhs == rhs.get();
 }
 
-template<typename T>
+template<typename U>
 inline bool
-operator==(const std::nullptr_t, const OOP<T>& rhs)
+operator==(const std::nullptr_t, const OOP<U>& rhs)
 {
     return nullptr == rhs.get();
 }
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator!=(const OOP<T>& lhs, const OOP<T>& rhs)
+operator!=(const OOP<T>& lhs, const OOP<U>& rhs)
 {
     return lhs.get() != rhs.get();
 }
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator!=(const OOP<T>& lhs, const T* rhs)
+operator!=(const OOP<T>& lhs, const U* rhs)
 {
     return lhs.get() != rhs;
 }
@@ -251,16 +251,16 @@ operator!=(const OOP<T>& lhs, const std::nullptr_t)
     return lhs.get() != nullptr;
 }
 
-template<typename T>
+template<typename T, typename U>
 inline bool
-operator!=(const T* lhs, const OOP<T>& rhs)
+operator!=(const T* lhs, const OOP<U>& rhs)
 {
     return lhs != rhs.get();
 }
 
-template<typename T>
+template<typename U>
 inline bool
-operator!=(const std::nullptr_t, const OOP<T>& rhs)
+operator!=(const std::nullptr_t, const OOP<U>& rhs)
 {
     return nullptr != rhs.get();
 }
