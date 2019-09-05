@@ -52,4 +52,29 @@ VMObject::headerToObject(void* header)
     return obj;
 }
 
+void
+VMObject::initializeSpecialObjects(VMObject* specialObjectsArray)
+{
+    S9_ASSERT(specialObjectsArray->size() == 5);
+
+    SpecialObjectsArray = specialObjectsArray;
+
+    {
+        int i = 0;
+
+        Nil = specialObjectsArray->slot(i++);
+        True = specialObjectsArray->slot(i++);
+        False = specialObjectsArray->slot(i++);
+        Class_SmallInteger = specialObjectsArray->slot(i++);
+        Symbol_evaluate = specialObjectsArray->slot(i++);
+    }
+}
+
+OOP<VMObject> SpecialObjectsArray;
+OOP<VMObject> Nil;
+OOP<VMObject> True;
+OOP<VMObject> False;
+OOP<VMObject> Class_SmallInteger;
+OOP<VMObject> Symbol_evaluate;
+
 } // namespace S9

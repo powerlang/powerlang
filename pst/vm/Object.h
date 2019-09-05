@@ -113,6 +113,8 @@ struct VMObject : private pst::oop_t
      */
     static VMObject* headerToObject(void* header);
 
+    static void initializeSpecialObjects(VMObject* specialObjectsArray);
+
     class InvalidAccess
     {
       protected:
@@ -264,6 +266,13 @@ operator!=(const std::nullptr_t, const OOP<U>& rhs)
 {
     return nullptr != rhs.get();
 }
+
+extern OOP<VMObject> SpecialObjectsArray;
+extern OOP<VMObject> Nil;
+extern OOP<VMObject> True;
+extern OOP<VMObject> False;
+extern OOP<VMObject> Class_SmallInteger;
+extern OOP<VMObject> Symbol_evaluate;
 
 } // namespace S9
 

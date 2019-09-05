@@ -23,6 +23,10 @@
 #include <fstream>
 
 #include <ImageSegment.h>
+#include <Object.h>
+#include <Classes.h>
+
+using namespace S9;
 
 int
 main(const int argc, const char** argv)
@@ -37,10 +41,12 @@ main(const int argc, const char** argv)
         return 1;
     }
 
-    S9::ImageSegment* kernel = S9::ImageSegment::load(&segment_file);
+    ImageSegment* kernel = ImageSegment::load(&segment_file);
 
     printf("Loaded kernel at %p, size %lu, TOC at %p\n",
            kernel,
            kernel->header.size,
            kernel->header.toc.get());
+
+    VMObject::initializeSpecialObjects((*(kernel->begin())).get());
 }
