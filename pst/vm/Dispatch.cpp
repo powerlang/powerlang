@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Javier Pimas, Jan Vrany
+ * Copyright (c) 2019 Javier Pimas, Boris Shingarov, Jan Vrany
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -8,7 +8,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
+ * The above copyright notice and this permission notice shall be included in
+ all
  * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -20,35 +21,14 @@
  * SOFTWARE.
  */
 
-#include <Object.h>
 #include <Classes.h>
+#include <Dispatch.h>
 
 namespace S9 {
-
 OOP<VMObject>
-VMMethodDictionary::lookup(OOP<VMObject> sel)
+Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
 {
-    OOP<> table = this->s_table;
-    S9_ASSERT((table->size() % 2) == 0);
-    for (size_t i = 0; i < table->size(); i += 2) {
-        if (sel == table->slot(i))
-            return table->slot(i + 1);
-    }
-    return {};
+    OOP<VMBehavior> behavior = obj->behavior();
+    return behavior->lookup(sel);
 }
-
-OOP<VMObject>
-VMBehavior::lookup(OOP<VMObject> sel)
-{
-    OOP<VMBehavior> behavior = this;
-    while (behavior != Nil) {
-        OOP<VMMethodDictionary> md = behavior->s_methods;
-        OOP<> val = md->lookup(sel);
-        if (val != nullptr)
-            return val;
-        behavior = behavior->s_next;
-    }
-    return {};
-}
-
 } // namespace S9

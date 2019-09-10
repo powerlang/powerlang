@@ -25,6 +25,7 @@
 #include <ImageSegment.h>
 #include <Object.h>
 #include <Classes.h>
+#include <Dispatch.h>
 
 using namespace S9;
 
@@ -49,4 +50,11 @@ main(const int argc, const char** argv)
            kernel->header.toc.get());
 
     VMObject::initializeSpecialObjects((*(kernel->begin())).get());
+
+    OOP<pst::BeeModuleTOC> toc = kernel->header.toc;
+    OOP<> entry = toc->s_actions->slot(0);
+
+    OOP<> entry_method = Lookup(entry, Symbol_evaluate);
+
+    printf("Entry method to execute %p\n", entry_method.get());
 }

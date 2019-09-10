@@ -41,6 +41,20 @@ typedef S9::VMObject VMObject;
 #undef DEFINE_SLOT
 #undef NIL
 
-namespace S9 {} // namespace S9
+namespace S9 {
+
+class VMMethodDictionary : public pst::MethodDictionary
+{
+  public:
+    OOP<VMObject> lookup(OOP<VMObject> sel);
+};
+
+class VMBehavior : public pst::Behavior
+{
+  public:
+    OOP<VMObject> lookup(OOP<VMObject> sel);
+};
+
+} // namespace S9
 
 #endif /* CLASSES_H_ */
