@@ -212,7 +212,7 @@ AstcodeEncoder >> nestedEncode: aBlock [
 { #category : #visiting }
 AstcodeEncoder >> nextLiteralPut: literalValue [
 	| index |
-	index := method indexOf: literalValue.
+	index := method literals indexOf: literalValue.
 	self assert: index != 0.
 	self nextPut: index.
 	
@@ -289,11 +289,9 @@ AstcodeEncoder >> visitLiteral: aLiteralNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitMessage: aMessageNode [
-	| symbol selector |
-	symbol := aMessageNode selector symbol.
-	selector := method indexOf: symbol.
-	self nextTypePut: MessageId; nextPut: selector.
-	selector = 0 ifTrue: [self nextPut: symbol].
+	| selector |
+	selector := aMessageNode selector symbol.
+	self nextTypePut: MessageId; nextLiteralPut: selector.
 	self nestedEncode: [aMessageNode receiver acceptVisitor: self].
 	aMessageNode arguments do: [:arg | 
 		self nestedEncode: [arg acceptVisitor: self]].

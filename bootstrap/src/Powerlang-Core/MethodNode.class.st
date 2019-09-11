@@ -16,8 +16,9 @@ MethodNode >> acceptVisitor: visitor [
 { #category : #parsing }
 MethodNode >> buildMethod [
 	| cm encoder astcodes |
-	cm := self methodClass withAll: self literals.
+	cm := self methodClass new.
 	cm
+		literals: self literals;
 		blockCount: compiler blockCount;
 		tempCount: scope stackSize;
 		argumentCount: arguments size;
@@ -69,6 +70,7 @@ MethodNode >> literals [
 	| literals v l |
 	literals := OrderedCollection new.
 	self nodesDo: [ :n |
+		n isPrimitive ifTrue: [ literals add: n name ].
 		n isLiteral ifTrue: [ v := n value. v isSmallInteger ifFalse: [ literals add: v] ].
 		n isMessageNode ifTrue: [ literals add: n symbol].
 		(n isIdentifier and: [ l := n binding literal. l notNil ])
@@ -93,6 +95,7 @@ MethodNode >> needsEnvironment [
 { #category : #enumerating }
 MethodNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
+	pragma notNil ifTrue:[aBlock evaluateWith: pragma].
 	(aBoolean and: [selector notNil]) ifTrue: [aBlock evaluateWith: selector]
 ]
 

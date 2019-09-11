@@ -1,9 +1,9 @@
 Class {
 	#name : #PCompiledMethod,
-	#superclass : #Array,
-	#type : #variable,
+	#superclass : #Object,
 	#instVars : [
 		'nativeCode',
+		'literals',
 		'astcodes',
 		'class',
 		'selector',
@@ -76,6 +76,16 @@ PCompiledMethod >> hasBlocks [
 PCompiledMethod >> initialize [
 	super initialize.
 	format := 0
+]
+
+{ #category : #accessing }
+PCompiledMethod >> literals [
+	^ literals
+]
+
+{ #category : #accessing }
+PCompiledMethod >> literals: anObject [
+	literals := anObject
 ]
 
 { #category : #constants }

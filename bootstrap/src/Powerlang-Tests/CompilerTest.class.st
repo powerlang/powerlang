@@ -25,7 +25,7 @@ CompilerTest >> test_01 [
 	methodInfo := compiler compile: 'perform: aSelector <primitive: Perform> ^self primitiveFailed'.
 	self assert: (methodInfo astcodes first) equals: MethodId.
 	self assert: (methodInfo astcodes second) equals: PrimitiveId.
-	self assert: (methodInfo astcodes third) equals: 2
+	self assert: (methodInfo literals at: methodInfo astcodes third) equals: 'Perform'
 	
 ]
 
