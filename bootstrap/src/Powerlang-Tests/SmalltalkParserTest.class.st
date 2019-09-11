@@ -671,6 +671,19 @@ SmalltalkParserTest >> testPeekForIdentifier [
 	self deny: (Compiler new peekForIdentifier: strm)
 ]
 
+{ #category : #messages }
+SmalltalkParserTest >> testPrimitive1 [
+	| source ast |
+	source := 'perform: selector
+						<primitive: Perform>'.
+	ast := parser parse: source.
+	self
+		assert: ast pragma notNil;
+		assert: ast pragma isUsed;
+		assert: ast pragma name = 'Perform'
+
+]
+
 { #category : #literals }
 SmalltalkParserTest >> testScientificNotation [
 	| method |

@@ -33,5 +33,5 @@ AstBindingTypes class >> initialize [
 	GlobalValueId := 10.
 	GlobalClassId := 11.
 	PoolVarId := 12.
-	ConstantPoolId := 13
+	ConstantPoolId := 13.
 ]

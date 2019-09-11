@@ -11,6 +11,7 @@ Class {
 		'MessageId',
 		'MethodId',
 		'PragmaId',
+		'PrimitiveId',
 		'ReturnId'
 	],
 	#category : #'Powerlang-Core-SExpressions'
@@ -27,5 +28,6 @@ AstNodeTypes class >> initialize [
 	BraceId := 7.
 	AssignmentId := 8.
 	ReturnId := 9.
-	PragmaId := 10
+	PragmaId := 10.
+	PrimitiveId := 11.
 ]
