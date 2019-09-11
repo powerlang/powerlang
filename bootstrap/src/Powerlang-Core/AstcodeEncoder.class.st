@@ -210,6 +210,15 @@ AstcodeEncoder >> nestedEncode: aBlock [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> nextLiteralPut: literalValue [
+	| index |
+	index := method indexOf: literalValue.
+	self assert: index != 0.
+	self nextPut: index.
+	
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> nextPut: anInteger [
 	stream nextPut: anInteger
 ]
@@ -266,10 +275,16 @@ AstcodeEncoder >> visitIdentifier: anIdentifierNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitLiteral: aLiteralNode [
-	| index |
-	index := method indexOf: aLiteralNode value.
-	self nextTypePut: LiteralId; nextPut: index.
-	index = 0 ifTrue: [self nextPut: aLiteralNode value]
+	| value |
+	
+	self nextTypePut: LiteralId.
+	
+	value := aLiteralNode value.
+	value isSmallInteger ifTrue:[
+			self nextPut: 0; nextPut: value.		
+	] ifFalse:[
+			self nextLiteralPut: value
+	].
 ]
 
 { #category : #visiting }
@@ -290,7 +305,7 @@ AstcodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
 	pragma := aMethodNode pragma.
-	pragma isPrimitive ifTrue: [ self nextTypePut: PrimitiveId; nextPut: pragma name ].
+	pragma isPrimitive ifTrue: [ self nextTypePut: PrimitiveId; nextLiteralPut: pragma name ].
 	self visitScript: aMethodNode.
 	^stream contents
 ]

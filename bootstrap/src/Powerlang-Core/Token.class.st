@@ -139,6 +139,11 @@ Token >> isPoolLiteral [
 ]
 
 { #category : #testing }
+Token >> isPrimitive [
+	^false
+]
+
+{ #category : #testing }
 Token >> isStringToken [
 	^false
 ]

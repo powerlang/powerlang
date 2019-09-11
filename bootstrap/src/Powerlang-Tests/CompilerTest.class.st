@@ -24,6 +24,17 @@ CompilerTest >> test_01 [
 	compiler := Compiler forClass: (Object ensureRingDefinitionIn: env).
 	methodInfo := compiler compile: 'perform: aSelector <primitive: Perform> ^self primitiveFailed'.
 	self assert: (methodInfo astcodes first) equals: MethodId.
-	self assert: (methodInfo astcodes second) equals: PrimitiveId
+	self assert: (methodInfo astcodes second) equals: PrimitiveId.
+	self assert: (methodInfo astcodes third) equals: 2
+	
+]
+
+{ #category : #tests }
+CompilerTest >> test_02 [
+	| compiler methodInfo |
+	
+	compiler := Compiler forClass: (Object ensureRingDefinitionIn: env).
+	methodInfo := compiler compile: 'meaningOfLife ^42'.
+	self assert: (methodInfo astcodes first) equals: MethodId.
 	
 ]

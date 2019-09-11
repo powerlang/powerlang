@@ -1,6 +1,6 @@
 Class {
 	#name : #PragmaNode,
-	#superclass : #Token,
+	#superclass : #ParseNode,
 	#instVars : [
 		'type',
 		'name',
