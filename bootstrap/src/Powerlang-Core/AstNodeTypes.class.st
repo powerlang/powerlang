@@ -10,7 +10,6 @@ Class {
 		'LiteralId',
 		'MessageId',
 		'MethodId',
-		'PragmaId',
 		'PrimitiveId',
 		'ReturnId'
 	],
@@ -28,6 +27,5 @@ AstNodeTypes class >> initialize [
 	BraceId := 7.
 	AssignmentId := 8.
 	ReturnId := 9.
-	PragmaId := 10.
-	PrimitiveId := 11.
+	PrimitiveId := 10.
 ]

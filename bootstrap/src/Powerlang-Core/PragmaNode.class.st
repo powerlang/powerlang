@@ -17,6 +17,11 @@ PragmaNode >> acceptVisitor: aVisitor [
 ]
 
 { #category : #'as yet unclassified' }
+PragmaNode >> isPrimitive [
+	^type = #primitive
+]
+
+{ #category : #'as yet unclassified' }
 PragmaNode >> isUsed [
 	^type notNil
 ]

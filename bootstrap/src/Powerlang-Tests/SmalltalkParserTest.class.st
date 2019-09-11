@@ -679,7 +679,7 @@ SmalltalkParserTest >> testPrimitive1 [
 	ast := parser parse: source.
 	self
 		assert: ast pragma notNil;
-		assert: ast pragma isUsed;
+		assert: ast pragma isPrimitive;
 		assert: ast pragma name = 'Perform'
 
 ]
