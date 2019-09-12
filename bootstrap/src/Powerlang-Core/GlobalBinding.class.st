@@ -19,6 +19,15 @@ GlobalBinding class >> usesSymbols [
 ]
 
 { #category : #testing }
+GlobalBinding >> encodeUsing: anAstcodeEncoder [
+	association value isClass ifTrue:[
+		anAstcodeEncoder encodeClassBinding: association.
+		^self
+	].
+	self notYetImplemented 
+]
+
+{ #category : #testing }
 GlobalBinding >> isGlobal [
 	^true
 ]

@@ -38,3 +38,15 @@ CompilerTest >> test_02 [
 	self assert: (methodInfo astcodes first) equals: MethodId.
 	
 ]
+
+{ #category : #tests }
+CompilerTest >> test_03 [
+	| object compiler methodInfo |
+	
+	object := Object ensureRingDefinitionIn: env.
+	compiler := Compiler forClass: object.
+	methodInfo := compiler compile: 'clone ^ Object new'.
+	self assert: (methodInfo literals contains:[:e|e value = object and:[e key = #Object]]).
+
+	
+]

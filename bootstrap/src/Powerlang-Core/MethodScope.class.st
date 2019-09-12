@@ -170,7 +170,8 @@ MethodScope >> species: aSpecies [
 	species := aSpecies.
 	self initializeInstVars; initializeClassVars; initializePoolVars.
 	species superclass isNil ifTrue: [^self].
-	pseudo at: 'super' put: SuperBinding new
+	pseudo at: 'super' put: SuperBinding new.
+	globals := DynamicBinder on: species environment of: GlobalBinding.
 ]
 
 { #category : #private }

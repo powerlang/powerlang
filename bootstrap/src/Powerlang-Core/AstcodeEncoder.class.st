@@ -103,7 +103,8 @@ AstcodeEncoder >> encodeArgument: anInteger env: environment [
 { #category : #visiting }
 AstcodeEncoder >> encodeClassBinding: association [
 	| index |
-	index := method indexOf: association ifAbsent: [self ASSERT: false].
+	index := method literals indexOf: association.
+	self assert: index ~~ 0.
 	stream nextPut: GlobalClassId; nextPut: index
 ]
 
