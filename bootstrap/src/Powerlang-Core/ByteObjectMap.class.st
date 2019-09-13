@@ -48,7 +48,7 @@ ByteObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self assert: anRGBehavior isBytes.
 	self assert: anRGBehavior isVariable.
 	
-	behaviorDef := anRGBehavior.
+	spec := anRGBehavior.
 	bytes := ByteArray new: size
 ]
 

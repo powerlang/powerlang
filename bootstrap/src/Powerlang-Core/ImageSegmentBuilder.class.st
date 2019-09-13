@@ -46,7 +46,7 @@ ImageSegmentBuilder >> falseObj [
 ImageSegmentBuilder >> fixBehaviorIn: obj [
 	| cls |
 	
-	cls := classDef2ClassObjMap at: obj behaviorDef.
+	cls := classDef2ClassObjMap at: obj spec.
 	obj behavior: cls instanceBehavior. 
 ]
 
@@ -240,7 +240,7 @@ ImageSegmentBuilder >> makeInstanceOf: className size: size [
 		obj isPointers ifTrue:[
 			| numSlots null |
 			
-			numSlots := obj behaviorDef instSize.
+			numSlots := obj spec instSize.
 			null := self nilObj.
 			1 to: obj size do:[:i |				
 				i <= numSlots ifTrue:[

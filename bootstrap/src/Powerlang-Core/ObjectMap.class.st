@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'behavior',
-		'behaviorDef'
+		'spec'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -59,11 +59,6 @@ ObjectMap >> behavior: anObjectMap [
 ]
 
 { #category : #accessing }
-ObjectMap >> behaviorDef [
-	^ behaviorDef
-]
-
-{ #category : #accessing }
 ObjectMap >> bodySizeInBytes [
 	"Return the size of object body(s) in bytes. 
 	 This DOES NOT INCLUDE any passing."
@@ -78,13 +73,13 @@ ObjectMap >> doesNotUnderstand: aMessage [
 	
 	sel := aMessage selector.
 	sel isUnary ifTrue:[
-		(behaviorDef allInstVarNames includes: sel) ifTrue:[
+		(spec allInstVarNames includes: sel) ifTrue:[
 			^self slotNamed: sel.
 		].
 	].
 	(sel isKeyword and:[sel numArgs == 1])  ifTrue:[
 		sel := sel allButLast.
-		(behaviorDef allInstVarNames includes: sel) ifTrue:[
+		(spec allInstVarNames includes: sel) ifTrue:[
 			^self slotNamed: sel put: aMessage arguments first.
 		].		
 	].
@@ -137,7 +132,7 @@ ObjectMap >> oopSizeInBytes [
 ObjectMap >> printOn: aStream [
 	super printOn: aStream.
 	aStream nextPutAll:'(a '.
-	aStream nextPutAll: behaviorDef name.
+	aStream nextPutAll: spec name.
 	aStream nextPut: $).
 ]
 
@@ -176,7 +171,7 @@ ObjectMap >> slotNamed: name [
 	
 	| index |
 	
-	index := behaviorDef allInstVarNames indexOf: name.
+	index := spec allInstVarNames indexOf: name.
 	index == 0 ifTrue:[
 		self error: 'No slot named ''', name , ''''.
 		^self.		
@@ -190,7 +185,7 @@ ObjectMap >> slotNamed: name put: value [
 	
 	| index |
 	
-	index := behaviorDef allInstVarNames indexOf: name.
+	index := spec allInstVarNames indexOf: name.
 	index == 0 ifTrue:[
 		self error: 'No slot named ''', name , ''''.
 		^self.		
@@ -212,6 +207,11 @@ ObjectMap >> smallHeaderSize [
 	
    size := self size.
    ^ size < 256 ifTrue: [ size ] ifFalse: [ 0 ]
+]
+
+{ #category : #accessing }
+ObjectMap >> spec [
+	^ spec
 ]
 
 { #category : #validation }
