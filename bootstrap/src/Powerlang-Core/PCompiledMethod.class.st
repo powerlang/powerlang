@@ -54,7 +54,7 @@ PCompiledMethod >> blockCount: anInteger [
 { #category : #constants }
 PCompiledMethod >> blocks [
 	self hasBlocks ifFalse: [^#()].
-	^self select: [:literal | literal isBlock]
+	^self literals select: [:literal | literal isBlock]
 ]
 
 { #category : #constants }

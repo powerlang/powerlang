@@ -84,7 +84,7 @@ AstcodeEncoder class >> initializeNodeTypes [
 { #category : #visiting }
 AstcodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |
-	index := method
+	index := method literals
 		findFirst: [:literal | literal isBlock
 			and: [literal id == aBlockNode index]].
 	^index
@@ -103,7 +103,7 @@ AstcodeEncoder >> encodeArgument: anInteger env: environment [
 { #category : #visiting }
 AstcodeEncoder >> encodeClassBinding: association [
 	| index |
-	index := method literals indexOf: association.
+	index := method literals indexOf: association key -> association value.
 	self assert: index ~~ 0.
 	stream nextPut: GlobalClassId; nextPut: index
 ]

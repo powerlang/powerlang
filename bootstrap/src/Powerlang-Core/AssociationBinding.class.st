@@ -30,5 +30,5 @@ AssociationBinding >> association: anAssociation [
 
 { #category : #accessing }
 AssociationBinding >> literal [
-	^association
+	^association key -> association value
 ]

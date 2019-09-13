@@ -18,6 +18,8 @@ MessageInliner >> inline: aMessageNode [
 	s == #ifTrue: ifTrue: [^self inlineConditional].
 	s == #ifFalse: ifTrue: [^self inlineConditional].
 	s == #ifNotNil: ifTrue: [^self inlineIfNotNil].
+	s == #ifTrue:ifFalse: ifTrue: [^self inlineConditional].
+	s == #ifFalse:ifTrue: ifTrue: [^self inlineConditional].
 ]
 
 { #category : #inlining }

@@ -50,3 +50,25 @@ CompilerTest >> test_03 [
 
 	
 ]
+
+{ #category : #tests }
+CompilerTest >> test_04 [
+	| object compiler methodInfo |
+	
+	object := ProtoObject ensureRingDefinitionIn: env.
+	compiler := Compiler forClass: object.
+	methodInfo := compiler compile: 'perform: aSymbol withArguments: anArray
+	| species article |
+	<primitive: PerformWithArguments>
+	aSymbol isSymbol ifFalse: [
+		species := aSymbol class name.
+		article := species first isVowel ifTrue: [''an ''] ifFalse: [''a ''].
+		^self error: ''perform: expects a Symbol, not '' , article , species].
+	^self
+		error: self class name , ''>>'' , aSymbol , '' does not expect ''
+			, anArray size printString
+			, '' arguments'''.
+
+
+	
+]

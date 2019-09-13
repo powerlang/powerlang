@@ -24,6 +24,7 @@ BlockNode >> beInlined [
 BlockNode >> buildBlock [
 	| block |
 	self isInlined ifTrue: [^nil].
+	self notYetImplemented.
 	block := PCompiledBlock new.
 	^block
 		id: index;
