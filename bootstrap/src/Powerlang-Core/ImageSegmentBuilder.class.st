@@ -203,6 +203,12 @@ ImageSegmentBuilder >> makeClasses [
 ]
 
 { #category : #utilities }
+ImageSegmentBuilder >> makeFloat: value [
+	"CRAP CRAP CRAP, totally bogus!"
+	^self nilObj 	
+]
+
+{ #category : #utilities }
 ImageSegmentBuilder >> makeInstanceOf: className [
 	^ self makeInstanceOf: className size: 0
 	
@@ -264,13 +270,80 @@ ImageSegmentBuilder >> makeInstanceOf: className size: size [
 	
 ]
 
+{ #category : #utilities }
+ImageSegmentBuilder >> makeInteger: value [
+	value isSmallInteger ifTrue:[
+		^self makeSmallInteger: value.
+	] ifFalse:[
+		"CRAP CRAP CRAP, totally bogus!"
+		^self nilObj 	
+	]
+	
+]
+
+{ #category : #utilities }
+ImageSegmentBuilder >> makeLiteral: anObject [
+	anObject isArray ifTrue:[
+		^self makeArray: (anObject collect:[:e|self makeLiteral:e])
+	].	
+	anObject == true ifTrue:[
+		^self trueObj 
+	].
+	anObject == false ifTrue:[
+		^self falseObj 
+	].
+	anObject isNil ifTrue:[
+		^self nilObj 
+	].
+	anObject isSymbol ifTrue:[
+		^self makeSymbol: anObject.
+	].
+	anObject isString ifTrue:[
+		^self makeString: anObject.
+	].
+	anObject class == Association ifTrue:[
+		| assoc |
+		
+		assoc := self makeInstanceOf: #Association.
+		assoc key: (self makeLiteral: anObject key).
+		assoc value: (self makeLiteral: anObject value).
+		^assoc.
+	].
+	anObject isClass ifTrue:[
+		^classDef2ClassObjMap at: anObject
+	].
+	anObject isFloat ifTrue:[
+		^self makeFloat: anObject.
+	].
+	anObject isInteger ifTrue:[
+		^self makeInteger: anObject.
+	].
+	self error: 'Invalid literal object'
+		
+
+]
+
 { #category : #'building-private' }
 ImageSegmentBuilder >> makeMethodDef: anRGMethod [
-	| methodObj |
+	| compiler methodInfo astcodesObj literalsObj methodObj  |
+	
+	[
+	compiler := Compiler forClass: anRGMethod parent.
+	methodInfo := compiler compile: anRGMethod sourceCode.	
+	astcodesObj := self makeLiteral: methodInfo astcodes.
+	literalsObj := self makeLiteral: methodInfo literals asArray.
+	] on: Error do:[:ex| 
+		methodInfo := astcodesObj := literalsObj := nil.
+		Transcript show: 'PST: failed to compile ', anRGMethod parent name , ' >> ' , anRGMethod selector, ': ', ex messageText; cr.
+	].
 	
 	methodObj := self makeInstanceOf: #CompiledMethod size: 0.
 	methodObj class: (classDef2ClassObjMap at: anRGMethod methodClass).
 	methodObj selector: (self makeSymbol: anRGMethod selector).
+	methodInfo notNil ifTrue:[
+		methodObj bytecodes: astcodesObj.
+		methodObj literals: literalsObj.
+	].
 	^methodObj 
 ]
 
@@ -279,6 +352,12 @@ ImageSegmentBuilder >> makeSmallInteger: value [
 	^(self makeInstanceOf: #SmallInteger)
 		value: value;
 		yourself
+	
+]
+
+{ #category : #utilities }
+ImageSegmentBuilder >> makeString: value [
+	^ self makeInstanceOf: #String bytes: value asByteArray
 	
 ]
 
