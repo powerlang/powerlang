@@ -29,10 +29,25 @@
 namespace S9 {
 
 OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
+Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
+
+template<typename... Targs>
+OOP<VMObject>
+LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
 {
-    OOP<VMBehavior> behavior = obj->behavior();
-    return behavior->lookup(sel);
+    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
+           obj.get(),
+           sel.get(),
+           ((char*)sel.get()));
+    OOP<VMMethod> mthd = Lookup(obj, sel);
+
+    auto code = mthd->getNativeCode();
+
+    if (code == nullptr) {
+        S9_ASSERT(0 && "No native code");
+        abort();
+    }
+    return code(args...);
 }
 } // namespace S9
 

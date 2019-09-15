@@ -54,7 +54,7 @@ main(const int argc, const char** argv)
     OOP<pst::BeeModuleTOC> toc = kernel->header.toc;
     OOP<> entry = toc->s_actions->slot(0);
 
-    OOP<> entry_method = Lookup(entry, Symbol_evaluate);
+    OOP<> retval = LookupAndInvoke(entry, Symbol_evaluate);
 
-    printf("Entry method to execute %p\n", entry_method.get());
+    printf("Result is %p\n", retval.get());
 }

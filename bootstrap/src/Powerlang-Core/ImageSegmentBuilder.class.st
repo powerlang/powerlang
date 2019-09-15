@@ -340,6 +340,7 @@ ImageSegmentBuilder >> makeMethodDef: anRGMethod [
 	methodObj := self makeInstanceOf: #CompiledMethod size: 0.
 	methodObj class: (classDef2ClassObjMap at: anRGMethod methodClass).
 	methodObj selector: (self makeSymbol: anRGMethod selector).
+	methodObj nativeCode: (self makeSmallInteger: 0).
 	methodInfo notNil ifTrue:[
 		methodObj bytecodes: astcodesObj.
 		methodObj literals: literalsObj.

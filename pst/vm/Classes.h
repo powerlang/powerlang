@@ -23,6 +23,7 @@
 #ifndef _CLASSES_H_
 #define _CLASSES_H_
 
+#include <cstdint>
 #include <Object.h>
 
 typedef S9::VMObject VMObject;
@@ -53,6 +54,19 @@ class VMBehavior : public pst::Behavior
 {
   public:
     OOP<VMObject> lookup(OOP<VMObject> sel);
+};
+
+using VMNativeCode = VMObject* (*)();
+
+class VMMethod : public pst::CompiledMethod
+{
+  public:
+    VMNativeCode getNativeCode()
+    {
+        uintptr_t code = (uintptr_t)this->s_nativeCode;
+        S9_ASSERT((code & 1) && "Native code is not a SmallInteger");
+        return (VMNativeCode)(code & ~1);
+    }
 };
 
 } // namespace S9
