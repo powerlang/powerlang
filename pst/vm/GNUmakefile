@@ -21,7 +21,12 @@ SOURCES=$(wildcard *.cpp)
 OBJECTS=$(patsubst %.cpp,$(BUILD)/%.o,$(SOURCES))
 DEPENDS=$(patsubst %.cpp,$(BUILD)/%.d,$(SOURCES))
 
-all: $(OBJECTS) $(BUILD)/s9
+DEFINITIONS= \
+	$(BUILD)/Classes.def \
+	$(BUILD)/AstNodeTypes.def \
+	$(BUILD)/AstBindingTypes.def
+
+all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/s9
 
 $(BUILD):
 	mkdir -p $(BUILD)
@@ -29,9 +34,18 @@ $(BUILD):
 $(BUILD)/%.o: %.cpp $(BUILD)/%.d| $(BUILD)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) $(DEPFLAGS) -o $@ -c $<
 
-$(BUILD)/Classes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo
+$(BUILD)/Classes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"ClassDefWriter writeToFile: '$(shell pwd)/$@'"
+
+$(BUILD)/AstNodeTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
+	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
+		"EnumDefWriter write: AstNodeTypes toFile: '$(shell pwd)/$@'"
+
+$(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
+	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
+		"EnumDefWriter write: AstBindingTypes toFile: '$(shell pwd)/$@'"
+
 
 $(BUILD)/s9: $(OBJECTS)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS)

@@ -1,8 +1,27 @@
 Class {
 	#name : #ClassDefWriter,
 	#superclass : #DefWriter,
+	#instVars : [
+		'classes'
+	],
 	#category : #'Powerlang-Core-Tools'
 }
+
+{ #category : #writing }
+ClassDefWriter class >> write: classes to: stream [
+	^self new
+		classes: classes;
+		stream: stream;
+		write
+]
+
+{ #category : #writing }
+ClassDefWriter class >> write: classes toFile: filename [
+	filename asFileReference writeStreamDo: [ :stream |
+		self write: classes to: stream
+	]
+
+]
 
 { #category : #writing }
 ClassDefWriter class >> writeToFile: filename [
@@ -10,12 +29,12 @@ ClassDefWriter class >> writeToFile: filename [
 ]
 
 { #category : #accessing }
-ClassDefWriter >> objects: classes [
+ClassDefWriter >> classes: aCollection [
 	| dependencies |
 	
 	dependencies := Set new.
-	classes do:[:cls | cls superclass notNil ifTrue:[dependencies add: cls -> cls superclass ]].
-	objects := TopologicalSort sort: dependencies.						
+	aCollection do:[:cls | cls superclass notNil ifTrue:[dependencies add: cls -> cls superclass ]].
+	classes := TopologicalSort sort: dependencies.						
 	
 	
 ]
@@ -31,11 +50,11 @@ ClassDefWriter >> write [
 		writeln:'#define DEFINE_SLOT(name)';
 		writeln:'#endif'.
 		
-	super write.
+	classes do:[:cls| self writeClass: cls]
 ]
 
 { #category : #writing }
-ClassDefWriter >> write1: anRGEnvironment [
+ClassDefWriter >> writeClass: anRGEnvironment [
 	self
 		write:'DEFINE_CLASS(';
 		write: anRGEnvironment name;
