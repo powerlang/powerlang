@@ -1,0 +1,3 @@
+[submodule "pst/vm/omr"]
+	path = pst/vm/omr
+	url = https://github.com/eclipse/omr.git

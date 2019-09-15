@@ -20,6 +20,7 @@ INCLUDES=-I. -I$(BUILD)
 SOURCES=$(wildcard *.cpp)
 OBJECTS=$(patsubst %.cpp,$(BUILD)/%.o,$(SOURCES))
 DEPENDS=$(patsubst %.cpp,$(BUILD)/%.d,$(SOURCES))
+LIBS   =
 
 DEFINITIONS= \
 	$(BUILD)/Classes.def \
@@ -46,17 +47,42 @@ $(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ..
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"EnumDefWriter write: AstBindingTypes toFile: '$(shell pwd)/$@'"
 
-
-$(BUILD)/s9: $(OBJECTS)
-	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS)
+$(BUILD)/s9:: $(OBJECTS)
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
 	$(MAKE) -C $(BOOTSTRAP)
-	
+
 $(DEPENDS):
 
 include $(wildcard $(DEPENDS))
 
-clean:
+clean::
 	rm -f $(OBJECTS) $(DEPENDS) $(BUILD)/s9
-	
+
+#
+# Definitions for OMR
+#
+INCLUDES +=         -Iomr/jitbuilder/release/cpp/include \
+	    -I$(BUILD)omr/jitbuilder/release/cpp/include
+
+LIBS += $(BUILD)/omr/jitbuilder/libjitbuilder.a
+
+$(BUILD)/s9:: $(BUILD)/omr/jitbuilder/libjitbuilder.a
+
+$(BUILD)/omr:
+	mkdir -p $@
+
+$(BUILD)/omr/Makefile: | omr $(BUILD)/omr
+	cmake -S omr -B $(BUILD)/omr \
+		-DOMR_COMPILER=ON \
+		-DOMR_JITBUILDER=ON \
+		-DOMR_JITBUILDER_TEST=OFF \
+		-DOMR_TEST_COMPILER=OFF \
+		-DOMR_GC=OFF
+
+$(BUILD)/omr/jitbuilder/libjitbuilder.a: $(BUILD)/omr/Makefile
+	$(MAKE) -C $(BUILD)/omr
+
+clean::
+	if test -f $(BUILD)/omr/Makefile; then $(MAKE) -C $(BUILD)/omr clean; fi
