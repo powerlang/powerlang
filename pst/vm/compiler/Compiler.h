@@ -20,40 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _DISPATCH_H_
-#define _DISPATCH_H_
 
-#include <Classes.h>
-#include <Object.h>
-#include <compiler/Compiler.h>
+#ifndef _COMPILER_H_
+#define _COMPILER_H_
+
+#include "JitBuilder.hpp"
+
+#include "Object.h"
+#include "Classes.h"
 
 namespace S9 {
-
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
-
-template<typename... Targs>
-OOP<VMObject>
-LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
+class Compiler
 {
-    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
-           obj.get(),
-           sel.get(),
-           ((char*)sel.get()));
-    OOP<VMMethod> mthd = Lookup(obj, sel);
+  public:
+    /**
+     * Initialize the compiler. Must be called before any compilation is
+     * done (during VM startup)
+     */
+    static bool initialize();
 
-    auto code = mthd->getNativeCode();
+    /**
+     * Compile given PST method into machine code and return its
+     * entry point.
+     */
+    static VMNativeCodePtr compile(OOP<VMMethod> method);
 
-    if (code == nullptr) {
-        code = Compiler::compile(mthd);
-        if (code == nullptr)
-            abort();
-        else
-            mthd->setNativeCode(code);
-    }
+  private:
+    static bool initialized;
+    static OMR::JitBuilder::TypeDictionary* types;
+};
 
-    return code(args...);
-}
 } // namespace S9
 
-#endif /* _DISPATCH_H_ */
+#endif // _COMPILER_H_

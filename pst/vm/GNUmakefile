@@ -17,9 +17,14 @@ BUILD = build/$(TARGET)
 
 INCLUDES=-I. -I$(BUILD)
 
-SOURCES=$(wildcard *.cpp)
+SOURCE_DIRS=. compiler
+SOURCES=$(foreach d,$(SOURCE_DIRS),$(wildcard $(d)/*.cpp))
+
+OBJECT_DIRS=$(foreach d,$(SOURCE_DIRS),$(BUILD)/$(d))
 OBJECTS=$(patsubst %.cpp,$(BUILD)/%.o,$(SOURCES))
+
 DEPENDS=$(patsubst %.cpp,$(BUILD)/%.d,$(SOURCES))
+
 LIBS   =
 
 DEFINITIONS= \
@@ -30,9 +35,12 @@ DEFINITIONS= \
 all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/s9
 
 $(BUILD):
-	mkdir -p $(BUILD)
+	mkdir -p $@
 
-$(BUILD)/%.o: %.cpp $(BUILD)/%.d| $(BUILD)
+$(OBJECT_DIRS): | $(BUILD)
+	mkdir -p $@
+
+$(BUILD)/%.o: %.cpp $(BUILD)/%.d | $(OBJECT_DIRS)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) $(DEPFLAGS) -o $@ -c $<
 
 $(BUILD)/Classes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
@@ -63,8 +71,8 @@ clean::
 #
 # Definitions for OMR
 #
-INCLUDES +=         -Iomr/jitbuilder/release/cpp/include \
-	    -I$(BUILD)omr/jitbuilder/release/cpp/include
+INCLUDES += -Iomr/include_core \
+	    -Iomr/jitbuilder/release/cpp/include
 
 LIBS += $(BUILD)/omr/jitbuilder/libjitbuilder.a
 

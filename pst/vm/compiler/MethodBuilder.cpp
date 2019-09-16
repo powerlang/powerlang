@@ -20,40 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _DISPATCH_H_
-#define _DISPATCH_H_
 
-#include <Classes.h>
-#include <Object.h>
-#include <compiler/Compiler.h>
+#include "Object.h"
+#include "compiler/MethodBuilder.h"
 
 namespace S9 {
 
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
-
-template<typename... Targs>
-OOP<VMObject>
-LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
+MethodBuilder::MethodBuilder(OOP<VMMethod> method,
+                             OMR::JitBuilder::TypeDictionary* types)
+  : OMR::JitBuilder::MethodBuilder(types,
+                                   (OMR::JitBuilder::VirtualMachineState*)NULL)
+  , method(method)
 {
-    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
-           obj.get(),
-           sel.get(),
-           ((char*)sel.get()));
-    OOP<VMMethod> mthd = Lookup(obj, sel);
-
-    auto code = mthd->getNativeCode();
-
-    if (code == nullptr) {
-        code = Compiler::compile(mthd);
-        if (code == nullptr)
-            abort();
-        else
-            mthd->setNativeCode(code);
-    }
-
-    return code(args...);
+    // CRAP CRAP CRAP: this is bogus, we need to construct proper name,
+    // number of arguments and so on...
+    DefineName("method");
+    DefineReturnType(Address);
 }
-} // namespace S9
 
-#endif /* _DISPATCH_H_ */
+IlValue*
+MethodBuilder::SmallInteger(uintptr_t value)
+{
+    return ConstAddress(VMObject::smallIntObj(value));
+}
+
+bool
+MethodBuilder::buildIL()
+{
+    // CRAP CRAP CRAP: totally bogus.
+    Return(SmallInteger(42));
+    return true;
+}
+
+} // namespace S9

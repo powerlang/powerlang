@@ -82,6 +82,26 @@ struct VMObject : private pst::oop_t
     VMObject* slot(uint32_t index);
 
     /**
+     * Return `true` if this object is a SmallInteger instance,
+     * `false` otherwise.
+     */
+    bool isSmallInt() { return (uintptr_t)this & 1 ? true : false; }
+
+    /**
+     * Assuming `this` represents a SmallInteger, return its
+     * (signed) integer value
+     */
+    intptr_t smallIntVal() { return (intptr_t)this >> 1; }
+
+    /**
+     * Create a new SmallInteger for given integer value.
+     */
+    static VMObject* smallIntObj(intptr_t val)
+    {
+        return (VMObject*)((val << 1) | 1);
+    }
+
+    /**
      * Return a byte of this object at given index. Index
      * starts at 0. This MUST be used only with byte-indexed
      * objects.

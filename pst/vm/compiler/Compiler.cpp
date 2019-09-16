@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Javier Pimas, Boris Shingarov, Jan Vrany
+ * Copyright (c) 2019 Javier Pimas, Jan Vrany
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,40 +20,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _DISPATCH_H_
-#define _DISPATCH_H_
 
-#include <Classes.h>
-#include <Object.h>
-#include <compiler/Compiler.h>
+#include "JitBuilder.hpp"
+#include "compiler/MethodBuilder.h"
+#include "compiler/Compiler.h"
 
 namespace S9 {
 
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
+bool Compiler::initialized = false;
 
-template<typename... Targs>
-OOP<VMObject>
-LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
+OMR::JitBuilder::TypeDictionary* Compiler::types = nullptr;
+
+bool
+Compiler::initialize()
 {
-    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
-           obj.get(),
-           sel.get(),
-           ((char*)sel.get()));
-    OOP<VMMethod> mthd = Lookup(obj, sel);
-
-    auto code = mthd->getNativeCode();
-
-    if (code == nullptr) {
-        code = Compiler::compile(mthd);
-        if (code == nullptr)
-            abort();
-        else
-            mthd->setNativeCode(code);
-    }
-
-    return code(args...);
+    ASSERT(!initialized && "Compiler already initialized!");
+    initialized = initializeJit();
+    types = new OMR::JitBuilder::TypeDictionary();
+    return initialized;
 }
-} // namespace S9
 
-#endif /* _DISPATCH_H_ */
+VMNativeCodePtr
+Compiler::compile(OOP<VMMethod> method)
+{
+    ASSERT(initialized && "Compiler not yet initialized!");
+    MethodBuilder mb(method, Compiler::types);
+    void* entry = 0;
+    if (compileMethodBuilder(&mb, &entry) != 0) {
+        throw "Failed to compile method";
+    }
+    return (VMNativeCodePtr)entry;
+}
+
+} // namespace S9

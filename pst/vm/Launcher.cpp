@@ -26,6 +26,7 @@
 #include <Object.h>
 #include <Classes.h>
 #include <Dispatch.h>
+#include <compiler/Compiler.h>
 
 using namespace S9;
 
@@ -50,6 +51,7 @@ main(const int argc, const char** argv)
            kernel->header.toc.get());
 
     VMObject::initializeSpecialObjects((*(kernel->begin())).get());
+    Compiler::initialize();
 
     OOP<pst::BeeModuleTOC> toc = kernel->header.toc;
     OOP<> entry = toc->s_actions->slot(0);

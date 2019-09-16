@@ -34,7 +34,7 @@ typedef S9::VMObject VMObject;
         SLOTS                                                                   \
     };                                                                          \
     }
-#define DEFINE_SLOT(SLOTNAME) Object* s_##SLOTNAME;
+#define DEFINE_SLOT(SLOTNAME) VMObject* s_##SLOTNAME;
 #define NIL VMObject
 
 #include "Classes.def"
@@ -56,16 +56,25 @@ class VMBehavior : public pst::Behavior
     OOP<VMObject> lookup(OOP<VMObject> sel);
 };
 
-using VMNativeCode = VMObject* (*)();
+using VMNativeCodePtr = VMObject* (*)();
 
 class VMMethod : public pst::CompiledMethod
 {
   public:
-    VMNativeCode getNativeCode()
+    VMNativeCodePtr getNativeCode()
     {
+        S9_ASSERT((this->s_nativeCode->isSmallInt()) &&
+                  "Native code is not a SmallInteger");
         uintptr_t code = (uintptr_t)this->s_nativeCode;
-        S9_ASSERT((code & 1) && "Native code is not a SmallInteger");
-        return (VMNativeCode)(code & ~1);
+        return (VMNativeCodePtr)(code & ~1);
+    }
+
+    void setNativeCode(VMNativeCodePtr nativeCode)
+    {
+        uintptr_t code = (uintptr_t)nativeCode;
+        S9_ASSERT(((code & 1) == 0) &&
+                  "Native code pointer is not aligned to 2 bytes!");
+        this->s_nativeCode = (VMObject*)(code | 1);
     }
 };
 

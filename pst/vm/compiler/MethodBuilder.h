@@ -20,40 +20,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _DISPATCH_H_
-#define _DISPATCH_H_
+#ifndef _COMPILER_METHODBUILDER_H_
+#define _COMPILER_METHODBUILDER_H_
 
-#include <Classes.h>
-#include <Object.h>
-#include <compiler/Compiler.h>
+#include "IlValue.hpp"
+#include "JitBuilder.hpp"
+
+#include "Object.h"
+#include "Classes.h"
+
+using namespace OMR::JitBuilder;
 
 namespace S9 {
-
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
-
-template<typename... Targs>
-OOP<VMObject>
-LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
+class MethodBuilder : public OMR::JitBuilder::MethodBuilder
 {
-    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
-           obj.get(),
-           sel.get(),
-           ((char*)sel.get()));
-    OOP<VMMethod> mthd = Lookup(obj, sel);
+  public:
+    MethodBuilder(OOP<VMMethod> method, OMR::JitBuilder::TypeDictionary* types);
 
-    auto code = mthd->getNativeCode();
+    virtual IlValue* SmallInteger(uintptr_t value);
 
-    if (code == nullptr) {
-        code = Compiler::compile(mthd);
-        if (code == nullptr)
-            abort();
-        else
-            mthd->setNativeCode(code);
-    }
+    virtual bool buildIL();
 
-    return code(args...);
-}
+    virtual ~MethodBuilder() {}
+
+  private:
+    OOP<VMMethod> method;
+};
 } // namespace S9
 
-#endif /* _DISPATCH_H_ */
+#endif /* _COMPILER_METHODBUILDER_H_ */
