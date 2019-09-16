@@ -56,7 +56,7 @@ class VMBehavior : public pst::Behavior
     OOP<VMObject> lookup(OOP<VMObject> sel);
 };
 
-using VMNativeCodePtr = VMObject* (*)();
+using VMNativeCodePtr = VMObject* (*)(OOP<VMObject>, ...);
 
 class VMMethod : public pst::CompiledMethod
 {

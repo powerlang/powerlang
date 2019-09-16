@@ -52,7 +52,7 @@ LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
             mthd->setNativeCode(code);
     }
 
-    return code(args...);
+    return code(obj, args...);
 }
 } // namespace S9
 

@@ -37,14 +37,22 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
   public:
     MethodBuilder(OOP<VMMethod> method, OMR::JitBuilder::TypeDictionary* types);
 
-    virtual IlValue* SmallInteger(uintptr_t value);
+    virtual IlValue* SmallInteger(intptr_t value);
+    virtual IlValue* Literal(intptr_t index);
 
     virtual bool buildIL();
+
+    virtual IlValue* buildNode(OOP<VMObject> node);
 
     virtual ~MethodBuilder() {}
 
   private:
     OOP<VMMethod> method;
+    IlType* AddressPtr;
+
+    IlValue* buildMethod(const OOP<VMObject> node);
+    IlValue* buildReturn(const OOP<VMObject> node);
+    IlValue* buildLiteral(const OOP<VMObject> node);
 };
 } // namespace S9
 
