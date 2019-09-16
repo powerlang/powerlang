@@ -42,6 +42,14 @@ ImageSegmentBuilder >> falseObj [
 	self notYetImplemented 
 ]
 
+{ #category : #utilities }
+ImageSegmentBuilder >> findClassDef: name [
+	"Return a class definition (as RGBehavior) for class
+	 with given name or nil (if not found in definitions)"
+	
+	^definition at: name
+]
+
 { #category : #'building-private' }
 ImageSegmentBuilder >> fixBehaviorIn: obj [
 	| cls |
@@ -161,7 +169,7 @@ ImageSegmentBuilder >> makeClass: className [
 	"Create a single class and return it."	
 	| clsDef clsObj metaObj |
 	
-	clsDef := definition at: className.
+	clsDef := self findClassDef: className.
 	self assert: clsDef notNil.  
 	self assert: clsDef isMeta not.
 	self assert: clsDef metaclass instSize == 0.
@@ -185,17 +193,22 @@ ImageSegmentBuilder >> makeClass: className [
 { #category : #'building-private' }
 ImageSegmentBuilder >> makeClassIfNotAlready: className [
 	"Create given class if it's not already created and return it."
-	self assert: (definition at: className) notNil.
+	self assert: (self findClassDef: className) notNil.
 
 	^classDef2ClassObjMap 
-		at: (definition at: className)
+		at: (self findClassDef: className)
 		ifAbsent:[self makeClass: className]
 	
 ]
 
 { #category : #'building-private' }
 ImageSegmentBuilder >> makeClasses [
-	definition behaviorsDo: [:behavior | 
+	self makeClasses: definition 	
+]
+
+{ #category : #'building-private' }
+ImageSegmentBuilder >> makeClasses: environment [
+	environment behaviorsDo: [:behavior | 
 		behavior isMeta ifFalse:[
 			self makeClassIfNotAlready: behavior  name ]	
 		]
@@ -235,7 +248,7 @@ ImageSegmentBuilder >> makeInstanceOf: className size: size [
 	"
 	| clsDef obj  |
 	
-	clsDef := (definition at: className) ifNil:[kernel at: className].
+	clsDef := (self findClassDef: className) ifNil:[kernel at: className].
 	
 	self assert: clsDef notNil.
 	
