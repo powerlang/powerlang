@@ -32,10 +32,13 @@ DEFINITIONS= \
 	$(BUILD)/AstNodeTypes.def \
 	$(BUILD)/AstBindingTypes.def
 
-all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/s9
+all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/s9 $(BUILD)/s9-gdb.py
 
 $(BUILD):
 	mkdir -p $@
+
+$(BUILD)/s9-gdb.py: | $(BUILD)
+	cd $(BUILD) && ln -s ../../s9-gdb.py .
 
 $(OBJECT_DIRS): | $(BUILD)
 	mkdir -p $@
