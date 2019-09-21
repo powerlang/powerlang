@@ -43,15 +43,15 @@ $(OBJECT_DIRS): | $(BUILD)
 $(BUILD)/%.o: %.cpp $(BUILD)/%.d | $(OBJECT_DIRS)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) $(DEPFLAGS) -o $@ -c $<
 
-$(BUILD)/Classes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
+$(BUILD)/Classes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/* | $(BUILD)
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"ClassDefWriter writeToFile: '$(shell pwd)/$@'"
 
-$(BUILD)/AstNodeTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
+$(BUILD)/AstNodeTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/* | $(BUILD)
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"EnumDefWriter write: AstNodeTypes toFile: '$(shell pwd)/$@'"
 
-$(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/*
+$(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ../kernel/* | $(BUILD)
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"EnumDefWriter write: AstBindingTypes toFile: '$(shell pwd)/$@'"
 
@@ -61,7 +61,7 @@ $(BUILD)/s9:: $(OBJECTS)
 $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
 	$(MAKE) -C $(BOOTSTRAP)
 
-$(DEPENDS):
+$(DEPENDS)::
 
 include $(wildcard $(DEPENDS))
 
@@ -73,6 +73,7 @@ clean::
 #
 INCLUDES += -Iomr/include_core \
 	    -Iomr/jitbuilder/release/cpp/include
+$(DEPENDS):: omr/jitbuilder/release/cpp/include/JitBuilder.hpp
 
 LIBS += $(BUILD)/omr/jitbuilder/libjitbuilder.a
 
@@ -89,7 +90,7 @@ $(BUILD)/omr/Makefile: | omr $(BUILD)/omr
 		-DOMR_TEST_COMPILER=OFF \
 		-DOMR_GC=OFF
 
-$(BUILD)/omr/jitbuilder/libjitbuilder.a: $(BUILD)/omr/Makefile
+omr/jitbuilder/release/cpp/include/JitBuilder.hpp $(BUILD)/omr/jitbuilder/libjitbuilder.a: $(BUILD)/omr/Makefile
 	$(MAKE) -C $(BUILD)/omr
 
 clean::
