@@ -85,26 +85,23 @@ ImageSegmentBuilder >> fixHierarchyIn: clsObj def: clsDef [
 	"
 	Fix hierarchy (superclasses, behavior links) in given class.
 	"
-	clsDef superclass notNil ifTrue:[
-			| superObj |
-			
+	| superObj superMetaObj metaObj |
+	clsDef superclass notNil ifTrue:[			
 			superObj := classDef2ClassObjMap at: clsDef superclass.
-			
-			"Link classes"
-			clsObj superclass: superObj.
-			clsObj instanceBehavior next: superObj instanceBehavior.
-			
-			"Link superclasses"
-			clsObj behavior superclass: superObj behavior.
-			clsObj behavior instanceBehavior next: superObj behavior instanceBehavior.			
+			superMetaObj := classDef2ClassObjMap at: clsDef metaclass superclass.
 	] ifFalse:[
-		| classObj |
-		
-		classObj := classDef2ClassObjMap at: (kernel at: #Class).
-		
-		clsObj behavior superclass: classObj.
-		clsObj behavior instanceBehavior next: classObj instanceBehavior.
-	]
+			superObj := classDef2ClassObjMap at: (kernel at: #Class).
+			superMetaObj := classDef2ClassObjMap at: (kernel at: #Class) metaclass.
+	].
+
+	"Link classes"
+	clsObj superclass: superObj.
+	clsObj instanceBehavior next: superObj instanceBehavior.
+			
+	"Link metaclasses"
+	metaObj := classDef2ClassObjMap at: clsDef metaclass.			
+	metaObj superclass: superObj behavior.
+	metaObj instanceBehavior next: superMetaObj instanceBehavior.
 	
 
 
@@ -157,9 +154,11 @@ ImageSegmentBuilder >> makeBehaviorFor: clsObj methods: methods [
 	methodsObj := self makeInstanceOf: #MethodDictionary.
 	methodsObj tally: (self makeSmallInteger: methods size).
 	methodsObj table: tableObj.
+	methodsObj class: clsObj.
 	
 	behaviorObj := self makeInstanceOf: #Behavior.
 	behaviorObj methods: methodsObj.
+
 	
 	^behaviorObj 
 ]
@@ -184,7 +183,7 @@ ImageSegmentBuilder >> makeClass: className [
 	metaObj instanceBehavior: (self makeBehaviorFor: metaObj methods: clsDef metaclass methods).
 	metaObj class: clsObj.
 	
-	clsObj behavior: metaObj.
+	clsObj behavior: metaObj instanceBehavior.
 		
 	^ clsObj.
 	
