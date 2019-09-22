@@ -304,7 +304,8 @@ AstcodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
 	pragma := aMethodNode pragma.
-	pragma isPrimitive ifTrue: [ self nextTypePut: PrimitiveId; nextLiteralPut: pragma name ].
+	pragma isPrimitive ifTrue: [ 
+		self nestedEncode: [ self nextTypePut: PrimitiveId; nextLiteralPut: pragma name ]].
 	self visitScript: aMethodNode.
 	^stream contents
 ]

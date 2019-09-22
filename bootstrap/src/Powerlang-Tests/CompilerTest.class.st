@@ -24,8 +24,8 @@ CompilerTest >> test_01 [
 	compiler := Compiler forClass: (Object ensureRingDefinitionIn: env).
 	methodInfo := compiler compile: 'perform: aSelector <primitive: Perform> ^self primitiveFailed'.
 	self assert: (methodInfo astcodes first) equals: MethodId.
-	self assert: (methodInfo astcodes second) equals: PrimitiveId.
-	self assert: (methodInfo literals at: methodInfo astcodes third) equals: 'Perform'
+	self assert: (methodInfo astcodes second first) equals: PrimitiveId.
+	self assert: (methodInfo literals at: methodInfo astcodes second second) equals: 'Perform'
 	
 ]
 
@@ -68,6 +68,22 @@ CompilerTest >> test_04 [
 		error: self class name , ''>>'' , aSymbol , '' does not expect ''
 			, anArray size printString
 			, '' arguments'''.
+
+
+	
+]
+
+{ #category : #tests }
+CompilerTest >> test_05 [
+	| object compiler methodInfo |
+	
+	object := ProtoObject ensureRingDefinitionIn: env.
+	compiler := Compiler forClass: object.
+	methodInfo := compiler compile: 'foo self qux. ^12'.
+	self assert: methodInfo astcodes size equals: 3.
+	self assert: methodInfo astcodes first equals: MethodId.
+	self assert: methodInfo astcodes second isArray.
+	self assert: methodInfo astcodes third isArray.
 
 
 	
