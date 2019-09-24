@@ -65,7 +65,11 @@ struct VMObject : private pst::oop_t
   public:
     VMObject* behavior()
     {
-        return reinterpret_cast<VMObject*>(this->small_header()->behavior);
+        if (isSmallInt()) {
+            return smallIntClass();
+        } else {
+            return reinterpret_cast<VMObject*>(this->small_header()->behavior);
+        }
     }
 
     VMObjectFlags flags()
@@ -74,32 +78,29 @@ struct VMObject : private pst::oop_t
     }
 
     /**
-     * Return a slot (pointer) of this object at given
-     * index. Index starts at 0. This CAN be used to access
-     * both named and indexed slots. This MUST be used only
-     * with pointer-indexed objects.
-     */
-    VMObject* slot(uint32_t index);
-
-    /**
      * Return `true` if this object is a SmallInteger instance,
      * `false` otherwise.
      */
     bool isSmallInt() { return (uintptr_t)this & 1 ? true : false; }
 
     /**
-     * Assuming `this` represents a SmallInteger, return its
-     * (signed) integer value
+     * Return `true` if this object is byte-indexed, `false`
+     * otherwise.
      */
-    intptr_t smallIntVal() { return (intptr_t)this >> 1; }
+    bool isBytes() { return !isSmallInt() && (flags() & IsBytes); }
 
     /**
-     * Create a new SmallInteger for given integer value.
+     * Return `true` if this object is pointer-indexed, `false`
+     * otherwise.
      */
-    static VMObject* smallIntObj(intptr_t val)
-    {
-        return (VMObject*)((val << 1) | 1);
-    }
+    bool isPointers() { return !isSmallInt() && !isBytes(); }
+    /**
+     * Return a slot (pointer) of this object at given
+     * index. Index starts at 0. This CAN be used to access
+     * both named and indexed slots. This MUST be used only
+     * with pointer-indexed objects.
+     */
+    VMObject* slot(uint32_t index);
 
     /**
      * Return a byte of this object at given index. Index
@@ -133,6 +134,28 @@ struct VMObject : private pst::oop_t
      */
     static VMObject* headerToObject(void* header);
 
+    static const intptr_t SMALLINT_MIN = INTPTR_MIN >> 1;
+    static const intptr_t SMALLINT_MAX = INTPTR_MAX >> 1;
+
+    /**
+     * Assuming `this` represents a SmallInteger, return its
+     * (signed) integer value
+     */
+    intptr_t smallIntVal()
+    {
+        S9_ASSERT(isSmallInt());
+        return (intptr_t)this >> 1;
+    }
+
+    /**
+     * Create a new SmallInteger for given integer value.
+     */
+    static VMObject* smallIntObj(intptr_t val)
+    {
+        S9_ASSERT(SMALLINT_MIN <= val && val <= SMALLINT_MAX);
+        return (VMObject*)((val << 1) | 1);
+    }
+
     static void initializeSpecialObjects(VMObject* specialObjectsArray);
 
     class InvalidAccess
@@ -149,6 +172,9 @@ struct VMObject : private pst::oop_t
           : msg(msg)
         {}
     };
+
+  private:
+    static VMObject* smallIntClass();
 };
 
 // Here we just need to make sure the struct Object is empty.
@@ -195,7 +221,7 @@ class OOP
     /* Destroy this reference.  */
     ~OOP() {}
 
-    /* Change this reference to bew object. Use with caution! */
+    /* Change this reference to new object. Use with caution! */
     void reset(T* obj) { ptr = obj; }
 
     /* Return referent */
@@ -212,6 +238,7 @@ class OOP
 
     /* Let users refer to members of the underlying pointer.  */
     T* operator->() const { return ptr; }
+    T* operator*() const { return ptr; }
 
   private:
     T* ptr;

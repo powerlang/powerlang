@@ -24,6 +24,7 @@
 #include "Object.h"
 #include "AstNodeTypes.h"
 #include "compiler/MethodBuilder.h"
+#include "compiler/MethodHelpers.h"
 
 namespace S9 {
 
@@ -40,6 +41,12 @@ MethodBuilder::MethodBuilder(OOP<VMMethod> method,
     DefineReturnType(Address);
 
     AddressPtr = types->PointerTo(Address);
+}
+
+bool
+MethodBuilder::RequestFunction(const char* name)
+{
+    return MethodHelpers::RequestFunction(name, this);
 }
 
 IlValue*
@@ -67,7 +74,10 @@ MethodBuilder::buildIL()
 IlValue*
 MethodBuilder::buildMethod(const OOP<VMObject> node)
 {
-    return buildNode(node->slot(1));
+    for (size_t i = 1; i < node->size(); i++) {
+        buildNode(node->slot(i));
+    }
+    return nullptr;
 }
 
 IlValue*
@@ -92,12 +102,40 @@ MethodBuilder::buildLiteral(const OOP<VMObject> node)
 }
 
 IlValue*
+MethodBuilder::buildSend(const OOP<VMObject> node)
+{
+    S9_ASSERT(node->slot(1)->isSmallInt());
+
+    size_t i = 0;
+    IlValue* args[node->size() - 1];
+    args[0] = buildNode(node->slot(2));                  // receiver
+    args[1] = Literal(node->slot(1)->smallIntVal() - 1); // selector
+    for (i = 3; i < node->size(); i++) {
+        args[i - 1] = buildNode(node->slot(i));
+    }
+    switch (node->size() - 3) {
+        case 0:
+            return Call("LookupAndInvoke0", node->size() - 1, args);
+        case 1:
+            return Call("LookupAndInvoke1", node->size() - 1, args);
+
+        default:
+            S9_ASSERT(0 && "Not yet supported");
+    }
+    return nullptr;
+}
+
+IlValue*
 MethodBuilder::buildNode(OOP<VMObject> node)
 {
+    S9_ASSERT(node->isPointers());
+    S9_ASSERT(node->slot(0)->isSmallInt());
+
     OOP<VMObject> nodeType = node->slot(0);
-    S9_ASSERT(nodeType->isSmallInt());
-    intptr_t nodeTypeId = nodeType->smallIntVal();
-    switch (nodeTypeId) {
+
+    switch (nodeType->smallIntVal()) {
+        case MessageId:
+            return buildSend(node);
         case MethodId:
             return buildMethod(node);
         case LiteralId:

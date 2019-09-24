@@ -9,8 +9,7 @@
  * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- all
- * copies or substantial portions of the Software.
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,16 +19,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef _COMPILER_METHODHELPERS_H_
+#define _COMPILER_METHODHELPERS_H_
 
-#include <Object.h>
-#include <Classes.h>
-#include <Dispatch.h>
+#include "Object.h"
 
 namespace S9 {
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
+class MethodHelpers
 {
-    OOP<VMBehavior> behavior = obj->behavior();
-    return behavior->lookup(sel);
-}
+  public:
+    static bool RequestFunction(const char* name,
+                                OMR::JitBuilder::MethodBuilder* builder);
+
+  private:
+    static VMObject* LookupAndInvoke0(VMObject* obj, VMObject* sel);
+    static VMObject* LookupAndInvoke1(VMObject* obj,
+                                      VMObject* sel,
+                                      VMObject* a1);
+};
 } // namespace S9
+
+#endif /* _COMPILER_METHODHELPERS_H_ */

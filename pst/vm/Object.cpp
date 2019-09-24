@@ -70,6 +70,12 @@ VMObject::initializeSpecialObjects(VMObject* specialObjectsArray)
     }
 }
 
+VMObject*
+VMObject::smallIntClass()
+{
+    return Class_SmallInteger.get();
+}
+
 OOP<VMObject> SpecialObjectsArray;
 OOP<VMObject> Nil;
 OOP<VMObject> True;
