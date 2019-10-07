@@ -56,7 +56,7 @@ class VMBehavior : public pst::Behavior
     OOP<VMObject> lookup(OOP<VMObject> sel);
 };
 
-using VMNativeCodePtr = VMObject* (*)(OOP<VMObject>, ...);
+using VMNativeCodePtr = VMObject* (*)(VMObject*, ...);
 
 class VMMethod : public pst::CompiledMethod
 {
@@ -76,6 +76,19 @@ class VMMethod : public pst::CompiledMethod
                   "Native code pointer is not aligned to 2 bytes!");
         this->s_nativeCode = (VMObject*)(code | 1);
     }
+
+    /**
+     * Return a literal at given `index`. Index starts
+     * with 1, like in Smalltalk. `index` must be a
+     * SmallInteger object.
+     */
+    OOP<VMObject> literal(OOP<VMObject> index);
+
+    /**
+     * Return a literal at given `index`. Index starts
+     * with 1, like in Smalltalk.
+     */
+    OOP<VMObject> literal(uint32_t index);
 };
 
 } // namespace S9

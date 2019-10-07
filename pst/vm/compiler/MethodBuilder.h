@@ -53,6 +53,7 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
     IlType* AddressPtr;
 
     IlValue* buildMethod(const OOP<VMObject> node);
+    IlValue* buildPrimitive(const OOP<VMObject> node);
     IlValue* buildReturn(const OOP<VMObject> node);
     IlValue* buildLiteral(const OOP<VMObject> node);
     IlValue* buildSend(const OOP<VMObject> node);

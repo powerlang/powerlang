@@ -23,6 +23,7 @@
 
 #include "Object.h"
 #include "AstNodeTypes.h"
+#include "Primitives.h"
 #include "compiler/MethodBuilder.h"
 #include "compiler/MethodHelpers.h"
 
@@ -74,7 +75,7 @@ MethodBuilder::buildIL()
 IlValue*
 MethodBuilder::buildMethod(const OOP<VMObject> node)
 {
-    for (size_t i = 1; i < node->size(); i++) {
+    for (size_t i = 1; i < 2 /*(node->size()*/; i++) {
         buildNode(node->slot(i));
     }
     return nullptr;
@@ -126,6 +127,29 @@ MethodBuilder::buildSend(const OOP<VMObject> node)
 }
 
 IlValue*
+MethodBuilder::buildPrimitive(const OOP<VMObject> node)
+{
+    S9_ASSERT(node->size() == 2);
+    S9_ASSERT(node->slot(1)->isSmallInt());
+
+    Primitive* prim =
+      Primitives::Lookup(method->literal(node->slot(1))->stringVal());
+    S9_ASSERT(prim != nullptr);
+    S9_ASSERT(prim->narg == 1);
+
+    DefineFunction(prim->name.c_str(),
+                   __FILE__,
+                   "0",
+                   prim->impl,
+                   Address,
+                   prim->narg + 1,
+                   Address,
+                   Address);
+    Return(Call(prim->name.c_str(), 2, Load("self"), Load("self")));
+    return nullptr;
+}
+
+IlValue*
 MethodBuilder::buildNode(OOP<VMObject> node)
 {
     S9_ASSERT(node->isPointers());
@@ -134,6 +158,8 @@ MethodBuilder::buildNode(OOP<VMObject> node)
     OOP<VMObject> nodeType = node->slot(0);
 
     switch (nodeType->smallIntVal()) {
+        case PrimitiveId:
+            return buildPrimitive(node);
         case MessageId:
             return buildSend(node);
         case MethodId:

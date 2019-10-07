@@ -51,4 +51,19 @@ VMBehavior::lookup(OOP<VMObject> sel)
     return {};
 }
 
+OOP<VMObject>
+VMMethod::literal(OOP<VMObject> index)
+{
+    S9_ASSERT(index->isSmallInt());
+    return literal(index->smallIntVal());
+}
+
+OOP<VMObject>
+VMMethod::literal(uint32_t index)
+{
+    S9_ASSERT(s_literals->isPointers());
+    S9_ASSERT(index <= s_literals->size());
+    return s_literals->slot(index - 1);
+}
+
 } // namespace S9

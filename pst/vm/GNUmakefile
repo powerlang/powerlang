@@ -93,7 +93,7 @@ $(BUILD)/omr/Makefile: | omr $(BUILD)/omr
 		-DOMR_TEST_COMPILER=OFF \
 		-DOMR_GC=OFF
 
-omr/jitbuilder/release/cpp/include/JitBuilder.hpp $(BUILD)/omr/jitbuilder/libjitbuilder.a: $(BUILD)/omr/Makefile
+omr/jitbuilder/release/cpp/include/JitBuilder.hpp $(BUILD)/omr/jitbuilder/libjitbuilder.a: | $(BUILD)/omr/Makefile
 	$(MAKE) -C $(BUILD)/omr
 
 clean::

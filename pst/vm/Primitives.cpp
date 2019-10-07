@@ -9,8 +9,7 @@
  * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- all
- * copies or substantial portions of the Software.
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,40 +19,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _DISPATCH_H_
-#define _DISPATCH_H_
 
-#include <Classes.h>
-#include <Object.h>
-#include <compiler/Compiler.h>
+#include "Primitives.h"
 
 namespace S9 {
 
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
+VMObject* Primitive::Failure = (VMObject*)(0x1 << 1);
 
-template<typename... Targs>
-OOP<VMObject>
-LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
+class PrimSmallIntegerPlus : public Primitive
 {
-    printf("LookupAndInvoke(%p, %p #%s, ...)\n",
-           obj.get(),
-           sel.get(),
-           sel.get()->stringVal().c_str());
-    OOP<VMMethod> mthd = Lookup(obj, sel);
+  public:
+    PrimSmallIntegerPlus()
+      : Primitive("SmallIntegerPlus", 1, (void*)&invoke)
+    {}
 
-    auto code = mthd->getNativeCode();
+    static VMObject* invoke(VMObject* rec, VMObject* arg)
+    {
+        if (!rec->isSmallInt())
+            return Primitive::Failure;
+        if (!arg->isSmallInt())
+            return Primitive::Failure;
 
-    if (code == nullptr) {
-        code = Compiler::compile(mthd);
-        if (code == nullptr)
-            abort();
-        else
-            mthd->setNativeCode(code);
+        return VMObject::smallIntObj(rec->smallIntVal() + arg->smallIntVal());
     }
+};
 
-    return code(*obj, *args...);
+bool Primitives::initialized = false;
+
+std::map<std::string, Primitive*> Primitives::map;
+
+void
+Primitives::initialize()
+{
+    if (initialized)
+        return;
+
+    add(new PrimSmallIntegerPlus());
 }
 } // namespace S9
-
-#endif /* _DISPATCH_H_ */

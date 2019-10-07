@@ -27,7 +27,7 @@ namespace S9 {
 VMObject*
 VMObject::slot(uint32_t index)
 {
-    S9_ASSERT(!this->_isBytes());
+    S9_ASSERT(!this->isBytes());
     S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
 
     VMObject** slot = (VMObject**)this + index;
@@ -38,9 +38,16 @@ VMObject::slot(uint32_t index)
 uint8_t
 VMObject::byte(uint32_t index)
 {
-    S9_ASSERT(this->_isBytes());
+    S9_ASSERT(this->isBytes());
     S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
     return *(((uint8_t*)this) + index);
+}
+
+std::string
+VMObject::stringVal()
+{
+    std::string str((const char*)this, this->size());
+    return str;
 }
 
 VMObject*

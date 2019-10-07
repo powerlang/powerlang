@@ -94,6 +94,7 @@ struct VMObject : private pst::oop_t
      * otherwise.
      */
     bool isPointers() { return !isSmallInt() && !isBytes(); }
+
     /**
      * Return a slot (pointer) of this object at given
      * index. Index starts at 0. This CAN be used to access
@@ -108,6 +109,12 @@ struct VMObject : private pst::oop_t
      * objects.
      */
     uint8_t byte(uint32_t index);
+
+    /**
+     * Return bytes as std::string. This MUST be used only
+     * with byte-indexed objects.
+     */
+    std::string stringVal();
 
     /**
      * Return size of an object. This is a number of slots
