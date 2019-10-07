@@ -354,6 +354,7 @@ ImageSegmentBuilder >> makeMethodDef: anRGMethod [
 	methodObj selector: (self makeSymbol: anRGMethod selector).
 	methodObj nativeCode: (self makeSmallInteger: 0).
 	methodInfo notNil ifTrue:[
+		methodObj format: (self makeSmallInteger: methodInfo format).
 		methodObj bytecodes: astcodesObj.
 		methodObj literals: literalsObj.
 	].

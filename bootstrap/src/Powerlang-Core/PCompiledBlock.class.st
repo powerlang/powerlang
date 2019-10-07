@@ -30,6 +30,11 @@ PCompiledBlock >> capturesSelf: aBoolean [
 		ifFalse: [ format bitClear: CapturesSelf ]
 ]
 
+{ #category : #accessing }
+PCompiledBlock >> format [
+	^ format
+]
+
 { #category : #constants }
 PCompiledBlock >> id [
 	^format bitsAt: Id

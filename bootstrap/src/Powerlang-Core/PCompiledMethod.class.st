@@ -67,6 +67,11 @@ PCompiledMethod >> classBinding: aClass [
 	class := aClass
 ]
 
+{ #category : #accessing }
+PCompiledMethod >> format [
+	^ format
+]
+
 { #category : #constants }
 PCompiledMethod >> hasBlocks [
 	^self blockCount > 0
