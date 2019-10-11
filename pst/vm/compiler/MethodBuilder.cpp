@@ -23,11 +23,20 @@
 
 #include "Object.h"
 #include "AstNodeTypes.h"
+#include "AstBindingTypes.h"
 #include "Primitives.h"
 #include "compiler/MethodBuilder.h"
 #include "compiler/MethodHelpers.h"
 
 namespace S9 {
+
+const int MethodBuilder::MaxParameters = 8;
+const char* MethodBuilder::ParameterNames[] = { "Arg1", "Arg2", "Arg3", "Arg4",
+                                                "Arg5", "Arg6", "Arg7", "Arg8" };
+
+const int MethodBuilder::MaxLocals = 8;
+const char* MethodBuilder::LocalNames[] = { "Temp1", "Temp2", "Temp3", "Temp4",
+                                            "Temp5", "Temp6", "Temp7", "Temp8" };
 
 MethodBuilder::MethodBuilder(OOP<VMMethod> method,
                              OMR::JitBuilder::TypeDictionary* types)
@@ -38,8 +47,12 @@ MethodBuilder::MethodBuilder(OOP<VMMethod> method,
     // CRAP CRAP CRAP: this is bogus, we need to construct proper name,
     // number of arguments and so on...
     DefineName("method");
-    DefineParameter("self", Address);
+
     DefineReturnType(Address);
+    DefineParameter("self", Address);
+    for (uint32_t i = 0; i < method->getNumberOfArgs(); i++) {
+        DefineParameter(ParameterNames[i], Address);
+    }
 
     AddressPtr = types->PointerTo(Address);
 }

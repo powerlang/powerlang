@@ -57,6 +57,12 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
     IlValue* buildReturn(const OOP<VMObject> node);
     IlValue* buildLiteral(const OOP<VMObject> node);
     IlValue* buildSend(const OOP<VMObject> node);
+
+    static const int MaxParameters;
+    static const char* ParameterNames[];
+
+    static const int MaxLocals;
+    static const char* LocalNames[];
 };
 } // namespace S9
 

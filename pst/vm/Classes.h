@@ -61,6 +61,11 @@ using VMNativeCodePtr = VMObject* (*)(VMObject*, ...);
 class VMMethod : public pst::CompiledMethod
 {
   public:
+    enum Flags
+    {
+        NumArgs = 0x3F // or 0xFF?
+    };
+
     VMNativeCodePtr getNativeCode()
     {
         S9_ASSERT((this->s_nativeCode->isSmallInt()) &&
@@ -75,6 +80,12 @@ class VMMethod : public pst::CompiledMethod
         S9_ASSERT(((code & 1) == 0) &&
                   "Native code pointer is not aligned to 2 bytes!");
         this->s_nativeCode = (VMObject*)(code | 1);
+    }
+
+    uint32_t getNumberOfArgs()
+    {
+        S9_ASSERT(this->s_format->isSmallInt());
+        return this->s_format->smallIntVal() & NumArgs;
     }
 
     /**
