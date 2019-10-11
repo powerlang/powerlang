@@ -41,6 +41,8 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
 
     virtual IlValue* SmallInteger(intptr_t value);
     virtual IlValue* Literal(intptr_t index);
+    virtual IlValue* LoadSelf();
+    virtual IlValue* LoadArg(int n);
 
     virtual bool buildIL();
 
@@ -57,6 +59,7 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
     IlValue* buildReturn(const OOP<VMObject> node);
     IlValue* buildLiteral(const OOP<VMObject> node);
     IlValue* buildSend(const OOP<VMObject> node);
+    IlValue* buildVariable(const OOP<VMObject> node);
 
     static const int MaxParameters;
     static const char* ParameterNames[];

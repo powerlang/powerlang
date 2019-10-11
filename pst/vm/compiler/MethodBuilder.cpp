@@ -78,6 +78,18 @@ MethodBuilder::Literal(intptr_t index)
       IndexAt(AddressPtr, ConstAddress(method->s_literals), Const(index)));
 }
 
+IlValue*
+MethodBuilder::LoadSelf()
+{
+    return Load("self");
+}
+
+IlValue*
+MethodBuilder::LoadArg(int n)
+{
+    return Load(ParameterNames[n]);
+}
+
 bool
 MethodBuilder::buildIL()
 {
@@ -163,6 +175,21 @@ MethodBuilder::buildPrimitive(const OOP<VMObject> node)
 }
 
 IlValue*
+MethodBuilder::buildVariable(const OOP<VMObject> node)
+{
+    S9_ASSERT(node->size() >= 2);
+    S9_ASSERT(node->slot(1)->isSmallInt());
+
+    switch (node->slot(1)->smallIntVal()) {
+        case SelfId:
+            return LoadSelf();
+        default:
+            S9_ASSERT(0 && "Unsupported variable type");
+            return nullptr;
+    }
+}
+
+IlValue*
 MethodBuilder::buildNode(OOP<VMObject> node)
 {
     S9_ASSERT(node->isPointers());
@@ -181,6 +208,8 @@ MethodBuilder::buildNode(OOP<VMObject> node)
             return buildLiteral(node);
         case ReturnId:
             return buildReturn(node);
+        case IdentifierId:
+            return buildVariable(node);
         default:
             S9_ASSERT(0 && "Unsupported nodeType");
             return nullptr;
