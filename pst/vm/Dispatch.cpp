@@ -25,11 +25,4 @@
 #include <Classes.h>
 #include <Dispatch.h>
 
-namespace S9 {
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
-{
-    OOP<VMBehavior> behavior = obj->behavior();
-    return behavior->lookup(sel);
-}
-} // namespace S9
+namespace S9 {} // namespace S9

@@ -24,7 +24,9 @@
 
 #include <string>
 #include <map>
+
 #include "Object.h"
+#include "compiler/MethodBuilder.h"
 
 namespace S9 {
 
@@ -42,23 +44,69 @@ class Primitive
      * Name of the primitive. Should be the same as name
      * of the class. Used to look it up.
      */
-    const std::string name;
+    const char* name;
 
     /**
      * Number of arguments this primitive takes (0, 1, 2, ...)
      */
-    const int32_t narg;
+    const int narg;
 
-    /**
-     * Implementation of the primitive
-     */
-    void* impl;
-
-    Primitive(const char* name, int32_t narg, void* impl)
+    Primitive(const char* name, const int narg)
       : name(name)
       , narg(narg)
-      , impl(impl)
     {}
+
+    /**
+     * Build IL that calls the primitive on given MethodBuilder.
+     */
+    virtual bool buildIL(MethodBuilder* builder) = 0;
+};
+
+class RuntimePrimitive : public Primitive
+{
+  public:
+    /**
+     * Implementation of the primitive. This should be naked
+     * pointer to a function defined as
+     *
+     *    extern "C" VMObject* PrimSomething(VMObject* ...)
+     *
+     */
+    const void* impl;
+    /**
+     * Filename in which the primitive implementation is defined.
+     * Used for debugging purposes;
+     */
+    const char* file;
+
+    /**
+     * Line in `file` in which the primitive implementation is defined.
+     * Used for debugging purposes;
+     */
+    const char* line;
+
+    RuntimePrimitive(const char* name,
+                     const int narg,
+                     const void* impl,
+                     const char* file,
+                     const char* line)
+      : Primitive(name, narg)
+      , impl(impl)
+      , file(file)
+      , line(line)
+    {}
+
+    virtual bool buildIL(MethodBuilder* builder);
+};
+
+class InlinedPrimitive : public Primitive
+{
+  public:
+    InlinedPrimitive(const char* name, const int narg)
+      : Primitive(name, narg)
+    {}
+
+    virtual bool buildIL(MethodBuilder* builder) = 0;
 };
 
 class Primitives

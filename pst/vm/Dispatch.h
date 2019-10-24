@@ -29,8 +29,17 @@
 
 namespace S9 {
 
-OOP<VMObject>
-Lookup(OOP<VMObject> obj, OOP<VMObject> sel);
+static OOP<VMObject>
+LookupInClass(OOP<VMBehavior> behavior, OOP<VMObject> sel)
+{
+    return behavior->lookup(sel);
+}
+
+static OOP<VMObject>
+Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
+{
+    return LookupInClass(obj->behavior(), sel);
+}
 
 template<typename... Targs>
 OOP<VMObject>
@@ -52,7 +61,7 @@ LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
             mthd->setNativeCode(code);
     }
 
-    return code(*obj, *args...);
+    return code(*obj, *sel, *args...);
 }
 } // namespace S9
 

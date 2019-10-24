@@ -25,9 +25,6 @@
 #include "Dispatch.h"
 #include "compiler/MethodHelpers.h"
 
-#define TOSTR(x) #x
-#define LINETOSTR(x) TOSTR(x)
-
 namespace S9 {
 
 VMObject*
@@ -42,6 +39,16 @@ MethodHelpers::LookupAndInvoke1(VMObject* obj, VMObject* sel, VMObject* a1)
 {
 #define LOOKUPANDINVOKE1_LINE LINETOSTR(__LINE__)
     return *(LookupAndInvoke<OOP<VMObject>>(obj, sel, a1));
+}
+
+VMObject*
+MethodHelpers::LookupAndInvoke2(VMObject* obj,
+                                VMObject* sel,
+                                VMObject* a1,
+                                VMObject* a2)
+{
+#define LOOKUPANDINVOKE2_LINE LINETOSTR(__LINE__)
+    return *(LookupAndInvoke<OOP<VMObject>, OOP<VMObject>>(obj, sel, a1, a2));
 }
 
 bool
@@ -66,6 +73,19 @@ MethodHelpers::RequestFunction(const char* name,
                                 (void*)&LookupAndInvoke1,
                                 builder->Address,
                                 3,
+                                builder->Address,
+                                builder->Address,
+                                builder->Address);
+        return true;
+    }
+    if (strcmp(name, "LookupAndInvoke2") == 0) {
+        builder->DefineFunction(name,
+                                __FILE__,
+                                LOOKUPANDINVOKE2_LINE,
+                                (void*)&LookupAndInvoke2,
+                                builder->Address,
+                                4,
+                                builder->Address,
                                 builder->Address,
                                 builder->Address,
                                 builder->Address);

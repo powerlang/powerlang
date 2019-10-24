@@ -23,6 +23,8 @@
 #ifndef _COMPILER_METHODBUILDER_H_
 #define _COMPILER_METHODBUILDER_H_
 
+#include <memory>
+
 #include "IlValue.hpp"
 #include "JitBuilder.hpp"
 
@@ -32,34 +34,49 @@
 using namespace OMR::JitBuilder;
 
 namespace S9 {
+
+using IlValueA = std::unique_ptr<IlValue* []>;
+
 class MethodBuilder : public OMR::JitBuilder::MethodBuilder
 {
   public:
     MethodBuilder(OOP<VMMethod> method, OMR::JitBuilder::TypeDictionary* types);
 
-    virtual bool RequestFunction(const char* name);
+    MethodBuilder(OOP<VMMethod> method, MethodBuilder* callerMB);
 
-    virtual IlValue* SmallInteger(intptr_t value);
-    virtual IlValue* Literal(intptr_t index);
-    virtual IlValue* LoadSelf();
-    virtual IlValue* LoadArg(int n);
+    virtual bool RequestFunction(const char* name);
 
     virtual bool buildIL();
 
-    virtual IlValue* buildNode(OOP<VMObject> node);
-
     virtual ~MethodBuilder() {}
+
+    IlValue* LoadSmallInteger(IlBuilder* bb, intptr_t value);
+    IlValue* LoadLiteral(IlBuilder* bb, intptr_t index);
+    IlValue* LoadSelf(IlBuilder* bb);
+    IlValue* LoadArg(IlBuilder* bb, int n);
+    IlValue* LoadBehavior(IlBuilder* bb, IlValue* obj);
+    IlValue* LoadBehaviorNonImmediate(IlBuilder* bb, IlValue* obj);
+
+    IlValue* TestSmallInteger(IlBuilder* bb, IlValue* obj);
+    IlValue* TestBehavior(IlBuilder* bb, IlValue* obj, OOP<VMBehavior> behavior);
 
   private:
     OOP<VMMethod> method;
     IlType* AddressPtr;
+    int labelCount = 0;
 
-    IlValue* buildMethod(const OOP<VMObject> node);
-    IlValue* buildPrimitive(const OOP<VMObject> node);
-    IlValue* buildReturn(const OOP<VMObject> node);
-    IlValue* buildLiteral(const OOP<VMObject> node);
-    IlValue* buildSend(const OOP<VMObject> node);
-    IlValue* buildVariable(const OOP<VMObject> node);
+    std::string* newInternalId(std::string prefix = "label");
+
+    IlValue* buildNode(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildMethod(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildPrimitive(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildReturn(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildLiteral(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildSend(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildVariable(IlBuilder* bb, const OOP<VMObject> node);
+
+    IlValueA buildSendArgs(IlBuilder* bb, const OOP<VMObject> node);
+    IlValue* buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args);
 
     static const int MaxParameters;
     static const char* ParameterNames[];

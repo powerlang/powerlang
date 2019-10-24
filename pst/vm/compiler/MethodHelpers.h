@@ -36,6 +36,10 @@ class MethodHelpers
     static VMObject* LookupAndInvoke1(VMObject* obj,
                                       VMObject* sel,
                                       VMObject* a1);
+    static VMObject* LookupAndInvoke2(VMObject* obj,
+                                      VMObject* sel,
+                                      VMObject* a1,
+                                      VMObject* a2);
 };
 } // namespace S9
 

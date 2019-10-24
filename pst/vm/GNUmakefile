@@ -87,6 +87,7 @@ $(BUILD)/omr:
 
 $(BUILD)/omr/Makefile: | omr $(BUILD)/omr
 	cmake -S omr -B $(BUILD)/omr \
+		-DCMAKE_BUILD_TYPE=Debug \
 		-DOMR_COMPILER=ON \
 		-DOMR_JITBUILDER=ON \
 		-DOMR_JITBUILDER_TEST=OFF \
