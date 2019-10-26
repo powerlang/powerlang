@@ -8,3 +8,4 @@ bootstrap/*-Test.xml
 bootstrap/PharoDebug.log
 *.log
 pst/vm/build
+pst/*.bsl

@@ -45,3 +45,10 @@ $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
 .PHONY: vm
 vm:
 	$(MAKE) -C vm
+
+.PHONY: clean
+
+clean:
+	$(MAKE) -C vm clean
+	$(MAKE) -C $(BOOTSTRAP) clean
+	rm -f kernel.bsl mintest_*.bsl
