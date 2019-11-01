@@ -224,13 +224,28 @@ IlValue*
 MethodBuilder::buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args)
 {
     S9_ASSERT(numArgs >= 2);
+
+    IlValue* funcAndArgs[numArgs + 1];
+    for (int i = 0; i < numArgs; i++) {
+        funcAndArgs[i + 1] = args[i];
+    }
+
     switch (numArgs) {
         case 2:
-            return bb->Call("LookupAndInvoke0", numArgs, args.get());
+            funcAndArgs[0] =
+              bb->ConstAddress((void*)&MethodHelpers::LookupAndInvoke0);
+            return bb->ComputedCall(
+              (char*)"LookupAndInvoke0", numArgs + 1, funcAndArgs);
         case 3:
-            return bb->Call("LookupAndInvoke1", numArgs, args.get());
+            funcAndArgs[0] =
+              bb->ConstAddress((void*)&MethodHelpers::LookupAndInvoke1);
+            return bb->ComputedCall(
+              (char*)"LookupAndInvoke1", numArgs + 1, funcAndArgs);
         case 4:
-            return bb->Call("LookupAndInvoke2", numArgs, args.get());
+            funcAndArgs[0] =
+              bb->ConstAddress((void*)&MethodHelpers::LookupAndInvoke2);
+            return bb->ComputedCall(
+              (char*)"LookupAndInvoke2", numArgs + 1, funcAndArgs);
         default:
             S9_ASSERT(0 && "Not yet supported");
     }

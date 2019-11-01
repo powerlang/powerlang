@@ -35,14 +35,15 @@ RuntimePrimitive::buildIL(MethodBuilder* bb)
     IlValue** argValues = new IlValue*[narg + 1];
 
     argTypes[0] = bb->Address;
-    argValues[0] = bb->LoadSelf(bb);
+    argValues[0] = bb->ConstAddress((void*)impl);
+    argValues[0 + 1] = bb->LoadSelf(bb);
     for (int i = 0; i < narg; i++) {
         argTypes[i + 1] = bb->Address;
-        argValues[i + 1] = bb->LoadArg(bb, i);
+        argValues[i + 1 + 1] = bb->LoadArg(bb, i);
     }
     bb->DefineFunction(
       name, file, line, (void*)impl, bb->Address, narg + 1, argTypes);
-    bb->Return(bb->Call(name, narg + 1, argValues));
+    bb->Return(bb->ComputedCall((char*)name, narg + 1, argValues));
 
     delete[] argTypes;
     delete[] argValues;

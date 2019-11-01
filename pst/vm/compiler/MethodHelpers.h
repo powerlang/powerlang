@@ -31,7 +31,6 @@ class MethodHelpers
     static bool RequestFunction(const char* name,
                                 OMR::JitBuilder::MethodBuilder* builder);
 
-  private:
     static VMObject* LookupAndInvoke0(VMObject* obj, VMObject* sel);
     static VMObject* LookupAndInvoke1(VMObject* obj,
                                       VMObject* sel,
