@@ -34,8 +34,6 @@ should look like, the direction in which we want to go:
 - Use astcodes to represent computation, a lower-level representation of asts.
 - We want a fully smalltalk-written GC, but will start with compressing GC on a dll (C++)
 
-
-
 ## Power Smalltalk Build Instructions
 
 ```
