@@ -23,7 +23,7 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include <Assert.h>
+#include <Bssert.h>
 #include <object_format.h>
 #include <string>
 #include <Util.h>
