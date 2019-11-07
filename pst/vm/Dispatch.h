@@ -29,13 +29,13 @@
 
 namespace S9 {
 
-static OOP<VMObject>
+static inline OOP<VMObject>
 LookupInClass(OOP<VMBehavior> behavior, OOP<VMObject> sel)
 {
     return behavior->lookup(sel);
 }
 
-static OOP<VMObject>
+static inline OOP<VMObject>
 Lookup(OOP<VMObject> obj, OOP<VMObject> sel)
 {
     return LookupInClass(obj->behavior(), sel);
