@@ -98,7 +98,7 @@ MethodBuilder::LoadLiteral(IlBuilder* bb, intptr_t index)
     return bb->LoadAt(AddressPtr,
                       bb->IndexAt(AddressPtr,
                                   bb->ConstAddress(method->s_literals),
-                                  bb->Const(index)));
+                                  bb->Const((void*)index)));
 }
 
 IlValue*

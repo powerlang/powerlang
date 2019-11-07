@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
+#ifndef _BSSERT_H_
+#define _BSSERT_H_
 
 #include <cassert>
 
 #define BAST_ASSERT(condition) assert(condition)
 
-#endif /* ASSERT_H_ */
+#endif /* BSSERT_H_ */

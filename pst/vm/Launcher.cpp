@@ -21,6 +21,7 @@
  */
 
 #include <fstream>
+#include <cinttypes>
 
 #include <ImageSegment.h>
 #include <Object.h>
@@ -45,7 +46,7 @@ main(const int argc, const char** argv)
 
     ImageSegment* kernel = ImageSegment::load(&segment_file);
 
-    printf("Loaded kernel at %p, size %lu, TOC at %p\n",
+    printf("Loaded kernel at %p, size %" PRIx64", TOC at %p\n",
            kernel,
            kernel->header.size,
            kernel->header.toc.get());
