@@ -59,6 +59,8 @@ VMObject::headerToObject(void* header)
     return obj;
 }
 
+uintptr_t VMObject::compressedReferenceBase = 0;
+
 void
 VMObject::initializeSpecialObjects(VMObject* specialObjectsArray)
 {

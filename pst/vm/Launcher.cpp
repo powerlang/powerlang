@@ -50,6 +50,8 @@ main(const int argc, const char** argv)
            kernel->header.size,
            kernel->header.toc.get());
 
+    VMObject::initializeCompressedReferenceBase((uintptr_t)kernel &
+                                                0xFFFFFFFF00000000);
     VMObject::initializeSpecialObjects((*(kernel->begin())).get());
     Compiler::initialize();
 

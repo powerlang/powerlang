@@ -136,7 +136,15 @@ MethodBuilder::LoadBehavior(IlBuilder* bb, IlValue* obj)
 IlValue*
 MethodBuilder::LoadBehaviorNonImmediate(IlBuilder* bb, IlValue* obj)
 {
-    return bb->LoadAt(AddressPtr, bb->Sub(obj, bb->ConstInt32(4)));
+    IlValue* behaviorBits =
+      bb->LoadAt(AddressPtr, bb->Sub(obj, bb->ConstInt32(4)));
+    if (VMObject::compressedReferenceBase) {
+        return bb->Add(
+          bb->ConstAddress((void*)VMObject::compressedReferenceBase),
+          behaviorBits);
+    } else {
+        return behaviorBits;
+    }
 }
 
 IlValue*

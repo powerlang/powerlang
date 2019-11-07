@@ -7,8 +7,26 @@ Class {
 		'falseObj',
 		'specialObjectsArrayObj'
 	],
+	#classVars : [
+		'DefaultBaseAddress'
+	],
 	#category : #'Powerlang-Core-Building'
 }
+
+{ #category : #'class initialization' }
+KernelSegmentBuilder class >> defaultBaseAddress [
+	^DefaultBaseAddress 
+]
+
+{ #category : #'class initialization' }
+KernelSegmentBuilder class >> defaultBaseAddress: anInteger [
+	DefaultBaseAddress := anInteger
+]
+
+{ #category : #'class initialization' }
+KernelSegmentBuilder class >> initialize [
+	DefaultBaseAddress := 16r1ff10000
+]
 
 { #category : #building }
 KernelSegmentBuilder >> build [
@@ -109,10 +127,28 @@ KernelSegmentBuilder >> trueObj [
 
 { #category : #writing }
 KernelSegmentBuilder >> writeTo: aStream [
+	self writeTo: aStream baseAddress: self class defaultBaseAddress 
+]
+
+{ #category : #writing }
+KernelSegmentBuilder >> writeTo: aStream baseAddress: baseAddress [
 	ImageSegmentWriter new
 		stream: aStream;
 		objects: objects; 
 		toc: tocObj;
-		baseAddress: 16r1ff10000;
+		baseAddress: baseAddress;
 		write
+]
+
+{ #category : #writing }
+KernelSegmentBuilder >> writeToFile: file baseAddress: baseAddress [
+	file asFileReference binaryWriteStreamDo: [ :stream |
+		"Bit stupid - we write into internal ByteArray backed stream and
+		then write it to real file. That's because WriteStream and ZnWriteStream
+		are not polymorphic. Sigh"
+
+		stream nextPutAll: (ByteArray streamContents:[:bytes | self writeTo: bytes baseAddress: baseAddress ]).
+	]
+	
+		
 ]

@@ -156,7 +156,7 @@ ImageSegmentWriter >> writeObjectHeader: obj [
 		uint16le: self nextHash;
 		nextPut: obj smallHeaderSize;
 		nextPut: obj smallHeaderFlags;
-		uint32le: behavior.
+		uint32le: (behavior bitAnd:16rFFFFFFFF).
 	self assert: stream position == (self offsetOf: obj)
 ]
 
