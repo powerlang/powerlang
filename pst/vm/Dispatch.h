@@ -27,7 +27,7 @@
 #include <Object.h>
 #include <compiler/Compiler.h>
 
-namespace S9 {
+namespace BAST {
 
 static OOP<VMObject>
 LookupInClass(OOP<VMBehavior> behavior, OOP<VMObject> sel)
@@ -63,6 +63,6 @@ LookupAndInvoke(OOP<VMObject> obj, OOP<VMObject> sel, Targs... args)
 
     return code(*obj, *sel, *args...);
 }
-} // namespace S9
+} // namespace BAST
 
 #endif /* _DISPATCH_H_ */

@@ -28,7 +28,7 @@
 #include <string>
 #include <cstdio>
 
-namespace S9 {
+namespace BAST {
 
 static inline uintptr_t
 align(uintptr_t value, int alignment)
@@ -48,6 +48,6 @@ format(const std::string& format, Args... args)
                        buf.get() + size - 1); // We don't want the '\0' inside
 }
 
-} // namespace S9
+} // namespace BAST
 
 #endif // _UTILS_H_

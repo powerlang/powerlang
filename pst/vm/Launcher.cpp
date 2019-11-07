@@ -28,7 +28,7 @@
 #include <Dispatch.h>
 #include <compiler/Compiler.h>
 
-using namespace S9;
+using namespace BAST;
 
 int
 main(const int argc, const char** argv)
@@ -39,7 +39,7 @@ main(const int argc, const char** argv)
     }
     std::ifstream segment_file(argv[1], std::ifstream::binary);
     if (!segment_file) {
-        printf("No such file: %s\n", argv[0]);
+        printf("No such file: %s\n", argv[1]);
         return 1;
     }
 

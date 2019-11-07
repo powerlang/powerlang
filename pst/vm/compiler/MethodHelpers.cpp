@@ -25,7 +25,7 @@
 #include "Dispatch.h"
 #include "compiler/MethodHelpers.h"
 
-namespace S9 {
+namespace BAST {
 
 VMObject*
 MethodHelpers::LookupAndInvoke0(VMObject* obj, VMObject* sel)
@@ -95,4 +95,4 @@ MethodHelpers::RequestFunction(const char* name,
     return false;
 }
 
-} // namespace S9
+} // namespace BAST

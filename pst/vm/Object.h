@@ -28,7 +28,7 @@
 #include <string>
 #include <Util.h>
 
-namespace S9 {
+namespace BAST {
 
 typedef enum
 {
@@ -151,7 +151,7 @@ struct VMObject : private pst::oop_t
      */
     intptr_t smallIntVal()
     {
-        S9_ASSERT(isSmallInt());
+        BAST_ASSERT(isSmallInt());
         return (intptr_t)this >> 1;
     }
 
@@ -160,7 +160,7 @@ struct VMObject : private pst::oop_t
      */
     static VMObject* smallIntObj(intptr_t val)
     {
-        S9_ASSERT(SMALLINT_MIN <= val && val <= SMALLINT_MAX);
+        BAST_ASSERT(SMALLINT_MIN <= val && val <= SMALLINT_MAX);
         return (VMObject*)((val << 1) | 1);
     }
 
@@ -170,8 +170,8 @@ struct VMObject : private pst::oop_t
 
     static void initializeCompressedReferenceBase(uintptr_t base)
     {
-        S9_ASSERT(compressedReferenceBase == 0);
-        S9_ASSERT((base & 0xFFFFFFFF) == 0);
+        BAST_ASSERT(compressedReferenceBase == 0);
+        BAST_ASSERT((base & 0xFFFFFFFF) == 0);
         compressedReferenceBase = base;
     }
 
@@ -338,6 +338,6 @@ extern OOP<VMObject> False;
 extern OOP<VMObject> Class_SmallInteger;
 extern OOP<VMObject> Symbol_evaluate;
 
-} // namespace S9
+} // namespace BAST
 
 #endif /* _OBJECT_H_ */

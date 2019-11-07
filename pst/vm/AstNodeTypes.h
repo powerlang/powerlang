@@ -23,13 +23,13 @@
 #ifndef _ASTNODETYPES_H_
 #define _ASTNODETYPES_H_
 
-namespace S9 {
+namespace BAST {
 typedef enum
 {
 #define DEFINE_VALUE(name, value) name = value,
 #include "AstNodeTypes.def"
 #undef DEFINE_VALUE
 } AstNodeTypes;
-} // namespace S9
+} // namespace BAST
 
 #endif /* _ASTNODETYPES_H_ */

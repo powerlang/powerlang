@@ -32,13 +32,13 @@ DEFINITIONS= \
 	$(BUILD)/AstNodeTypes.def \
 	$(BUILD)/AstBindingTypes.def
 
-all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/s9 $(BUILD)/s9-gdb.py
+all: $(DEFINITIONS) $(OBJECTS) $(BUILD)/bast $(BUILD)/bast-gdb.py
 
 $(BUILD):
 	mkdir -p $@
 
-$(BUILD)/s9-gdb.py: | $(BUILD)
-	cd $(BUILD) && ln -s ../../s9-gdb.py .
+$(BUILD)/bast-gdb.py: | $(BUILD)
+	cd $(BUILD) && ln -s ../../bast-gdb.py .
 
 $(OBJECT_DIRS): | $(BUILD)
 	mkdir -p $@
@@ -58,7 +58,7 @@ $(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ..
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"EnumDefWriter write: AstBindingTypes toFile: '$(shell pwd)/$@'"
 
-$(BUILD)/s9:: $(OBJECTS)
+$(BUILD)/bast:: $(OBJECTS)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
@@ -69,7 +69,7 @@ $(DEPENDS)::
 include $(wildcard $(DEPENDS))
 
 clean::
-	rm -f $(OBJECTS) $(DEPENDS) $(BUILD)/s9
+	rm -f $(OBJECTS) $(DEPENDS) $(BUILD)/bash
 
 #
 # Definitions for OMR
@@ -80,7 +80,7 @@ $(DEPENDS):: omr/jitbuilder/release/cpp/include/JitBuilder.hpp
 
 LIBS += $(BUILD)/omr/jitbuilder/libjitbuilder.a
 
-$(BUILD)/s9:: $(BUILD)/omr/jitbuilder/libjitbuilder.a
+$(BUILD)/bast:: $(BUILD)/omr/jitbuilder/libjitbuilder.a
 
 $(BUILD)/omr:
 	mkdir -p $@

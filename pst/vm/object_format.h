@@ -5,7 +5,7 @@
 #include <cassert>
 
 #ifndef ASSERT
-#define ASSERT assert
+#define ASSERT(condition) assert(condition)
 #endif
 
 /* 

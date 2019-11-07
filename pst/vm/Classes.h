@@ -26,7 +26,7 @@
 #include <cstdint>
 #include <Object.h>
 
-typedef S9::VMObject VMObject;
+typedef BAST::VMObject VMObject;
 #define DEFINE_CLASS(CLASSNAME, SUPERNAME, SLOTS)                               \
     namespace pst {                                                             \
     struct CLASSNAME : public SUPERNAME                                         \
@@ -42,7 +42,7 @@ typedef S9::VMObject VMObject;
 #undef DEFINE_SLOT
 #undef NIL
 
-namespace S9 {
+namespace BAST {
 
 class VMMethodDictionary : public pst::MethodDictionary
 {
@@ -68,7 +68,7 @@ class VMMethod : public pst::CompiledMethod
 
     VMNativeCodePtr getNativeCode()
     {
-        S9_ASSERT((this->s_nativeCode->isSmallInt()) &&
+        BAST_ASSERT((this->s_nativeCode->isSmallInt()) &&
                   "Native code is not a SmallInteger");
         uintptr_t code = (uintptr_t)this->s_nativeCode;
         return (VMNativeCodePtr)(code & ~1);
@@ -77,14 +77,14 @@ class VMMethod : public pst::CompiledMethod
     void setNativeCode(VMNativeCodePtr nativeCode)
     {
         uintptr_t code = (uintptr_t)nativeCode;
-        S9_ASSERT(((code & 1) == 0) &&
+        BAST_ASSERT(((code & 1) == 0) &&
                   "Native code pointer is not aligned to 2 bytes!");
         this->s_nativeCode = (VMObject*)(code | 1);
     }
 
     uint32_t getNumberOfArgs()
     {
-        S9_ASSERT(this->s_format->isSmallInt());
+        BAST_ASSERT(this->s_format->isSmallInt());
         return this->s_format->smallIntVal() & NumArgs;
     }
 
@@ -102,6 +102,6 @@ class VMMethod : public pst::CompiledMethod
     OOP<VMObject> literal(uint32_t index);
 };
 
-} // namespace S9
+} // namespace BAST
 
 #endif /* CLASSES_H_ */

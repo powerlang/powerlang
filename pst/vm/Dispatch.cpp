@@ -25,4 +25,4 @@
 #include <Classes.h>
 #include <Dispatch.h>
 
-namespace S9 {} // namespace S9
+namespace BAST {} // namespace BAST

@@ -28,7 +28,7 @@
 #include "Object.h"
 #include "compiler/MethodBuilder.h"
 
-namespace S9 {
+namespace BAST {
 
 class Primitive
 {
@@ -129,6 +129,6 @@ class Primitives
     }
 };
 
-} // namespace S9
+} // namespace BAST
 
 #endif /* _PRIMITIVE_H_ */

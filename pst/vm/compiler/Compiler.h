@@ -29,7 +29,7 @@
 #include "Object.h"
 #include "Classes.h"
 
-namespace S9 {
+namespace BAST {
 class Compiler
 {
   public:
@@ -50,6 +50,6 @@ class Compiler
     static OMR::JitBuilder::TypeDictionary* types;
 };
 
-} // namespace S9
+} // namespace BAST
 
 #endif // _COMPILER_H_

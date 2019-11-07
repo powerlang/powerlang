@@ -24,7 +24,7 @@
 
 #include "Object.h"
 
-namespace S9 {
+namespace BAST {
 class MethodHelpers
 {
   public:
@@ -40,6 +40,6 @@ class MethodHelpers
                                       VMObject* a1,
                                       VMObject* a2);
 };
-} // namespace S9
+} // namespace BAST
 
 #endif /* _COMPILER_METHODHELPERS_H_ */

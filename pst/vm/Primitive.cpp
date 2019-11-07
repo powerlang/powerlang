@@ -24,7 +24,7 @@
 
 #include <memory>
 
-namespace S9 {
+namespace BAST {
 
 VMObject* Primitive::Failure = (VMObject*)(0x1 << 1);
 
@@ -107,4 +107,4 @@ Primitives::initialize()
     //                             PrimSmallIntegerPlus_LINE));
     add(new ImplSmallIntegerPlus("SmallIntegerPlus", 1));
 }
-} // namespace S9
+} // namespace BAST

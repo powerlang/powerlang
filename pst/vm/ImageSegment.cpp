@@ -34,10 +34,10 @@ pagealign(uintptr_t addr)
         pagesize = (int)sysconf(_SC_PAGESIZE);
         ASSERT(pagesize != -1);
     }
-    return S9::align(addr, pagesize);
+    return BAST::align(addr, pagesize);
 }
 
-namespace S9 {
+namespace BAST {
 
 ImageSegment*
 ImageSegment::alloc(uintptr_t base, size_t size)
@@ -74,4 +74,4 @@ ImageSegment::load(std::istream* data)
     return segment;
 }
 
-} // namespace S9
+} // namespace BAST

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Javier Pimas, Jan Vrany
+ * Copyright (c) 2019 Javier Pimas, Boris Shingarov, Jan Vrany
 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -9,8 +9,7 @@
  * furnished to do so, subject to the following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- all
- * copies or substantial portions of the Software.
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,35 +20,6 @@
  * SOFTWARE.
  */
 
-#include "JitBuilder.hpp"
-#include "compiler/MethodBuilder.h"
-#include "compiler/Compiler.h"
+#include "Util.h"
 
-namespace BAST {
-
-bool Compiler::initialized = false;
-
-OMR::JitBuilder::TypeDictionary* Compiler::types = nullptr;
-
-bool
-Compiler::initialize()
-{
-    ASSERT(!initialized && "Compiler already initialized!");
-    initialized = initializeJit();
-    types = new OMR::JitBuilder::TypeDictionary();
-    return initialized;
-}
-
-VMNativeCodePtr
-Compiler::compile(OOP<VMMethod> method)
-{
-    ASSERT(initialized && "Compiler not yet initialized!");
-    MethodBuilder mb(method, Compiler::types);
-    void* entry = 0;
-    if (compileMethodBuilder(&mb, &entry) != 0) {
-        throw "Failed to compile method";
-    }
-    return (VMNativeCodePtr)entry;
-}
-
-} // namespace BAST
+namespace BAST {} // namespace BAST

@@ -30,7 +30,7 @@
 #include "compiler/MethodBuilder.h"
 #include "compiler/MethodHelpers.h"
 
-namespace S9 {
+namespace BAST {
 
 const int MethodBuilder::MaxParameters = 8;
 const char* MethodBuilder::ParameterNames[] = { "Arg1", "Arg2", "Arg3", "Arg4",
@@ -93,7 +93,7 @@ MethodBuilder::LoadSmallInteger(IlBuilder* bb, intptr_t value)
 IlValue*
 MethodBuilder::LoadLiteral(IlBuilder* bb, intptr_t index)
 {
-    S9_ASSERT((size_t)index < method->s_literals->size());
+    BAST_ASSERT((size_t)index < method->s_literals->size());
     IlType* AddressPtr = bb->typeDictionary()->PointerTo(bb->Address);
     return bb->LoadAt(AddressPtr,
                       bb->IndexAt(AddressPtr,
@@ -116,7 +116,7 @@ MethodBuilder::LoadArg(IlBuilder* bb, int n)
 IlValue*
 MethodBuilder::LoadBehavior(IlBuilder* bb, IlValue* obj)
 {
-    S9_ASSERT(obj != nullptr);
+    BAST_ASSERT(obj != nullptr);
 
     std::string* behaviorId = newInternalId("behavior");
     IlBuilder* smicase = nullptr;
@@ -178,7 +178,7 @@ MethodBuilder::buildIL()
     buildNode(this, method->s_bytecodes);
     OOP<VMObject> last =
       method->s_bytecodes->slot(method->s_bytecodes->size() - 1);
-    S9_ASSERT(last->slot(0)->isSmallInt());
+    BAST_ASSERT(last->slot(0)->isSmallInt());
     if (last->slot(0)->smallIntVal() != ReturnId) {
         Return(LoadSelf(this));
     }
@@ -188,7 +188,7 @@ MethodBuilder::buildIL()
 IlValue*
 MethodBuilder::buildMethod(IlBuilder* bb, const OOP<VMObject> node)
 {
-    S9_ASSERT(bb == this);
+    BAST_ASSERT(bb == this);
     for (size_t i = 1; i < /*2*/ node->size() /**/; i++) {
         buildNode(bb, node->slot(i));
     }
@@ -205,11 +205,11 @@ MethodBuilder::buildReturn(IlBuilder* bb, const OOP<VMObject> node)
 IlValue*
 MethodBuilder::buildLiteral(IlBuilder* bb, const OOP<VMObject> node)
 {
-    S9_ASSERT(node->slot(1)->isSmallInt());
+    BAST_ASSERT(node->slot(1)->isSmallInt());
     intptr_t literalIndex = node->slot(1)->smallIntVal();
     if (literalIndex == 0) {
-        S9_ASSERT(node->size() == 3);
-        S9_ASSERT(node->slot(2)->isSmallInt());
+        BAST_ASSERT(node->size() == 3);
+        BAST_ASSERT(node->slot(2)->isSmallInt());
         return LoadSmallInteger(bb, node->slot(2)->smallIntVal());
     } else {
         return LoadLiteral(bb, literalIndex - 1);
@@ -231,7 +231,7 @@ MethodBuilder::buildSendArgs(IlBuilder* bb, const OOP<VMObject> node)
 IlValue*
 MethodBuilder::buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args)
 {
-    S9_ASSERT(numArgs >= 2);
+    BAST_ASSERT(numArgs >= 2);
 
     IlValue* funcAndArgs[numArgs + 1];
     for (int i = 0; i < numArgs; i++) {
@@ -255,7 +255,7 @@ MethodBuilder::buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args)
             return bb->ComputedCall(
               (char*)"LookupAndInvoke2", numArgs + 1, funcAndArgs);
         default:
-            S9_ASSERT(0 && "Not yet supported");
+            BAST_ASSERT(0 && "Not yet supported");
     }
     return nullptr;
 }
@@ -263,7 +263,7 @@ MethodBuilder::buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args)
 OOP<VMObject>
 assumedBehaviorOfSend(OOP<VMObject> selector)
 {
-    S9_ASSERT(selector->isBytes());
+    BAST_ASSERT(selector->isBytes());
     if (selector->stringVal() == "+") {
         return Class_SmallInteger;
     }
@@ -273,7 +273,7 @@ assumedBehaviorOfSend(OOP<VMObject> selector)
 IlValue*
 MethodBuilder::buildSend(IlBuilder* bb, const OOP<VMObject> node)
 {
-    S9_ASSERT(node->slot(1)->isSmallInt());
+    BAST_ASSERT(node->slot(1)->isSmallInt());
 
     OOP<VMObject> selector = method->literal(node->slot(1));
     OOP<VMObject> behavior = assumedBehaviorOfSend(selector);
@@ -293,7 +293,7 @@ MethodBuilder::buildSend(IlBuilder* bb, const OOP<VMObject> node)
             bb->IfThenElse(
               &fastpath, &fallback, TestBehavior(bb, args[0], behavior));
             {
-                S9_ASSERT(callee != nullptr);
+                BAST_ASSERT(callee != nullptr);
                 /*
                  * CRAP CRAP CRAP
                  *
@@ -313,42 +313,42 @@ MethodBuilder::buildSend(IlBuilder* bb, const OOP<VMObject> node)
     }
     return buildSendFull(bb, node->size() - 1, args);
 
-    S9_ASSERT(0 && "Should never be reached");
+    BAST_ASSERT(0 && "Should never be reached");
     return nullptr;
 }
 
 IlValue*
 MethodBuilder::buildPrimitive(IlBuilder* bb, const OOP<VMObject> node)
 {
-    S9_ASSERT(bb == this);
-    S9_ASSERT(node->size() == 2);
-    S9_ASSERT(node->slot(1)->isSmallInt());
+    BAST_ASSERT(bb == this);
+    BAST_ASSERT(node->size() == 2);
+    BAST_ASSERT(node->slot(1)->isSmallInt());
 
     Primitive* prim =
       Primitives::Lookup(method->literal(node->slot(1))->stringVal());
-    S9_ASSERT(prim != nullptr);
+    BAST_ASSERT(prim != nullptr);
 
-    S9_ASSERT(prim->buildIL(this) == true);
+    BAST_ASSERT(prim->buildIL(this) == true);
     return nullptr;
 }
 
 IlValue*
 MethodBuilder::buildVariable(IlBuilder* bb, const OOP<VMObject> node)
 {
-    S9_ASSERT(node->size() >= 2);
-    S9_ASSERT(node->slot(1)->isSmallInt());
+    BAST_ASSERT(node->size() >= 2);
+    BAST_ASSERT(node->slot(1)->isSmallInt());
 
     switch (node->slot(1)->smallIntVal()) {
         case SelfId:
             return LoadSelf(bb);
         case ArgumentId:
-            S9_ASSERT(node->size() == 4);
-            S9_ASSERT(node->slot(2)->isSmallInt());
-            S9_ASSERT(node->slot(3)->isSmallInt());
-            S9_ASSERT(node->slot(3)->smallIntVal() == 0);
+            BAST_ASSERT(node->size() == 4);
+            BAST_ASSERT(node->slot(2)->isSmallInt());
+            BAST_ASSERT(node->slot(3)->isSmallInt());
+            BAST_ASSERT(node->slot(3)->smallIntVal() == 0);
             return LoadArg(bb, node->slot(2)->smallIntVal() - 1);
         default:
-            S9_ASSERT(0 && "Unsupported variable type");
+            BAST_ASSERT(0 && "Unsupported variable type");
             return nullptr;
     }
 }
@@ -356,8 +356,8 @@ MethodBuilder::buildVariable(IlBuilder* bb, const OOP<VMObject> node)
 IlValue*
 MethodBuilder::buildNode(IlBuilder* bb, OOP<VMObject> node)
 {
-    S9_ASSERT(node->isPointers());
-    S9_ASSERT(node->slot(0)->isSmallInt());
+    BAST_ASSERT(node->isPointers());
+    BAST_ASSERT(node->slot(0)->isSmallInt());
 
     OOP<VMObject> nodeType = node->slot(0);
 
@@ -375,9 +375,9 @@ MethodBuilder::buildNode(IlBuilder* bb, OOP<VMObject> node)
         case IdentifierId:
             return buildVariable(bb, node);
         default:
-            S9_ASSERT(0 && "Unsupported nodeType");
+            BAST_ASSERT(0 && "Unsupported nodeType");
             return nullptr;
     }
 }
 
-} // namespace S9
+} // namespace BAST

@@ -17,7 +17,7 @@ class Types:
     void = gdb.lookup_type('void')
     uintptr_t = gdb.lookup_type('uintptr_t')
 
-    obj = gdb.lookup_type('S9::VMObject')
+    obj = gdb.lookup_type('BAST::VMObject')
     oop = obj.pointer()
     small_header_t = gdb.lookup_type('pst::small_header_t')
     large_header_t = gdb.lookup_type('pst::large_header_t')
@@ -49,7 +49,7 @@ class oop(object):
     """
     def __init__(self, val):
         if isinstance(val, gdb.Value):
-            if (val.type.code != gdb.TYPE_CODE_PTR) and val.type.name.startswith('S9::OOP'):
+            if (val.type.code != gdb.TYPE_CODE_PTR) and val.type.name.startswith('BAST::OOP'):
                 val = val['ptr']
             self._oop = val
         else:
@@ -105,7 +105,7 @@ class VMObject(object):
         obj_val = oopish
         if not isinstance(obj_val, gdb.Value):
             obj_val = oop(oopish).value()
-        elif (obj_val.type.code != gdb.TYPE_CODE_PTR) and obj_val.type.name.startswith('S9::OOP'):
+        elif (obj_val.type.code != gdb.TYPE_CODE_PTR) and obj_val.type.name.startswith('BAST::OOP'):
             obj_val = obj_val['ptr']
         if (int(obj_val) & 1) == 1:
             return VMSmallInteger(obj_val)
@@ -374,9 +374,9 @@ class CxxPrettyPrinter(gdb.printing.PrettyPrinter):
 
 
 def _build_pretty_printer():
-    pp = CxxPrettyPrinter("S9")
-    pp.add_printer("OOP", "^S9::OOP", oop)
-    pp.add_printer("VMObject", "^S9::VMObject", oop)
+    pp = CxxPrettyPrinter("BAST")
+    pp.add_printer("OOP", "^BAST::OOP", oop)
+    pp.add_printer("VMObject", "^BAST::VMObject", oop)
     return pp
 
 gdb.printing.register_pretty_printer(gdb, _build_pretty_printer(), replace = True)

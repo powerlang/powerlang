@@ -23,13 +23,13 @@
 #include <Object.h>
 #include <Classes.h>
 
-namespace S9 {
+namespace BAST {
 
 OOP<VMObject>
 VMMethodDictionary::lookup(OOP<VMObject> sel)
 {
     OOP<> table = this->s_table;
-    S9_ASSERT((table->size() % 2) == 0);
+    BAST_ASSERT((table->size() % 2) == 0);
     for (size_t i = 0; i < table->size(); i += 2) {
         if (sel == table->slot(i))
             return table->slot(i + 1);
@@ -54,16 +54,16 @@ VMBehavior::lookup(OOP<VMObject> sel)
 OOP<VMObject>
 VMMethod::literal(OOP<VMObject> index)
 {
-    S9_ASSERT(index->isSmallInt());
+    BAST_ASSERT(index->isSmallInt());
     return literal(index->smallIntVal());
 }
 
 OOP<VMObject>
 VMMethod::literal(uint32_t index)
 {
-    S9_ASSERT(s_literals->isPointers());
-    S9_ASSERT(index <= s_literals->size());
+    BAST_ASSERT(s_literals->isPointers());
+    BAST_ASSERT(index <= s_literals->size());
     return s_literals->slot(index - 1);
 }
 
-} // namespace S9
+} // namespace BAST

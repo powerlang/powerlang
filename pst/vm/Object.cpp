@@ -22,13 +22,13 @@
 
 #include <Object.h>
 
-namespace S9 {
+namespace BAST {
 
 VMObject*
 VMObject::slot(uint32_t index)
 {
-    S9_ASSERT(!this->isBytes());
-    S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
+    BAST_ASSERT(!this->isBytes());
+    BAST_ASSERT(/*index >= 0 &&*/ index <= this->_size());
 
     VMObject** slot = (VMObject**)this + index;
 
@@ -38,8 +38,8 @@ VMObject::slot(uint32_t index)
 uint8_t
 VMObject::byte(uint32_t index)
 {
-    S9_ASSERT(this->isBytes());
-    S9_ASSERT(/*index >= 0 &&*/ index <= this->_size());
+    BAST_ASSERT(this->isBytes());
+    BAST_ASSERT(/*index >= 0 &&*/ index <= this->_size());
     return *(((uint8_t*)this) + index);
 }
 
@@ -64,7 +64,7 @@ uintptr_t VMObject::compressedReferenceBase = 0;
 void
 VMObject::initializeSpecialObjects(VMObject* specialObjectsArray)
 {
-    S9_ASSERT(specialObjectsArray->size() == 5);
+    BAST_ASSERT(specialObjectsArray->size() == 5);
 
     SpecialObjectsArray = specialObjectsArray;
 
@@ -92,4 +92,4 @@ OOP<VMObject> False;
 OOP<VMObject> Class_SmallInteger;
 OOP<VMObject> Symbol_evaluate;
 
-} // namespace S9
+} // namespace BAST

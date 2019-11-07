@@ -25,6 +25,6 @@
 
 #include <cassert>
 
-#define S9_ASSERT(condition) assert(condition)
+#define BAST_ASSERT(condition) assert(condition)
 
 #endif /* ASSERT_H_ */

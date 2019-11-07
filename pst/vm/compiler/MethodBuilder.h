@@ -33,7 +33,7 @@
 
 using namespace OMR::JitBuilder;
 
-namespace S9 {
+namespace BAST {
 
 using IlValueA = std::unique_ptr<IlValue* []>;
 
@@ -84,6 +84,6 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
     static const int MaxLocals;
     static const char* LocalNames[];
 };
-} // namespace S9
+} // namespace BAST
 
 #endif /* _COMPILER_METHODBUILDER_H_ */

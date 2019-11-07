@@ -30,7 +30,7 @@
 #include <Object.h>
 #include <Classes.h>
 
-namespace S9 {
+namespace BAST {
 
 typedef struct _ImageSegmentHeader
 {
@@ -130,7 +130,7 @@ class ImageSegment
       private:
         value_type curr()
         {
-            S9_ASSERT(current_hdr != nullptr);
+            BAST_ASSERT(current_hdr != nullptr);
             if (current == nullptr) {
                 current = VMObject::headerToObject(current_hdr);
             }
@@ -149,6 +149,6 @@ class ImageSegment
     };
 };
 
-} // namespace S9
+} // namespace BAST
 
 #endif // _SEGMENT_H_

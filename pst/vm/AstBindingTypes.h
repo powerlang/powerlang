@@ -23,13 +23,13 @@
 #ifndef _ASTBINDINGTYPES_H_
 #define _ASTBINDINGTYPES_H_
 
-namespace S9 {
+namespace BAST {
 typedef enum
 {
 #define DEFINE_VALUE(name, value) name = value,
 #include "AstBindingTypes.def"
 #undef DEFINE_VALUE
 } AstBindingTypes;
-} // namespace S9
+} // namespace BAST
 
 #endif /* _ASTBINDINGTYPES_H_ */
