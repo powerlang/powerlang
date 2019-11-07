@@ -68,7 +68,8 @@ struct VMObject : private pst::oop_t
         if (isSmallInt()) {
             return smallIntClass();
         } else {
-            return reinterpret_cast<VMObject*>(this->small_header()->behavior);
+            uintptr_t behaviorBits = this->small_header()->behavior;
+            return (VMObject*)(compressedReferenceBase + behaviorBits);
         }
     }
 
@@ -163,7 +164,16 @@ struct VMObject : private pst::oop_t
         return (VMObject*)((val << 1) | 1);
     }
 
+    static uintptr_t compressedReferenceBase;
+
     static void initializeSpecialObjects(VMObject* specialObjectsArray);
+
+    static void initializeCompressedReferenceBase(uintptr_t base)
+    {
+        S9_ASSERT(compressedReferenceBase == 0);
+        S9_ASSERT((base & 0xFFFFFFFF) == 0);
+        compressedReferenceBase = base;
+    }
 
     class InvalidAccess
     {
