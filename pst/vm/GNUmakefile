@@ -27,6 +27,8 @@ DEPENDS=$(patsubst %.cpp,$(BUILD)/%.d,$(SOURCES))
 
 LIBS   =
 
+LIBS_DEPS =
+
 DEFINITIONS= \
 	$(BUILD)/Classes.def \
 	$(BUILD)/AstNodeTypes.def \
@@ -58,7 +60,7 @@ $(BUILD)/AstBindingTypes.def: $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo ..
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"EnumDefWriter write: AstBindingTypes toFile: '$(shell pwd)/$@'"
 
-$(BUILD)/bast:: $(OBJECTS)
+$(BUILD)/bast:: 3rdparty $(OBJECTS)
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -o $@ $(OBJECTS) $(LIBS)
 
 $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
@@ -71,6 +73,8 @@ include $(wildcard $(DEPENDS))
 clean::
 	rm -f $(OBJECTS) $(DEPENDS) $(BUILD)/bash
 
+3rdparty::
+
 #
 # Definitions for OMR
 #
@@ -80,13 +84,13 @@ $(DEPENDS):: omr/jitbuilder/release/cpp/include/JitBuilder.hpp
 
 LIBS += $(BUILD)/omr/jitbuilder/libjitbuilder.a
 
-$(BUILD)/bast:: $(BUILD)/omr/jitbuilder/libjitbuilder.a
+3rdparty:: $(BUILD)/omr/jitbuilder/libjitbuilder.a
 
 $(BUILD)/omr:
 	mkdir -p $@
 
 $(BUILD)/omr/Makefile: | omr $(BUILD)/omr
-	cmake -S omr -B $(BUILD)/omr \
+	cd $(BUILD)/omr && cmake ../../../omr \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DOMR_COMPILER=ON \
 		-DOMR_JITBUILDER=ON \
