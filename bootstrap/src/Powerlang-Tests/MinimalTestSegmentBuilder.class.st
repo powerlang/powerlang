@@ -1,8 +1,7 @@
 Class {
 	#name : #MinimalTestSegmentBuilder,
-	#superclass : #KernelSegmentBuilder,
+	#superclass : #ScriptSegmentBuilder,
 	#instVars : [
-		'mintests',
 		'methods'
 	],
 	#category : #'Powerlang-Tests-Building'
@@ -10,17 +9,19 @@ Class {
 
 { #category : #building }
 MinimalTestSegmentBuilder >> build [
-	| mintestDef |
-	mintests := RGEnvironment new.
-	mintestDef := mintests ensureClassNamed: #MinimalTest.
-	mintestDef superclass name: #Object.
+	| scriptDef scriptPkg |
+	script := RGEnvironment new.
+	scriptPkg := script ensurePackageNamed: #Script.
+	scriptDef := script ensureClassNamed: #MinimalTest.
+	scriptDef superclass name: #Object.
+	scriptDef package: scriptPkg.
 
 	methods do:[:each |
-		mintestDef compile: each classified: 'methods'. 
+		scriptDef compile: each classified: 'methods'. 
 	].	
 	self assert: methods size > 0.
-	self assert: (mintestDef >> #evaluate) notNil.
-	super genesis
+	self assert: (scriptDef >> #evaluate) notNil.
+	super build.
 ]
 
 { #category : #utilities }
@@ -28,12 +29,7 @@ MinimalTestSegmentBuilder >> findClassDef: name [
 	"Return a class definition (as RGBehavior) for class
 	 with given name or nil (if not found in definitions)"
 	
-	^(definition at: name) ifNil:[mintests at: name]
-]
-
-{ #category : #building }
-MinimalTestSegmentBuilder >> genesis [
-	self shouldNotImplement. "Use #build instead"
+	^(definition at: name) ifNil:[script at: name]
 ]
 
 { #category : #initialization }
@@ -41,17 +37,6 @@ MinimalTestSegmentBuilder >> initialize [
 	super initialize.
 	methods := OrderedCollection new.
 	
-]
-
-{ #category : #'building-private' }
-MinimalTestSegmentBuilder >> makeClasses [
-	super makeClasses.
-	self makeClasses: mintests 
-]
-
-{ #category : #building }
-MinimalTestSegmentBuilder >> makeLoadAction [
-	^self makeInstanceOf: #MinimalTest.
 ]
 
 { #category : #initialization }

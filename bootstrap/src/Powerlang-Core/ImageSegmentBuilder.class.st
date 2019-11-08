@@ -87,8 +87,8 @@ ImageSegmentBuilder >> fixHierarchyIn: clsObj def: clsDef [
 	"
 	| superObj superMetaObj metaObj |
 	clsDef superclass notNil ifTrue:[			
-			superObj := classDef2ClassObjMap at: clsDef superclass.
-			superMetaObj := classDef2ClassObjMap at: clsDef metaclass superclass.
+			superObj := classDef2ClassObjMap at: (self findClassDef: clsDef superclass name) .
+			superMetaObj := classDef2ClassObjMap at: (self findClassDef: clsDef superclass name) metaclass.
 	] ifFalse:[
 			superObj := classDef2ClassObjMap at: (kernel at: #Class).
 			superMetaObj := classDef2ClassObjMap at: (kernel at: #Class) metaclass.

@@ -97,7 +97,7 @@ KernelSegmentBuilder >> makeLoadAction [
 	
 	"CRAP crap to be easily grepped.
  	 This obviously bogus, we should make an instance
-	 of BeeLoader and send it #start. But for now, comuting
+	 of BeeLoader and send it #start. But for now, computing
 	 #gcd: is challenging enough."
 	
 	messageSendObj receiver: (self makeSmallInteger: 10).
