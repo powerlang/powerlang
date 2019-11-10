@@ -46,7 +46,7 @@ main(const int argc, const char** argv)
 
     ImageSegment* kernel = ImageSegment::load(&segment_file);
 
-    printf("Loaded kernel at %p, size %" PRIx64", TOC at %p\n",
+    printf("Loaded kernel at %8p, size %" PRIx64 ", TOC at %8p\n",
            kernel,
            kernel->header.size,
            kernel->header.toc.get());
@@ -61,5 +61,9 @@ main(const int argc, const char** argv)
 
     OOP<> retval = LookupAndInvoke(entry, Symbol_evaluate);
 
-    printf("Result is %p\n", retval.get());
+    printf("\n\nReturn value is %p", retval.get());
+    if (retval->isSmallInt()) {
+        printf(" (SmallInteger %" PRIdPTR ")", retval->smallIntVal());
+    }
+    printf("\n");
 }
