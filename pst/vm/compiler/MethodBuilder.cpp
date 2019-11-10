@@ -58,6 +58,7 @@ MethodBuilder::MethodBuilder(OOP<VMMethod> method,
     }
 
     AddressPtr = types->PointerTo(Address);
+    Int32Ptr = types->PointerTo(Int32);
 }
 
 MethodBuilder::MethodBuilder(OOP<VMMethod> method, MethodBuilder* callerMB)
@@ -76,6 +77,7 @@ MethodBuilder::MethodBuilder(OOP<VMMethod> method, MethodBuilder* callerMB)
     }
 
     AddressPtr = callerMB->AddressPtr;
+    Int32Ptr = callerMB->Int32Ptr;
 }
 
 bool
@@ -128,7 +130,8 @@ MethodBuilder::LoadBehavior(IlBuilder* bb, IlValue* obj)
         smicase->Store(behaviorId->c_str(), behavior);
     }
     {
-        objcase->Store(behaviorId->c_str(), LoadBehaviorNonImmediate(bb, obj));
+        objcase->Store(behaviorId->c_str(),
+                       LoadBehaviorNonImmediate(objcase, obj));
     }
     return bb->Load(behaviorId->c_str());
 }
@@ -136,15 +139,15 @@ MethodBuilder::LoadBehavior(IlBuilder* bb, IlValue* obj)
 IlValue*
 MethodBuilder::LoadBehaviorNonImmediate(IlBuilder* bb, IlValue* obj)
 {
-    IlValue* behaviorBits =
-      bb->LoadAt(AddressPtr, bb->Sub(obj, bb->ConstInt32(4)));
+    IlValue* behaviorAddr = bb->Sub(obj, bb->ConstInt32(sizeof(uint32_t)));
+    IlValue* behavior = bb->LoadAt(Int32Ptr, behaviorAddr);
+    behavior = bb->ConvertTo(Int64, behavior);
+    behavior = bb->ConvertTo(Address, behavior);
     if (VMObject::compressedReferenceBase) {
-        return bb->Add(
-          bb->ConstAddress((void*)VMObject::compressedReferenceBase),
-          behaviorBits);
-    } else {
-        return behaviorBits;
+        behavior = bb->Add(
+          bb->ConstAddress((void*)VMObject::compressedReferenceBase), behavior);
     }
+    return behavior;
 }
 
 IlValue*

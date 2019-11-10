@@ -41,6 +41,10 @@ mintest_ret_self.bsl: $(BOOTSTRAP)/bootstrap.image kernel kernel/*
 	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
 		"MinimalTestSegmentBuilder new method: 'evaluate ^ self'; build; writeToFile: '$(shell pwd)/$@'"
 
+mintest_ret_behavior.bsl: $(BOOTSTRAP)/bootstrap.image kernel kernel/*
+	cd $(BOOTSTRAP) && ./pharo bootstrap.image eval \
+		"MinimalTestSegmentBuilder new method: 'evaluate ^self behavior'; build; writeToFile: '$(shell pwd)/$@'"
+
 
 $(BOOTSTRAP)/bootstrap.image $(BOOTSTRAP)/pharo:
 	$(MAKE) -C $(BOOTSTRAP)

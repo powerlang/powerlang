@@ -63,6 +63,7 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
   private:
     OOP<VMMethod> method;
     IlType* AddressPtr;
+    IlType* Int32Ptr;
     int labelCount = 0;
 
     std::string* newInternalId(std::string prefix = "label");

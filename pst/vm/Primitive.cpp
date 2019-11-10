@@ -90,6 +90,24 @@ ImplSmallIntegerPlus::buildIL(MethodBuilder* bb)
         bothSmallInts->ConvertTo(bothSmallInts->Int64, arg))));
     return true;
 }
+
+class ImplGetBehavior : public InlinedPrimitive
+{
+  public:
+    ImplGetBehavior(const char* name, const int narg)
+      : InlinedPrimitive(name, narg)
+    {}
+
+    virtual bool buildIL(MethodBuilder* bb);
+};
+
+bool
+ImplGetBehavior::buildIL(MethodBuilder* bb)
+{
+    bb->Return(bb->LoadBehavior(bb, bb->LoadSelf(bb)));
+    return true;
+}
+
 bool Primitives::initialized = false;
 
 std::map<std::string, Primitive*> Primitives::map;
@@ -102,9 +120,11 @@ Primitives::initialize()
 
     //    add(new RuntimePrimitive("SmallIntegerPlus",
     //                             1,
-    //                             PrimSmallIntegerPlus,
+    //                             (void*)PrimSmallIntegerPlus,
     //                             __FILE__,
     //                             PrimSmallIntegerPlus_LINE));
     add(new ImplSmallIntegerPlus("SmallIntegerPlus", 1));
+
+    add(new ImplGetBehavior("GetBehavior", 0));
 }
 } // namespace BAST
