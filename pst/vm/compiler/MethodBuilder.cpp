@@ -264,8 +264,29 @@ MethodBuilder::buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args)
 }
 
 OOP<VMObject>
-assumedBehaviorOfSend(OOP<VMObject> selector)
+MethodBuilder::assumedBehaviorOfSend(OOP<VMObject> node)
 {
+    BAST_ASSERT(node->slot(1)->isSmallInt());
+
+    OOP<VMObject> receiver = node->slot(2);
+    BAST_ASSERT(receiver->isPointers());
+    BAST_ASSERT(receiver->slot(0)->isSmallInt());
+
+    switch (receiver->slot(0)->smallIntVal()) {
+        case IdentifierId: {
+            BAST_ASSERT(receiver->size() >= 2);
+            BAST_ASSERT(receiver->slot(1)->isSmallInt());
+
+            if (receiver->slot(1)->smallIntVal() == SelfId) {
+                OOP<pst::Species> species = method->s_class;
+                return species->s_instanceBehavior;
+            }
+        } break;
+        default:
+            break;
+    }
+
+    OOP<VMObject> selector = method->literal(node->slot(1));
     BAST_ASSERT(selector->isBytes());
     if (selector->stringVal() == "+") {
         return Class_SmallInteger;
@@ -279,12 +300,12 @@ MethodBuilder::buildSend(IlBuilder* bb, const OOP<VMObject> node)
     BAST_ASSERT(node->slot(1)->isSmallInt());
 
     OOP<VMObject> selector = method->literal(node->slot(1));
-    OOP<VMObject> behavior = assumedBehaviorOfSend(selector);
+    OOP<VMObject> behavior = assumedBehaviorOfSend(node);
     IlValueA args = buildSendArgs(bb, node);
     if (behavior != nullptr) {
         OOP<VMMethod> callee = LookupInClass(behavior, selector);
         // Avoid recursive inlining into itself
-        if (callee != method) {
+        if (callee != method && callee->s_bytecodes != Nil) {
 
             std::string* sendId = newInternalId("send");
 

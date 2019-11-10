@@ -76,6 +76,8 @@ class MethodBuilder : public OMR::JitBuilder::MethodBuilder
     IlValue* buildSend(IlBuilder* bb, const OOP<VMObject> node);
     IlValue* buildVariable(IlBuilder* bb, const OOP<VMObject> node);
 
+    OOP<VMObject> assumedBehaviorOfSend(OOP<VMObject> node);
+
     IlValueA buildSendArgs(IlBuilder* bb, const OOP<VMObject> node);
     IlValue* buildSendFull(IlBuilder* bb, int numArgs, IlValueA& args);
 
