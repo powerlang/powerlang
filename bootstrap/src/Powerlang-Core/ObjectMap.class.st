@@ -36,7 +36,7 @@ ObjectMap >> at: index [
 	 used for accessing named slots (aka, instance variables), to access 
 	 them use #instVarAt:"
 	
-	self shouldNotImplement  
+	self subclassResponsibility  
 ]
 
 { #category : #accessing }
@@ -45,7 +45,7 @@ ObjectMap >> at: index put: value [
 	 setting named slots (aka, instance variables), to access them use 
 	 #instVarAt:put:"
 	
-	self shouldNotImplement  
+	self subclassResponsibility  
 ]
 
 { #category : #accessing }
@@ -85,7 +85,7 @@ ObjectMap >> slotAt: index [
 	 for accessing indexed slots  (i.e., variable part of array-like objects), 
    to set them use #at:"
 	
-	self shouldNotImplement  
+	self subclassResponsibility  
 ]
 
 { #category : #accessing }
@@ -94,7 +94,7 @@ ObjectMap >> slotAt: index put: value [
 	 for setting indexed slots  (i.e., variable part of array-like objects), 
    to set them use #at:put:"
 	
-	self shouldNotImplement  
+	self subclassResponsibility
 ]
 
 { #category : #accessing }
@@ -102,12 +102,8 @@ ObjectMap >> slotNamed: name [
 	"Get a named slot with given `name`"
 	
 	| index |
-	
 	index := spec allInstVarNames indexOf: name.
-	index == 0 ifTrue:[
-		self error: 'No slot named ''', name , ''''.
-		^self.		
-	].
+	index == 0 ifTrue:[ ^self error: 'No slot named "', name , '"'].
 	^ self slotAt: index
 ]
 
@@ -116,12 +112,8 @@ ObjectMap >> slotNamed: name put: value [
 	"Set a named slot with given `name` to `value`"
 	
 	| index |
-	
 	index := spec allInstVarNames indexOf: name.
-	index == 0 ifTrue:[
-		self error: 'No slot named ''', name , ''''.
-		^self.		
-	].
+	index == 0 ifTrue: [ ^self error: 'No slot named "', name , '"'	].
 	^ self slotAt: index put: value
 ]
 

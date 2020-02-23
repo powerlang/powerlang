@@ -7,6 +7,16 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #accessing }
+SmallintObjectMap >> at: index [
+	self errorNotIndexable
+]
+
+{ #category : #accessing }
+SmallintObjectMap >> at: index put: anObject [
+	self errorNotIndexable
+]
+
 { #category : #initialization }
 SmallintObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior name == #SmallInteger.
@@ -23,6 +33,16 @@ SmallintObjectMap >> isImmediate [
 { #category : #accessing }
 SmallintObjectMap >> size [ 
 	^ 0
+]
+
+{ #category : #accessing }
+SmallintObjectMap >> slotAt: index [
+	self errorNotIndexable
+]
+
+{ #category : #accessing }
+SmallintObjectMap >> slotAt: index put: anObject [
+	self errorNotIndexable
 ]
 
 { #category : #validation }
