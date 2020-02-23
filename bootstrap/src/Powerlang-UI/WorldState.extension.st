@@ -2,14 +2,7 @@ Extension { #name : #WorldState }
 
 { #category : #'*Powerlang-UI' }
 WorldState class >> pstClassBrowser [
-	| kernel |
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../src/kernel' asFileReference;
-		load.
-	ProjectBrowser new
-		project: kernel;
-		openWithSpec
+	SmalltalkKernel spec browse
 ]
 
 { #category : #'*Powerlang-UI' }
