@@ -12,7 +12,7 @@ SmallintObjectMap >> initializeWithDef: anRGBehavior size: size [
 	self assert: anRGBehavior name == #SmallInteger.
 	self assert: size == 0.
 	
-	behaviorDef := anRGBehavior.
+	spec := anRGBehavior.
 ]
 
 { #category : #testing }

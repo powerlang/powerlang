@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'behavior',
-		'behaviorDef'
+		'spec'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -60,7 +60,7 @@ ObjectMap >> behavior: anObjectMap [
 
 { #category : #accessing }
 ObjectMap >> behaviorDef [
-	^ behaviorDef
+	^ spec
 ]
 
 { #category : #initialization }
@@ -108,7 +108,7 @@ ObjectMap >> slotNamed: name [
 	
 	| index |
 	
-	index := behaviorDef allInstVarNames indexOf: name.
+	index := spec allInstVarNames indexOf: name.
 	index == 0 ifTrue:[
 		self error: 'No slot named ''', name , ''''.
 		^self.		
@@ -122,7 +122,7 @@ ObjectMap >> slotNamed: name put: value [
 	
 	| index |
 	
-	index := behaviorDef allInstVarNames indexOf: name.
+	index := spec allInstVarNames indexOf: name.
 	index == 0 ifTrue:[
 		self error: 'No slot named ''', name , ''''.
 		^self.		
