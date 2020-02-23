@@ -64,7 +64,7 @@ SlotObjectMap >> doesNotUnderstand: aMessage [
 { #category : #testing }
 SlotObjectMap >> headerFlags [
 	| variable named small |
-	variable := spec isVariable ifNil: [0] ifNotNil: [2].
+	variable := spec isVariable ifTrue: [2] ifFalse: [0].
 	named := spec instSize == 0 ifTrue: [0] ifFalse: [4].
 	small := self isSmall ifTrue: [16r80] ifFalse: [0].
 	^ variable | named | small

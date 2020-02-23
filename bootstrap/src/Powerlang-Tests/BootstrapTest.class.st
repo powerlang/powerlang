@@ -30,7 +30,8 @@ BootstrapTest >> test010nil [
 		assert: nilObj behavior equals: behavior;
 		assert: (behavior slotNamed: 'class') equals: class;
 		assert: nilObj classname equals: 'UndefinedObject';
-		assert: behavior classname equals: 'Behavior'
+		assert: behavior classname equals: 'Behavior';
+		assert: class name bytes asString allButLast = 'UndefinedObject'
 ]
 
 { #category : #tests }

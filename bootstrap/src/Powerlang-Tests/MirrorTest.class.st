@@ -34,19 +34,14 @@ MirrorTest >> mirrorForObject [
 MirrorTest >> setUp [
 	| kernel stream |
 	super setUp.
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../pst/kernel' asFileReference;
-		load.
-	builder := SmalltalkKernel new
-		project: kernel;
-		build.
+	kernel := SmalltalkKernel spec.
+	builder := SmalltalkKernel new spec: kernel; build.
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
 		stream: stream;
 		objects: builder objects;
 		write.
-	runtime := Runtime forSimulatedPst: writer image with: kernel module
+	runtime := Runtime forSimulatedPst: writer image with: kernel
 ]
 
 { #category : #tests }
@@ -103,6 +98,6 @@ MirrorTest >> testObjectMirrorBasics [
 		deny: class reflectsBytesObject;
 		deny: class reflectsLargeObject;
 		deny: class reflectsNil.
-	definition := builder project classNamed: 'Class'.
+	definition := builder => 'Class'.
 	self assert: class size equals: definition allInstVarNames size
 ]

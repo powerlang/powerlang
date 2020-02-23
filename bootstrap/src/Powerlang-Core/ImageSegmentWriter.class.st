@@ -91,7 +91,9 @@ ImageSegmentWriter >> writeHeader [
 
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectBody: obj [
-	obj isBytes ifTrue: [ self writeObjectBytes: obj ] ifFalse: [ self writeObjectSlots: obj ]
+	obj isBytes
+		ifTrue: [ self writeObjectBytes: obj ]
+		ifFalse: [ self writeObjectSlots: obj ]
 ]
 
 { #category : #accessing }

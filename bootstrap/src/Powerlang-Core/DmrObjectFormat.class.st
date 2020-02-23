@@ -91,15 +91,17 @@ DmrObjectFormat >> largeSizeOf: oid [
 
 { #category : #sizes }
 DmrObjectFormat >> print: oid on: aStream [
+	| size |
 	aStream
 		nextPut: $@;
 		nextPutAll: oid hex;
 		nextPutAll: '[flags: 0x';
 		nextPutAll: (self flagsOf: oid) printStringHex.
 	self printFlagsOf: oid on: aStream.
+	size := self sizeOf: oid.
 	aStream
 		nextPutAll: ', size: 0x';
-		nextPutAll: self size printStringHex;
+		nextPutAll: size printStringHex;
 		nextPut: $].
 
 

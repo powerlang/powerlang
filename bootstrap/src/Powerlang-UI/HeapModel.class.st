@@ -22,26 +22,21 @@ HeapModel class >> defaultSpec [
 HeapModel class >> forSimulatedPst [
 	<example>
 	| kernel stream builder writer runtime labels |
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../pst/kernel' asFileReference;
-		load.
-	builder := SmalltalkKernel new
-		project: kernel;
-		build.
+	kernel := SmalltalkKernel spec.
+	builder := SmalltalkKernel new spec: kernel; build.
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
 		stream: stream;
 		objects: builder objects;
 		write.
-	runtime := Runtime forSimulatedPst: writer image with: kernel module.
+	runtime := Runtime forSimulatedPst: writer image with: kernel.
 	labels := Dictionary new.
 	builder classes
 		do: [ :class | 
 			| classname offset ibehavior cbehavior |
-			classname := (class at: 'name') asString.
+			classname := class name asString.
 			offset := writer offsetOf: class.
-			ibehavior := class at: 'instanceBehavior'.
+			ibehavior := class instanceBehavior.
 			ibehavior := writer offsetOf: ibehavior.
 			cbehavior := writer offsetOf: class behavior.
 			labels

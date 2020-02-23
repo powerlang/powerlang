@@ -253,7 +253,7 @@ SmalltalkKernel >> new: classDef sized: size [
 SmalltalkKernel >> newArray: anArray [
 	| instance |
 	instance := self newSlots: 'Array' sized: anArray size.
-	anArray withIndexDo: [ :obj :i | instance at: i put: nilObj ].
+	anArray withIndexDo: [ :obj :i | instance at: i put: obj ].
 	^ instance
 ]
 

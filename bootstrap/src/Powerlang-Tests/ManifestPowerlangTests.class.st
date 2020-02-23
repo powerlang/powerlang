@@ -16,3 +16,8 @@ ManifestPowerlangTests class >> ruleAssertEqualSignIntoAssertEqualsV1FalsePositi
 ManifestPowerlangTests class >> ruleRBConsistencyCheckRuleV1FalsePositive [
 	^ #(#(#(#RGPackage #(#'Powerlang-Tests')) #'2019-07-24T21:37:19.12369-03:00') )
 ]
+
+{ #category : #'code-critics' }
+ManifestPowerlangTests class >> ruleRBSentNotImplementedRuleV1FalsePositive [
+	^ #(#(#(#RGPackage #(#'Powerlang-Tests')) #'2020-02-26T15:19:33.083731-03:00') )
+]

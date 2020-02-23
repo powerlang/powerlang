@@ -10,19 +10,14 @@ Class {
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
 	| kernel builder stream writer |
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../pst/kernel' asFileReference;
-		load.
-	builder := SmalltalkKernel new
-		project: kernel;
-		build.
+	kernel := SmalltalkKernel spec.
+	builder := SmalltalkKernel new spec: kernel; build.
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
 		stream: stream;
 		objects: builder objects;
 		write.
-	^ Runtime forSimulatedPst: writer image with: kernel module
+	^ Runtime forSimulatedPst: writer image with: kernel
 ]
 
 { #category : #private }
