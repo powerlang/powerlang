@@ -2,29 +2,57 @@ Class {
 	#name : #SmalltalkKernel,
 	#superclass : #Object,
 	#instVars : [
-		'project',
 		'index',
 		'classes',
 		'objects',
 		'symbols',
 		'nilObj',
 		'trueObj',
-		'falseObj'
+		'falseObj',
+		'environment'
+	],
+	#classVars : [
+		'Spec'
 	],
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #accessing }
+SmalltalkKernel class >> spec [
+	Spec ifNil:[
+		| repo |
+		repo := TonelRepository new directory: '../pst' asFileReference.
+		Spec := repo asRingEnvironmentWith: #(kernel).
+		Spec clean.
+	].
+	^ Spec
+	
+]
+
 { #category : #initialization }
-SmalltalkKernel >> allInstVarNamesOf: classmap [
-	| all current names ivars |
-	all := OrderedCollection new.
-	current := classmap.
-	[ current != nilObj ]
-		whileTrue: [ ivars := current at: 'instanceVariables'.
-			names := (1 to: ivars size) collect: [ :i | ivars arrayedAt: i ].
-			all addAll: names.
-			current := current at: 'superclass' ].
-	^ all
+SmalltalkKernel >> => aSymbol [
+	^environment at: aSymbol
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> basicNewBytes: classname contents: aByteObject [
+	| obj |
+	obj := ByteObjectMap new: self => classname valued: aByteObject.
+	^objects add: obj
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> basicNewSlots: classname [
+	^self basicNewSlots: classname sized: 0
+
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> basicNewSlots: classname sized: size [
+	| spec instance |
+	spec := environment at: classname.
+	instance := SlotObjectMap new: spec size: size withAll: nilObj.
+	^ objects add: instance
 ]
 
 { #category : #building }
@@ -33,89 +61,19 @@ SmalltalkKernel >> build [
 		createNil;
 		createTrue;
 		createFalse;
-		createEmptyClasses;
-		buildClasses;
-		buildBehaviors;
-		buildNil;
-		buildTrue;
-		buildFalse
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildBehaviors [
-	| b behavior |
-	b := self instanceBehaviorOf: 'Behavior'.
-	classes
-		do: [ :class | 
-			behavior := class at: 'instanceBehavior'.
-			behavior
-				behavior: b ]
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildClass: class from: definition [
-	| behavior superclass name ivars classIvars pools subclasses format |
-	"st-80 behavior := self newBehavior."
-	behavior := (self classNamed: 'Class') at: 'instanceBehavior'.
-	superclass := self classNamedOrNil: definition supername.
-	subclasses := definition subclasses collect: [ :def | self classNamed: def name ].
-	subclasses := self newArray: subclasses.
-	name := self newString: definition name.
-	format := self newSmallInteger: 0.
-	ivars := self newStringArray: definition instVarNames.
-	classIvars := self newStringArray: definition classVarNames.
-	pools := self newStringArray: definition sharedPools.
-	class
-		behavior: behavior;
-		at: 'superclass' put: superclass;
-		at: 'format' put: format;
-		at: 'instanceVariables' put: ivars;
-		at: 'organization' put: nilObj;
-		at: 'name' put: name;
-		at: 'subclasses' put: subclasses;
-		at: 'classVariables' put: classIvars;
-		at: 'sharedPools' put: pools
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildClasses [
-	project classes
-		with: classes
-		do: [ :spec :class | self buildClass: class from: spec ]
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildFalse [
-	| behavior |
-	behavior := self instanceBehaviorOf: 'False'.
-	falseObj behavior: behavior
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildNil [
-	| behavior |
-	behavior := self instanceBehaviorOf: 'UndefinedObject'.
-	nilObj behavior: behavior
+		createClasses;
+		initializeBehaviors
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> buildTestMethod [
-	| method behavior astcodes |
-	method := self newSlots.
-	behavior := self instanceBehaviorOf: 'CompiledMethod'.
+	| method astcodes |
+	method := self newSlots: 'CompiledMethod'.
 	astcodes := self transferArrayDeep: self testMethodAstcodes.
 	method
-		behavior: behavior;
-		at: 'nativeCode' put: self nilObject;
-		at: 'astcodes' put: astcodes.
+		nativeCode: nilObj;
+		astcodes: astcodes.
 	^ method
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> buildTrue [
-	| behavior |
-	behavior := self instanceBehaviorOf: 'True'.
-	trueObj behavior: behavior
 ]
 
 { #category : #initialization }
@@ -134,33 +92,55 @@ SmalltalkKernel >> classes [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> createEmptyClasses [
+SmalltalkKernel >> createClass: definition [
 	| class behavior |
-	project classes
-		do: [ :definition | 
-			class := self newNamed: definition name.
-			behavior := self newSlots
-				at: 'methods' put: nilObj;
-				at: 'next' put: nilObj;
-				at: 'class' put: class;
-				yourself.
-			class at: 'superclass' put: nilObj; at: 'instanceBehavior' put: behavior.
-			classes add: class ]
+	class := self basicNewSlots: #Class.
+	self define: class as: definition name.
+	behavior := self basicNewSlots: #Behavior.
+	behavior class: class.
+	class instanceBehavior: behavior.
+	classes at: definition put: class.
+	self define: class as: definition name
+
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> createClasses [
+	environment allClasses
+		do: [ :def | self createClass: def; createMetaclass: def ];
+		do: [ :def | self initializeClass: def; initializeMetaclass: def]
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> createFalse [
-	falseObj := self newSlots
+	falseObj := self basicNewSlots: #False
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> createMetaclass: spec [
+	|  meta ibehavior class |
+	meta := self basicNewSlots: #Metaclass.
+	ibehavior := self basicNewSlots: #Behavior.
+	ibehavior class: meta.
+	class := classes at: spec.
+	class behavior: ibehavior.
+	meta instanceBehavior: ibehavior; class: class.
+
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> createNil [
-	nilObj := self newSlots
+	nilObj := self basicNewSlots: #UndefinedObject.
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> createTrue [
-	trueObj := self newSlots
+	trueObj := self basicNewSlots: #True
+]
+
+{ #category : #'as yet unclassified' }
+SmalltalkKernel >> define: anObject as: aSymbol [
+	^ index at: aSymbol put: anObject
 ]
 
 { #category : #'as yet unclassified' }
@@ -169,18 +149,84 @@ SmalltalkKernel >> falseObject [
 ]
 
 { #category : #initialization }
+SmalltalkKernel >> formatOfClass: definition [
+	| variable pointers |
+	variable := definition isVariable ifTrue: [ 16r2000 ] ifFalse: [ 0 ].
+	pointers := definition isBytes ifTrue: [ 0 ] ifFalse: [16r4000 ].
+	^variable | pointers | definition allInstVarNames size
+]
+
+{ #category : #initialization }
 SmalltalkKernel >> initialize [
 	index := Dictionary new.
-	classes := OrderedCollection new.
+	classes := OrderedDictionary new.
 	objects := OrderedCollection new.
 	symbols := OrderedDictionary new
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> initializeBehavior: anObjectMap [
+	| class |
+	class := classes at: anObjectMap spec.
+	anObjectMap behavior: class instanceBehavior.
+
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> initializeBehaviors [
+	objects do: [:o | o behavior ifNil: [ self initializeBehavior: o ]]
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> initializeClass: definition [
+	| class supername superclass name flag ivars classIvars pools subclasses format |
+	class := classes at: definition.
+	supername := definition superclass ifNotNil: [ :s | s name ].
+	superclass := self classNamedOrNil: supername.
+	subclasses := definition subclasses collect: [ :def | self classNamed: def name ].
+	subclasses := self newArray: subclasses.
+	name := self newString: definition name.
+	flag := self formatOfClass: definition.
+	format := self newSmallInteger: flag.
+	ivars := self newStringArray: definition instVarNames.
+	classIvars := self newStringArray: definition classVarNames.
+	pools := self newStringArray: definition sharedPools.
+	class
+		superclass: superclass;
+		format: format;
+		instanceVariables: ivars;
+		organization: nilObj;
+		name: name;
+		subclasses: subclasses;
+		classVariables: classIvars;
+		sharedPools: pools
+]
+
+{ #category : #initialization }
+SmalltalkKernel >> initializeMetaclass: definition [
+	| class meta supername superclass ivars supermeta flags format |
+	class := classes at: definition.
+	meta := class behavior slotNamed: #class.
+	supername := definition superclass ifNotNil: [ :s | s name ].
+	superclass := self classNamedOrNil: supername.
+	supermeta := superclass == nilObj
+		ifTrue: [ self classNamed: #ProtoObject ]
+		ifFalse: [ superclass behavior slotNamed: #class].
+	ivars := self newStringArray: definition metaclass instVarNames.
+	flags := self formatOfClass: definition metaclass.
+	format := self newSmallInteger: flags.
+	meta
+		superclass: supermeta;
+		format: format;
+		instanceVariables: ivars;
+		organization: nilObj
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> instanceBehaviorOf: classname [
 	| class |
 	class := self classNamed: classname.
-	^class at: 'instanceBehavior'.
+	^class instanceBehavior
 
 ]
 
@@ -190,117 +236,118 @@ SmalltalkKernel >> nameOf: anObject [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> new: classmap [
-	| behavior fields instance |
-	behavior := classmap at: 'instanceBehavior'.
-	fields := self allInstVarNamesOf: classmap.
-	instance := self newSlots behavior: behavior.
-	fields do: [ :name | instance at: name put: nilObj ].
-	^instance
+SmalltalkKernel >> new: classDef sized: size [
+	"
+	Allocate an object of pointer type (as SlotObjectMap).
+	It is niled-out, and 	`size` is the size of indexed part (i.e.,
+	shall not include named slots)
+	"
+
+	| obj |
+	obj := self newSlots: classDef sized: size.
+	1 to: obj basicSize do: [ :i | obj basicAt: i put: nilObj ].
+	^ obj
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newArray: anArray [
 	| instance |
-	instance := self newTyped: 'Array'.
-	anArray do: [ :obj | instance add: obj ].
+	instance := self newSlots: 'Array' sized: anArray size.
+	anArray withIndexDo: [ :obj :i | instance at: i put: nilObj ].
 	^ instance
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newBehavior [
-	^ self newTyped: 'Behavior'
+	^ self newSlots: 'Behavior'
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> newBytes [
-
-	| instance |
-	instance := ByteObjectMap new.
-	^ objects add: instance
-
+SmalltalkKernel >> newBytes: classname contents: aByteObject [
+	| obj |
+	obj := self basicNewBytes: classname contents: aByteObject. 
+	self initializeBehavior: obj.
+	^obj
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> newBytesTyped: classname contents: aByteObject [
-	| behavior |
-	behavior := self instanceBehaviorOf: classname.
-	^ self newBytes
-		behavior: behavior;
-		contents: aByteObject
+SmalltalkKernel >> newBytesFrom: aByteObject [
+	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newClosure: aPCompiledBlock [
-	^ self newTyped: 'Closure'
+	^ self newSlots: 'Closure'
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
 	| method astcodes class selector format |
-	method := self newTyped: 'CompiledMethod'.
+	method := self newSlots: 'CompiledMethod'.
 	astcodes := self transferAstcodesFrom: anAstcode.
 	class := self classNamed: classname.
 	selector := self newSymbol: aSymbol.
 	format := self newSmallInteger: anInteger.
 	method
-		at: 'nativeCode' put: self nilObject;
-		at: 'semantics' put: astcodes;
-		at: 'class' put: class;
-		at: 'selector' put: selector;
-		at: 'format' put: format;
-		at: 'source' put: self nilObject.
+		nativeCode: self nilObject;
+		semantics: astcodes;
+		class: class;
+		selector: selector;
+		format: format;
+		source: self nilObject.
 	^ method
 ]
 
 { #category : #'as yet unclassified' }
 SmalltalkKernel >> newNamed: aSymbol [
-	^ index at: aSymbol put: self newSlots
+	| obj |
+	obj := self newSlots: aSymbol.
+	^ index at: aSymbol put: obj
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> newSlots [
+SmalltalkKernel >> newSlots: classname [
+	^self newSlots: classname sized: 0
+]
 
-	| instance |
-	instance := SlotObjectMap new.
-	^ objects add: instance
+{ #category : #initialization }
+SmalltalkKernel >> newSlots: classname sized: size [
+	| obj |
+	obj := self basicNewSlots: classname sized: size.
+	self initializeBehavior: obj.
+	^obj
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newSmallInteger: anInteger [
-	^SmallintObjectMap new value: anInteger
+	^SmallintObjectMap new: self => #SmallInteger valued: anInteger
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newString: aString [
-
-	^self newBytesTyped: 'String' contents: aString
+	| bytes |
+	bytes := aString copyWith: Character null.
+	^self newBytes: 'String' contents: bytes
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newStringArray: strings [
 	| array bytes |
-	array := self newTyped: 'Array'.
+	array := self newSlots: 'Array' sized: strings size.
 	strings
-		do: [ :s | 
+		withIndexDo: [ :s :i |
 			bytes := self newString: s.
-			array add: bytes ].
-	^array
+			array at: i put: bytes ].
+	^ array
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> newSymbol: aSymbol [
-	| new |
+	| new bytes |
 	symbols at: aSymbol ifPresent: [:s | ^s ].
-	new := self newBytesTyped: 'Symbol' contents: aSymbol.
+	bytes := aSymbol copyWith: Character null.
+	new := self newBytes: 'Symbol' contents: bytes.
 	^symbols at: aSymbol put: new
-]
-
-{ #category : #initialization }
-SmalltalkKernel >> newTyped: classname [
-	| behavior |
-	behavior := self instanceBehaviorOf: classname.
-	^self newSlots behavior: behavior
 ]
 
 { #category : #'as yet unclassified' }
@@ -319,13 +366,13 @@ SmalltalkKernel >> objects [
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> project [
-	^project
+SmalltalkKernel >> spec: anRGEnvironment [
+	environment := anRGEnvironment
 ]
 
 { #category : #initialization }
-SmalltalkKernel >> project: aProjectSpec [
-	project := aProjectSpec
+SmalltalkKernel >> specNamed: aSymbol [
+	^environment at: aSymbol
 ]
 
 { #category : #initialization }
@@ -337,46 +384,38 @@ SmalltalkKernel >> testMethodAstcodes [
 
 { #category : #initialization }
 SmalltalkKernel >> transferArrayDeep: anArray [
-	| copy behavior transferred |
-	copy := self newSlots.
-	behavior := self instanceBehaviorOf: 'Array'.
-	copy behavior: behavior.
+	| copy transferred |
+	copy := self newSlots: 'Array' sized: anArray size.
 	anArray
-		do: [ :elem | 
+		withIndexDo: [ :elem :i | 
 			transferred := elem isSmallInteger
 				ifTrue: [ self newSmallInteger: elem ]
 				ifFalse: [ self transferArrayDeep: elem ].
-			copy add: transferred ].
+			copy at: i put: transferred ].
 	^ copy
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> transferAstcodesFrom: anArray [
-	| copy behavior transferred |
-	copy := self newSlots.
-	behavior := self instanceBehaviorOf: 'Array'.
-	copy behavior: behavior.
-	anArray
-		do: [ :elem | 
+	| copy transferred |
+	copy := self newSlots: 'Array' sized: anArray size.
+	anArray withIndexDo: [ :elem :i | 
 			transferred := elem isSmallInteger
 				ifTrue: [ self newSmallInteger: elem ]
 				ifFalse: [ self transferAstcodesFrom: elem ].
-			copy add: transferred ].
+			copy at: i put: transferred ].
 	^ copy
 ]
 
 { #category : #initialization }
 SmalltalkKernel >> transferObjectDeep: anObject [
-	| transferred behavior slot |
-	transferred := self newSlots.
-	behavior := self instanceBehaviorOf: anObject class name.
-	transferred behavior: behavior.
-	anObject
-		do: [ :elem | 
-			slot := elem isSmallInteger
-				ifTrue: [ self newSmallInteger: elem ]
-				ifFalse: [ self transferObjectDeep: elem ].
-			transferred add: slot ].
+	| transferred slot |
+	anObject isSmallInteger ifTrue: [ ^self newSmallInteger: anObject ].
+	anObject isBytes ifTrue: [ ^self newBytesFrom: anObject ].
+	transferred := self newSlots: anObject class name sized: anObject size.
+	anObject withIndexDo: [ :elem :i | 
+			slot := self transferObjectDeep: elem.
+			transferred at: i put: slot ].
 	^ transferred
 ]
 

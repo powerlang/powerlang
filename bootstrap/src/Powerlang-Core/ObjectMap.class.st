@@ -9,25 +9,24 @@ Class {
 }
 
 { #category : #'instance creation' }
+ObjectMap class >> classFor: anRGBehavior [
+	anRGBehavior name == #SmallInteger ifTrue: [^SmallintObjectMap].
+	^anRGBehavior isBytes
+		ifTrue: [ ByteObjectMap ]
+		ifFalse: [ SlotObjectMap ]
+]
+
+{ #category : #'instance creation' }
 ObjectMap class >> new: anRGBehavior [
 	^self new: anRGBehavior size: 0
 ]
 
 { #category : #'instance creation' }
 ObjectMap class >> new: anRGBehavior size: size [
-	| flavour |
-	self assert: (anRGBehavior isVariable or:[size == 0]).
-	
-	anRGBehavior name == #SmallInteger ifTrue:[
-		flavour := SmallintObjectMap
-	] ifFalse:[
-		anRGBehavior isBytes ifTrue:[
-			flavour := ByteObjectMap
-		] ifFalse:[
-			flavour := SlotObjectMap
-		]
-	].
-	^flavour new initializeAs: anRGBehavior sized: size
+	| class |
+	self assert: (anRGBehavior isVariable or: [ size == 0 ]).
+	class := self classFor: anRGBehavior.
+	^ class new initializeAs: anRGBehavior sized: size
 ]
 
 { #category : #accessing }
@@ -58,14 +57,71 @@ ObjectMap >> behavior: anObjectMap [
 	behavior := anObjectMap.
 ]
 
+{ #category : #accessing }
+ObjectMap >> bodySizeInBytes [
+	"Return the size of object body(s) in bytes,
+	 padded if a byte object"
+	^ self subclassResponsibility 
+]
+
+{ #category : #accessing }
+ObjectMap >> classname [
+	^spec name
+]
+
+{ #category : #accessing }
+ObjectMap >> headerSizeInBytes [
+	"
+		Return the size of object header in bytes, 
+		including both small and large part (if any).
+	"
+	
+	^ self isSmall ifTrue: [ 8 ] ifFalse: [ 16 ]
+
+]
+
+{ #category : #accessing }
+ObjectMap >> headerSmallSize [
+	"Return value of 'size' field of small header"
+	 | size |	
+   size := self size.
+   ^ size < 256 ifTrue: [ size ] ifFalse: [ 0 ]
+]
+
 { #category : #initialization }
 ObjectMap >> initializeAs: anRGBehavior sized: size [
 	self subclassResponsibility
 ]
 
 { #category : #testing }
+ObjectMap >> isBytes [
+	^ false
+]
+
+{ #category : #testing }
 ObjectMap >> isImmediate [ 
 	^false
+]
+
+{ #category : #testing }
+ObjectMap >> isPointers [
+	^false
+]
+
+{ #category : #testing }
+ObjectMap >> isSmall [
+	^self size < 256
+]
+
+{ #category : #testing }
+ObjectMap >> printOn: aStream [
+	| name |
+	super printOn: aStream.
+	name := spec name.
+	aStream
+		nextPutAll: ' (';
+		nextPutAll: name withArticle;
+		nextPut: $)
 ]
 
 { #category : #accessing }
@@ -77,6 +133,12 @@ ObjectMap >> size [
 	 For byte objects, this is a number of bytes. "
 	
 	self subclassResponsibility 
+]
+
+{ #category : #accessing }
+ObjectMap >> sizeInBytes [
+	"Return the size of object in bytes without padding"
+	^ self subclassResponsibility 
 ]
 
 { #category : #accessing }
@@ -125,4 +187,11 @@ ObjectMap >> spec [
 { #category : #validation }
 ObjectMap >> validate [
 	self assert: behavior notNil.
+]
+
+{ #category : #accessing }
+ObjectMap >> wordSize [
+	"Return the size in bytes of the word (i.e, a reference to an object)"
+	
+	^ 8 "For now, 64bit only!"
 ]

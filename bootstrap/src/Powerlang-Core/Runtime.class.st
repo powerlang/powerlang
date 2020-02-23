@@ -109,9 +109,9 @@ Runtime >> loadBridge [
 ]
 
 { #category : #initialization }
-Runtime >> loadShapesFrom: aModuleSpec [
-	objectModel := aModuleSpec.
-	aModuleSpec classes do: [ :class | shapeMap load: class ]
+Runtime >> loadShapesFrom: anRGEnvironment [
+	objectModel := anRGEnvironment.
+	anRGEnvironment allClasses do: [ :class | shapeMap load: class ]
 ]
 
 { #category : #initialization }

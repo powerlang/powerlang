@@ -12,26 +12,23 @@ Class {
 
 { #category : #running }
 BootstrapTest >> setUp [
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../pst/kernel' asFileReference;
-		load.
-	builder := SmalltalkKernel new project: kernel; build.
+	kernel := SmalltalkKernel spec.
+	builder := SmalltalkKernel new spec: kernel; build.
 	runtime := Runtime forBootstrappingPst: builder.
-	runtime loadShapesFrom: kernel module
+	runtime loadShapesFrom: kernel
 ]
 
 { #category : #tests }
 BootstrapTest >> test010nil [
-	| nilObj behavior class |
+	| nilObj class behavior |
 	nilObj := builder objects first.
-	behavior := builder instanceBehaviorOf: 'UndefinedObject'. 
 	class := builder classNamed: 'UndefinedObject'.
+	behavior := class instanceBehavior.
 	self
 		assert: nilObj equals: builder nilObject;
-		assert: nilObj slots isEmpty;
+		assert: nilObj size equals: 0;
 		assert: nilObj behavior equals: behavior;
-		assert: (behavior at: 'class') equals: class;
+		assert: (behavior slotNamed: 'class') equals: class;
 		assert: nilObj classname equals: 'UndefinedObject';
 		assert: behavior classname equals: 'Behavior'
 ]

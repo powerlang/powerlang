@@ -4,8 +4,8 @@ Class {
 	#instVars : [
 		'stream',
 		'objects',
-		'offsets',
-		'nextHash'
+		'nextHash',
+		'oops'
 	],
 	#classVars : [
 		'WordSize'
@@ -22,7 +22,7 @@ ImageSegmentWriter class >> initialize [
 ImageSegmentWriter >> encodedReferenceTo: anObject [
 	anObject isImmediate
 		ifTrue: [ ^ anObject value * 2 + 1 ].
-	^ offsets at: anObject
+	^ oops at: anObject
 ]
 
 { #category : #accessing }
@@ -32,19 +32,19 @@ ImageSegmentWriter >> image [
 
 { #category : #accessing }
 ImageSegmentWriter >> initialize [
-	offsets := IdentityDictionary new.
+	oops := IdentityDictionary new.
 	nextHash := 1
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> layoutObjects [
-	| offset |
+	| offset oop |
 	offset := stream position.
 	objects
 		do: [ :obj | 
-			offset := offset + obj headerByteSize.
-			offsets at: obj put: offset.
-			offset := offset + obj slotByteSize ]
+			oop := offset + obj headerSizeInBytes.
+			oops at: obj put: oop.
+			offset := oop + obj bodySizeInBytes ]
 ]
 
 { #category : #accessing }
@@ -67,7 +67,7 @@ ImageSegmentWriter >> objects: aCollection [
 
 { #category : #accessing }
 ImageSegmentWriter >> offsetOf: anObjectMap [
-	^ offsets at: anObjectMap
+	^ oops at: anObjectMap
 ]
 
 { #category : #accessing }
@@ -97,7 +97,7 @@ ImageSegmentWriter >> writeObjectBody: obj [
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectBytes: obj [
 	| current aligned |
-	stream nextBytesPutAll: obj contents.
+	stream nextBytesPutAll: obj bytes.
 	current := stream position.
 	aligned := current alignedTo: WordSize.
 	aligned - current timesRepeat: [ stream nextPut: 0 ]
@@ -113,18 +113,16 @@ ImageSegmentWriter >> writeObjectHeader: obj [
 	behavior := self encodedReferenceTo: obj behavior.
 	stream
 		uint16le: self nextHash;
-		nextPut: obj smallSizeField;
-		nextPut: obj flagsField;
+		nextPut: obj headerSmallSize;
+		nextPut: obj headerFlags;
 		uint32le: behavior.
-	stream position != (self offsetOf: obj) ifTrue: [ self halt ]
+	self assert: stream position == (self offsetOf: obj)
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectSlots: obj [
-	| arrayed |
 	obj slots do: [ :slot | self writeReferenceTo: slot ].
-	arrayed := obj arrayed ifNil: [ ^self ].
-	arrayed do: [ :slot | self writeReferenceTo: slot ]
+
 ]
 
 { #category : #accessing }

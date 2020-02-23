@@ -72,7 +72,7 @@ MirageGate >> handle: anObjectHandle [
 
 { #category : #nativizing }
 MirageGate >> lookup: selector [
-	^class compiledMethodFor: selector
+	^class methodNamed: selector
 ]
 
 { #category : #private }

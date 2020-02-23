@@ -7,6 +7,11 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #'instance creation' }
+SmallintObjectMap class >> new: anRGBehavior valued: anInteger [
+	^self new initializeAs: anRGBehavior valued: anInteger
+]
+
 { #category : #accessing }
 SmallintObjectMap >> at: index [
 	self errorNotIndexable
@@ -19,10 +24,15 @@ SmallintObjectMap >> at: index put: anObject [
 
 { #category : #initialization }
 SmallintObjectMap >> initializeAs: anRGBehavior sized: size [
+	self shouldNotImplement
+]
+
+{ #category : #initialization }
+SmallintObjectMap >> initializeAs: anRGBehavior valued: anInteger [
 	self assert: anRGBehavior name == #SmallInteger.
-	self assert: size == 0.
-	
+	self assert: anInteger isSmallInteger.
 	spec := anRGBehavior.
+	value := anInteger.
 ]
 
 { #category : #testing }

@@ -34,7 +34,7 @@ SExpressionInterpreterTest >> injectMethod: anAstcode selector: selector for: cl
 
 { #category : #tests }
 SExpressionInterpreterTest >> injectObject [
-	^ builder newTyped: 'Object'
+	^ builder newSlots: 'Object'
 ]
 
 { #category : #tests }

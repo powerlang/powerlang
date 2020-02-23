@@ -7,6 +7,14 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #'instance creation' }
+SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
+	| obj |
+	obj := self new: anRGBehavior size: size.
+	^obj atAllPut: value; yourself
+	
+]
+
 { #category : #accessing }
 SlotObjectMap >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
@@ -28,6 +36,17 @@ SlotObjectMap >> at: index put: value [
 	^slots at: spec instSize + index put: value
 ]
 
+{ #category : #initialization }
+SlotObjectMap >> atAllPut: value [
+	slots atAllPut: value
+]
+
+{ #category : #accessing }
+SlotObjectMap >> bodySizeInBytes [	
+	^ self sizeInBytes
+
+]
+
 { #category : #accessing }
 SlotObjectMap >> doesNotUnderstand: aMessage [
 	| sel |
@@ -40,6 +59,15 @@ SlotObjectMap >> doesNotUnderstand: aMessage [
 			(spec allInstVarNames includes: sel)
 				ifTrue: [ ^ self slotNamed: sel put: aMessage arguments first ] ].
 	^ super doesNotUnderstand: aMessage
+]
+
+{ #category : #testing }
+SlotObjectMap >> headerFlags [
+	| variable named small |
+	variable := spec isVariable ifNil: [0] ifNotNil: [2].
+	named := spec instSize == 0 ifTrue: [0] ifFalse: [4].
+	small := self isSmall ifTrue: [16r80] ifFalse: [0].
+	^ variable | named | small
 ]
 
 { #category : #initialization }
@@ -55,6 +83,11 @@ SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> isPointers [
+	^true
+]
+
+{ #category : #accessing }
 SlotObjectMap >> size [
 	"Return the size if this object, that this, the value of
 	 size field in object header. 
@@ -63,6 +96,12 @@ SlotObjectMap >> size [
 	 For byte objects, this is a number of bytes. "
 	
 	^ slots size
+]
+
+{ #category : #accessing }
+SlotObjectMap >> sizeInBytes [	
+	^ self size * self wordSize
+
 ]
 
 { #category : #accessing }
@@ -84,6 +123,11 @@ SlotObjectMap >> slotAt: index put: value [
 	self assert: (index between: 1 and: spec instSize).
 	self assert: (value isKindOf: ObjectMap).
 	^slots at: index put: value
+]
+
+{ #category : #accessing }
+SlotObjectMap >> slots [
+	^slots
 ]
 
 { #category : #validation }

@@ -48,6 +48,11 @@ ManifestPST class >> ruleRBSearchingLiteralRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBSentNotImplementedRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkKernel #createClasses #false)) #'2020-02-25T22:59:31.058411-03:00') #(#(#RGMethodDefinition #(#SmalltalkKernel #createMetaclassFor: #false)) #'2020-02-25T23:16:30.071654-03:00') #(#(#RGClassDefinition #(#SmalltalkKernel)) #'2020-02-25T23:30:19.042184-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBStringConcatenationRuleV1FalsePositive [
 	^ #(#(#(#RGMethodDefinition #(#SlotObjectMap #printOn: #false)) #'2019-05-19T00:11:27.865645-03:00') #(#(#RGMetaclassDefinition #(#'HeapModel class' #HeapModel)) #'2019-05-28T11:56:52.832767-03:00') )
 ]
@@ -64,5 +69,5 @@ ManifestPST class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBUsesAddRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SmalltalkKernel #newSlots #false)) #'2019-05-19T01:27:26.911539-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SmalltalkKernel)) #'2020-02-26T01:42:53.799604-03:00') )
 ]
