@@ -28,6 +28,20 @@ SlotObjectMap >> at: index put: value [
 	^slots at: spec instSize + index put: value
 ]
 
+{ #category : #accessing }
+SlotObjectMap >> doesNotUnderstand: aMessage [
+	| sel |
+	sel := aMessage selector.
+	sel isUnary
+		ifTrue: [ (spec allInstVarNames includes: sel)
+				ifTrue: [ ^ self slotNamed: sel ] ].
+	(sel isKeyword and: [ sel numArgs == 1 ])
+		ifTrue: [ sel := sel allButLast.
+			(spec allInstVarNames includes: sel)
+				ifTrue: [ ^ self slotNamed: sel put: aMessage arguments first ] ].
+	^ super doesNotUnderstand: aMessage
+]
+
 { #category : #initialization }
 SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
