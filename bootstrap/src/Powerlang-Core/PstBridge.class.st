@@ -8,7 +8,7 @@ Class {
 PstBridge >> findFalseObject [
 	| s handle |
 	s := runtime storage.
-	handle := s class = SmalltalkKernel
+	handle := s class = SmalltalkBootstrapper
 		ifTrue: [ s falseObject ]
 		ifFalse: [ self ASSERT: false ].
 	^ trueObj := ObjectHandle on: handle within: runtime

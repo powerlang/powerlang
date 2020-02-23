@@ -48,13 +48,7 @@ SExpressionInterpreterTest >> invoke: method with: object [
 { #category : #running }
 SExpressionInterpreterTest >> setUp [
 	super setUp.
-	kernel := ProjectSpec new
-		name: 'kernel';
-		path: '../pst/kernel' asFileReference;
-		load.
-	builder := SmalltalkKernel new
-		project: kernel;
-		build
+	builder := SmalltalkBootstrapper fromSpec build
 ]
 
 { #category : #tests }
@@ -79,6 +73,6 @@ SExpressionInterpreterTest >> write [
 		stream: stream;
 		objects: builder objects;
 		write.
-	runtime := Runtime forSimulatedPst: writer image with: kernel module.
+	runtime := Runtime forSimulatedPst: writer image with: SmalltalkBootstrapper spec.
 
 ]

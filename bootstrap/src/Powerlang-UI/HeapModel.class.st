@@ -22,8 +22,8 @@ HeapModel class >> defaultSpec [
 HeapModel class >> forSimulatedPst [
 	<example>
 	| kernel stream builder writer runtime labels |
-	kernel := SmalltalkKernel spec.
-	builder := SmalltalkKernel new spec: kernel; build.
+	kernel := SmalltalkBootstrapper spec.
+	builder := SmalltalkBootstrapper new spec: kernel; build.
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
 		stream: stream;
@@ -34,7 +34,7 @@ HeapModel class >> forSimulatedPst [
 	builder classes
 		do: [ :class | 
 			| classname offset ibehavior cbehavior |
-			classname := class name asString.
+			classname := class name bytes allButLast asString.
 			offset := writer offsetOf: class.
 			ibehavior := class instanceBehavior.
 			ibehavior := writer offsetOf: ibehavior.
@@ -93,12 +93,10 @@ HeapModel >> describe: bytes at: address into: aStream [
 	addr := address printStringHex padLeftTo: 16 with: $0.
 	value := names
 		at: slot
-		ifPresent: [ :name | name padLeftTo: 16 ]
-		ifAbsent: [ slot printStringHex padLeftTo: 16 ].
+		ifPresent: [ :name | '-> ', name ]
+		ifAbsent: [ slot printStringHex ].
 	aStream
 		nextPutAll: addr;
-		tab: 2;
-		nextPutAll: value;
 		nextPutAll: ' | '.
 	bytes
 		do: [ :byte | 
@@ -108,7 +106,8 @@ HeapModel >> describe: bytes at: address into: aStream [
 				ifFalse: [ $. ].
 			aStream nextPut: char ].
 	aStream
-		nextPutAll: ' |';
+		nextPutAll: ' | ';
+		nextPutAll: value;
 		cr
 ]
 

@@ -14,7 +14,7 @@ ManifestPST class >> ruleAssertEqualSignIntoAssertEqualsV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#SmalltalkKernel)) #'2019-05-18T22:56:29.321173-03:00') #(#(#RGClassDefinition #(#ClassDefinition)) #'2019-05-20T12:59:59.672325-03:00') #(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-28T14:14:22.801693-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SmalltalkBootstrapper)) #'2019-05-18T22:56:29.321173-03:00') #(#(#RGClassDefinition #(#ClassDefinition)) #'2019-05-20T12:59:59.672325-03:00') #(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-28T14:14:22.801693-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -49,7 +49,7 @@ ManifestPST class >> ruleRBSearchingLiteralRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBSentNotImplementedRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SmalltalkKernel #createClasses #false)) #'2020-02-25T22:59:31.058411-03:00') #(#(#RGMethodDefinition #(#SmalltalkKernel #createMetaclassFor: #false)) #'2020-02-25T23:16:30.071654-03:00') #(#(#RGClassDefinition #(#SmalltalkKernel)) #'2020-02-25T23:30:19.042184-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkBootstrapper #createClasses #false)) #'2020-02-25T22:59:31.058411-03:00') #(#(#RGMethodDefinition #(#SmalltalkBootstrapper #createMetaclassFor: #false)) #'2020-02-25T23:16:30.071654-03:00') #(#(#RGClassDefinition #(#SmalltalkBootstrapper)) #'2020-02-25T23:30:19.042184-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -69,5 +69,5 @@ ManifestPST class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBUsesAddRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#SmalltalkKernel)) #'2020-02-26T01:42:53.799604-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SmalltalkBootstrapper)) #'2020-02-26T01:42:53.799604-03:00') )
 ]

@@ -10,8 +10,8 @@ Class {
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
 	| kernel builder stream writer |
-	kernel := SmalltalkKernel spec.
-	builder := SmalltalkKernel new spec: kernel; build.
+	kernel := SmalltalkBootstrapper spec.
+	builder := SmalltalkBootstrapper new spec: kernel; build.
 	stream := #[] writeStream.
 	writer := ImageSegmentWriter new
 		stream: stream;
