@@ -24,7 +24,7 @@ ObjectHandle >> asLocalBytes [
 
 { #category : #'meta accessing' }
 ObjectHandle >> asLocalCollection [
-	^self isBytes ifTrue: [runtime stringOf: oid] ifFalse: [self ASSERT: false]
+	^self isBytes ifTrue: [runtime bytesOf: oid] ifFalse: [self ASSERT: false]
 ]
 
 { #category : #'meta accessing' }
@@ -35,6 +35,11 @@ ObjectHandle >> asLocalInteger [
 { #category : #'meta accessing' }
 ObjectHandle >> asLocalString [
 	^runtime stringOf: oid
+]
+
+{ #category : #'meta accessing' }
+ObjectHandle >> asLocalSymbol [
+	^runtime symbolOf: oid
 ]
 
 { #category : #'meta accessing' }

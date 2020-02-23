@@ -59,6 +59,11 @@ Runtime >> bridge: aBridge [
 	bridge runtime: self
 ]
 
+{ #category : #storage }
+Runtime >> bytesOf: oid [
+	^objectFormat bytesOf: oid
+]
+
 { #category : #accessing }
 Runtime >> false [
 	^ bridge false
@@ -196,6 +201,11 @@ Runtime >> stringOf: oid [
 { #category : #shapes }
 Runtime >> structureOf: type [
 	^shapeMap at: type
+]
+
+{ #category : #storage }
+Runtime >> symbolOf: oid [
+	^objectFormat symbolOf: oid
 ]
 
 { #category : #accessing }

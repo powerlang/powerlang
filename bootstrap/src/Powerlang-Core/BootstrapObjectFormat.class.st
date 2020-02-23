@@ -79,10 +79,10 @@ BootstrapObjectFormat >> sizeOf: oid [
 
 { #category : #public }
 BootstrapObjectFormat >> slotOf: oid at: index [
-	^ oid slotAtIndex: index
+	^ oid slotAt: index
 ]
 
 { #category : #public }
 BootstrapObjectFormat >> stringOf: oid count: size [
-	^(oid contents copyFrom: 1 to: size) asString
+	^(oid bytes copyFrom: 1 to: size) asString
 ]

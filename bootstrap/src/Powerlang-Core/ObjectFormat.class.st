@@ -54,10 +54,17 @@ ObjectFormat >> storage: anObject [
 ObjectFormat >> stringOf: oid [
 	| size |
 	size := self sizeOf: oid.
-	^self stringOf: oid count: size
+	^self stringOf: oid count: size - 1
 ]
 
 { #category : #public }
 ObjectFormat >> stringOf: oid count: size [
 	^self subclassResponsibility
+]
+
+{ #category : #public }
+ObjectFormat >> symbolOf: oid [
+	| size |
+	size := self sizeOf: oid.
+	^self stringOf: oid count: size
 ]
