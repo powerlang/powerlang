@@ -36,10 +36,12 @@ ObjectMapTest >> test_01a [
 
 { #category : #tests }
 ObjectMapTest >> test_01b [
-	| null frac |
+	| undefined fraction null frac |
+	undefined := kernel at: #UndefinedObject.
+	fraction := kernel at: #Fraction.
 	
-	null := ObjectMap new: (kernel at: #UndefinedObject).
-	frac := ObjectMap new: (kernel at: #Fraction).
+	null := ObjectMap new: undefined.
+	frac := ObjectMap new: fraction.
 	self assert: frac class == SlotObjectMap.
 	self assert: frac size == 2.
 	
@@ -76,28 +78,30 @@ ObjectMapTest >> test_01b [
 
 { #category : #tests }
 ObjectMapTest >> test_01c [
-	| null frac |
+	| undefined array null indexed |
 	
-	null := ObjectMap new: (kernel at: #UndefinedObject).
-	frac := ObjectMap new: (kernel at: #Array) size: 2.
-	self assert: frac class == SlotObjectMap.
-	self assert: frac size == 2.
+	undefined := kernel at: #UndefinedObject.
+	array := kernel at: #Array.
+	null := ObjectMap new: undefined.
+	indexed := ObjectMap new: array size: 2.
+	self assert: indexed class == SlotObjectMap.
+	self assert: indexed size == 2.
 	
-	frac at: 1 put: null.
-	frac at: 2 put: frac.
-	self assert: (frac at: 1) == null.
-	self assert: (frac at: 2) == frac.
+	indexed at: 1 put: null.
+	indexed at: 2 put: indexed.
+	self assert: (indexed at: 1) == null.
+	self assert: (indexed at: 2) == indexed.
 	
-	frac at: 1 put: frac.
-	frac at: 2 put: null.
-	self assert: (frac at: 1) == frac.
-	self assert: (frac at: 2) == null.
+	indexed at: 1 put: indexed.
+	indexed at: 2 put: null.
+	self assert: (indexed at: 1) == indexed.
+	self assert: (indexed at: 2) == null.
 	
-	self should: [ frac at: 0 ] raise: Error.
-	self should: [ frac at: 3 ] raise: Error.
-	self should: [ frac at: 0 put: null ] raise: Error.
-	self should: [ frac at: 3 put: null ] raise: Error.
-	self should: [ frac at: 1 put: 1] raise: Error.
+	self should: [ indexed at: 0 ] raise: Error.
+	self should: [ indexed at: 3 ] raise: Error.
+	self should: [ indexed at: 0 put: null ] raise: Error.
+	self should: [ indexed at: 3 put: null ] raise: Error.
+	self should: [ indexed at: 1 put: 1] raise: Error.
 	
 	
 	
