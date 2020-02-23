@@ -29,7 +29,7 @@ ByteObjectMap >> at: index put: value [
 ]
 
 { #category : #initialization }
-ByteObjectMap >> initializeWithDef: anRGBehavior size: size [
+ByteObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
 	self assert: anRGBehavior isBytes.
 	self assert: anRGBehavior isVariable.

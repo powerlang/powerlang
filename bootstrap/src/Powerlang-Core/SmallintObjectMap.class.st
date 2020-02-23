@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #initialization }
-SmallintObjectMap >> initializeWithDef: anRGBehavior size: size [
+SmallintObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior name == #SmallInteger.
 	self assert: size == 0.
 	

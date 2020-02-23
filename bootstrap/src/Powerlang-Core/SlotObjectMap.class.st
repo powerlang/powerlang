@@ -29,7 +29,7 @@ SlotObjectMap >> at: index put: value [
 ]
 
 { #category : #initialization }
-SlotObjectMap >> initializeWithDef: anRGBehavior size: size [
+SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
 	self assert: anRGBehavior isPointers.
 	self assert:(anRGBehavior isVariable or:[size == 0]).

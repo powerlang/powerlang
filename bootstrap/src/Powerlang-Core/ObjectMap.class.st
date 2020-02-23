@@ -27,7 +27,7 @@ ObjectMap class >> new: anRGBehavior size: size [
 			flavour := SlotObjectMap
 		]
 	].
-	^flavour new initializeWithDef: anRGBehavior size: size
+	^flavour new initializeAs: anRGBehavior sized: size
 ]
 
 { #category : #accessing }
@@ -58,13 +58,8 @@ ObjectMap >> behavior: anObjectMap [
 	behavior := anObjectMap.
 ]
 
-{ #category : #accessing }
-ObjectMap >> behaviorDef [
-	^ spec
-]
-
 { #category : #initialization }
-ObjectMap >> initializeWithDef: anRGBehavior size: size [
+ObjectMap >> initializeAs: anRGBehavior sized: size [
 	self subclassResponsibility
 ]
 
@@ -128,6 +123,11 @@ ObjectMap >> slotNamed: name put: value [
 		^self.		
 	].
 	^ self slotAt: index put: value
+]
+
+{ #category : #accessing }
+ObjectMap >> spec [
+	^ spec
 ]
 
 { #category : #validation }
