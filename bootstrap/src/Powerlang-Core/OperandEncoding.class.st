@@ -15,6 +15,9 @@ Class {
 	#classVars : [
 		'Encodings'
 	],
+	#pools : [
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

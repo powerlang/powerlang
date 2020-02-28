@@ -14,6 +14,10 @@ Class {
 	#classVars : [
 		'Types'
 	],
+	#pools : [
+		'OperandTypeFlags',
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

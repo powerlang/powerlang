@@ -13,8 +13,8 @@ Class {
 }
 
 { #category : #private }
-LegacyPrefix class >> addressSizOverride [
-	^{Address-size override}
+LegacyPrefix class >> addressSizeOverride [
+	^AddressSize_Override
 ]
 
 { #category : #initialization }
@@ -52,7 +52,7 @@ LegacyPrefix class >> initializeGroup3 [
 	prefix := self new
 		group: 3;
 		value: 16r66;
-		name: 'Operand-size override'.
+		name: 'OperandSize_Override'.
 	Prefixes at: prefix name put: prefix
 ]
 
@@ -62,7 +62,7 @@ LegacyPrefix class >> initializeGroup4 [
 	prefix := self new
 		group: 4;
 		value: 16r67;
-		name: 'Address-size override'.
+		name: 'AddressSize_Override'.
 	Prefixes at: prefix name put: prefix
 ]
 
@@ -77,8 +77,8 @@ LegacyPrefix class >> initializePrefixes [
 ]
 
 { #category : #private }
-LegacyPrefix class >> operandSizOverride [
-	^{Operand-size override}
+LegacyPrefix class >> operandSizeOverride [
+	^OperandSize_Override
 ]
 
 { #category : #accessing }
@@ -110,12 +110,12 @@ LegacyPrefix >> matches: aLegacyPrefix [
 
 { #category : #testing }
 LegacyPrefix >> overridesAddressSize [
-	^self = {Address-size override}
+	^self = AddressSize_Override
 ]
 
 { #category : #testing }
 LegacyPrefix >> overridesOperandSize [
-	^self = {Operand-size override}
+	^self = OperandSize_Override
 ]
 
 { #category : #accessing }

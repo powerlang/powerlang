@@ -11,8 +11,17 @@ Class {
 		'family',
 		'flags'
 	],
+	#pools : [
+		'OperandTypeFlags',
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
+
+{ #category : #private }
+Register class >> addRegister: aRegister [
+	Registers at: aRegister name put: aRegister
+]
 
 { #category : #initialization }
 Register class >> initialize [
@@ -76,6 +85,11 @@ Register class >> initialize8BitRexRegisters [
 				length: 8;
 				initializeFlags.
 			self addRegister: register]
+]
+
+{ #category : #initialization }
+Register class >> initializeFamilies [
+	Registers do: [:reg | reg initializeFamily]
 ]
 
 { #category : #initialization }
@@ -143,6 +157,44 @@ Register class >> initializeSegmentRegisters [
 ]
 
 { #category : #accessing }
+Register class >> named: aString [
+	"
+	Register named: 'rax'
+	"
+	^Registers at: aString asLowercase ifAbsent: nil
+]
+
+{ #category : #accessing }
+Register class >> segment: index [
+	index = 0 ifTrue: [^cs].
+	index = 1 ifTrue: [^ss].
+	index = 2 ifTrue: [^ds].
+	index = 3 ifTrue: [^es].
+	index = 4 ifTrue: [^fs].
+	index = 5 ifTrue: [^gs].
+	^nil
+]
+
+{ #category : #accessing }
+Register class >> withIndex: index length: length [
+	^Registers detect: [:r | 
+		r index = index
+			and: [r length = length]
+			and: [(r name beginsWith: 'mmx') not]
+			and: [r isSegment not]]
+]
+
+{ #category : #accessing }
+Register class >> withIndex: index length: length long: aBoolean [
+	^Registers detect: [:r | 
+		r index = index
+			and: [r length = length]
+			and: [(r name beginsWith: 'mmx') not]
+			and: [r isSegment not]
+			and: [r isLongModeOld8BitRegister ifTrue: [aBoolean] ifFalse: [true]]]
+]
+
+{ #category : #accessing }
 Register class >> xmm: i [
 	^self named: 'xmm' , i asString
 ]
@@ -182,6 +234,69 @@ Register >> family: anArray [
 	family := anArray
 ]
 
+{ #category : #private }
+Register >> getB [
+	self == rax ifTrue: [^al].
+	self == rcx ifTrue: [^cl].
+	self == rdx ifTrue: [^dl].
+	self == rbx ifTrue: [^bl].
+	self == rsi ifTrue: [^sil].
+	self == rdi ifTrue: [^dil].
+	self == rbp ifTrue: [^bpl].
+	self == rsp ifTrue: [^spl].
+	self == r8 ifTrue: [^r8b].
+	self == r9 ifTrue: [^r9b].
+	self == r10 ifTrue: [^r10b].
+	self == r11 ifTrue: [^r11b].
+	self == r12 ifTrue: [^r12b].
+	self == r13 ifTrue: [^r13b].
+	self == r14 ifTrue: [^r14b].
+	self == r15 ifTrue: [^r15b].
+	^nil
+]
+
+{ #category : #private }
+Register >> getE [
+	self == rax ifTrue: [^eax].
+	self == rcx ifTrue: [^ecx].
+	self == rdx ifTrue: [^edx].
+	self == rbx ifTrue: [^ebx].
+	self == rsi ifTrue: [^esi].
+	self == rdi ifTrue: [^edi].
+	self == rbp ifTrue: [^ebp].
+	self == rsp ifTrue: [^esp].
+	self == r8 ifTrue: [^r8d].
+	self == r9 ifTrue: [^r9d].
+	self == r10 ifTrue: [^r10d].
+	self == r11 ifTrue: [^r11d].
+	self == r12 ifTrue: [^r12d].
+	self == r13 ifTrue: [^r13d].
+	self == r14 ifTrue: [^r14d].
+	self == r15 ifTrue: [^r15d].
+	^nil
+]
+
+{ #category : #private }
+Register >> getW [
+	self == rax ifTrue: [^ax].
+	self == rcx ifTrue: [^cx].
+	self == rdx ifTrue: [^dx].
+	self == rbx ifTrue: [^bx].
+	self == rsi ifTrue: [^si].
+	self == rdi ifTrue: [^di].
+	self == rbp ifTrue: [^bp].
+	self == rsp ifTrue: [^sp].
+	self == r8 ifTrue: [^r8w].
+	self == r9 ifTrue: [^r9w].
+	self == r10 ifTrue: [^r10w].
+	self == r11 ifTrue: [^r11w].
+	self == r12 ifTrue: [^r12w].
+	self == r13 ifTrue: [^r13w].
+	self == r14 ifTrue: [^r14w].
+	self == r15 ifTrue: [^r15w].
+	^nil
+]
+
 { #category : #accessing }
 Register >> index [
 	^index
@@ -206,6 +321,14 @@ Register >> initializeFlags [
 ]
 
 { #category : #initialization }
+Register >> initializeRegisterGroupFlag [
+	(name includesString: 'mm') ifTrue: [^self addFlag: RegisterSIMD].
+	(#('es' 'cs' 'ss' 'ds' 'fs' 'gs') includes: name)
+		ifTrue: [^self addFlag: RegisterSegment].
+	self addFlag: RegisterGP
+]
+
+{ #category : #initialization }
 Register >> isCompatibleWith: anOperandType [
 	anOperandType isRegister ifFalse: [^false].
 	(anOperandType registerGroup = self registerGroup
@@ -220,8 +343,32 @@ Register >> isExtended [
 ]
 
 { #category : #testing }
+Register >> isGeneral [
+	^self registerGroup = RegisterGP
+]
+
+{ #category : #testing }
+Register >> isLongModeOld8BitRegister [
+	self = spl ifTrue: [^true].
+	self = bpl ifTrue: [^true].
+	self = sil ifTrue: [^true].
+	self = dil ifTrue: [^true].
+	^false
+]
+
+{ #category : #testing }
 Register >> isRegister [
 	^true
+]
+
+{ #category : #testing }
+Register >> isSIMD [
+	^self registerGroup = RegisterSIMD
+]
+
+{ #category : #testing }
+Register >> isSegment [
+	^self registerGroup = RegisterSegment
 ]
 
 { #category : #testing }
@@ -263,6 +410,11 @@ Register >> r [
 { #category : #accessing }
 Register >> regExtension [
 	^self extensionBit
+]
+
+{ #category : #initialization }
+Register >> registerGroup [
+	^flags bitAnd: RegisterGroupMask
 ]
 
 { #category : #encoding }

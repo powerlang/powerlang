@@ -30,6 +30,9 @@ Class {
 	#classVars : [
 		'Specs'
 	],
+	#pools : [
+		'CharacterConstants'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

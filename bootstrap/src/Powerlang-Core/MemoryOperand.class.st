@@ -12,6 +12,9 @@ Class {
 		'displacement',
 		'segment'
 	],
+	#pools : [
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

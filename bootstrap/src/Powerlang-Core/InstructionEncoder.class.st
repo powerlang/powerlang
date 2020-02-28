@@ -23,6 +23,9 @@ Class {
 	#classVars : [
 		'Cache'
 	],
+	#pools : [
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
@@ -541,8 +544,8 @@ InstructionEncoder >> writePrefixes [
 	self writeSegmentPrefixes.
 	instruction prefix notNil ifTrue: [instruction prefix writeOn: self].
 	head := self spec prefixes asOrderedCollection.
-	p66 := LegacyPrefix operandSizOverride.
-	p67 := LegacyPrefix addressSizOverride.
+	p66 := LegacyPrefix operandSizeOverride.
+	p67 := LegacyPrefix addressSizeOverride.
 	(head anySatisfy: [:p | p = p66 or: [p = p67] or: [p isVex]]) ifFalse: [
 		self overridesOperandSize ifTrue: [head addFirst: p66].
 		(instruction overridesAddressSize: wordSize) ifTrue: [head addFirst: p67]].

@@ -11,12 +11,20 @@ Class {
 	#classVars : [
 		'Signatures'
 	],
+	#pools : [
+		'CharacterConstants'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
 { #category : #accessing }
 VEXPrefix class >> b [
 	^16r20
+]
+
+{ #category : #'instance creation' }
+VEXPrefix class >> fromStream: aStream [
+	^self withSignature: (aStream upTo: Space)
 ]
 
 { #category : #initialization }
@@ -150,6 +158,16 @@ VEXPrefix class >> withSignature: aString [
 { #category : #accessing }
 VEXPrefix class >> x [
 	^16r40
+]
+
+{ #category : #input }
+VEXPrefix >> fromStream: aStream [
+	| stream |
+	stream := (aStream upTo: Space) readStream.
+	signature := Array streamContents: [:strm | 
+		[stream atEnd] whileFalse: [| part |
+			part := stream upTo: $..
+			strm nextPut: part]]
 ]
 
 { #category : #initialization }

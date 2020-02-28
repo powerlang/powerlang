@@ -11,6 +11,9 @@ Class {
 		'operands',
 		'template'
 	],
+	#pools : [
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

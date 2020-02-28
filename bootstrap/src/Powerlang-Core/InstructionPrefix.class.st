@@ -8,7 +8,7 @@ Class {
 	#instVars : [
 		'name'
 	],
-	#classVars : [
+	#pools : [
 		'Prefixes'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
@@ -52,20 +52,15 @@ InstructionPrefix class >> initializePrefixes [
 	self class compileAll
 ]
 
-{ #category : #prefixes }
-InstructionPrefix class >> operandSizeOverride [
-	^{Operand-size override}
-]
-
 { #category : #services }
 InstructionPrefix class >> peekFrom: aStream [
 	(aStream peekFor: LOCK value) ifTrue: [^LOCK].
 	(aStream peekFor: REPNE value) ifTrue: [^REPNE].
 	(aStream peekFor: REP value) ifTrue: [^REP].
-	(aStream peekFor: {Operand-size override} value)
-		ifTrue: [^{Operand-size override}].
-	(aStream peekFor: {Address-size override} value)
-		ifTrue: [^{Address-size override}].
+	(aStream peekFor: OperandSize_Override value)
+		ifTrue: [^OperandSize_Override].
+	(aStream peekFor: AddressSize_Override value)
+		ifTrue: [^AddressSize_Override].
 	^nil
 ]
 
