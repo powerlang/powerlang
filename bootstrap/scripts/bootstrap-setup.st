@@ -1,9 +1,17 @@
-Metacello new
+(SystemVersion current version beginsWith: 'Pharo7') ifTrue: [
+  Metacello new
   baseline: 'Ring2';
   repository: 'github://pavel-krivanek/Ring2/src';
   load;
   load: 'runtimeSupport';
-  load: 'calypso'.
+  load: 'calypso'].
+
+Gofer new smalltalkhubUser: 'Moose' project: 'PetitParser';
+    configurationOf: #PetitParser; load.
+
+(ConfigurationOfPetitParser project version: #development) load: 'Core'.
+(ConfigurationOfPetitParser project version: #development) load: 'PetitTests'.
+
 
 Author useAuthor: 'PowerSmalltalkLoader' during: [
     | repo |
