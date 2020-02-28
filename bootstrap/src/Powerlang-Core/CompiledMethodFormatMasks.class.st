@@ -1,6 +1,6 @@
 Class {
 	#name : #CompiledMethodFormatMasks,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgCount',
 		'BlockCount',

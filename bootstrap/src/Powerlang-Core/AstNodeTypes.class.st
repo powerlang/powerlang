@@ -1,6 +1,6 @@
 Class {
 	#name : #AstNodeTypes,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'AssignmentId',
 		'BlockId',

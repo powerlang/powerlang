@@ -95,21 +95,21 @@ OperandEncoding class >> initialize [
 { #category : #initialization }
 OperandEncoding class >> initializeEncodings [
 	Encodings := OrderedCollection new.
-	self defs do: [:def | | oe n selectors |
-		n := def first replaceAll: '-' with: ''.
-		oe := OperandEncoding new.
-		selectors := (2 to: def size)
-			collect: [:i | ('encode' , n , 'Operand' , (i - 1) asString , ':') asSymbol].
-		oe
-			name: n;
-			selectors: selectors;
-			descriptions: def allButFirst.
-		selectors reject: [:s | self includesSelector: s] thenDo: [:s | | change |
-			change := self project changes
-				methodDefinitionClass: self
-				sourceCode: s , ' instruction'.
-			change perform].
-		Encodings add: oe].
+	self defs
+		do: [ :def | 
+			| oe n selectors |
+			n := def first replaceAllSubstrings: '-' with: ''.
+			oe := self new.
+			selectors := (2 to: def size)
+				collect: [ :i | ('encode' , n , 'Operand' , (i - 1) asString , ':') asSymbol ].
+			oe
+				name: n;
+				selectors: selectors;
+				descriptions: def allButFirst.
+			selectors
+				reject: [ :s | self includesSelector: s ]
+				thenDo: [ :s | self compile: s , ' instruction' ].
+			Encodings add: oe ].
 	Encodings := Encodings asArray
 ]
 

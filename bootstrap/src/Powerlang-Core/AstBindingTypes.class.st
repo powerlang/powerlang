@@ -1,6 +1,6 @@
 Class {
 	#name : #AstBindingTypes,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgumentId',
 		'ClassVarId',

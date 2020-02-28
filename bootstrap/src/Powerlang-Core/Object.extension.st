@@ -38,6 +38,55 @@ Object >> hashWith: a [
 ]
 
 { #category : #'*Powerlang-Core' }
+Object >> hashWith: a with: b [
+	^ self
+		hashedWith: a
+		with: b
+		with: nil
+		with: nil
+		with: nil
+		with: nil
+		count: 3
+]
+
+{ #category : #'*Powerlang-Core' }
+Object >> hashWith: a with: b with: c [
+	^self
+		hashedWith: a
+		with: b
+		with: c
+		with: nil
+		with: nil
+		with: nil
+		count: 4
+
+]
+
+{ #category : #'*Powerlang-Core' }
+Object >> hashWith: a with: b with: c with: d [
+	^ self
+		hashedWith: a
+		with: b
+		with: c
+		with: d
+		with: nil
+		with: nil
+		count: 5
+]
+
+{ #category : #'*Powerlang-Core' }
+Object >> hashWith: a with: b with: c with: d with: e [
+	^ self
+		hashedWith: a
+		with: b
+		with: c
+		with: d
+		with: e
+		with: nil
+		count: 6
+]
+
+{ #category : #'*Powerlang-Core' }
 Object >> hashedWith: a
 with: b
 with: c

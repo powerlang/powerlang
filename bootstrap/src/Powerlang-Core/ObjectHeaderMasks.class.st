@@ -1,6 +1,6 @@
 Class {
 	#name : #ObjectHeaderMasks,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'IsArrayed',
 		'IsBytes',

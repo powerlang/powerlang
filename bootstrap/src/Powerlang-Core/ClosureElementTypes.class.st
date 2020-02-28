@@ -1,6 +1,6 @@
 Class {
 	#name : #ClosureElementTypes,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'Argument',
 		'Environment',

@@ -3058,7 +3058,7 @@ InstructionSpec >> instruction [
 InstructionSpec >> instruction: aString [
 	| substrings |
 	instruction := aString asLowercase.
-	substrings := (instruction replaceAll: ',' with: ' ') substrings.
+	substrings := (instruction replaceAllSubstrings: ',' with: ' ') substrings.
 	mnemonic := substrings first.
 	self operandsFrom: substrings
 ]

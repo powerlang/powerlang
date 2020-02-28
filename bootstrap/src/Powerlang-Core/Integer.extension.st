@@ -1,6 +1,25 @@
 Extension { #name : #Integer }
 
 { #category : #'*Powerlang-Core' }
+Integer >> bin [
+	"
+	255 bin
+	"
+	^self radix: 2
+]
+
+{ #category : #'*Powerlang-Core' }
+Integer >> bin: bits [
+	"
+	(2 bin: 7) size = 7
+	"
+	| pad bin |
+	pad := String new: bits withAll: $0.
+	bin := pad , self bin.
+	^ bin copyFrom: bin size - bits + 1 to: bin size
+]
+
+{ #category : #'*Powerlang-Core' }
 Integer >> bitShiftRight: anInteger [
 	^self bitShift: 0 - anInteger
 ]
@@ -39,6 +58,11 @@ Integer >> bitsClear: aStretch [
 	| mask |
 	mask := (1 bitShift: aStretch end) - (1 bitShift: aStretch start - 1).
 	^self bitAnd: mask bitInvert
+]
+
+{ #category : #'*Powerlang-Core' }
+Integer >> isOnBit: n [
+	^(self bitAnd: n) = n
 ]
 
 { #category : #'*Powerlang-Core' }

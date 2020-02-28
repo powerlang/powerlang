@@ -1,6 +1,6 @@
 Class {
 	#name : #CharacterConstants,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'Cr',
 		'Lf',

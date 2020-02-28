@@ -1,6 +1,6 @@
 Class {
 	#name : #ObjectHeaderOffsets,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'BehaviorOffset',
 		'FlagsOffset',

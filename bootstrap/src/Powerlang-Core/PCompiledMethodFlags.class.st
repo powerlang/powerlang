@@ -1,6 +1,6 @@
 Class {
 	#name : #PCompiledMethodFlags,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgCount',
 		'BlockCount',

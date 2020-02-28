@@ -1,6 +1,22 @@
 Extension { #name : #False }
 
 { #category : #'*Powerlang-Core' }
+False >> and: block1 and: block2 [
+	^ self
+]
+
+{ #category : #'*Powerlang-Core' }
+False >> and: block1 and: block2 and: block3 [
+	^self
+
+]
+
+{ #category : #'*Powerlang-Core' }
+False >> and: block1 andNot: block2 [
+	^self
+]
+
+{ #category : #'*Powerlang-Core' }
 False >> andNot: aBlock [
 	^self
 ]

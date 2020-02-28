@@ -35,7 +35,8 @@ VEXPrefix class >> initialize [
 
 { #category : #initialization }
 VEXPrefix class >> initializeSignatures [
-	Signatures isNil ifTrue: [Signatures := Dictionary new].
+	Signatures isNil
+		ifTrue: [ Signatures := Dictionary new ].
 	'VEX.128.0F.WIG
 	VEX.128.66.0F.W0
 	VEX.128.66.0F.W1
@@ -113,9 +114,12 @@ VEXPrefix class >> initializeSignatures [
 	VEX.NDS.LZ.F2.0F38.W1
 	VEX.NDS.LZ.F3.0F38.W0
 	VEX.NDS.LZ.F3.0F38.W1
-	VEX128.66.0F.WIG' lines do: [:s | | vex |
-		vex := self new signature: ($. split: s).
-		Signatures at: s put: vex]
+	VEX128.66.0F.WIG' lines
+		do: [ :line | 
+			| s vex |
+			s := line trimBlanks.
+			vex := self new signature: ($. split: s).
+			Signatures at: s put: vex ]
 ]
 
 { #category : #accessing }

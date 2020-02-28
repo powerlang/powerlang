@@ -1,6 +1,6 @@
 Class {
 	#name : #SExpressionTypes,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'AssignmentId',
 		'BlockId',

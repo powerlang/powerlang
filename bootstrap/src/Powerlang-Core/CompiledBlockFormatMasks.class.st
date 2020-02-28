@@ -1,5 +1,5 @@
 Class {
 	#name : #CompiledBlockFormatMasks,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#category : #'Powerlang-Core-Mirrors'
 }

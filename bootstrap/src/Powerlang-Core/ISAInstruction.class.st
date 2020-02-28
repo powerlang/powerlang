@@ -89,7 +89,7 @@ ISAInstruction >> hasDisplacement [
 
 { #category : #comparing }
 ISAInstruction >> hasOperands [
-	^operands size > 0
+	^operands notNil and: [operands size > 0]
 ]
 
 { #category : #testing }

@@ -43,7 +43,8 @@ ISAOperandType class >> immediateTypes [
 
 { #category : #initialization }
 ISAOperandType class >> initialize [
-	self initializeFlags; initializeTypes
+	self
+		initializeTypes
 ]
 
 { #category : #initialization }

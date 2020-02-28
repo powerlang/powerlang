@@ -1,6 +1,15 @@
 Extension { #name : #PositionableStream }
 
 { #category : #'*Powerlang-Core' }
+PositionableStream >> peekForAll: aCollection [
+	| n |
+	n := aCollection size.
+	^((self peek: n) hasEqualElements: aCollection)
+		ifTrue: [self skip: n];
+		yourself
+]
+
+{ #category : #'*Powerlang-Core' }
 PositionableStream >> uint16le [
 	"Answer the next unsigned, 16-bit integer from this (binary) stream."
 

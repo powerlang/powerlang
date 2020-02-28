@@ -40,6 +40,12 @@ InstructionEncoder class >> checkCache64 [
 ]
 
 { #category : #initialization }
+InstructionEncoder class >> initialize [
+	self initializeCache
+
+]
+
+{ #category : #initialization }
 InstructionEncoder class >> initializeCache [
 	Cache := Dictionary new
 ]

@@ -1,6 +1,6 @@
 Class {
 	#name : #Registers,
-	#superclass : #SharedPool,
+	#superclass : #PSharedPool,
 	#classVars : [
 		'ah',
 		'al',
