@@ -348,11 +348,11 @@ SmalltalkParser >> expression [
 SmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	| tag |
 	tag := token value asLowercase.
-	tag last = $: ifFalse: [self invalidPrimitiveToken].
+	tag last = $: ifFalse: [self invalidPragma].
 	tag := tag allButLast.
 	token value: tag.
 	tag = 'primitive' ifTrue: [^self primitive].
-	self invalidPrimitiveToken
+	self invalidPragma
 ]
 
 { #category : #binary }
@@ -401,8 +401,11 @@ SmalltalkParser >> invalidByteValue [
 ]
 
 { #category : #private }
-SmalltalkParser >> invalidPrimitiveToken [
-	self error: 'invalid primitive token'
+SmalltalkParser >> invalidPragma [
+	| position stretch |
+	position := token position.
+ 	stretch := position thru: position.
+	^InvalidPragmaError new stretch: stretch; signal
 ]
 
 { #category : #private }
@@ -551,7 +554,7 @@ SmalltalkParser >> missingToken: aString [
 { #category : #private }
 SmalltalkParser >> namedPrimitive [
 	| name pragma |
-	token isNameToken ifFalse: [self invalidPrimitiveToken].
+	token isNameToken ifFalse: [self invalidPragma].
 	name := token value.
 	pragma := self buildNode: compiler pragmaNode at: token position.
 	^pragma primitive: 0 name: name
@@ -590,6 +593,15 @@ SmalltalkParser >> notify: aString [
 { #category : #errors }
 SmalltalkParser >> notify: aString at: position [
 	compiler notify: aString at: position
+]
+
+{ #category : #private }
+SmalltalkParser >> numberedPrimitive [
+	| number pragma |
+	number := token value.
+	number isInteger ifFalse: [self invalidPragma].
+	pragma := self buildNode: compiler pragmaNode at: token position.
+	^pragma primitive: number name: nil
 ]
 
 { #category : #accessing }

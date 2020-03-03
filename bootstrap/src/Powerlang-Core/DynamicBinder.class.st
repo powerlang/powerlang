@@ -30,6 +30,7 @@ DynamicBinder class >> on: aDictionary of: type [
 DynamicBinder >> at: aString [
 	| key assoc |
 	key := self keyFor: aString.
+	key ifNil: [ ^nil ].
 	assoc := contents associationAt: key ifAbsent: [^nil].
 	^type on: assoc
 ]

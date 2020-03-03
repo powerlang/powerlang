@@ -263,3 +263,13 @@ SmalltalkCompiler >> stringToken [
 SmalltalkCompiler >> supportsBraceNodes [
 	^true
 ]
+
+{ #category : #nodes }
+SmalltalkCompiler >> undeclaredErrorAt: aStretch assignment: aBoolean [
+	^UndeclaredIdentifierError new
+		compiler: self;
+		stretch: aStretch;
+		assignment: aBoolean;
+		beResumable;
+		signal
+]

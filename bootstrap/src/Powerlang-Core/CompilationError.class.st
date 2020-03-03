@@ -16,6 +16,11 @@ CompilationError >> beFatal [
 ]
 
 { #category : #accessing }
+CompilationError >> beResumable [
+	resumable := true
+]
+
+{ #category : #accessing }
 CompilationError >> compiler [
 	^compiler
 ]
@@ -28,7 +33,7 @@ CompilationError >> compiler: aCompiler [
 
 { #category : #accessing }
 CompilationError >> description: aString [
-	description := aString
+	messageText := aString
 ]
 
 { #category : #accessing }
