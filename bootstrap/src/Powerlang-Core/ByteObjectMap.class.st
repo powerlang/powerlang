@@ -85,8 +85,3 @@ ByteObjectMap >> size [
 	
 	^ bytes size
 ]
-
-{ #category : #validation }
-ByteObjectMap >> validate [
-	super validate.
-]

@@ -62,12 +62,7 @@ SmalltalkBootstrapper >> basicNewSlots: classname sized: size [
 
 { #category : #building }
 SmalltalkBootstrapper >> build [
-	self
-		createNil;
-		createTrue;
-		createFalse;
-		createClasses;
-		initializeBehaviors
+	self genesis
 ]
 
 { #category : #initialization }
@@ -159,6 +154,23 @@ SmalltalkBootstrapper >> formatOfClass: definition [
 	variable := definition isVariable ifTrue: [ 16r2000 ] ifFalse: [ 0 ].
 	pointers := definition isBytes ifTrue: [ 0 ] ifFalse: [16r4000 ].
 	^variable | pointers | definition allInstVarNames size
+]
+
+{ #category : #building }
+SmalltalkBootstrapper >> genesis [
+	"
+	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
+	done this (and much more) before us. Namely SELF people. I (JV) would like to use this opportunity and point you to
+	
+	https://github.com/russellallen/self/blob/2bcf2c4cab23f52bf68ac4f617020e748699a548/vm/src/any/memory/universe.cpp#L79
+	"	
+	self
+		createNil;
+		createTrue;
+		createFalse;
+		createClasses;
+		initializeBehaviors;
+		validate
 ]
 
 { #category : #initialization }
@@ -427,4 +439,9 @@ SmalltalkBootstrapper >> transferObjectDeep: anObject [
 { #category : #'as yet unclassified' }
 SmalltalkBootstrapper >> trueObject [
 	^ trueObj
+]
+
+{ #category : #validating }
+SmalltalkBootstrapper >> validate [
+	objects do:[:obj | obj validate]
 ]

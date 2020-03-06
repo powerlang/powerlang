@@ -186,7 +186,7 @@ ObjectMap >> spec [
 
 { #category : #validation }
 ObjectMap >> validate [
-	self assert: behavior notNil.
+	self assert: behavior notNil
 ]
 
 { #category : #accessing }
