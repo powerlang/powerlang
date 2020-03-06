@@ -5,7 +5,8 @@ Class {
 		'stream',
 		'objects',
 		'nextHash',
-		'oops'
+		'offsets',
+		'base'
 	],
 	#classVars : [
 		'WordSize'
@@ -19,10 +20,30 @@ ImageSegmentWriter class >> initialize [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> base [
+	"
+		Return preferred base address for this segment
+	"
+	^ base
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> base: anInteger [
+	"
+	 Set the preferred base address for this segment. 
+	 This is a hint only, loaders may load a segment
+	 at a different address but then they must relocate.
+	"
+	base := anInteger
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> encodedReferenceTo: anObject [
+	| offset |
 	anObject isImmediate
 		ifTrue: [ ^ anObject value * 2 + 1 ].
-	^ oops at: anObject
+	offset := offsets at: anObject.
+	^base + offset
 ]
 
 { #category : #accessing }
@@ -32,8 +53,10 @@ ImageSegmentWriter >> image [
 
 { #category : #accessing }
 ImageSegmentWriter >> initialize [
-	oops := IdentityDictionary new.
-	nextHash := 1
+	offsets := IdentityDictionary new.
+	stream := #[] writeStream.
+	nextHash := 1.
+	base := 0.
 ]
 
 { #category : #accessing }
@@ -43,7 +66,7 @@ ImageSegmentWriter >> layoutObjects [
 	objects
 		do: [ :obj | 
 			oop := offset + obj headerSizeInBytes.
-			oops at: obj put: oop.
+			offsets at: obj put: oop.
 			offset := oop + obj bodySizeInBytes ]
 ]
 
@@ -67,7 +90,7 @@ ImageSegmentWriter >> objects: aCollection [
 
 { #category : #accessing }
 ImageSegmentWriter >> offsetOf: anObjectMap [
-	^ oops at: anObjectMap
+	^ offsets at: anObjectMap
 ]
 
 { #category : #accessing }

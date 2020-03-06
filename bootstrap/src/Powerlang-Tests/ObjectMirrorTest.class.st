@@ -9,14 +9,10 @@ Class {
 
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
-	| kernel builder stream writer |
+	| kernel builder writer |
 	kernel := SmalltalkBootstrapper spec.
 	builder := SmalltalkBootstrapper new spec: kernel; build.
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects;
-		write.
+	writer := builder writer write.
 	^ Runtime forSimulatedPst: writer image with: kernel
 ]
 

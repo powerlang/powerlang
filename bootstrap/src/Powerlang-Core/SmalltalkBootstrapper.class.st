@@ -445,3 +445,8 @@ SmalltalkBootstrapper >> trueObject [
 SmalltalkBootstrapper >> validate [
 	objects do:[:obj | obj validate]
 ]
+
+{ #category : #validating }
+SmalltalkBootstrapper >> writer [
+	^ImageSegmentWriter new objects: objects
+]

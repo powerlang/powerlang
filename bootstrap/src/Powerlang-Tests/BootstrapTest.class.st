@@ -36,15 +36,11 @@ BootstrapTest >> test010nil [
 
 { #category : #tests }
 BootstrapTest >> test100writeSegment [
-	| nilObj trueObj falseObj stream writer |
+	| nilObj trueObj falseObj |
 	nilObj := builder objects first.
 	trueObj := builder objects second.
 	falseObj := builder objects third.
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects.
-	writer write.
+	writer := builder writer write.
 	self
 		assert: (writer offsetOf: nilObj) equals: 16r10;
 		assert: (writer offsetOf: trueObj) equals: 16r18;
@@ -54,13 +50,9 @@ BootstrapTest >> test100writeSegment [
 
 { #category : #tests }
 BootstrapTest >> test200writeTestMethod [
-	| method stream writer offset |
+	| method offset |
 	method := builder buildTestMethod.
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects.
-	writer write.
+	writer := builder writer write.
 	offset := writer offsetOf: method.
 	offset halt
 ]

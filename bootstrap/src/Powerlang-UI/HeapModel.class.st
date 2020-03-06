@@ -21,14 +21,10 @@ HeapModel class >> defaultSpec [
 { #category : #specs }
 HeapModel class >> forSimulatedPst [
 	<example>
-	| kernel stream builder writer runtime labels |
+	| kernel builder writer runtime labels |
 	kernel := SmalltalkBootstrapper spec.
 	builder := SmalltalkBootstrapper new spec: kernel; build.
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects;
-		write.
+	writer := builder writer write.
 	runtime := Runtime forSimulatedPst: writer image with: kernel.
 	labels := Dictionary new.
 	builder classes

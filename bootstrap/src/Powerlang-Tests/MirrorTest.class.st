@@ -32,15 +32,11 @@ MirrorTest >> mirrorForObject [
 
 { #category : #tests }
 MirrorTest >> setUp [
-	| kernel stream |
+	| kernel |
 	super setUp.
 	kernel := SmalltalkBootstrapper spec.
 	builder := SmalltalkBootstrapper new spec: kernel; build.
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects;
-		write.
+	writer := builder writer write.
 	runtime := Runtime forSimulatedPst: writer image with: kernel
 ]
 
