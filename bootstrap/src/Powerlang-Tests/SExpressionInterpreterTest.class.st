@@ -67,12 +67,7 @@ SExpressionInterpreterTest >> test100empty [
 
 { #category : #running }
 SExpressionInterpreterTest >> write [
-	| stream |
-	stream := #[] writeStream.
-	writer := ImageSegmentWriter new
-		stream: stream;
-		objects: builder objects;
-		write.
+	writer := builder writer write.
 	runtime := Runtime forSimulatedPst: writer image with: SmalltalkBootstrapper spec.
 
 ]

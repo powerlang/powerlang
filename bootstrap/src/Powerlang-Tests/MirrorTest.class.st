@@ -66,7 +66,7 @@ MirrorTest >> test020nilBehaviorHandle [
 MirrorTest >> test030nilClassHandle [
 	| behavior class name |
 	behavior := runtime nil getBehavior.
-	class := behavior slotAt: 3.
+	class := behavior slotAt: 1.
 	self
 		assert: class isSmall;
 		deny: class isBytes;

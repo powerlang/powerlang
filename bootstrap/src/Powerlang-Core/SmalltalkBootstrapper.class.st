@@ -117,6 +117,18 @@ SmalltalkBootstrapper >> createFalse [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> createLoadAction [
+	|  message receiver selector argument arguments |
+	message := self new: #MessageSend.
+	receiver := self newSmallInteger: 10.
+	selector := self newSymbol: #gcd:.
+	argument := self newSmallInteger: 15.
+	arguments := self newArray: {argument}.
+	message receiver: receiver; selector: selector; arguments: arguments.
+	^message
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> createMetaclass: spec [
 	|  meta ibehavior class |
 	meta := self basicNewSlots: #Metaclass.
@@ -126,6 +138,15 @@ SmalltalkBootstrapper >> createMetaclass: spec [
 	class behavior: ibehavior.
 	meta instanceBehavior: ibehavior; class: class.
 
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> createModule [
+	| module array |
+	module := self new: #Module.
+	array := self newArray: classes values.
+	module classes: array; loadAction: self createLoadAction.
+	^module
 ]
 
 { #category : #initialization }
@@ -253,7 +274,14 @@ SmalltalkBootstrapper >> nameOf: anObject [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> new: classDef sized: size [
+SmalltalkBootstrapper >> new: classname [
+	"	Allocate an object of pointer type. It is niled-out "
+
+	^self new: classname sized: 0
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> new: classname sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
@@ -261,7 +289,7 @@ SmalltalkBootstrapper >> new: classDef sized: size [
 	"
 
 	| obj |
-	obj := self newSlots: classDef sized: size.
+	obj := self newSlots: classname sized: size.
 	1 to: obj basicSize do: [ :i | obj basicAt: i put: nilObj ].
 	^ obj
 ]
@@ -448,5 +476,5 @@ SmalltalkBootstrapper >> validate [
 
 { #category : #validating }
 SmalltalkBootstrapper >> writer [
-	^ImageSegmentWriter new objects: objects
+	^ImageSegmentWriter new objects: objects; module: self createModule
 ]

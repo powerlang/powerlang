@@ -6,7 +6,9 @@ Class {
 		'objects',
 		'nextHash',
 		'offsets',
-		'base'
+		'size',
+		'base',
+		'module'
 	],
 	#classVars : [
 		'WordSize'
@@ -17,6 +19,20 @@ Class {
 { #category : #'class initialization' }
 ImageSegmentWriter class >> initialize [
 	WordSize := 8
+]
+
+{ #category : #accessing }
+ImageSegmentWriter class >> nilOffset [
+	^self objectsOffset + 8
+]
+
+{ #category : #accessing }
+ImageSegmentWriter class >> objectsOffset [
+	"
+		The offset at which header terminates and objects are stored.
+		See ImageSegment.h for structure of a segment header
+	"
+	^32
 ]
 
 { #category : #accessing }
@@ -62,12 +78,18 @@ ImageSegmentWriter >> initialize [
 { #category : #accessing }
 ImageSegmentWriter >> layoutObjects [
 	| offset oop |
-	offset := stream position.
+	offset := self objectsOffset.
 	objects
 		do: [ :obj | 
 			oop := offset + obj headerSizeInBytes.
 			offsets at: obj put: oop.
-			offset := oop + obj bodySizeInBytes ]
+			offset := oop + obj bodySizeInBytes ].
+	size := offset.
+]
+
+{ #category : #initialization }
+ImageSegmentWriter >> module: aSlotObjectMap [
+	module := aSlotObjectMap
 ]
 
 { #category : #accessing }
@@ -89,6 +111,11 @@ ImageSegmentWriter >> objects: aCollection [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> objectsOffset [
+	^self class objectsOffset
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> offsetOf: anObjectMap [
 	^ offsets at: anObjectMap
 ]
@@ -101,15 +128,17 @@ ImageSegmentWriter >> stream: aWriteStream [
 { #category : #accessing }
 ImageSegmentWriter >> write [
 	self
+		layoutObjects;
 		writeSignature;
 		writeHeader;
-		layoutObjects;
 		writeObjects
 ]
 
 { #category : #accessing }
 ImageSegmentWriter >> writeHeader [
-	"TODO: write info about the contents"
+	"See ImageSegment.h for structure of a segment header"
+	stream uint64le: base; uint64le: size.
+	self writeReferenceTo: module
 ]
 
 { #category : #accessing }
@@ -152,6 +181,7 @@ ImageSegmentWriter >> writeObjectSlots: obj [
 
 { #category : #accessing }
 ImageSegmentWriter >> writeObjects [
+	self assert: stream position == self objectsOffset.
 	objects
 		do: [ :obj | 
 			self

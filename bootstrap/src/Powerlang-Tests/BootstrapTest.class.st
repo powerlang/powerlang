@@ -36,32 +36,35 @@ BootstrapTest >> test010nil [
 
 { #category : #tests }
 BootstrapTest >> test100writeSegment [
-	| nilObj trueObj falseObj |
+	| nilObj trueObj falseObj offset |
 	nilObj := builder objects first.
 	trueObj := builder objects second.
 	falseObj := builder objects third.
 	writer := builder writer write.
+	offset := writer objectsOffset.
 	self
-		assert: (writer offsetOf: nilObj) equals: 16r10;
-		assert: (writer offsetOf: trueObj) equals: 16r18;
-		assert: (writer offsetOf: falseObj) equals: 16r20.
+		assert: (writer offsetOf: nilObj) equals: offset + 16r08;
+		assert: (writer offsetOf: trueObj) equals: offset + 16r10;
+		assert: (writer offsetOf: falseObj) equals: offset + 16r18.
 
 ]
 
 { #category : #tests }
 BootstrapTest >> test120writeSegmentWithBase [
-	| nilObj trueObj falseObj |
+	| nilObj trueObj falseObj b offset |
 	nilObj := builder objects first.
 	trueObj := builder objects second.
 	falseObj := builder objects third.
-	writer := builder writer base: 16r1ff10000; write.
+	b := 16r1ff10000.
+	writer := builder writer base: b; write.
+	offset := writer objectsOffset.
 	self
-		assert: (writer offsetOf: nilObj) equals: 16r10;
-		assert: (writer offsetOf: trueObj) equals: 16r18;
-		assert: (writer offsetOf: falseObj) equals: 16r20;
-		assert: (writer encodedReferenceTo: nilObj) equals: 16r1ff10010;
-		assert: (writer encodedReferenceTo: trueObj) equals: 16r1ff10018;
-		assert: (writer encodedReferenceTo: falseObj) equals: 16r1ff10020
+		assert: (writer offsetOf: nilObj) equals: offset + 16r08;
+		assert: (writer offsetOf: trueObj) equals: offset + 16r10;
+		assert: (writer offsetOf: falseObj) equals: offset + 16r18;
+		assert: (writer encodedReferenceTo: nilObj) equals: b + offset + 16r08;
+		assert: (writer encodedReferenceTo: trueObj) equals: b + offset + 16r10;
+		assert: (writer encodedReferenceTo: falseObj) equals: b + offset + 16r18
 ]
 
 { #category : #tests }

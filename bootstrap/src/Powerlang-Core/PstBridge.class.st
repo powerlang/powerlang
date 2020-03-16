@@ -11,7 +11,7 @@ PstBridge >> findFalseObject [
 	handle := s class = SmalltalkBootstrapper
 		ifTrue: [ s falseObject ]
 		ifFalse: [ self ASSERT: false ].
-	^ trueObj := ObjectHandle on: handle within: runtime
+	^ falseObj := ObjectHandle on: handle within: runtime
 ]
 
 { #category : #initialization }
@@ -28,7 +28,7 @@ PstBridge >> findGlobalNamed: name [
 
 { #category : #initialization }
 PstBridge >> findNilObject [
-	^ nilObj := ObjectHandle on: 16 within: runtime
+	^ nilObj := ObjectHandle on: ImageSegmentWriter nilOffset within: runtime
 ]
 
 { #category : #initialization }
