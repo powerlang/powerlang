@@ -240,8 +240,9 @@ AstcodeEncoder >> visitBlock: aBlockNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitBraceNode: aBraceNode [
-	CompilationError signal.
-	^self notYetImplemented
+	aBraceNode isLiteral
+		ifTrue: [self visitLiteral: aBraceNode asLiteralNode]
+		ifFalse: [self visitCascade: aBraceNode asMessageNode]
 ]
 
 { #category : #visiting }
