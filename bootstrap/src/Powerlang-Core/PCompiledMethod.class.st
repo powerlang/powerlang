@@ -72,11 +72,6 @@ PCompiledMethod >> hasBlocks [
 	^self blockCount > 0
 ]
 
-{ #category : #accessing }
-PCompiledMethod >> indexOf: anObject [
-	^literals indexOf: anObject
-]
-
 { #category : #constants }
 PCompiledMethod >> initialize [
 	super initialize.

@@ -106,11 +106,13 @@ MethodScope >> initializeInstVars [
 
 { #category : #initialization }
 MethodScope >> initializePoolVars [
-	species allSharedPools
-		do: [:name | globals
+	| instance |
+	instance := species instanceSide.
+	instance sharedPoolsDo: [:name |
+		globals
 			poolNamed: name
 			ifPresent: [:pool | self addPool: pool]].
-	species instanceSide withAllSuperclasses
+	instance withAllSuperclasses
 		do: [:class | class localPools do: [:pool | self addPool: pool]]
 ]
 

@@ -273,3 +273,10 @@ SmalltalkCompiler >> undeclaredErrorAt: aStretch assignment: aBoolean [
 		beResumable;
 		signal
 ]
+
+{ #category : #errors }
+SmalltalkCompiler >> warning: aString at: aStretch [
+	| error |
+	error := self compilationError: aString stretch: aStretch.
+	error beWarning; signal
+]

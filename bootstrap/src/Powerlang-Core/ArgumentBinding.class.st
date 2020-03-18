@@ -15,6 +15,11 @@ ArgumentBinding >> canBeAssigned [
 ]
 
 { #category : #actions }
+ArgumentBinding >> description [
+	^'argument ' , name
+]
+
+{ #category : #actions }
 ArgumentBinding >> encodeUsing: anAstcodeEncoder [
 	anAstcodeEncoder encodeArgument: index env: environment
 ]

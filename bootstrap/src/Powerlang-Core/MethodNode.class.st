@@ -42,6 +42,11 @@ MethodNode >> compiler: aSmalltalkCompiler [
 	pragma := aSmalltalkCompiler pragmaNode
 ]
 
+{ #category : #private }
+MethodNode >> environmentIndexOf: aParseNode [
+	^nil
+]
+
 { #category : #inquiries }
 MethodNode >> header [
 	"

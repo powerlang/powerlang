@@ -32,8 +32,9 @@ AstcodeTest >> encode: source [
 
 { #category : #private }
 AstcodeTest >> encode: source in: aSpecies [
-	| compiler |
-	compiler := ProjectSpec kernel compilerFor: aSpecies name.
+	| ring compiler |
+	ring := SmalltalkBootstrapper spec bindingOf: aSpecies name.
+	compiler := Compiler forClass: ring value.
 	method := compiler compile: source.
 	^method astcodes
 ]

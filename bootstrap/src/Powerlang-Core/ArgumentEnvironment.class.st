@@ -3,3 +3,8 @@ Class {
 	#superclass : #StackEnvironment,
 	#category : #'Powerlang-Core-SCompiler'
 }
+
+{ #category : #private }
+ArgumentEnvironment >> environmentType [
+	^Argument
+]

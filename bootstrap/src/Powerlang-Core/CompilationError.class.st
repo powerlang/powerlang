@@ -21,6 +21,11 @@ CompilationError >> beResumable [
 ]
 
 { #category : #accessing }
+CompilationError >> beWarning [
+	resumable := true
+]
+
+{ #category : #accessing }
 CompilationError >> compiler [
 	^compiler
 ]

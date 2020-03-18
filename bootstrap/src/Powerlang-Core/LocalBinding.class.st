@@ -45,6 +45,11 @@ LocalBinding >> environmentObject [
 ]
 
 { #category : #accessing }
+LocalBinding >> environmentType [
+	^environment environmentType
+]
+
+{ #category : #accessing }
 LocalBinding >> index [
 	^index
 ]

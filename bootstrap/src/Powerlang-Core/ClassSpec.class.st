@@ -16,6 +16,11 @@ ClassSpec class >> from: aClass in: aCodeCorpus [
 	^self new module: aCodeCorpus; fromClass: aClass
 ]
 
+{ #category : #'instance creation' }
+ClassSpec class >> new [ 
+	self halt
+]
+
 { #category : #accessing }
 ClassSpec >> allMethods [
 	^methods & metaclass methods

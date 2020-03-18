@@ -41,8 +41,11 @@ Compiler >> canStartIdentifier: aCharacter [
 
 { #category : #initialization }
 Compiler >> classBinding: aSpecies [
+	| instance |
 	class := aSpecies.
-	aSpecies instanceSide configureCompiler: self
+	instance := aSpecies instanceSide.
+	(instance respondsTo: #configureCompiler)
+		ifTrue: [instance configureCompiler: self]
 ]
 
 { #category : #services }

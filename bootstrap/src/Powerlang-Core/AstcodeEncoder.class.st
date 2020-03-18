@@ -126,7 +126,7 @@ AstcodeEncoder >> encodeClosureElements: aBlockNode [
 				s nextPut: EnvironmentValue; nextPut: index]].
 		scope capturedArguments do: [:a | | binding |
 			binding := aBlockNode parent scope resolve: a name.
-			s nextPut: binding environmentType; nextPut: binding position]]
+			s nextPut: binding environmentType; nextPut: binding environmentIndex; nextPut: binding index]]
 ]
 
 { #category : #visiting }
@@ -240,6 +240,7 @@ AstcodeEncoder >> visitBlock: aBlockNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitBraceNode: aBraceNode [
+	CompilationError signal.
 	^self notYetImplemented
 ]
 

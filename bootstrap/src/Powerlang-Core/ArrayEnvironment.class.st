@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #private }
+ArrayEnvironment >> environmentType [
+	^EnvironmentValue
+]
+
+{ #category : #private }
 ArrayEnvironment >> index [
 	^index
 ]

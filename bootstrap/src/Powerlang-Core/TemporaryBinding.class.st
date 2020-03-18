@@ -4,6 +4,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #printing }
+TemporaryBinding >> description [
+	^'temporary ' , name
+]
+
 { #category : #initialization }
 TemporaryBinding >> encodeUsing: anAstcodeEncoder [
 	anAstcodeEncoder encodeTemporary: index env: environment

@@ -37,6 +37,11 @@ BlockNode >> captureHome [
 	scope captureEnvironment: self ast
 ]
 
+{ #category : #testing }
+BlockNode >> environmentIndexOf: aParseNode [
+	^scope environmentIndexOf: aParseNode
+]
+
 { #category : #accessing }
 BlockNode >> index [
 	^index

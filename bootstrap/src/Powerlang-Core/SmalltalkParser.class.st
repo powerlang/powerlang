@@ -694,7 +694,7 @@ SmalltalkParser >> primitive [
 SmalltalkParser >> pseudoLiteralValue [
 	| value |
 	token isPoolLiteral ifTrue: [^token literalValue].
-	value := token value asAnsi.
+	value := token value.
 	value = 'nil' ifTrue: [^nil].
 	value = 'true' ifTrue: [^true].
 	value = 'false' ifTrue: [^false].

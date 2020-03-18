@@ -103,8 +103,8 @@ BlockScope >> environmentIndexOf: aScriptNode [
 	temporal compatibility
 	"
 	(aScriptNode isKindOf: ScriptNode)
-		ifTrue: [^self capturedEnvironmentIndexOf: aScriptNode].
-	^nil
+		ifFalse: [ self ASSERT: false. ^nil ].
+	^self capturedEnvironmentIndexOf: aScriptNode
 ]
 
 { #category : #private }
