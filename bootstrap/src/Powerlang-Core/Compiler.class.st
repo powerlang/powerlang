@@ -5,7 +5,8 @@ Class {
 		'errorHandler',
 		'result',
 		'class',
-		'pools'
+		'pools',
+		'namespace'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -20,6 +21,16 @@ Compiler class >> compile: aString in: aClass [
 { #category : #'instance creation' }
 Compiler class >> forClass: aClass [
 	^self new forClass: aClass
+]
+
+{ #category : #services }
+Compiler class >> namespace: aDictionary [
+	^self basicNew initialize: aDictionary
+]
+
+{ #category : #'instance creation' }
+Compiler class >> new [
+	^self namespace: Smalltalk globals
 ]
 
 { #category : #services }
@@ -62,16 +73,24 @@ Compiler >> forClass: aClass [
 ]
 
 { #category : #initialization }
-Compiler >> initialize [
+Compiler >> initialize: aDictionary [
 	super initialize.
-	class := UndefinedObject.
+	namespace := aDictionary.
+	class := aDictionary at: #UndefinedObject ifAbsent: nil.
 	pools := OrderedCollection new.
 ]
 
 { #category : #initialization }
+Compiler >> namespace: aDictionary [
+	namespace := aDictionary
+]
+
+{ #category : #initialization }
 Compiler >> newScope [
-	class isNil ifTrue: [class := UndefinedObject].
-	^MethodScope new species: class; addPoolBinders: pools
+	^MethodScope new
+		species: class;
+		addPoolBinders: pools;
+		namespace: namespace
 ]
 
 { #category : #services }
@@ -106,4 +125,14 @@ Compiler >> protect: aBlock [
 { #category : #services }
 Compiler >> smalltalkCompiler [
 	^ SmalltalkCompiler new frontend: self
+]
+
+{ #category : #services }
+Compiler >> smalltalkParser [
+	^ self smalltalkCompiler parser
+]
+
+{ #category : #services }
+Compiler >> smalltalkScanner [
+	^ self smalltalkCompiler scanner
 ]

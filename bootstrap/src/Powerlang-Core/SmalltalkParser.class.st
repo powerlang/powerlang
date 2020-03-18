@@ -315,9 +315,7 @@ SmalltalkParser >> compiler [
 { #category : #accessing }
 SmalltalkParser >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler.
-	compiler sourceCode
-		ifNotNil: [:s | scanner sourceCode: s; compiler: compiler].
-	scanner compiler: compiler
+	scanner := compiler scanner
 ]
 
 { #category : #errors }
@@ -380,14 +378,6 @@ SmalltalkParser >> headlessMethod [
 	compiler activeScript: method.
 	self addBodyTo: method.
 	^method
-]
-
-{ #category : #initialization }
-SmalltalkParser >> initialize [
-	super initialize.
-	compiler := Compiler new smalltalkCompiler.
-	compiler resetResult.
-	self scanner: SmalltalkScanner new
 ]
 
 { #category : #errors }
@@ -715,12 +705,6 @@ SmalltalkParser >> return [
 		end: end;
 		expression: expression;
 		moveCommentsFrom: return
-]
-
-{ #category : #accessing }
-SmalltalkParser >> scanner: aSmalltalkScanner [
-	scanner := aSmalltalkScanner.
-	scanner compiler: compiler
 ]
 
 { #category : #private }

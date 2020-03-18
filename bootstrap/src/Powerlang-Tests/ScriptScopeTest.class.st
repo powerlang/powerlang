@@ -143,7 +143,7 @@ ScriptScopeTest >> scopeFor: aSpecies [
 { #category : #private }
 ScriptScopeTest >> test010resolveClass [
 	| binding |
-	binding := MethodScope new resolve: 'Point'.
+	binding := Compiler new smalltalkCompiler methodNode scope resolve: 'Point'.
 	self
 		assert: binding isGlobal;
 		assert: binding isClassBinding;
@@ -161,7 +161,7 @@ ScriptScopeTest >> test010resolveClassVariables [
 { #category : #private }
 ScriptScopeTest >> test010resolveGlobal [
 	| binding |
-	binding := MethodScope new resolve: 'Smalltalk'.
+	binding := Compiler new smalltalkCompiler methodNode scope resolve: 'Smalltalk'.
 	self
 		assert: binding isGlobal;
 		deny: binding isClassBinding;

@@ -48,7 +48,8 @@ SmalltalkScanner >> compiler [
 
 { #category : #accessing }
 SmalltalkScanner >> compiler: aSmalltalkCompiler [
-	compiler := aSmalltalkCompiler
+	compiler := aSmalltalkCompiler.
+	compiler sourceCode ifNotNil: [:s | self sourceCode: s]
 ]
 
 { #category : #scanning }
@@ -64,13 +65,6 @@ SmalltalkScanner >> error: aString [
 { #category : #errors }
 SmalltalkScanner >> error: aString at: anInteger [
 	^compiler error: aString at: anInteger
-]
-
-{ #category : #initialization }
-SmalltalkScanner >> initialize [
-	super initialize.
-	compiler := Compiler new smalltalkCompiler.
-	compiler resetResult
 ]
 
 { #category : #scanning }

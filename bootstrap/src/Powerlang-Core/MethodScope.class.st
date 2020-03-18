@@ -75,19 +75,11 @@ MethodScope >> hasMultipleBindingsFor: aString [
 { #category : #initialization }
 MethodScope >> initialize [
 	super initialize.
-	globals := DynamicBinder on: Smalltalk globals of: GlobalBinding.
+	globals := DynamicBinder on: Dictionary new of: GlobalBinding.
 	ivars := StaticBinder new.
-	cvars := OrderedCollection new.
+	cvars := OrderedCollection new. 
 	pools := OrderedCollection new.
 	self initializePseudoVars
-]
-
-{ #category : #initialization }
-MethodScope >> initialize: aSpecies [
-	species := aSpecies.
-	self initializeInstVars; initializeClassVars; initializePoolVars.
-	species superclass isNil ifTrue: [^self].
-	pseudo at: 'super' put: SuperBinding new
 ]
 
 { #category : #initialization }
@@ -132,8 +124,8 @@ MethodScope >> namespace [
 ]
 
 { #category : #accessing }
-MethodScope >> namespace: aSmalltalkSystem [
-	globals contents: aSmalltalkSystem globals
+MethodScope >> namespace: aDictionary [
+	globals contents: aDictionary
 ]
 
 { #category : #services }

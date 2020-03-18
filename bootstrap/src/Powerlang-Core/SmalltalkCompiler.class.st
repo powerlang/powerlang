@@ -148,6 +148,12 @@ SmalltalkCompiler >> identifierNode [
 ]
 
 { #category : #nodes }
+SmalltalkCompiler >> initialize [
+	self reset
+
+]
+
+{ #category : #nodes }
 SmalltalkCompiler >> literalNode [
 	^LiteralNode new compiler: self
 ]
@@ -237,6 +243,11 @@ SmalltalkCompiler >> result [
 { #category : #nodes }
 SmalltalkCompiler >> returnNode [
 	^ReturnNode new compiler: self
+]
+
+{ #category : #accessing }
+SmalltalkCompiler >> scanner [
+	^SmalltalkScanner new compiler: self
 ]
 
 { #category : #nodes }

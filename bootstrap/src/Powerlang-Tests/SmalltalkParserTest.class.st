@@ -10,7 +10,7 @@ Class {
 { #category : #setup }
 SmalltalkParserTest >> setUp [
 	super setUp.
-	parser := SmalltalkParser new
+	parser := Compiler new smalltalkParser
 ]
 
 { #category : #other }
@@ -650,8 +650,9 @@ SmalltalkParserTest >> testParseFragment [
 { #category : #temporaries }
 SmalltalkParserTest >> testParseTemporaries [
 	| temporaries |
-	temporaries := SmalltalkParser new
-		parseTemporaries: 'm: arg
+	temporaries := Compiler new smalltalkParser
+		parseTemporaries:
+			'm: arg
 	| t1 t2 t3 |
 	^:= will not even parse'.
 	self assert: (temporaries collect: #name) asArray = #('t1' 't2' 't3')
