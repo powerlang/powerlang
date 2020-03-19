@@ -20,6 +20,11 @@ CompilationResult >> ast: aParseNode [
 	ast := aParseNode
 ]
 
+{ #category : #errors }
+CompilationResult >> beSuccessful [
+	error := nil
+]
+
 { #category : #accessing }
 CompilationResult >> compiler: aSmalltalkCompiler [
 	compiler := aSmalltalkCompiler

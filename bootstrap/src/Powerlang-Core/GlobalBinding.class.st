@@ -19,6 +19,11 @@ GlobalBinding class >> usesSymbols [
 ]
 
 { #category : #testing }
+GlobalBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodeGlobalVar: association
+]
+
+{ #category : #testing }
 GlobalBinding >> isGlobal [
 	^true
 ]

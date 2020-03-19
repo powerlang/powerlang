@@ -42,6 +42,34 @@ CompilationError >> description: aString [
 ]
 
 { #category : #accessing }
+CompilationError >> isResumable [
+	^resumable
+
+]
+
+{ #category : #testing }
+CompilationError >> isUndeclaredAccess [
+	^false
+]
+
+{ #category : #testing }
+CompilationError >> isUndeclaredAssignment [
+	^ false
+]
+
+{ #category : #accessing }
+CompilationError >> proceed [
+	retryable := false.
+	compiler result beSuccessful.
+	self isResumable ifTrue: [ self resume ] ifFalse: [ self return ]
+]
+
+{ #category : #accessing }
+CompilationError >> source [
+	^compiler sourceCode copyFrom: stretch start to: stretch end
+]
+
+{ #category : #accessing }
 CompilationError >> stretch [
 	^stretch
 ]

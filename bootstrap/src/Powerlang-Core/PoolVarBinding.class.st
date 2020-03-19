@@ -6,7 +6,7 @@ Class {
 
 { #category : #testing }
 PoolVarBinding >> encodeUsing: anAstcodeEmitter [
-	anAstcodeEmitter encodePoolVar: association
+	anAstcodeEmitter encodePoolVar: self literal
 ]
 
 { #category : #testing }

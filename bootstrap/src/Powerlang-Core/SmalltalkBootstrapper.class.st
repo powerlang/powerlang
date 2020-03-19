@@ -23,12 +23,18 @@ SmalltalkBootstrapper class >> fromSpec [
 ]
 
 { #category : #accessing }
+SmalltalkBootstrapper class >> initializePools [
+	Spec allClasses do: [ :b | PoolInitializer new initialize: b ]
+]
+
+{ #category : #accessing }
 SmalltalkBootstrapper class >> spec [
 	Spec ifNil:[
 		| repo |
 		repo := TonelRepository new directory: '../pst' asFileReference.
 		Spec := repo asRingEnvironmentWith: #(kernel).
 		Spec clean.
+		self initializePools
 	].
 	^ Spec
 	

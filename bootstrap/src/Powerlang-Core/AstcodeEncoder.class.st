@@ -135,6 +135,15 @@ AstcodeEncoder >> encodeFalse [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodeGlobalVar: association [
+	| index |
+	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: GlobalValueId;
+		nextPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodeInlinedMessage: aMessageNode [
 	self nextTypePut: 0
 ]
