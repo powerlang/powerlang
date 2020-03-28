@@ -140,9 +140,10 @@ AssemblerGrammar >> prefix [
 
 { #category : #accessing }
 AssemblerGrammar >> reg [
-	^(PPChoiceParser
-		withAll: ((Registers asArray sortBy: [:a :b | a name size > b name size])
-			collect: [:r | r name asParser])) flatten
+	^ (PPChoiceParser
+		withAll:
+			((Registers asArray sort: [ :a :b | a name size > b name size ])
+				collect: [ :r | r name asParser ])) flatten
 ]
 
 { #category : #accessing }
