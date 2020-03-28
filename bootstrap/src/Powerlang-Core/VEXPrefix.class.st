@@ -28,12 +28,6 @@ VEXPrefix class >> fromStream: aStream [
 ]
 
 { #category : #initialization }
-VEXPrefix class >> initialize [
-	self initializeSignatures.
-	InstructionSpec initializeSpecs
-]
-
-{ #category : #initialization }
 VEXPrefix class >> initializeSignatures [
 	Signatures isNil
 		ifTrue: [ Signatures := Dictionary new ].

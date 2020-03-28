@@ -29,19 +29,16 @@ REXPrefix class >> fromString: aString [
 ]
 
 { #category : #initialization }
-REXPrefix class >> initialize [
-	self initializePrefixes; compileAll.
-	self class compileAll.
-	InstructionSpec initializeSpecs.
-	Smalltalk at: #Decoder64 ifPresent: [:d | d initializeSpecs]
-]
-
-{ #category : #initialization }
 REXPrefix class >> initializePrefixes [
-	#('REX' 'REX_W' 'REX_R') do: [:s | | rex |
-		rex := self new name: s.
-		Prefixes at: s put: rex].
-	super initializePrefixes
+	#('REX' 'REX_W' 'REX_R')
+		do: [ :s | 
+			| rex |
+			rex := self new name: s.
+			Prefixes at: s put: rex ].
+	super initializePrefixes.
+	self	compileAll.
+	self class compileAll.
+
 ]
 
 { #category : #'instance creation' }

@@ -38,16 +38,9 @@ InstructionPrefix class >> fromString: aString [
 ]
 
 { #category : #initialization }
-InstructionPrefix class >> initialize [
-	self initializePrefixes
-]
-
-{ #category : #initialization }
 InstructionPrefix class >> initializePrefixes [
-	Prefixes isNil ifTrue: [Prefixes := PoolDictionary new].
-	self == InstructionPrefix ifTrue: [
-		self allSubclasses do: #initializePrefixes.
-		InstructionSpec initialize].
+	self == InstructionPrefix
+		ifTrue: [ self allSubclasses do: #initializePrefixes ].
 	self compileAll.
 	self class compileAll
 ]
