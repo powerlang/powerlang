@@ -26,6 +26,13 @@ PSharedPool class >> at: aString ifAbsent: aBlock [
 ]
 
 { #category : #accessing }
+PSharedPool class >> at: aString put: anObject [
+	^self classPool
+		at: aString 
+		put: anObject
+]
+
+{ #category : #accessing }
 PSharedPool class >> detect: aBlock ifNone: anotherBlock [
 	^self classPool detect: aBlock  ifNone: [ ^ anotherBlock value ].
 	
