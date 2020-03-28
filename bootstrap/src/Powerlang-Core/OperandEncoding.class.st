@@ -88,11 +88,6 @@ OperandEncoding class >> defs [
 ]
 
 { #category : #initialization }
-OperandEncoding class >> initialize [
-	self initializeEncodings
-]
-
-{ #category : #initialization }
 OperandEncoding class >> initializeEncodings [
 	Encodings := OrderedCollection new.
 	self defs

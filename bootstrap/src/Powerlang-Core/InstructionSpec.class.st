@@ -96,6 +96,7 @@ InstructionSpec class >> fromString: aString [
 
 { #category : #initialization }
 InstructionSpec class >> initialize [
+	OperandEncoding initializeEncodings.
 	self initializeSpecs
 ]
 
