@@ -75,6 +75,17 @@ ByteObjectMap >> isBytes [
 	^true
 ]
 
+{ #category : #testing }
+ByteObjectMap >> printOn: aStream [
+	| contents |
+	super printOn: aStream.
+	spec ifNil: [ ^ self ].
+	contents := spec name == #String
+		ifTrue: [ ' ''', bytes asString, '''' ]
+		ifFalse: [ bytes printString ].
+	aStream nextPutAll: contents
+]
+
 { #category : #accessing }
 ByteObjectMap >> size [
 	"Return the size if this object, that this, the value of

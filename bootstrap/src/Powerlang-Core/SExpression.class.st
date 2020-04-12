@@ -57,6 +57,11 @@ SExpression >> isReturn [
 	^false
 ]
 
+{ #category : #visiting }
+SExpression >> isSuper [
+	^ false
+]
+
 { #category : #testing }
 SExpression >> printOn: aStream [
 	self printOn: aStream indent: 0

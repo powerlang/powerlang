@@ -6,7 +6,7 @@ Class {
 
 { #category : #initialization }
 PharoBridge >> findRootObjects [
-	nilObj := LocalHandle new target: nil; runtime: runtime.
-	trueObj := LocalHandle new target: true; runtime: runtime.
-	falseObj := LocalHandle new target: false; runtime: runtime
+	nilObj := LocalHandle on: nil within: runtime.
+	trueObj := LocalHandle on: true within: runtime.
+	falseObj := LocalHandle on: false within: runtime
 ]

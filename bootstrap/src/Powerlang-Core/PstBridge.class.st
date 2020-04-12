@@ -28,7 +28,9 @@ PstBridge >> findGlobalNamed: name [
 
 { #category : #initialization }
 PstBridge >> findNilObject [
-	^ nilObj := ObjectHandle on: ImageSegmentWriter nilOffset within: runtime
+	^ nilObj := ObjectHandle
+		on: ImageSegmentWriter nilOffset
+		within: runtime
 ]
 
 { #category : #initialization }

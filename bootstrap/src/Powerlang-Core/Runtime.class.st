@@ -76,7 +76,14 @@ Runtime >> globalNamed: name [
 
 { #category : #'meta accessing' }
 Runtime >> handleOn: oid [
-	^ObjectHandle on: oid within: self
+	^ ObjectHandle on: oid within: self
+]
+
+{ #category : #'meta accessing' }
+Runtime >> handleOnGlobal: aString [
+	| oid |
+	oid := self globalNamed: aString.
+	^self handleOn: oid
 ]
 
 { #category : #shapes }
@@ -125,6 +132,11 @@ Runtime >> loadShapesFromImage [
 	objectModel := Smalltalk.
 	classes := #(ClassDescription Class Metaclass) collect: [ :name | Smalltalk at: name ].
 	classes do: [ :class | shapeMap load: class ]
+]
+
+{ #category : #'meta accessing' }
+Runtime >> lookup [
+	^ lookup
 ]
 
 { #category : #'meta accessing' }

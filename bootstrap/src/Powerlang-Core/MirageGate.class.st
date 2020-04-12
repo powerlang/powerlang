@@ -28,16 +28,18 @@ MirageGate >> dispatch: aMessage from: parentInterpreter [
 
 { #category : #notifications }
 MirageGate >> dispatchLocal: aMessage from: parentInterpreter [
-	| args receiver result |
-	args := aMessage arguments collect: [:arg | arg class == Subject ifTrue: [arg _gate handle oid] ifFalse: [arg]] .
+	| args receiver result hresult |
+	args := aMessage arguments
+		collect: [ :arg | 
+			arg class == Subject
+				ifTrue: [ arg _gate handle oid ]
+				ifFalse: [ arg ] ].
 	receiver := aMessage receiver _gate handle.
-	result := receiver oid
-		perform: aMessage selector
-		withArguments: args.
-	handle := LocalHandle new
-		target: result;
-		runtime: receiver runtime.
-	^ handle mirage.
+	result := receiver oid perform: aMessage selector withArguments: args.
+	result class == Subject
+		ifTrue: [ ^ result ].
+	hresult := LocalHandle on: result within: receiver runtime.
+	^ hresult mirage
 ]
 
 { #category : #notifications }
@@ -67,7 +69,7 @@ MirageGate >> handle: anObjectHandle [
 	super handle: anObjectHandle.
 	class := handle isLocal
 		ifTrue: [ handle oid class ]
-		ifFalse: [handle mirror reflectedClass localEquivalent]
+		ifFalse: [ handle mirror reflectedClass localEquivalent ]
 ]
 
 { #category : #nativizing }

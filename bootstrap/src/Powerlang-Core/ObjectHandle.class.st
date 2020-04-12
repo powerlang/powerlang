@@ -8,13 +8,13 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-ObjectHandle class >> on: oid within: runtime [
-	^self new oid: oid; runtime: runtime
+ObjectHandle class >> on: anObject within: aRuntime [
+	^self new oid: anObject; runtime: aRuntime
 ]
 
-{ #category : #comparing }
+{ #category : #'as yet unclassified' }
 ObjectHandle >> = anObject [
-	^anObject class = ObjectHandle and: [oid = anObject oid]
+	^ anObject class = self class and: [ oid = anObject oid ]
 ]
 
 { #category : #'meta accessing' }
@@ -58,6 +58,11 @@ ObjectHandle >> getBehavior [
 ObjectHandle >> getClass [
 	^runtime objectFormat classOf: self.
 
+]
+
+{ #category : #'as yet unclassified' }
+ObjectHandle >> handleOn: anObject [
+	^self class on: anObject within: runtime
 ]
 
 { #category : #comparing }
@@ -112,17 +117,17 @@ ObjectHandle >> largeSize [
 	^runtime objectFormat largeSizeOf: oid
 ]
 
-{ #category : #converting }
+{ #category : #'as yet unclassified' }
 ObjectHandle >> maneuverer [
-	^DirectGate subjectOn: self
+	^ DirectGate subjectOn: self
 ]
 
-{ #category : #converting }
+{ #category : #'as yet unclassified' }
 ObjectHandle >> mirage [
 	^MirageGate subjectOn: self
 ]
 
-{ #category : #accessing }
+{ #category : #'as yet unclassified' }
 ObjectHandle >> mirror [
 	^ObjectMirror on: self
 ]
@@ -139,6 +144,7 @@ ObjectHandle >> oid [
 
 { #category : #accessing }
 ObjectHandle >> oid: objectId [
+	self ASSERT: objectId !== nil.
 	oid := objectId
 ]
 
@@ -155,6 +161,16 @@ ObjectHandle >> printOn: aStream [
 		ifFalse: [ aStream cr ].
 	bytes := format bytesOf: oid count: size.
 	aStream print: bytes
+]
+
+{ #category : #'as yet unclassified' }
+ObjectHandle >> runtime [
+	^runtime
+]
+
+{ #category : #'as yet unclassified' }
+ObjectHandle >> runtime: aRuntime [
+	runtime := aRuntime
 ]
 
 { #category : #'meta accessing' }

@@ -1,49 +1,34 @@
 Class {
 	#name : #LocalHandle,
-	#superclass : #Object,
-	#instVars : [
-		'target',
-		'runtime'
-	],
+	#superclass : #ObjectHandle,
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
 { #category : #'as yet unclassified' }
-LocalHandle >> = anObject [
-	^anObject class = LocalHandle and: [target = anObject target]
-]
-
-{ #category : #'as yet unclassified' }
 LocalHandle >> asLocalCollection [
-	^target
+	^ oid
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> asLocalInteger [
-	^ target
+	^ oid
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> asLocalString [
-	^target asString
+	^ oid asString
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> getClass [
 	| handle |
-	handle := runtime handleOn: target class.
-	^handle mirror asSpeciesMirror
-
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> handleOn: anObject [
-	^self class on: anObject within: runtime
+	handle := runtime handleOn: oid class.
+	^ handle mirror asSpeciesMirror
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> indexOf: varname for: aMirror [
-	^target class indexOfSlot: varname asString
+	^ oid class indexOfSlot: varname asString
 ]
 
 { #category : #'as yet unclassified' }
@@ -52,53 +37,26 @@ LocalHandle >> isLocal [
 ]
 
 { #category : #'as yet unclassified' }
-LocalHandle >> mirage [
-	^MirageGate subjectOn: self
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> mirror [
-	^ObjectMirror on: self
-]
-
-{ #category : #'as yet unclassified' }
 LocalHandle >> nilObject [
 	^self handleOn: nil
 ]
 
 { #category : #'as yet unclassified' }
-LocalHandle >> oid [
-	^ target
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> runtime [
-	^runtime
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> runtime: aRuntime [
-	runtime := aRuntime
+LocalHandle >> oid: objectId [
+	oid != nil ifTrue: [ self halt ].
+	objectId class = ByteString
+		ifTrue: [ self halt ].
+	oid := objectId
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> size [
-	^target basicSize + target class instSize
+	^ oid basicSize + oid class instSize
 ]
 
 { #category : #'as yet unclassified' }
 LocalHandle >> slotAt: index [
 	| slot |
-	slot := target instVarAt: index.
-	^self handleOn: slot
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> target [
-	^target
-]
-
-{ #category : #'as yet unclassified' }
-LocalHandle >> target: anObject [
-	target := anObject
+	slot := oid instVarAt: index.
+	^ self handleOn: slot
 ]
