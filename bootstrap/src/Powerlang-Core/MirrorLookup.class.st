@@ -1,6 +1,6 @@
 Class {
 	#name : #MirrorLookup,
-	#superclass : #Object,
+	#superclass : #Lookup,
 	#category : #'Powerlang-Core-Metaphysics'
 }
 

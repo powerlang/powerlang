@@ -4,8 +4,8 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'method',
-		'nativeCode',
-		'format'
+		'format',
+		'nativeCode'
 	],
 	#pools : [
 		'PCompiledBlockFlags'
@@ -72,6 +72,11 @@ PCompiledBlock >> nativeCode: code [
 ]
 
 { #category : #constants }
+PCompiledBlock >> newClosure [
+	^PClosure new block: self
+]
+
+{ #category : #constants }
 PCompiledBlock >> tempCount [
 	^format bitsAt: TempCount
 ]
@@ -83,6 +88,7 @@ PCompiledBlock >> tempCount: anInteger [
 
 { #category : #constants }
 PCompiledBlock >> value [
-	<primitive: BlockValue>
-	^self primitiveFailed
+self halt
+"	<primitive: BlockValue>
+	^ self primitiveFailed" 
 ]

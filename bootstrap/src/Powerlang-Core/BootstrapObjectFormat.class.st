@@ -44,14 +44,12 @@ BootstrapObjectFormat >> isInteger: oid [
 
 { #category : #public }
 BootstrapObjectFormat >> labelFor: oid [
-	^(self isInteger: oid) 
-		ifTrue: [ 'SMI 0x', (self integerOf: oid) printString ]
-		ifFalse: [ (storage nameOf: oid) ifNil: [ 'unknown' ]]
-]
-
-{ #category : #public }
-BootstrapObjectFormat >> newClosure: aPCompiledBlock [
-	^ storage newClosure: aPCompiledBlock
+	| c |
+	(self isInteger: oid) 
+		ifTrue: [ ^'SMI 0x', (self integerOf: oid) printString ].
+	(storage nameOf: oid) ifNotNil: [:name | ^name].
+	c := self classOf: (runtime handleOn: oid).
+	^c localName
 ]
 
 { #category : #public }

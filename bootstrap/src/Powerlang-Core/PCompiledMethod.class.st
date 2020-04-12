@@ -78,6 +78,15 @@ PCompiledMethod >> initialize [
 	format := 0
 ]
 
+{ #category : #printing }
+PCompiledMethod >> printOn: aStream [
+	aStream nextPutAll: self classBinding name; nextPutAll: '>>'; print: selector; cr.
+	source
+		ifNotNil: [ aStream
+				cr;
+				nextPutAll: source ]
+]
+
 { #category : #constants }
 PCompiledMethod >> selector [
 	^selector

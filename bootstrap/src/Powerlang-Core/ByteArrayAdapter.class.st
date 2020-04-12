@@ -1,6 +1,6 @@
 Class {
 	#name : #ByteArrayAdapter,
-	#superclass : #Object,
+	#superclass : #Storage,
 	#instVars : [
 		'bytes'
 	],

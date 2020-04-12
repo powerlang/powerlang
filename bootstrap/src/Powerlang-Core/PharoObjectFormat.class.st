@@ -26,8 +26,8 @@ PharoObjectFormat >> integerOf: oid [
 ]
 
 { #category : #public }
-PharoObjectFormat >> isBytes: oid [
-	^oid isBytes
+PharoObjectFormat >> isBytes: anObject [
+	^anObject class isBytes
 ]
 
 { #category : #public }
@@ -37,20 +37,17 @@ PharoObjectFormat >> isInteger: oid [
 
 { #category : #public }
 PharoObjectFormat >> labelFor: oid [
-	^(storage nameOf: oid) ifNil: [ 'unknown' ]
+	| label |
+	label := storage ifNotNil: [storage nameOf: oid].
+	^label ifNil: [ 'unknown' ]
 ]
 
 { #category : #public }
 PharoObjectFormat >> print: oid on: aStream [
-	| label |
-	label := self labelFor: oid.
 	aStream
-		nextPut: $@;
-		nextPutAll: label;
-		nextPutAll: ' [size: 0x';
-		nextPutAll: (self sizeOf: oid) printStringHex;
-		nextPut: $].
-
+		nextPutAll: '@local {';
+		print: oid;
+		nextPut: $}
 ]
 
 { #category : #public }
