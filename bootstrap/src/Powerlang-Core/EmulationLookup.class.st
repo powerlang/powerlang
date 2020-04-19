@@ -16,8 +16,15 @@ EmulationLookup >> compile: anRGMethod [
 	method := compiler
 		forClass: anRGMethod parent;
 		compile: anRGMethod sourceCode.
-	cache at: anRGMethod class -> anRGMethod selector put: method.
 	^ method
+]
+
+{ #category : #accessing }
+EmulationLookup >> compiledMethodFor: anRGMethod [
+	| method |
+	cache at: anRGMethod ifPresent: [ :cm | ^ cm ].
+	method := self compile: anRGMethod.
+	^ cache at: anRGMethod put: method
 ]
 
 { #category : #accessing }
@@ -34,9 +41,8 @@ EmulationLookup >> initialize [
 EmulationLookup >> lookup: aSymbol on: aSubject [
 	| behavior classname |
 	classname := aSubject _gate handle oid classname.
-	cache at: classname->aSymbol ifPresent: [ :cached | ^cached ].
 	behavior := spec at: classname.
-	^self lookup: aSymbol startingAt: behavior
+	^ self lookup: aSymbol startingAt: behavior
 ]
 
 { #category : #accessing }
@@ -44,7 +50,7 @@ EmulationLookup >> lookup: aSymbol startingAt: aBehavior [
 	| next m c |
 	next := aBehavior.
 	[ m := next methodNamed: aSymbol.
-	m ifNotNil: [ ^ self compile: m ].
+	m ifNotNil: [ ^ self compiledMethodFor: m ].
 	next := next superclass.
 	next notNil ] whileTrue.
 	^ aBehavior isMeta
