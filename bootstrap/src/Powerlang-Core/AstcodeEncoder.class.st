@@ -120,13 +120,16 @@ AstcodeEncoder >> encodeClosureElements: aBlockNode [
 	scope := aBlockNode scope.
 	parent := aBlockNode realParent.
 	^Array streamContents: [:s |
+		scope capturesSelf ifTrue: [ s nextPut: Self ].
 		scope capturedEnvironments do: [:e | | index |
 			e == parent ifTrue: [s nextPut: Environment] ifFalse: [
-				index := e environmentIndexOf: aBlockNode.
+				index := aBlockNode environmentIndexOf: e.
+				self ASSERT: index notNil.
 				s nextPut: EnvironmentValue; nextPut: index]].
 		scope capturedArguments do: [:a | | binding |
 			binding := aBlockNode parent scope resolve: a name.
-			s nextPut: binding environmentType; nextPut: binding environmentIndex; nextPut: binding index]]
+			s 	nextPut: binding environmentType; nextPut: binding index]]
+	
 ]
 
 { #category : #visiting }
@@ -192,8 +195,11 @@ AstcodeEncoder >> encodeTrue [
 
 { #category : #visiting }
 AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
-	aLocalEnvironment isStack ifTrue: [^0].
-	^aLocalEnvironment index ifNil: [1]
+	aLocalEnvironment isStack
+		ifTrue: [ ^ aLocalEnvironment isInlinedArgument ifTrue: [-1] ifFalse: [nil] ].
+	aLocalEnvironment isCurrent
+		ifTrue: [ ^ 0 ].
+	^ aLocalEnvironment index
 ]
 
 { #category : #accessing }
@@ -238,12 +244,16 @@ AstcodeEncoder >> visitAssignment: anAssignmentNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitBlock: aBlockNode [
+	| args |
 	self nextTypePut: BlockId.
-	aBlockNode isInlined ifTrue: [stream nextPut: 0] ifFalse: [| index captured |
-		index := self compiledBlockIndexOf: aBlockNode.
-		self nextPut: index.
-		captured := self encodeClosureElements: aBlockNode.
-		stream nextPut: captured].
+	aBlockNode isInlined
+		ifTrue: [ stream nextPut: 0. args := aBlockNode arguments collect: [:id | id binding index]. 
+			stream nextPut: args  ]
+		ifFalse: [ | index captured |
+			index := self compiledBlockIndexOf: aBlockNode.
+			self nextPut: index.
+			captured := self encodeClosureElements: aBlockNode.
+			stream nextPut: captured ].
 	self visitScript: aBlockNode
 ]
 
