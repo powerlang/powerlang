@@ -30,6 +30,11 @@ ObjectMap class >> new: anRGBehavior size: size [
 ]
 
 { #category : #accessing }
+ObjectMap >> arrayedSize [
+	^self size
+]
+
+{ #category : #accessing }
 ObjectMap >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
 	 used for accessing named slots (aka, instance variables), to access 
@@ -113,6 +118,15 @@ ObjectMap >> isSmall [
 	^self size < 256
 ]
 
+{ #category : #initialization }
+ObjectMap >> nilAll: nilObject [
+	
+]
+
+{ #category : #initialization }
+ObjectMap >> nilWith: nilObject [
+]
+
 { #category : #testing }
 ObjectMap >> printOn: aStream [
 	| name |
@@ -162,21 +176,28 @@ ObjectMap >> slotAt: index put: value [
 { #category : #accessing }
 ObjectMap >> slotNamed: name [
 	"Get a named slot with given `name`"
-	
+
 	| index |
-	index := spec allInstVarNames indexOf: name.
-	index == 0 ifTrue:[ ^self error: 'No slot named "', name , '"'].
+	index := self allInstVarNames indexOf: name.
+	index == 0
+		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
 	^ self slotAt: index
 ]
 
 { #category : #accessing }
 ObjectMap >> slotNamed: name put: value [
 	"Set a named slot with given `name` to `value`"
-	
+
 	| index |
-	index := spec allInstVarNames indexOf: name.
-	index == 0 ifTrue: [ ^self error: 'No slot named "', name , '"'	].
+	index := self allInstVarNames indexOf: name.
+	index == 0
+		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
 	^ self slotAt: index put: value
+]
+
+{ #category : #accessing }
+ObjectMap >> slotsDo: aBlock [
+	
 ]
 
 { #category : #accessing }

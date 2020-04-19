@@ -5,13 +5,28 @@ Class {
 }
 
 { #category : #public }
+BootstrapObjectFormat >> arrayedSizeOf: oid [
+	^ oid arrayedSize
+]
+
+{ #category : #public }
+BootstrapObjectFormat >> arrayedSlotOf: oid at: index [
+	^ oid at: index
+]
+
+{ #category : #public }
+BootstrapObjectFormat >> arrayedSlotOf: oid at: index put: anotherOid [
+	^ oid at: index put: anotherOid
+]
+
+{ #category : #public }
 BootstrapObjectFormat >> behaviorOf: oid [
 	^oid behavior
 ]
 
 { #category : #public }
 BootstrapObjectFormat >> bytesOf: oid count: size [
-	^oid contents copyFrom: 1 to: size
+	^oid bytes copyFrom: 1 to: size
 ]
 
 { #category : #public }

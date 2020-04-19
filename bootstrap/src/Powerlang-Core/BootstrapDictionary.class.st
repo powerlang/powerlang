@@ -7,6 +7,14 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #'instance creation' }
+BootstrapDictionary class >> withAll: variables [
+	| result |
+	result := self new.
+	variables do: [ :v | result at: v name put: v association ].
+	^result
+]
+
 { #category : #accessing }
 BootstrapDictionary >> associationAt: aSymbol [
 	

@@ -13,6 +13,12 @@ BootstrapStorage class >> on: aSmalltalkBootstrapper [
 ]
 
 { #category : #storage }
+BootstrapStorage >> arrayedSlotOf: oid at: index put: anotherOid [
+	"fixme: this message should be sent to ObjectFormat"
+	^ oid at: index put: anotherOid
+]
+
+{ #category : #storage }
 BootstrapStorage >> bootstrapper: aSmalltalkBootstrapper [
 	bootstrapper := aSmalltalkBootstrapper
 ]

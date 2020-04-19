@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #storage }
+Storage >> arrayedSlotOf: base at: index put: value [
+	^ self subclassResponsibility
+]
+
+{ #category : #storage }
 Storage >> new: oid [
 	^self subclassResponsibility
 ]

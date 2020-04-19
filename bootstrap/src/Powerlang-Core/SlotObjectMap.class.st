@@ -16,6 +16,26 @@ SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> allInstVarNames [ 
+	| c |
+	^spec isMeta 
+		ifTrue: [ 
+			c := spec environment at: #Class.
+			c allInstVarNames, spec allInstVarNames ]
+		ifFalse: [ spec allInstVarNames ].
+]
+
+{ #category : #accessing }
+SlotObjectMap >> arrayedSize [
+	"
+	 Return the size of the arrayed part of this object, that this,
+	 the value of size field in object header minus the instSize. 
+	"
+
+	^ self size - self instSize
+]
+
+{ #category : #accessing }
 SlotObjectMap >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
 	 used for accessing named slots (aka, instance variables), to access 
@@ -49,14 +69,15 @@ SlotObjectMap >> bodySizeInBytes [
 
 { #category : #accessing }
 SlotObjectMap >> doesNotUnderstand: aMessage [
-	| sel |
+	| sel ivars |
 	sel := aMessage selector.
+	ivars := self allInstVarNames.
 	sel isUnary
-		ifTrue: [ (spec allInstVarNames includes: sel)
+		ifTrue: [ (ivars includes: sel)
 				ifTrue: [ ^ self slotNamed: sel ] ].
 	(sel isKeyword and: [ sel numArgs == 1 ])
 		ifTrue: [ sel := sel allButLast.
-			(spec allInstVarNames includes: sel)
+			(ivars includes: sel)
 				ifTrue: [ ^ self slotNamed: sel put: aMessage arguments first ] ].
 	^ super doesNotUnderstand: aMessage
 ]
@@ -74,12 +95,18 @@ SlotObjectMap >> headerFlags [
 SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
 	self assert: anRGBehavior isPointers.
-	self assert:(anRGBehavior isVariable or:[size == 0]).
-	
+	self assert: (anRGBehavior isVariable or: [ size == 0 ]).
 	spec := anRGBehavior.
-	slots := Array new: (anRGBehavior instSize + size)
-	
-	
+	slots := Array new: self instSize + size
+]
+
+{ #category : #accessing }
+SlotObjectMap >> instSize [
+	| c |
+	^ spec isMeta
+		ifTrue: [ c := spec environment at: #Class.
+			c instSize + spec instSize ]
+		ifFalse: [ spec instSize ]
 ]
 
 { #category : #accessing }
@@ -110,7 +137,7 @@ SlotObjectMap >> slotAt: index [
 	 for accessing indexed slots  (i.e., variable part of array-like objects), 
    to set them use #at:"
 	
-	self assert: (index between: 1 and: spec instSize).
+	self assert: (index between: 1 and: self instSize).
 	^slots at: index
 ]
 
@@ -120,7 +147,7 @@ SlotObjectMap >> slotAt: index put: value [
 	 for setting indexed slots  (i.e., variable part of array-like objects), 
    to set them use #at:put:"
 	
-	self assert: (index between: 1 and: spec instSize).
+	self assert: (index between: 1 and: self instSize).
 	self assert: (value isKindOf: ObjectMap).
 	^slots at: index put: value
 ]
@@ -130,8 +157,21 @@ SlotObjectMap >> slots [
 	^slots
 ]
 
+{ #category : #accessing }
+SlotObjectMap >> slotsDo: aBlock [
+	slots do: aBlock
+]
+
 { #category : #validation }
 SlotObjectMap >> validate [
 	super validate.
 	slots withIndexDo:[:value :index | self assert: value notNil ]
+]
+
+{ #category : #accessing }
+SlotObjectMap >> value [
+	| message |
+	(self allInstVarNames includes: #value) ifFalse: [ ^super value ].
+	message := Message selector: #value.
+	^ self doesNotUnderstand: message
 ]
