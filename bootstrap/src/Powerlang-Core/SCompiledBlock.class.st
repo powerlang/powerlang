@@ -1,5 +1,5 @@
 Class {
-	#name : #PCompiledBlock,
+	#name : #SCompiledBlock,
 	#superclass : #Object,
 	#type : #variable,
 	#instVars : [
@@ -8,98 +8,98 @@ Class {
 		'nativeCode'
 	],
 	#pools : [
-		'PCompiledBlockFlags'
+		'SCompiledBlockFlags'
 	],
-	#category : #'Powerlang-Core-PST'
+	#category : #'Powerlang-Core-SCompiler'
 }
 
 { #category : #constants }
-PCompiledBlock >> argumentCount [
+SCompiledBlock >> argumentCount [
 	^format bitsAt: ArgCount
 ]
 
 { #category : #constants }
-PCompiledBlock >> argumentCount: anInteger [
+SCompiledBlock >> argumentCount: anInteger [
 	format := format bitsAt: ArgCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledBlock >> capturesSelf: aBoolean [
+SCompiledBlock >> capturesSelf: aBoolean [
 	format := aBoolean
 		ifTrue: [ format bitOr: CapturesSelf ]
 		ifFalse: [ format bitClear: CapturesSelf ]
 ]
 
 { #category : #constants }
-PCompiledBlock >> environmentCount [
+SCompiledBlock >> environmentCount [
 	^ format bitsAt: EnvCount
 ]
 
 { #category : #constants }
-PCompiledBlock >> environmentCount: anInteger [
+SCompiledBlock >> environmentCount: anInteger [
 	format := format bitsAt: EnvCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledBlock >> id [
+SCompiledBlock >> id [
 	^format bitsAt: Id
 ]
 
 { #category : #constants }
-PCompiledBlock >> id: anInteger [
+SCompiledBlock >> id: anInteger [
 	format := format bitsAt: Id put: anInteger
 ]
 
 { #category : #constants }
-PCompiledBlock >> initialize [
+SCompiledBlock >> initialize [
 	super initialize.
 	format := 0
 ]
 
 { #category : #constants }
-PCompiledBlock >> isBlock [
+SCompiledBlock >> isBlock [
 	^true
 ]
 
 { #category : #constants }
-PCompiledBlock >> method [
+SCompiledBlock >> method [
 	^method
 ]
 
 { #category : #accessing }
-PCompiledBlock >> method: aCompiledMethod [
+SCompiledBlock >> method: aCompiledMethod [
 	method := aCompiledMethod
 ]
 
 { #category : #constants }
-PCompiledBlock >> nativeCode [
+SCompiledBlock >> nativeCode [
 	^nativeCode
 ]
 
 { #category : #constants }
-PCompiledBlock >> nativeCode: code [
+SCompiledBlock >> nativeCode: code [
 	nativeCode := code
 ]
 
 { #category : #constants }
-PCompiledBlock >> newClosure [
+SCompiledBlock >> newClosure [
 	| closure |
-	closure := PClosure new: self environmentCount.
+	closure := SClosure new: self environmentCount.
 	^ closure block: self
 ]
 
 { #category : #constants }
-PCompiledBlock >> tempCount [
+SCompiledBlock >> tempCount [
 	^format bitsAt: TempCount
 ]
 
 { #category : #constants }
-PCompiledBlock >> tempCount: anInteger [
+SCompiledBlock >> tempCount: anInteger [
 	format := format bitsAt: TempCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledBlock >> value [
+SCompiledBlock >> value [
 self halt
 "	<primitive: BlockValue>
 	^ self primitiveFailed" 

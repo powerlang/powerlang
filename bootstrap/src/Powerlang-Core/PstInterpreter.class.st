@@ -202,7 +202,7 @@ PstInterpreter >> trueLiteral [
 PstInterpreter >> visitBlock: anSBlock [
 	| closure handle |
 	closure := anSBlock isInlined
-		ifTrue: [ PCompiledBlock new newClosure home: self ]
+		ifTrue: [ SCompiledBlock new newClosure home: self ]
 		ifFalse: [ self captureClosure: anSBlock].
 	blockAstcodes at: closure block put: anSBlock.
 	handle := LocalHandle on: closure within: localRuntime.

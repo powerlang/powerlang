@@ -1,32 +1,32 @@
 Class {
-	#name : #PClosure,
+	#name : #SClosure,
 	#superclass : #Array,
 	#type : #variable,
 	#instVars : [
 		'block',
 		'home'
 	],
-	#category : #'Powerlang-Core-PST'
+	#category : #'Powerlang-Core-Metaphysics'
 }
 
 { #category : #accessing }
-PClosure >> block [
+SClosure >> block [
 	^block
 ]
 
 { #category : #accessing }
-PClosure >> block: aPCompiledMethod [
+SClosure >> block: aPCompiledMethod [
 	block := aPCompiledMethod
 ]
 
 { #category : #accessing }
-PClosure >> evaluateWith: anObject [
+SClosure >> evaluateWith: anObject [
 	^self value: anObject
 	
 ]
 
 { #category : #accessing }
-PClosure >> evaluateWith: anObject with: anotherObject [
+SClosure >> evaluateWith: anObject with: anotherObject [
 	block argumentCount = 2
 		ifFalse: [^super evaluateWith: anObject with: anotherObject].
 	^self value: anObject value: anotherObject
@@ -34,37 +34,37 @@ PClosure >> evaluateWith: anObject with: anotherObject [
 ]
 
 { #category : #accessing }
-PClosure >> home: anObject [
+SClosure >> home: anObject [
 	home := anObject
 ]
 
 { #category : #accessing }
-PClosure >> isSelfEvaluating [
+SClosure >> isSelfEvaluating [
 	^false
 ]
 
 { #category : #accessing }
-PClosure >> value [
+SClosure >> value [
 	^home evaluateBlock: self
 ]
 
 { #category : #accessing }
-PClosure >> value: anObject [
+SClosure >> value: anObject [
 	^home evaluateBlock: self with: anObject
 ]
 
 { #category : #accessing }
-PClosure >> value: anObject1 value: anObject2 [ 
+SClosure >> value: anObject1 value: anObject2 [ 
 	^ home evaluateBlock: self with: anObject1 with: anObject2
 ]
 
 { #category : #accessing }
-PClosure >> value: anObject1 value: anObject2 with: anObject3 [
+SClosure >> value: anObject1 value: anObject2 with: anObject3 [
 	^ home evaluateBlock: self with: anObject1 with: anObject2 with: anObject3
 ]
 
 { #category : #accessing }
-PClosure >> whileFalse: aBlockSubject [
+SClosure >> whileFalse: aBlockSubject [
 	| result |
 	[ result := home evaluateBlock: self.
 	result _gate handle asLocalBoolean ] 
@@ -72,7 +72,7 @@ PClosure >> whileFalse: aBlockSubject [
 ]
 
 { #category : #accessing }
-PClosure >> whileTrue: aBlockSubject [
+SClosure >> whileTrue: aBlockSubject [
 	| result |
 	[ result := home evaluateBlock: self.
 	result _gate handle asLocalBoolean ]

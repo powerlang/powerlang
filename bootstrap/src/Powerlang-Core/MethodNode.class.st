@@ -87,7 +87,7 @@ MethodNode >> literals [
 
 { #category : #parsing }
 MethodNode >> methodClass [
-	^PCompiledMethod
+	^SCompiledMethod
 ]
 
 { #category : #testing }

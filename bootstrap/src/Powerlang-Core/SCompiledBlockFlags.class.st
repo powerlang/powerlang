@@ -1,5 +1,5 @@
 Class {
-	#name : #PCompiledBlockFlags,
+	#name : #SCompiledBlockFlags,
 	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgCount',
@@ -8,11 +8,11 @@ Class {
 		'Id',
 		'TempCount'
 	],
-	#category : #'Powerlang-Core-PST'
+	#category : #'Powerlang-Core-SCompiler'
 }
 
 { #category : #'class initialization' }
-PCompiledBlockFlags class >> initialize [
+SCompiledBlockFlags class >> initialize [
 	ArgCount := 1 thru: 8.
 	TempCount := 9 thru: 16.
 	Id := 17 thru: 24.

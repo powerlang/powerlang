@@ -25,7 +25,7 @@ BlockNode >> buildBlock [
 	| block |
 	self isInlined
 		ifTrue: [ ^ nil ].
-	block := PCompiledBlock new.
+	block := SCompiledBlock new.
 	^ block
 		id: index;
 		argumentCount: arguments size;

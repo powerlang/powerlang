@@ -1,5 +1,5 @@
 Class {
-	#name : #PCompiledMethodFlags,
+	#name : #SCompiledMethodFlags,
 	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgCount',
@@ -7,11 +7,11 @@ Class {
 		'EnvCount',
 		'TempCount'
 	],
-	#category : #'Powerlang-Core-PST'
+	#category : #'Powerlang-Core-SCompiler'
 }
 
 { #category : #'class initialization' }
-PCompiledMethodFlags class >> initialize [
+SCompiledMethodFlags class >> initialize [
 	ArgCount := 1 thru: 8.
 	BlockCount := 8 thru: 16.
 	TempCount := 17 thru: 24.

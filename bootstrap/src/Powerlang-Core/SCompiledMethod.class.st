@@ -1,5 +1,5 @@
 Class {
-	#name : #PCompiledMethod,
+	#name : #SCompiledMethod,
 	#superclass : #Array,
 	#type : #variable,
 	#instVars : [
@@ -11,85 +11,85 @@ Class {
 		'source'
 	],
 	#pools : [
-		'PCompiledMethodFlags'
+		'SCompiledMethodFlags'
 	],
-	#category : #'Powerlang-Core-PST'
+	#category : #'Powerlang-Core-SCompiler'
 }
 
 { #category : #'instance creation' }
-PCompiledMethod class >> new: anInteger [
+SCompiledMethod class >> new: anInteger [
 	^(super new: anInteger) initialize
 ]
 
 { #category : #constants }
-PCompiledMethod >> argumentCount [
+SCompiledMethod >> argumentCount [
 	^format bitsAt: ArgCount
 ]
 
 { #category : #constants }
-PCompiledMethod >> argumentCount: anInteger [
+SCompiledMethod >> argumentCount: anInteger [
 	format := format bitsAt: ArgCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledMethod >> astcodes [
+SCompiledMethod >> astcodes [
 	^astcodes
 ]
 
 { #category : #constants }
-PCompiledMethod >> astcodes: aCollection [
+SCompiledMethod >> astcodes: aCollection [
 	astcodes := aCollection
 ]
 
 { #category : #constants }
-PCompiledMethod >> blockCount [
+SCompiledMethod >> blockCount [
 	^format bitsAt: BlockCount
 ]
 
 { #category : #constants }
-PCompiledMethod >> blockCount: anInteger [
+SCompiledMethod >> blockCount: anInteger [
 	format := format bitsAt: BlockCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledMethod >> blocks [
+SCompiledMethod >> blocks [
 	self hasBlocks ifFalse: [^#()].
 	^self select: [:literal | literal isBlock]
 ]
 
 { #category : #constants }
-PCompiledMethod >> classBinding [
+SCompiledMethod >> classBinding [
 	^class
 ]
 
 { #category : #constants }
-PCompiledMethod >> classBinding: aClass [
+SCompiledMethod >> classBinding: aClass [
 	class := aClass
 ]
 
 { #category : #constants }
-PCompiledMethod >> environmentCount [
+SCompiledMethod >> environmentCount [
 	^format bitsAt: EnvCount
 ]
 
 { #category : #constants }
-PCompiledMethod >> environmentCount: anInteger [
+SCompiledMethod >> environmentCount: anInteger [
 	format := format bitsAt: EnvCount put: anInteger
 ]
 
 { #category : #constants }
-PCompiledMethod >> hasBlocks [
+SCompiledMethod >> hasBlocks [
 	^self blockCount > 0
 ]
 
 { #category : #constants }
-PCompiledMethod >> initialize [
+SCompiledMethod >> initialize [
 	super initialize.
 	format := 0
 ]
 
 { #category : #printing }
-PCompiledMethod >> printOn: aStream [
+SCompiledMethod >> printOn: aStream [
 	aStream nextPutAll: self classBinding name; nextPutAll: '>>'; print: selector; cr.
 	source
 		ifNotNil: [ aStream
@@ -98,17 +98,17 @@ PCompiledMethod >> printOn: aStream [
 ]
 
 { #category : #constants }
-PCompiledMethod >> selector [
+SCompiledMethod >> selector [
 	^selector
 ]
 
 { #category : #constants }
-PCompiledMethod >> selector: aSymbol [
+SCompiledMethod >> selector: aSymbol [
 	selector := aSymbol
 ]
 
 { #category : #constants }
-PCompiledMethod >> sexpressions [
+SCompiledMethod >> sexpressions [
 	| decoder |
 	decoder := AstcodeDecoder new
 		stream: astcodes readStream;
@@ -117,21 +117,21 @@ PCompiledMethod >> sexpressions [
 ]
 
 { #category : #constants }
-PCompiledMethod >> source [
+SCompiledMethod >> source [
 	^source
 ]
 
 { #category : #constants }
-PCompiledMethod >> source: aString [
+SCompiledMethod >> source: aString [
 	source := aString
 ]
 
 { #category : #constants }
-PCompiledMethod >> tempCount [
+SCompiledMethod >> tempCount [
 	^format bitsAt: TempCount
 ]
 
 { #category : #constants }
-PCompiledMethod >> tempCount: anInteger [
+SCompiledMethod >> tempCount: anInteger [
 	format := format bitsAt: TempCount put: anInteger
 ]
