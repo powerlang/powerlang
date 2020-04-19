@@ -21,6 +21,7 @@ MethodNode >> buildMethod [
 		blockCount: compiler blockCount;
 		tempCount: scope stackSize;
 		argumentCount: arguments size;
+		environmentCount: scope environmentSize;
 		selector: self selector;
 		source: compiler sourceCode;
 		classBinding: scope classBinding.

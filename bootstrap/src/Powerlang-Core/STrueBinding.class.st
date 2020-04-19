@@ -13,3 +13,8 @@ STrueBinding >> printOn: aStream [
 STrueBinding >> value [
 	^true
 ]
+
+{ #category : #printing }
+STrueBinding >> valueWithin: evaluator [
+	^evaluator trueLiteral
+]

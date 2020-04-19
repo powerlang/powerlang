@@ -84,9 +84,20 @@ MethodScope >> initialize [
 
 { #category : #initialization }
 MethodScope >> initializeClassVars [
-	species instanceSide withAllSuperclasses do: [:class | | binder |
-		binder := DynamicBinder on: class classPool of: ClassVarBinding.
-		cvars add: binder]
+	"
+		fixme: bootstrapping should be properly abstracted
+		and not checked with isKindOf:
+	"
+
+	| vars |
+	species instanceSide withAllSuperclasses
+		do: [ :class | 
+			| binder |
+			vars := (class isKindOf: Behavior)
+				ifTrue: [ class classPool ]
+				ifFalse: [ BootstrapDictionary withAll: class classVariables ].
+			binder := DynamicBinder on: vars of: ClassVarBinding.
+			cvars add: binder ]
 ]
 
 { #category : #initialization }

@@ -69,12 +69,11 @@ BlockScope >> capturedArguments [
 { #category : #private }
 BlockScope >> capturedEnvironmentIndexOf: aScriptNode [
 	| index |
-	aScriptNode realScript == script realScript ifTrue: [^nil].
-	aScriptNode == self home ifTrue: [^4].
+	aScriptNode realScript == script realScript
+		ifTrue: [ ^ nil ].
 	index := environments indexOf: aScriptNode ifAbsent: nil.
 	self ASSERT: index notNil.
-	self capturesHome ifTrue: [index := index - 1].
-	^4 + index
+	^self capturesSelf ifTrue: [ index + 1 ] ifFalse: [ index ]
 ]
 
 { #category : #services }
@@ -114,9 +113,9 @@ BlockScope >> environmentSizeUpToCapturedArguments [
 
 { #category : #private }
 BlockScope >> environmentSizeUpToEnvironments [
-	| home |
-	home := self home ifNil: [0] ifNotNil: [1].
-	^4 + environments size - home
+	| receiver |
+	receiver := self capturesSelf ifTrue: [ 1 ] ifFalse: [ 0 ].
+	^receiver + environments size
 ]
 
 { #category : #services }

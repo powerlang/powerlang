@@ -2,7 +2,8 @@ Class {
 	#name : #SBlock,
 	#superclass : #SScript,
 	#instVars : [
-		'capturedVariables'
+		'capturedVariables',
+		'inlinedArgs'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -32,14 +33,28 @@ SBlock >> initialize [
 	capturedVariables := #()
 ]
 
+{ #category : #accessing }
+SBlock >> inlinedArgs [
+	^ inlinedArgs
+]
+
+{ #category : #accessing }
+SBlock >> inlinedArgs: anArray [
+	inlinedArgs:= anArray 
+]
+
 { #category : #initialization }
 SBlock >> isInlined [
-	^true
+	^compiledCode isNil
 ]
 
 { #category : #unclassified }
 SBlock >> printOn: aStream indent: anInteger [
-	aStream nextPutAll: '{BlockId.'; cr.
+	aStream
+		tab: anInteger;
+		nextPutAll: '{BlockId. capturedVariables: ';
+		print: capturedVariables;
+		cr.
 	super printOn: aStream indent: anInteger.
 	aStream nextPutAll: '}'
 ]

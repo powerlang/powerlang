@@ -24,6 +24,12 @@ ArgumentBinding >> encodeUsing: anAstcodeEncoder [
 	anAstcodeEncoder encodeArgument: index env: environment
 ]
 
+{ #category : #testing }
+ArgumentBinding >> index: aNumber [
+	index := aNumber.
+
+]
+
 { #category : #initialization }
 ArgumentBinding >> initialize [
 	super initialize.

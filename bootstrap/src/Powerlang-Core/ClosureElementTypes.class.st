@@ -2,9 +2,9 @@ Class {
 	#name : #ClosureElementTypes,
 	#superclass : #PSharedPool,
 	#classVars : [
-		'Argument',
 		'Environment',
 		'EnvironmentValue',
+		'LocalArgument',
 		'Self'
 	],
 	#category : #'Powerlang-Core-SExpressions'
@@ -13,7 +13,7 @@ Class {
 { #category : #'class initialization' }
 ClosureElementTypes class >> initialize [
 	Self := 0.
-	Argument := 1.
+	LocalArgument := 1.
 	Environment := 2.
 	EnvironmentValue := 3
 ]

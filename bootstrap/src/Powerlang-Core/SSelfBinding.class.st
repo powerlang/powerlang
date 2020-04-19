@@ -18,3 +18,8 @@ SSelfBinding >> isSelf [
 SSelfBinding >> printOn: aStream [
 	aStream nextPutAll: 'SelfId'
 ]
+
+{ #category : #testing }
+SSelfBinding >> valueWithin: evaluator [
+	^evaluator receiver
+]

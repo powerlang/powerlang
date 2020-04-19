@@ -6,5 +6,5 @@ Class {
 
 { #category : #private }
 ArgumentEnvironment >> environmentType [
-	^Argument
+	^LocalArgument
 ]

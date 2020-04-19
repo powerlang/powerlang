@@ -68,6 +68,16 @@ PCompiledMethod >> classBinding: aClass [
 ]
 
 { #category : #constants }
+PCompiledMethod >> environmentCount [
+	^format bitsAt: EnvCount
+]
+
+{ #category : #constants }
+PCompiledMethod >> environmentCount: anInteger [
+	format := format bitsAt: EnvCount put: anInteger
+]
+
+{ #category : #constants }
 PCompiledMethod >> hasBlocks [
 	^self blockCount > 0
 ]

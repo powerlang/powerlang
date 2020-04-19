@@ -23,12 +23,14 @@ BlockNode >> beInlined [
 { #category : #private }
 BlockNode >> buildBlock [
 	| block |
-	self isInlined ifTrue: [^nil].
+	self isInlined
+		ifTrue: [ ^ nil ].
 	block := PCompiledBlock new.
-	^block
+	^ block
 		id: index;
 		argumentCount: arguments size;
 		tempCount: scope stackSize;
+		environmentCount: scope environmentSize;
 		capturesSelf: scope capturesSelf
 ]
 

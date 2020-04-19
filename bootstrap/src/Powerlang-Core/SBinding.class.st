@@ -10,6 +10,11 @@ SBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #testing }
+SBinding >> assign: value within: evaluator [
+	^self subclassResponsibility
+]
+
+{ #category : #testing }
 SBinding >> isArgument [
 	^false
 ]
@@ -57,4 +62,9 @@ SBinding >> isSuper [
 { #category : #testing }
 SBinding >> isTemporary [
 	^false
+]
+
+{ #category : #testing }
+SBinding >> valueWithin: evaluator [
+	^self subclassResponsibility
 ]

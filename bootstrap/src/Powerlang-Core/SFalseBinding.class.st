@@ -13,3 +13,8 @@ SFalseBinding >> printOn: aStream [
 SFalseBinding >> value [
 	^false
 ]
+
+{ #category : #printing }
+SFalseBinding >> valueWithin: evaluator [
+	^evaluator falseLiteral
+]

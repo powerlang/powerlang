@@ -13,3 +13,8 @@ SNilBinding >> printOn: aStream [
 SNilBinding >> value [
 	^nil
 ]
+
+{ #category : #evaluating }
+SNilBinding >> valueWithin: evaluator [
+	^evaluator nilLiteral
+]

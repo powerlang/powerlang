@@ -30,5 +30,6 @@ SLocalBinding >> index: anInteger [
 
 { #category : #testing }
 SLocalBinding >> isInStack [
-	^environment = 0
+	self ASSERT: false.
+	^ environment = 0
 ]

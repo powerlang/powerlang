@@ -6,11 +6,12 @@ Class {
 
 { #category : #private }
 GlobalBinding class >> on: anAssociation [
-	| class |
-	class := anAssociation value isSpecies
-		ifTrue: [ClassBinding]
-		ifFalse: [GlobalBinding].
-	^class new association: anAssociation
+	| v class |
+	v := anAssociation value.
+	class := (v isSpecies or: [ v class == SlotObjectMap and: [v spec isMeta]])
+		ifTrue: [ ClassBinding ]
+		ifFalse: [ GlobalBinding ].
+	^ class new association: anAssociation
 ]
 
 { #category : #testing }

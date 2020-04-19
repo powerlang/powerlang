@@ -23,8 +23,13 @@ ArrayEnvironment >> index: anInteger [
 ]
 
 { #category : #testing }
+ArrayEnvironment >> isCurrent [
+	^index isNil
+]
+
+{ #category : #testing }
 ArrayEnvironment >> isIndirect [
-	^index notNil
+	^self isCurrent not
 ]
 
 { #category : #testing }

@@ -31,6 +31,16 @@ PCompiledBlock >> capturesSelf: aBoolean [
 ]
 
 { #category : #constants }
+PCompiledBlock >> environmentCount [
+	^ format bitsAt: EnvCount
+]
+
+{ #category : #constants }
+PCompiledBlock >> environmentCount: anInteger [
+	format := format bitsAt: EnvCount put: anInteger
+]
+
+{ #category : #constants }
 PCompiledBlock >> id [
 	^format bitsAt: Id
 ]
@@ -73,7 +83,9 @@ PCompiledBlock >> nativeCode: code [
 
 { #category : #constants }
 PCompiledBlock >> newClosure [
-	^PClosure new block: self
+	| closure |
+	closure := PClosure new: self environmentCount.
+	^ closure block: self
 ]
 
 { #category : #constants }

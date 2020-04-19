@@ -21,3 +21,8 @@ SAssociationBinding >> association: anAssociation [
 SAssociationBinding >> isAssociation [
 	^true
 ]
+
+{ #category : #testing }
+SAssociationBinding >> valueWithin: evaluator [
+	^evaluator literal: association value
+]

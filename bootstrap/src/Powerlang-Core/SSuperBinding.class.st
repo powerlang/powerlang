@@ -13,3 +13,8 @@ SSuperBinding >> isSelf [
 SSuperBinding >> isSuper [
 	^true
 ]
+
+{ #category : #testing }
+SSuperBinding >> printOn: aStream [
+	aStream nextPutAll: 'SuperId'
+]

@@ -40,6 +40,21 @@ Compiler class >> parse: aString in: aClass [
 	^compiler parse: aString
 ]
 
+{ #category : #initialization }
+Compiler >> addPool: aPoolDictionary [
+	| dict |
+	dict := DynamicBinder on: aPoolDictionary.
+	pools add: dict
+
+]
+
+{ #category : #initialization }
+Compiler >> addPool: aDictionary of: type [
+	| dict |
+	dict := DynamicBinder on: aDictionary of: type.
+	pools add: dict
+]
+
 { #category : #testing }
 Compiler >> canBeInIdentifier: aCharacter [
 	^aCharacter isLetter or: [aCharacter isDigit] or: [aCharacter = $_]
