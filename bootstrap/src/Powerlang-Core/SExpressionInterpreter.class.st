@@ -13,6 +13,9 @@ Class {
 		'blockAstcodes',
 		'environment'
 	],
+	#pools : [
+		'ClosureElementTypes'
+	],
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
@@ -30,8 +33,38 @@ SExpressionInterpreter class >> on: receiverMirror with: arguments for: method [
 ]
 
 { #category : #visiting }
+SExpressionInterpreter >> argumentAt: index in: anInteger [
+	| env |
+	anInteger ifNil: [ ^arguments at: index ].
+	env := self environmentFor: anInteger.
+	^env at: index.
+]
+
+{ #category : #visiting }
 SExpressionInterpreter >> arguments: aCollection [
 	arguments := aCollection
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> captureClosure: anSBlock [
+	| closure s i type env arg |
+	closure := anSBlock compiledCode newClosure home: self.
+	s := anSBlock capturedVariables readStream.
+	i := 1.
+	[ s atEnd ]
+		whileFalse: [ type := s next.
+			type = Self
+				ifTrue: [ closure at: i put: receiver ].
+			type = Environment
+				ifTrue: [ closure at: i put: environment].
+			type = EnvironmentValue
+				ifTrue: [ env := environment at: s next.
+					closure at: i put: env ].
+			type = LocalArgument
+				ifTrue: [ arg := arguments at: s next.
+					closure at: i put: arg ].
+			i := i + 1 ].
+	^ closure
 ]
 
 { #category : #visiting }
@@ -42,6 +75,20 @@ SExpressionInterpreter >> dispatch: message to: msgReceiver [
 { #category : #visiting }
 SExpressionInterpreter >> dispatchSpecial: message [
 		^self subclassResponsibility 
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> environmentFor: anInteger [
+	"
+	-1: inlined argument.
+	 0: current env.
+ 	>0: index of env in current env. "
+
+	anInteger = 0
+		ifTrue: [ ^ environment ].
+	anInteger = -1
+		ifTrue: [ ^ temporaries ].
+	^ environment at: anInteger
 ]
 
 { #category : #visiting }
@@ -93,10 +140,8 @@ SExpressionInterpreter >> initialize [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> instVarAt: index [
-	| oid |
-	oid := receiver _gate handle slotAt: index. 
-	^receiver _gate handleOn: oid
+SExpressionInterpreter >> instVarAt: anInteger [
+	^receiver _gate slotAt: anInteger
 ]
 
 { #category : #visiting }
@@ -216,6 +261,22 @@ SExpressionInterpreter >> subjectOnObjectOk: anObjectHandle [
 ]
 
 { #category : #visiting }
+SExpressionInterpreter >> temporaryAt: index in: anInteger [
+	| env |
+	anInteger ifNil: [ ^ temporaries at: index ].
+	env := self environmentFor: anInteger.
+	^ env at: index
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> temporaryAt: index in: anInteger put: aValue [
+	| env |
+	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
+	env := self environmentFor: anInteger.
+	^ env at: index put: aValue
+]
+
+{ #category : #visiting }
 SExpressionInterpreter >> visitArgument: anSIdentifier [
 	^arguments at: anSIdentifier binding index
 ]
@@ -227,6 +288,17 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 	anSAssignment assignees
 		do: [ :identifier | identifier binding assign: result within: self ].
 	^result
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> visitBlock: anSBlock [
+	| closure handle |
+	closure := anSBlock isInlined
+		ifTrue: [ SCompiledBlock new newClosure home: self ]
+		ifFalse: [ self captureClosure: anSBlock].
+	blockAstcodes at: closure block put: anSBlock.
+	handle := LocalHandle on: closure within: localRuntime.
+	^ handle mirage
 ]
 
 { #category : #visiting }

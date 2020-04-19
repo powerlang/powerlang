@@ -48,7 +48,7 @@ MirageGate >> dispatchRemote: aMessage from: parentInterpreter [
 	| method interpreter |
 	method := self lookup: aMessage selector.
 	method ifNil: [ self error: 'cannot interpet ' , aMessage selector ].
-	interpreter := PstInterpreter
+	interpreter := SmalltalkInterpreter
 		on: aMessage receiver
 		with: aMessage arguments
 		for: method.

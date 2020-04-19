@@ -158,7 +158,7 @@ ObjectMirror >> hash [
 { #category : #'meta accessing' }
 ObjectMirror >> invoke: method with: arguments [
 	| interpreter |
-	interpreter := PstInterpreter on: self with: arguments for: method.
+	interpreter := SmalltalkInterpreter on: self with: arguments for: method.
 	^ interpreter evaluate: method
 ]
 

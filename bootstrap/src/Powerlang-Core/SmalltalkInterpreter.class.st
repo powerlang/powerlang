@@ -1,5 +1,5 @@
 Class {
-	#name : #PstInterpreter,
+	#name : #SmalltalkInterpreter,
 	#superclass : #SExpressionInterpreter,
 	#instVars : [
 		'localRuntime'
@@ -7,14 +7,11 @@ Class {
 	#classVars : [
 		'underprimitives'
 	],
-	#pools : [
-		'ClosureElementTypes'
-	],
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
 { #category : #'class initialization' }
-PstInterpreter class >> initialize [
+SmalltalkInterpreter class >> initialize [
 	"
 	self initialize
 	"
@@ -23,42 +20,12 @@ PstInterpreter class >> initialize [
 ]
 
 { #category : #visiting }
-PstInterpreter >> argumentAt: index in: anInteger [
-	| env |
-	anInteger ifNil: [ ^arguments at: index ].
-	env := self environmentFor: anInteger.
-	^env at: index.
-]
-
-{ #category : #visiting }
-PstInterpreter >> captureClosure: anSBlock [
-	| closure s i type env arg |
-	closure := anSBlock compiledCode newClosure home: self.
-	s := anSBlock capturedVariables readStream.
-	i := 1.
-	[ s atEnd ]
-		whileFalse: [ type := s next.
-			type = Self
-				ifTrue: [ closure at: i put: receiver ].
-			type = Environment
-				ifTrue: [ closure at: i put: environment].
-			type = EnvironmentValue
-				ifTrue: [ env := environment at: s next.
-					closure at: i put: env ].
-			type = LocalArgument
-				ifTrue: [ arg := arguments at: s next.
-					closure at: i put: arg ].
-			i := i + 1 ].
-	^ closure
-]
-
-{ #category : #visiting }
-PstInterpreter >> dispatch: message to: msgReceiver [
+SmalltalkInterpreter >> dispatch: message to: msgReceiver [
 	^ msgReceiver _gate dispatch: message from: self
 ]
 
 { #category : #visiting }
-PstInterpreter >> dispatchSpecial: message [
+SmalltalkInterpreter >> dispatchSpecial: message [
 	| selector mirror gate |
 	selector := message selector.
 	gate := message receiver _gate.
@@ -81,32 +48,18 @@ PstInterpreter >> dispatchSpecial: message [
 ]
 
 { #category : #visiting }
-PstInterpreter >> dispatchSuper: message to: msgReceiver [
+SmalltalkInterpreter >> dispatchSuper: message to: msgReceiver [
 	^ msgReceiver _gate dispatchSuper: message from: self
 ]
 
 { #category : #visiting }
-PstInterpreter >> environmentFor: anInteger [
-	"
-	-1: inlined argument.
-	 0: current env.
- 	>0: index of env in current env. "
-
-	anInteger = 0
-		ifTrue: [ ^ environment ].
-	anInteger = -1
-		ifTrue: [ ^ temporaries ].
-	^ environment at: anInteger
-]
-
-{ #category : #visiting }
-PstInterpreter >> falseLiteral [
+SmalltalkInterpreter >> falseLiteral [
 	^receiver _gate handle runtime false maneuverer.
 
 ]
 
 { #category : #visiting }
-PstInterpreter >> gateOnBlock: aPCompiledBlock [
+SmalltalkInterpreter >> gateOnBlock: aPCompiledBlock [
 	| runtime closure handle |
 	runtime := receiver _gate handle runtime.
 	closure := aPCompiledBlock newClosure home: self.
@@ -115,31 +68,26 @@ PstInterpreter >> gateOnBlock: aPCompiledBlock [
 ]
 
 { #category : #visiting }
-PstInterpreter >> initialize [
+SmalltalkInterpreter >> initialize [
 	super initialize.
 	localRuntime := Runtime forLocalPharo.
 
 ]
 
 { #category : #visiting }
-PstInterpreter >> instVarAt: anInteger [
-	^receiver _gate slotAt: anInteger
-]
-
-{ #category : #visiting }
-PstInterpreter >> isSpecial: selector [
+SmalltalkInterpreter >> isSpecial: selector [
 	^underprimitives includes: selector
 ]
 
 { #category : #visiting }
-PstInterpreter >> literal: anObject [
+SmalltalkInterpreter >> literal: anObject [
 	| handle |
 	handle := receiver _gate handleOn: anObject.
 	^ self subjectOn: handle
 ]
 
 { #category : #visiting }
-PstInterpreter >> mirageOnBlock: aPCompiledBlock [
+SmalltalkInterpreter >> mirageOnBlock: aPCompiledBlock [
 	| runtime handle |
 	runtime := receiver _gate handle runtime.
 	handle := runtime newClosureHandle: aPCompiledBlock.
@@ -147,13 +95,13 @@ PstInterpreter >> mirageOnBlock: aPCompiledBlock [
 ]
 
 { #category : #visiting }
-PstInterpreter >> nilLiteral [
+SmalltalkInterpreter >> nilLiteral [
 	^receiver _gate handle runtime nil maneuverer.
 
 ]
 
 { #category : #visiting }
-PstInterpreter >> primitiveClosureValue [
+SmalltalkInterpreter >> primitiveClosureValue [
 	| closure block sblock prev result interpreter next |
 	closure := receiver _gate handle.
 	block := closure mirror asClosureMirror block handle oid.
@@ -168,7 +116,7 @@ PstInterpreter >> primitiveClosureValue [
 ]
 
 { #category : #visiting }
-PstInterpreter >> primitivePrimeFor [
+SmalltalkInterpreter >> primitivePrimeFor [
 	| num result  |
 	num := arguments first _gate handle asLocalInteger.
 	result := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 269 359 479 641 857 1151 1549 2069 2237 2423 2617 2797 2999 3167 3359 3539 3727 3911 4441 4787 5119 5471 5801 6143 6521 6827 7177 7517 7853 8783 9601 10243 10867 11549 12239 12919 13679 14293 15013 15731 17569 19051 20443 21767 23159 24611 25847 27397 28571 30047 31397 35771 38201 40841 43973 46633 48989 51631 54371 57349 60139 62969)
@@ -177,40 +125,13 @@ PstInterpreter >> primitivePrimeFor [
 ]
 
 { #category : #visiting }
-PstInterpreter >> temporaryAt: index in: anInteger [
-	| env |
-	anInteger ifNil: [ ^ temporaries at: index ].
-	env := self environmentFor: anInteger.
-	^ env at: index
-]
-
-{ #category : #visiting }
-PstInterpreter >> temporaryAt: index in: anInteger put: aValue [
-	| env |
-	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
-	env := self environmentFor: anInteger.
-	^ env at: index put: aValue
-]
-
-{ #category : #visiting }
-PstInterpreter >> trueLiteral [
+SmalltalkInterpreter >> trueLiteral [
 	^receiver _gate handle runtime true maneuverer.
 
 ]
 
 { #category : #visiting }
-PstInterpreter >> visitBlock: anSBlock [
-	| closure handle |
-	closure := anSBlock isInlined
-		ifTrue: [ SCompiledBlock new newClosure home: self ]
-		ifFalse: [ self captureClosure: anSBlock].
-	blockAstcodes at: closure block put: anSBlock.
-	handle := LocalHandle on: closure within: localRuntime.
-	^ handle mirage
-]
-
-{ #category : #visiting }
-PstInterpreter >> visitLiteral: anSLiteral [
+SmalltalkInterpreter >> visitLiteral: anSLiteral [
 	| handle |
 	anSLiteral value isInteger ifTrue: [ 
 		^self subjectOnInteger: anSLiteral value in: receiver _gate handle runtime ].
@@ -219,7 +140,7 @@ PstInterpreter >> visitLiteral: anSLiteral [
 ]
 
 { #category : #visiting }
-PstInterpreter >> visitPrimitive: primitive [
+SmalltalkInterpreter >> visitPrimitive: primitive [
 	| gate new left right args rcvr runtime value class |
 	returned := true.
 	gate := receiver _gate.
@@ -321,7 +242,7 @@ PstInterpreter >> visitPrimitive: primitive [
 ]
 
 { #category : #visiting }
-PstInterpreter >> visitPrimitiveOld: primitive [
+SmalltalkInterpreter >> visitPrimitiveOld: primitive [
 	| gate new left right args rcvr |
 	returned := true.
 	gate := receiver _gate.
