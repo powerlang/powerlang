@@ -1,5 +1,5 @@
 Class {
-	#name : #SExpressionInterpreterTest,
+	#name : #SExpressionEmulatorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'builder',
@@ -15,7 +15,7 @@ Class {
 }
 
 { #category : #tests }
-SExpressionInterpreterTest >> handleFor: anObjectMap [
+SExpressionEmulatorTest >> handleFor: anObjectMap [
 	| oid |
 	oid := writer offsetOf: anObjectMap.
 	^runtime handleOn: oid
@@ -23,7 +23,7 @@ SExpressionInterpreterTest >> handleFor: anObjectMap [
 ]
 
 { #category : #tests }
-SExpressionInterpreterTest >> injectMethod: anAstcode selector: selector for: classname [
+SExpressionEmulatorTest >> injectMethod: anAstcode selector: selector for: classname [
 	^ builder
 		newMethod: anAstcode
 		selector: selector
@@ -33,12 +33,12 @@ SExpressionInterpreterTest >> injectMethod: anAstcode selector: selector for: cl
 ]
 
 { #category : #tests }
-SExpressionInterpreterTest >> injectObject [
+SExpressionEmulatorTest >> injectObject [
 	^ builder newSlots: 'Object'
 ]
 
 { #category : #tests }
-SExpressionInterpreterTest >> invoke: method with: object [
+SExpressionEmulatorTest >> invoke: method with: object [
 	| m receiver |
 	m := self handleFor: method.
 	receiver := self handleFor: object.
@@ -46,27 +46,23 @@ SExpressionInterpreterTest >> invoke: method with: object [
 ]
 
 { #category : #running }
-SExpressionInterpreterTest >> setUp [
+SExpressionEmulatorTest >> setUp [
 	super setUp.
 	builder := SmalltalkBootstrapper fromSpec build
 ]
 
 { #category : #tests }
-SExpressionInterpreterTest >> test100empty [
-	| object astcodes method result original |
+SExpressionEmulatorTest >> test100yourself [
+	| object handle result |
 	object := self injectObject.
-	astcodes := {MethodId. {IdentifierId. SelfId}}.	"foo self"
-	method := self injectMethod: astcodes selector: #foo for: 'Object'.
-	self write.
-	result := self invoke: method with: object.
-	original := self handleFor: object.
+	handle := builder emulator handleOn: object.
+	result := handle maneuverer yourself.
 	self
-		assert: result localClassname equals: 'Object';
-		assert: (result equals: original mirror)
+		assert: object == result
 ]
 
 { #category : #running }
-SExpressionInterpreterTest >> write [
+SExpressionEmulatorTest >> write [
 	writer := builder writer write.
 	runtime := Runtime
 		forSimulating: SmalltalkBootstrapper spec

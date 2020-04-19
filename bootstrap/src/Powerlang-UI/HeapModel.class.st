@@ -23,9 +23,11 @@ HeapModel class >> forSimulatedPst [
 	<example>
 	| kernel builder writer runtime labels |
 	kernel := SmalltalkBootstrapper spec.
-	builder := SmalltalkBootstrapper new spec: kernel; build.
+	builder := SmalltalkBootstrapper new
+		spec: kernel;
+		build.
 	writer := builder writer write.
-	runtime := Runtime forSimulatedPst: writer image with: kernel.
+	runtime := Runtime forSimulating: kernel memory: writer image.
 	labels := Dictionary new.
 	builder classes
 		do: [ :class | 

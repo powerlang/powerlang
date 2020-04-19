@@ -13,8 +13,8 @@ Class {
 { #category : #running }
 BootstrapTest >> setUp [
 	kernel := SmalltalkBootstrapper spec.
-	builder := SmalltalkBootstrapper new spec: kernel; build.
-	runtime := Runtime forBootstrappingPst: builder.
+	builder := SmalltalkBootstrapper fromSpec	build.
+	runtime := Runtime forEmulatingPst: builder.
 	runtime loadShapesFrom: kernel
 ]
 

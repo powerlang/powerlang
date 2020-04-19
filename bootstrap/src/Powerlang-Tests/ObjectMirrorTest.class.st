@@ -9,11 +9,10 @@ Class {
 
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
-	| kernel builder writer |
-	kernel := SmalltalkBootstrapper spec.
-	builder := SmalltalkBootstrapper new spec: kernel; build.
+	| builder writer |
+	builder := SmalltalkBootstrapper fromSpec build.
 	writer := builder writer write.
-	^ Runtime forSimulatedPst: writer image with: kernel
+	^ Runtime forSimulating: SmalltalkBootstrapper spec memory: writer image
 ]
 
 { #category : #private }

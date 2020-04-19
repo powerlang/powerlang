@@ -14,11 +14,20 @@ Class {
 }
 
 { #category : #private }
-Runtime class >> forBootstrappingPst: aSmalltalkKernel [
+Runtime class >> forBootstrappingPst: aSmalltalkBootstrapper spec: anRGEnvironment [
 	^ self new
-		bridge: BootstrappedPstBridge new;
-		objectFormat: (BootstrapObjectFormat on: aSmalltalkKernel);
-		storage: aSmalltalkKernel;
+		bridge: (BootstrappedPstBridge new bootstrapper: aSmalltalkBootstrapper);
+		objectFormat: (BootstrapObjectFormat on: aSmalltalkBootstrapper);
+		storage: (BootstrapStorage on: aSmalltalkBootstrapper);
+		useEmulationLookup: anRGEnvironment
+]
+
+{ #category : #private }
+Runtime class >> forEmulatingPst: aSmalltalkBootstrapper [
+	^ self new
+		bridge: (BootstrappedPstBridge new bootstrapper: aSmalltalkBootstrapper);
+		objectFormat: (BootstrapObjectFormat on: aSmalltalkBootstrapper);
+		storage: (BootstrapStorage on: aSmalltalkBootstrapper);
 		loadBridge
 ]
 
@@ -27,12 +36,13 @@ Runtime class >> forLocalPharo [
 	^ self new
 		bridge: PharoBridge new;
 		objectFormat: PharoObjectFormat new;
+		usePharoLookup;
 		loadBridge;
 		loadShapesFromImage
 ]
 
 { #category : #private }
-Runtime class >> forSimulatedPst: aByteArray with: aModuleSpec [
+Runtime class >> forSimulating: aModuleSpec memory: aByteArray [
 	| adapter |
 	adapter := ByteArrayAdapter on: aByteArray.
 	^ self new
@@ -46,6 +56,16 @@ Runtime class >> forSimulatedPst: aByteArray with: aModuleSpec [
 { #category : #private }
 Runtime class >> new [
 	^self basicNew initialize
+]
+
+{ #category : #storage }
+Runtime >> arrayedSlotOf: object at: index [
+	^ objectFormat arrayedSlotOf: object at: index
+]
+
+{ #category : #storage }
+Runtime >> arrayedSlotOf: object at: index put: value [
+	^ storage arrayedSlotOf: object at: index put: value
 ]
 
 { #category : #accessing }
@@ -144,6 +164,11 @@ Runtime >> lookup: aSymbol on: aSubject [
 	^lookup lookup: aSymbol on: aSubject
 ]
 
+{ #category : #'meta accessing' }
+Runtime >> lookupSuper: aSymbol on: aSubject from: classname [
+	^ lookup lookupSuper: aSymbol on: aSubject from: classname
+]
+
 { #category : #'object format' }
 Runtime >> new: oid [
 	| instance |
@@ -152,11 +177,27 @@ Runtime >> new: oid [
 ]
 
 { #category : #'object format' }
+Runtime >> new: oid sized: anInteger [
+	| instance |
+	instance := storage new: oid sized: anInteger.
+	^ self handleOn: instance
+]
+
+{ #category : #'object format' }
+Runtime >> newClosure: anObjectHandle [
+	| oid |
+	oid := storage newClosure: anObjectHandle.
+	"should put a thing that lives in remote runtime, not a PCompiledBlock"
+	oid block: anObjectHandle.
+	^ self handleOn: oid
+]
+
+{ #category : #'object format' }
 Runtime >> newClosureHandle: aPCompiledBlock [
 	| oid |
-	oid := objectFormat newClosure: aPCompiledBlock.
+	oid := storage newClosure: aPCompiledBlock.
 	"should put a thing that lives in remote runtime, not a PCompiledBlock"
-	oid at: 'block' put: aPCompiledBlock.
+	oid block: aPCompiledBlock.
 	^ self handleOn: oid
 ]
 
@@ -172,7 +213,8 @@ Runtime >> objectFormat [
 
 { #category : #accessing }
 Runtime >> objectFormat: anObjectFormat [
-	objectFormat := anObjectFormat
+	objectFormat := anObjectFormat.
+	anObjectFormat runtime: self
 ]
 
 { #category : #initialization }
@@ -226,6 +268,16 @@ Runtime >> true [
 ]
 
 { #category : #initialization }
+Runtime >> useEmulationLookup: anRGEnvironment [ 
+	lookup := EmulationLookup new spec: anRGEnvironment
+]
+
+{ #category : #initialization }
 Runtime >> useMirrorLookup [
 	lookup := MirrorLookup new
+]
+
+{ #category : #initialization }
+Runtime >> usePharoLookup [
+	lookup := PharoLookup new
 ]

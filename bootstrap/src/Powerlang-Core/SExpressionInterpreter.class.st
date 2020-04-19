@@ -8,8 +8,10 @@ Class {
 		'returned',
 		'returnValue',
 		'method',
-		'blocks',
-		'parent'
+		'parent',
+		'gateBuilder',
+		'blockAstcodes',
+		'environment'
 	],
 	#category : #'Powerlang-Core-Metaphysics'
 }
@@ -33,11 +35,6 @@ SExpressionInterpreter >> arguments: aCollection [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> blocks [
-	^blocks
-]
-
-{ #category : #visiting }
 SExpressionInterpreter >> dispatch: message to: msgReceiver [
 	^ self subclassResponsibility
 ]
@@ -48,15 +45,63 @@ SExpressionInterpreter >> dispatchSpecial: message [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluate: anSExpression [
-	^ self visitMethod: anSExpression
+SExpressionInterpreter >> evaluate: aPCompiledMethod [
+	method := aPCompiledMethod.
+	^ self visitMethod: aPCompiledMethod sexpressions
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> evaluateBlock: aPClosure [
+	^self evaluateBlock: aPClosure withArgs: {}
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> evaluateBlock: aPClosure with: anObject [
+	 ^self evaluateBlock: aPClosure withArgs: { anObject }
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> evaluateBlock: aPClosure with: anObject with: anotherObject [
+	^ self evaluateBlock: aPClosure withArgs: {anObject. anotherObject}
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> evaluateBlock: aPClosure withArgs: anArray [
+	| oldArgs oldTemps oldEnv block sblock result |
+	block := aPClosure block.
+	sblock := blockAstcodes at: block.
+	sblock isInlined ifTrue: [
+			 anArray with: sblock inlinedArgs do: [:arg :i | temporaries at: i put: arg].
+			^ self visitScript: sblock ].
+	oldArgs := arguments.
+	oldTemps := temporaries.
+	oldEnv := environment.
+	arguments := anArray.
+	temporaries := Array new: block tempCount.
+	environment := aPClosure.
+	result := self visitScript: sblock.
+	environment := oldEnv.
+	temporaries := oldTemps.
+	arguments := oldArgs.
+	^ result
 ]
 
 { #category : #visiting }
 SExpressionInterpreter >> initialize [
 	returned := false.
-	temporaries := OrderedCollection new.
-	blocks := IdentityDictionary new
+	blockAstcodes := IdentityDictionary new
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> instVarAt: index [
+	| oid |
+	oid := receiver _gate handle slotAt: index. 
+	^receiver _gate handleOn: oid
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> instVarAt: index put: aValue [
+	^ receiver _gate handle slotAt: index put: aValue _gate handle oid
 ]
 
 { #category : #visiting }
@@ -64,9 +109,37 @@ SExpressionInterpreter >> isSpecial: aSelectorMirror [
 	^ self subclassResponsibility 
 ]
 
+{ #category : #visiting }
+SExpressionInterpreter >> method [
+	^method
+]
+
 { #category : #accessing }
 SExpressionInterpreter >> method: aCompiledMethod [
-	method := aCompiledMethod
+	method := aCompiledMethod.
+	temporaries := Array new: aCompiledMethod tempCount.
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> mirageOnBoolean: aBoolean [
+	| runtime handle |
+	runtime := receiver _gate handle runtime.
+	handle := aBoolean ifTrue: [runtime true] ifFalse: [runtime false].
+	^ handle mirage
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> mirageOnInteger: anInteger [
+	| runtime handle |
+	runtime := receiver _gate handle runtime.
+	handle := runtime integerHandle: anInteger.
+	^ handle mirage
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> mirageOnObject: anObject [
+	anObject isSmallInteger ifTrue: [ ^ self mirageOnInteger: anObject ].
+	self ASSERT: false
 ]
 
 { #category : #visiting }
@@ -79,6 +152,35 @@ SExpressionInterpreter >> parent: anInterpreter [
 	parent := anInterpreter
 ]
 
+{ #category : #printing }
+SExpressionInterpreter >> printOn: aStream [
+	aStream
+		nextPutAll: self class name withArticle;
+		cr;
+		print: method classBinding;
+		nextPutAll: '>>';
+		print: method selector;
+		cr.
+	aStream
+		nextPutAll: 'rcvr -> ';
+		print: receiver _gate handle;
+		cr.
+	arguments
+		withIndexDo: [ :a :i | 
+			aStream
+				nextPutAll: 'arg ';
+				print: i;
+				nextPutAll: ' -> ';
+				print: a _gate;
+				cr ].
+	aStream nextPutAll: method source
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> receiver [
+	^receiver
+]
+
 { #category : #visiting }
 SExpressionInterpreter >> receiver: anObject [
 	receiver := anObject.
@@ -86,8 +188,31 @@ SExpressionInterpreter >> receiver: anObject [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> temporaryAt: index put: aValue [
-	^temporaries at: index put: aValue
+SExpressionInterpreter >> subjectOn: anObjectHandle [
+	^ anObjectHandle maneuverer
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> subjectOnBoolean: aBoolean in: aRuntime [
+	| t f |
+	^ aBoolean
+		ifTrue: [ t := aRuntime true. t oid = true ifTrue: [ t mirage] ifFalse: [ t maneuverer  ] ]
+		ifFalse: [ f := aRuntime false. f oid = false ifTrue: [ f mirage ] ifFalse: [ f maneuverer]] 
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> subjectOnInteger: anInteger in: aRuntime [
+	^ (aRuntime integerHandle: anInteger) maneuverer
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> subjectOnObject: anObjectHandle [
+	^ anObjectHandle maneuverer
+]
+
+{ #category : #visiting }
+SExpressionInterpreter >> subjectOnObjectOk: anObjectHandle [
+	^ self maneuvererOn: anObjectHandle
 ]
 
 { #category : #visiting }
@@ -105,39 +230,9 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> visitAssociationVariable: anSIdentifier [
-	^ self mirageOnObject: anSIdentifier binding association value
-]
-
-{ #category : #visiting }
-SExpressionInterpreter >> visitHomeOf: aClosure [
-	| block |
-	block := blocks
-		at: aClosure
-		ifAbsent: [^parent visitHomeOf: aClosure].
-	^self visitScript: block
-]
-
-{ #category : #visiting }
 SExpressionInterpreter >> visitIdentifier: anSIdentifier [
-	anSIdentifier isSelfOrSuper
-		ifTrue: [ ^ receiver ].
-	anSIdentifier isLiteral
-		ifTrue: [ ^ self visitLiteral: anSIdentifier ].
-	anSIdentifier isAssociation
-		ifTrue: [ ^ self visitAssociationVariable: anSIdentifier ].
-	anSIdentifier isInstVar
-		ifTrue: [ ^ self visitInstanceVariable: anSIdentifier ].
-	anSIdentifier isArgument
-		ifTrue: [ ^ self visitArgument: anSIdentifier ].
-	anSIdentifier isTemporary
-		ifTrue: [ ^ self visitTemporary: anSIdentifier ].
-	self error: 'cannot resolve ' , anSIdentifier
-]
+	^anSIdentifier binding valueWithin: self.
 
-{ #category : #visiting }
-SExpressionInterpreter >> visitInstanceVariable: anSIdentifier [
-	^ receiver _gate slotAt: anSIdentifier binding index
 ]
 
 { #category : #visiting }
@@ -151,18 +246,20 @@ SExpressionInterpreter >> visitMessage: anSMessage [
 		receiver: msgReceiver
 		selector: selector
 		arguments: msgArguments.
-	^ (self isSpecial: selector)
-		ifTrue: [ self dispatchSpecial: message ]
-		ifFalse: [ self dispatch: message to: msgReceiver]
+	 (self isSpecial: selector)
+		ifTrue: [ ^self dispatchSpecial: message ].
+	anSMessage receiver isSuper ifTrue: [^self dispatchSuper: message to: msgReceiver].
+	^self dispatch: message to: msgReceiver
 ]
 
 { #category : #visiting }
 SExpressionInterpreter >> visitMethod: anSMethod [
-	| primitive |
+	| primitive value |
 	primitive := anSMethod primitive.
 	primitive ifNotNil: [ ^ self visitPrimitive: primitive ].
-	^self visitScript: anSMethod.
-
+	environment := Array new: method environmentCount.
+	value := self visitScript: anSMethod.
+	^returned ifTrue: [ value ] ifFalse: [ receiver ]
 ]
 
 { #category : #visiting }
