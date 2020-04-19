@@ -77,13 +77,13 @@ ByteObjectMap >> isBytes [
 
 { #category : #testing }
 ByteObjectMap >> printOn: aStream [
-	| contents |
 	super printOn: aStream.
 	spec ifNil: [ ^ self ].
-	contents := spec name == #String
-		ifTrue: [ ' ''', bytes asString, '''' ]
-		ifFalse: [ bytes printString ].
-	aStream nextPutAll: contents
+	spec name == #String
+		ifTrue: [ ^ aStream nextPutAll: bytes allButLast asString storeString ].
+	spec name == #Symbol
+		ifTrue: [ ^ aStream nextPutAll: bytes allButLast asString asSymbol storeString ].
+	aStream nextPutAll: bytes storeString
 ]
 
 { #category : #accessing }
