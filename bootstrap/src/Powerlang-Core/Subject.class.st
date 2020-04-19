@@ -32,6 +32,24 @@ Subject >> doesNotUnderstand: aMessage [
 			^ gate dispatch: send
 ]
 
+{ #category : #'inspector extensions' }
+Subject >> gtDisplayString [
+	^self printString
+]
+
+{ #category : #private }
+Subject >> isKindOf: aClass [
+	"Answer whether the class, aClass, is a superclass or class of the receiver.
+	The current implemementation allows for a Trait to be used as argument"
+
+	^ self class == aClass or: [ self class inheritsFrom: aClass ]
+]
+
+{ #category : #'inspector extensions' }
+Subject >> isSelfEvaluating [
+	^false
+]
+
 { #category : #private }
 Subject >> perform: aSymbol withArguments: anArray [
 	| message |
@@ -60,4 +78,9 @@ Subject >> printString2 [
 		selector: #printString
 		arguments: #().
 	^ self doesNotUnderstand: message
+]
+
+{ #category : #'inspector extensions' }
+Subject >> shouldBePrintedAsLiteral [
+	^false
 ]

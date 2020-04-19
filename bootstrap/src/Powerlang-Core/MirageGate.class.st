@@ -29,11 +29,12 @@ MirageGate >> dispatch: aMessage from: parentInterpreter [
 { #category : #notifications }
 MirageGate >> dispatchLocal: aMessage from: parentInterpreter [
 	| args receiver result hresult |
-	args := aMessage arguments
+	"args := aMessage arguments
 		collect: [ :arg | 
 			arg class == Subject
 				ifTrue: [ arg _gate handle oid ]
-				ifFalse: [ arg ] ].
+				ifFalse: [ arg ] ]."
+	args := aMessage arguments.
 	receiver := aMessage receiver _gate handle.
 	result := receiver oid perform: aMessage selector withArguments: args.
 	result class == Subject
@@ -53,7 +54,7 @@ MirageGate >> dispatchRemote: aMessage from: parentInterpreter [
 		for: method.
 	^ interpreter
 		parent: parentInterpreter;
-		evaluate: method sexpressions
+		evaluate: method
 ]
 
 { #category : #private }

@@ -18,6 +18,18 @@ ObjectHandle >> = anObject [
 ]
 
 { #category : #'meta accessing' }
+ObjectHandle >> arrayedSize [
+	^ runtime objectFormat arrayedSizeOf: oid
+]
+
+{ #category : #'meta accessing' }
+ObjectHandle >> asLocalBoolean [
+	runtime false oid = oid ifTrue: [ ^false ].
+	runtime true oid = oid ifTrue: [ ^true ].
+	self ASSERT: false.
+]
+
+{ #category : #'meta accessing' }
 ObjectHandle >> asLocalBytes [
 	^runtime objectFormat bytesOf: oid
 ]
@@ -40,6 +52,18 @@ ObjectHandle >> asLocalString [
 { #category : #'meta accessing' }
 ObjectHandle >> asLocalSymbol [
 	^runtime symbolOf: oid
+]
+
+{ #category : #services }
+ObjectHandle >> at: index [
+	| slot |
+	slot := runtime arrayedSlotOf: oid at: index.
+	^ self handleOn: slot
+]
+
+{ #category : #services }
+ObjectHandle >> at: index put: anOid [
+	^ runtime arrayedSlotOf: oid at: index put: anOid
 ]
 
 { #category : #'meta accessing' }

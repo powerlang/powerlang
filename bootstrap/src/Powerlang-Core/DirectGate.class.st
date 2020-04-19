@@ -9,12 +9,32 @@ DirectGate >> dispatch: aMessage from: parentInterpreter [
 	| receiver method interpreter |
 	receiver := aMessage receiver.
 	method := handle runtime lookup: aMessage selector on: receiver.
-	method ifNil: [self ASSERT: false].
+	method ifNil: [ self ASSERT: false ].
 	interpreter := PstInterpreter
 		on: receiver
 		with: aMessage arguments
 		for: method.
-	^interpreter parent: parentInterpreter; evaluate: method astcode
+	^ interpreter
+		parent: parentInterpreter;
+		evaluate: method
+]
+
+{ #category : #accessing }
+DirectGate >> dispatchSuper: aMessage from: parentInterpreter [
+	| receiver method interpreter |
+	receiver := aMessage receiver.
+	method := handle runtime
+		lookupSuper: aMessage selector
+		on: receiver
+		from: parentInterpreter method classBinding superclass name.
+	method ifNil: [ self ASSERT: false ].
+	interpreter := PstInterpreter
+		on: receiver
+		with: aMessage arguments
+		for: method.
+	^ interpreter
+		parent: parentInterpreter;
+		evaluate: method
 ]
 
 { #category : #private }

@@ -121,7 +121,7 @@ ObjectMirror >> dispatch: aMessage from: parentInterpreter [
 		for: method.
 	^ interpreter
 		parent: parentInterpreter;
-		evaluate: method astcode
+		evaluate: method
 ]
 
 { #category : #'meta accessing' }
@@ -158,12 +158,8 @@ ObjectMirror >> hash [
 { #category : #'meta accessing' }
 ObjectMirror >> invoke: method with: arguments [
 	| interpreter |
-	interpreter := PstInterpreter
-		on: self
-		with: arguments
-		for: method.
-	^ interpreter
-		evaluate: method decodedAstcodes
+	interpreter := PstInterpreter on: self with: arguments for: method.
+	^ interpreter evaluate: method
 ]
 
 { #category : #testing }
