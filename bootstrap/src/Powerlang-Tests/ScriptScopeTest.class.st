@@ -229,7 +229,11 @@ ScriptScopeTest >> test030resolveNestedTemporaryConflictingWithIvar [
 	ast := self compile: 'foo  [ | x | [[x]] ]' in: Point.
 	b3 := ast children first children first children first.
 	x := b3 statements first binding.
-	self assert: x isEnvTemp: 'x' at: 5 index: 5
+	self
+		assert: x
+		isEnvTemp: 'x'
+		at: 1
+		index: 1
 ]
 
 { #category : #private }
@@ -401,8 +405,8 @@ ScriptScopeTest >> test060useNestedMethodArgs [
 		checkArgs: #('a1' 'a2') in: ast scope;
 		assert: ma1 isStackArg: 'a1' at: 1;
 		assert: ma2 isStackArg: 'a2' at: 2;
-		assert: ba1 isEnvArg: 'a1' at: 5;
-		assert: ba2 isEnvArg: 'a2' at: 6
+		assert: ba1 isEnvArg: 'a1' at: 1;
+		assert: ba2 isEnvArg: 'a2' at: 2
 ]
 
 { #category : #private }
@@ -415,8 +419,14 @@ ScriptScopeTest >> test061useNestedMethodSiblingBlockTemps [
 	b2t2 := block2 statements first binding.
 	self
 		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: b1t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b2t2 isEnvTemp: 't2' at: 4 index: 2
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2
 ]
 
 { #category : #private }
@@ -428,8 +438,14 @@ ScriptScopeTest >> test061useNestedMethodTemps [
 	bt2 := block statements second binding.
 	self
 		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: bt1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: bt2 isEnvTemp: 't2' at: 4 index: 2
+		assert: bt1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: bt2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2
 ]
 
 { #category : #private }
@@ -446,8 +462,8 @@ ScriptScopeTest >> test062useNestedBlockArgs [
 		checkArgs: #('a1' 'a2') in: block1 scope;
 		assert: b1a1 isStackArg: 'a1' at: 1;
 		assert: b1a2 isStackArg: 'a2' at: 2;
-		assert: b2a1 isEnvArg: 'a1' at: 5;
-		assert: b2a2 isEnvArg: 'a2' at: 6
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b2a2 isEnvArg: 'a2' at: 2
 ]
 
 { #category : #private }
@@ -460,8 +476,14 @@ ScriptScopeTest >> test063useNestedBlockTemps [
 	b2t2 := block2 statements second binding.
 	self
 		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
-		assert: b2t1 isEnvTemp: 't1' at: 5 index: 5;
-		assert: b2t2 isEnvTemp: 't2' at: 5 index: 6
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2
 ]
 
 { #category : #private }
@@ -475,8 +497,14 @@ ScriptScopeTest >> test064useSiblingBlocksNestedTemps [
 	b3t2 := block3 statements first binding.
 	self
 		checkClosureEnvTemps: #('t1' 't2') in: block1 scope at: nil;
-		assert: b2t1 isEnvTemp: 't1' at: 5 index: 5;
-		assert: b3t2 isEnvTemp: 't2' at: 5 index: 6
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b3t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2
 ]
 
 { #category : #private }
@@ -490,8 +518,14 @@ ScriptScopeTest >> test065useNestedBlockAndMethodTemps [
 	self
 		checkEnvTemps: #('t1') in: ast scope at: nil;
 		checkClosureEnvTemps: #('t2') in: block1 scope at: nil;
-		assert: b2t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b2t2 isEnvTemp: 't2' at: 5 index: 5
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 2
+			index: 2
 ]
 
 { #category : #private }
@@ -506,10 +540,10 @@ ScriptScopeTest >> test070useDoublyNestedMethodArgs [
 	b2a2 := block2 statements second binding.
 	self
 		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: b1a1 isEnvArg: 'a1' at: 5;
-		assert: b1a2 isEnvArg: 'a2' at: 6;
-		assert: b2a1 isEnvArg: 'a1' at: 5;
-		assert: b2a2 isEnvArg: 'a2' at: 6
+		assert: b1a1 isEnvArg: 'a1' at: 1;
+		assert: b1a2 isEnvArg: 'a2' at: 2;
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b2a2 isEnvArg: 'a2' at: 2
 ]
 
 { #category : #private }
@@ -524,10 +558,22 @@ ScriptScopeTest >> test071useDoublyNestedMethodTemps [
 	b2t2 := block2 statements second binding.
 	self
 		checkEnvTemps: #('t1' 't2') in: ast scope at: nil;
-		assert: b1t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b1t2 isEnvTemp: 't2' at: 4 index: 2;
-		assert: b2t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b2t2 isEnvTemp: 't2' at: 4 index: 2
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 2
 ]
 
 { #category : #private }
@@ -548,14 +594,26 @@ ScriptScopeTest >> test075useDoublyNestedMethodArgsWithTemps [
 	b2t2 := block2 statements fourth binding.
 	self
 		checkArgs: #('a1' 'a2') in: ast scope;
-		assert: b1a1 isEnvArg: 'a1' at: 5;
-		assert: b1a2 isEnvArg: 'a2' at: 6;
-		assert: b1t2 isEnvTemp: 't2' at: nil index: 7;
-		assert: b1t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b2t1 isEnvTemp: 't1' at: 4 index: 1;
-		assert: b2t2 isEnvTemp: 't2' at: 5 index: 7;
-		assert: b2a1 isEnvArg: 'a1' at: 6;
-		assert: b2a2 isEnvArg: 'a2' at: 7
+		assert: b1a1 isEnvArg: 'a1' at: 2;
+		assert: b1a2 isEnvArg: 'a2' at: 3;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: nil
+			index: 4;
+		assert: b1t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 2
+			index: 4;
+		assert: b2a1 isEnvArg: 'a1' at: 3;
+		assert: b2a2 isEnvArg: 'a2' at: 4
 ]
 
 { #category : #private }
@@ -568,7 +626,7 @@ ScriptScopeTest >> test080captureSelf [
 		assert: receiver isSelf;
 		assert: ast environmentSize = 0;
 		assert: block scope capturesSelf;
-		assert: block environmentSize = 4;
+		assert: block environmentSize equals: 1;
 		assert: block scope home == nil
 ]
 
@@ -580,7 +638,7 @@ ScriptScopeTest >> test090useNonLocalReturn [
 	self
 		assert: ast environmentSize = 0;
 		assert: ast needsEnvironment;
-		assert: block environmentSize = 4;
+		assert: block environmentSize = 1;
 		assert: block scope home == ast
 ]
 
@@ -592,7 +650,7 @@ ScriptScopeTest >> test091nonLocalReturnSelf [
 	self
 		assert: ast environmentSize = 0;
 		assert: ast needsEnvironment;
-		assert: block environmentSize = 4;
+		assert: block environmentSize = 2;
 		assert: block scope home == ast
 ]
 
@@ -657,7 +715,9 @@ ScriptScopeTest >> test110inlineUseMixedMethodTemps [
 { #category : #private }
 ScriptScopeTest >> test120inlineEnvironmentTemp [
 	| ast block1 block2 mt1 mt2 b1t1 b1t2 b2t2 |
-	ast := self compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. [t2]]' in: Point.
+	ast := self
+		compile: 'foo | t1 | 1 ifTrue: [ | t2 | t1. [t2]]'
+		in: Point.
 	block1 := ast children first.
 	block2 := block1 children first.
 	mt1 := ast scope resolve: 't1'.
@@ -670,8 +730,14 @@ ScriptScopeTest >> test120inlineEnvironmentTemp [
 		assert: mt2 isUnresolved;
 		assert: mt1 isStackTemp: 't1' at: 1;
 		assert: b1t1 isStackTemp: 't1' at: 1;
-		assert: b1t2 isEnvTemp: 't2' at: nil index: 1;
-		assert: b2t2 isEnvTemp: 't2' at: 4 index: 1;
+		assert: b1t2
+			isEnvTemp: 't2'
+			at: nil
+			index: 1;
+		assert: b2t2
+			isEnvTemp: 't2'
+			at: 1
+			index: 1;
 		assert: ast scope environmentSize = 1
 ]
 
@@ -736,7 +802,7 @@ ScriptScopeTest >> test134inlineBlockArgNestedAccess [
 	b2a1 := block2 scope resolve: 'a1'.
 	self
 		assert: b1a1 isEnvArg: 'a1' at: 1;
-		assert: b2a1 isEnvArg: 'a1' at: 5
+		assert: b2a1 isEnvArg: 'a1' at: 1
 ]
 
 { #category : #private }
@@ -752,8 +818,8 @@ ScriptScopeTest >> test135inlineBlockWithArgInRealBlockCaptured [
 	b2a1 := block2 scope resolve: 'a1'.
 	b3a1 := block3 scope resolve: 'a1'.
 	self
-		assert: b2a1 isEnvArg: 'a1' at: 5;
-		assert: b3a1 isEnvArg: 'a1' at: 5
+		assert: b2a1 isEnvArg: 'a1' at: 1;
+		assert: b3a1 isEnvArg: 'a1' at: 1
 ]
 
 { #category : #private }
@@ -772,7 +838,9 @@ ScriptScopeTest >> test136inlineBlockWithArgCapturedByInlinedBlock [
 { #category : #private }
 ScriptScopeTest >> test137inlineBlockWithArgCapturedByInlinedBlockInRealBlock [
 	| ast block1 block2 block3 b1a1 b3a1 |
-	ast := self compile: 'foo 1 ifNotNil: [:a1 | [2 ifTrue: [a1]]]' in: Point.
+	ast := self
+		compile: 'foo 1 ifNotNil: [:a1 | [2 ifTrue: [a1]]]'
+		in: Point.
 	block1 := ast children first.
 	block2 := block1 children first.
 	block3 := block2 children first.
@@ -780,7 +848,7 @@ ScriptScopeTest >> test137inlineBlockWithArgCapturedByInlinedBlockInRealBlock [
 	b3a1 := block3 scope resolve: 'a1'.
 	self
 		assert: b1a1 isEnvArg: 'a1' at: 1;
-		assert: b3a1 isEnvArg: 'a1' at: 5
+		assert: b3a1 isEnvArg: 'a1' at: 1
 ]
 
 { #category : #private }
@@ -793,9 +861,14 @@ ScriptScopeTest >> test138blockWithInlinedBlockWithTempCaptured [
 	b2t1 := block2 scope resolve: 't1'.
 	b3t1 := block3 scope resolve: 't1'.
 	self
-		assert: b2t1 isEnvTemp: 't1' at: nil index: 5;
-		assert: b3t1 isEnvTemp: 't1' at: 5 index: 5.
-
+		assert: b2t1
+			isEnvTemp: 't1'
+			at: nil
+			index: 1;
+		assert: b3t1
+			isEnvTemp: 't1'
+			at: 1
+			index: 1
 ]
 
 { #category : #private }
