@@ -23,9 +23,7 @@ HeapModel class >> forSimulatedPst [
 	<example>
 	| kernel builder writer runtime labels |
 	kernel := SmalltalkBootstrapper spec.
-	builder := SmalltalkBootstrapper new
-		spec: kernel;
-		build.
+	builder := SmalltalkBootstrapper fromSpec build.
 	writer := builder writer write.
 	runtime := Runtime forSimulating: kernel memory: writer image.
 	labels := Dictionary new.
@@ -116,9 +114,14 @@ HeapModel >> extent [
 
 { #category : #accessing }
 HeapModel >> initialize [
+	| start |
 	super initialize.
 	names := Dictionary new.
-	names at: 16r10 put: 'nil'; at: 16r18 put: 'true'; at: 16r20 put: 'false'
+	start := ImageSegmentWriter objectsOffset.
+	names
+		at: start + 16r8 put: 'nil';
+		at: start + 16r10 put: 'true';
+		at: start + 16r18 put: 'false'
 ]
 
 { #category : #accessing }
