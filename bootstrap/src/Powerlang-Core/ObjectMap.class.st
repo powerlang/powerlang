@@ -127,17 +127,6 @@ ObjectMap >> nilAll: nilObject [
 ObjectMap >> nilWith: nilObject [
 ]
 
-{ #category : #testing }
-ObjectMap >> printOn: aStream [
-	| name |
-	super printOn: aStream.
-	name := spec name.
-	aStream
-		nextPutAll: ' (';
-		nextPutAll: name withArticle;
-		nextPut: $)
-]
-
 { #category : #accessing }
 ObjectMap >> size [
 	"Return the size if this object, that this, the value of

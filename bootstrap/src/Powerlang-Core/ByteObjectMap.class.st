@@ -2,10 +2,18 @@ Class {
 	#name : #ByteObjectMap,
 	#superclass : #ObjectMap,
 	#instVars : [
-		'bytes'
+		'bytes',
+		'hash'
 	],
 	#category : #'Powerlang-Core-Building'
 }
+
+{ #category : #'instance creation' }
+ByteObjectMap class >> new: anRGBehavior size: anInteger [
+
+	^ self new
+		initializeAs: anRGBehavior sized: anInteger
+]
 
 { #category : #'instance creation' }
 ByteObjectMap class >> new: anRGBehavior valued: bytes [
@@ -45,6 +53,17 @@ ByteObjectMap >> bytes [
 	^ bytes
 ]
 
+{ #category : #testing }
+ByteObjectMap >> contentsString [
+		spec name == #String
+		ifTrue: [ ^bytes allButLast asString storeString ].
+		spec name == #Symbol
+				ifTrue: [ ^bytes allButLast asString asSymbol storeString ].
+		spec name == #ByteArray
+			ifTrue: [ ^bytes storeString ].
+		^spec name withArticle, ': ', bytes printString
+]
+
 { #category : #accessing }
 ByteObjectMap >> fillFrom: anObject [
 	self assert: anObject size == bytes size.
@@ -58,6 +77,21 @@ ByteObjectMap >> headerFlags [
 	variable := 2.
 	small := self isSmall ifTrue: [ 16r80 ] ifFalse: [ 0 ].
 	^ byte | variable | small
+]
+
+{ #category : #testing }
+ByteObjectMap >> headerHash [
+	^ hash
+]
+
+{ #category : #testing }
+ByteObjectMap >> headerHash: anInteger [
+	hash := anInteger
+]
+
+{ #category : #initialization }
+ByteObjectMap >> initialize [
+	hash := 0
 ]
 
 { #category : #initialization }
@@ -77,13 +111,11 @@ ByteObjectMap >> isBytes [
 
 { #category : #testing }
 ByteObjectMap >> printOn: aStream [
-	super printOn: aStream.
-	spec ifNil: [ ^ self ].
-	spec name == #String
-		ifTrue: [ ^ aStream nextPutAll: bytes allButLast asString storeString ].
-	spec name == #Symbol
-		ifTrue: [ ^ aStream nextPutAll: bytes allButLast asString asSymbol storeString ].
-	aStream nextPutAll: bytes storeString
+	spec ifNil: [ ^ super printOn: aStream ].
+	aStream
+		nextPutAll: '<<';
+		nextPutAll: self contentsString;
+		nextPutAll: '>>'
 ]
 
 { #category : #accessing }

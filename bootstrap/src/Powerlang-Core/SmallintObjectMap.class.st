@@ -40,6 +40,14 @@ SmallintObjectMap >> isImmediate [
 	^ true
 ]
 
+{ #category : #printing }
+SmallintObjectMap >> printOn: aStream [
+	aStream
+		nextPutAll: '<<';
+		nextPutAll: value printString;
+		nextPutAll: '>>'
+]
+
 { #category : #accessing }
 SmallintObjectMap >> size [ 
 	^ 0

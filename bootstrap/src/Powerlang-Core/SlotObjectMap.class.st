@@ -2,7 +2,8 @@ Class {
 	#name : #SlotObjectMap,
 	#superclass : #ObjectMap,
 	#instVars : [
-		'slots'
+		'slots',
+		'hash'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -62,6 +63,14 @@ SlotObjectMap >> atAllPut: value [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> basicAt: index [
+	"Return indexed value at given raw index, starting with 1"
+
+	self assert: (index between: 1 and: slots size).
+	^ slots at: index
+]
+
+{ #category : #accessing }
 SlotObjectMap >> bodySizeInBytes [	
 	^ self sizeInBytes
 
@@ -91,6 +100,21 @@ SlotObjectMap >> headerFlags [
 	^ variable | named | small
 ]
 
+{ #category : #testing }
+SlotObjectMap >> headerHash [
+	^hash
+]
+
+{ #category : #testing }
+SlotObjectMap >> headerHash: anInteger [
+	hash := anInteger
+]
+
+{ #category : #testing }
+SlotObjectMap >> initialize [
+	hash := 0
+]
+
 { #category : #initialization }
 SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 	self assert: anRGBehavior notNil.
@@ -112,6 +136,14 @@ SlotObjectMap >> instSize [
 { #category : #accessing }
 SlotObjectMap >> isPointers [
 	^true
+]
+
+{ #category : #accessing }
+SlotObjectMap >> printOn: aStream [
+	aStream
+		nextPutAll: '<<';
+		nextPutAll: spec name withArticle;
+		nextPutAll: '>>'
 ]
 
 { #category : #accessing }
