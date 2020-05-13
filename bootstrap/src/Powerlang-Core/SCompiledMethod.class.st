@@ -77,6 +77,19 @@ SCompiledMethod >> environmentCount: anInteger [
 	format := format bitsAt: EnvCount put: anInteger
 ]
 
+{ #category : #accessing }
+SCompiledMethod >> format [
+	^format
+]
+
+{ #category : #printing }
+SCompiledMethod >> gtDisplayOn: stream [
+stream
+		nextPutAll: self classBinding name;
+		nextPutAll: '>>';
+		print: selector
+]
+
 { #category : #constants }
 SCompiledMethod >> hasBlocks [
 	^self blockCount > 0
