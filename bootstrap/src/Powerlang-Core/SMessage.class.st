@@ -63,7 +63,7 @@ SMessage >> opcodes: aCollection [
 
 { #category : #printing }
 SMessage >> printOn: aStream indent: anInteger [
-	aStream tab: anInteger; nextPutAll: '{MessageId. '; nextPutAll: selector; nextPutAll: '. '; cr.
+	aStream tab: anInteger; nextPutAll: '{MessageId. '; print: selector; nextPutAll: '. '; cr.
 	receiver printOn: aStream indent: anInteger + 1.
 	aStream nextPutAll: '.'; cr.
 	arguments
