@@ -248,7 +248,7 @@ AstcodeEncoder >> visitBlock: aBlockNode [
 	self nextTypePut: BlockId.
 	aBlockNode isInlined
 		ifTrue: [ stream nextPut: 0. args := aBlockNode arguments collect: [:id | id binding index]. 
-			stream nextPut: args  ]
+			stream nextPut: args asArray ]
 		ifFalse: [ | index captured |
 			index := self compiledBlockIndexOf: aBlockNode.
 			self nextPut: index.
