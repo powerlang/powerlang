@@ -7,6 +7,11 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
+{ #category : #testing }
+SAssociationBinding >> assign: value within: evaluator [
+	^evaluator association: association put: value
+]
+
 { #category : #accessing }
 SAssociationBinding >> association [
 	^association

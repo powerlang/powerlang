@@ -11,7 +11,8 @@ Class {
 		'falseObj',
 		'environment',
 		'emulator',
-		'globals'
+		'globals',
+		'hash'
 	],
 	#classVars : [
 		'EmulationSpec',
@@ -37,7 +38,7 @@ SmalltalkBootstrapper class >> initializePools [
 
 { #category : #accessing }
 SmalltalkBootstrapper class >> newEmulationSpec [
-	| spec species basicNew new basicNewSized newSized proto equal table prime int plus minus times divdiv less closure value size quot at obj behavior undersize |
+	| spec species basicNew new basicNewSized newSized proto equal table prime int plus minus times divdiv bitand less closure value size quot at obj behavior undersize whiletrue whilefalse evaluateWith evaluateWithWith valueWith valueWithWith valueWithWithWith atomic hash argCount bitxor bitshift newBytes string replace |
 	spec := self newSpec.
 	species := spec at: #Species.
 	basicNew := species methodNamed: #basicNew.
@@ -48,6 +49,9 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 	basicNewSized sourceCode: 'basicNew: anInteger <primitive: NewSized>'.
 	newSized := species methodNamed: #new:.
 	newSized sourceCode: 'new: anInteger <primitive: NewSized>'.
+	newBytes := species methodNamed: #primitiveNewBytes:.
+	newBytes
+		sourceCode: 'primitiveNewBytes: anInteger <primitive: NewBytes>'.
 	proto := spec at: #ProtoObject.
 	undersize := proto methodNamed: #_size.
 	undersize sourceCode: '_size <primitive: UnderSize>'.
@@ -59,9 +63,12 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 	size sourceCode: 'primitiveSize <primitive: Size>'.
 	at := proto methodNamed: #primitiveAt:.
 	at sourceCode: 'primitiveAt: anInteger <primitive: At>'.
+	hash := proto methodNamed: #basicHash.
+	hash sourceCode: 'basicHash <primitive: Hash>'.
 	obj := spec at: #Object.
 	at := obj methodNamed: #primitiveAt:put:.
-	at sourceCode: 'primitiveAt: anInteger put: anObject <primitive: AtPut>'.
+	at
+		sourceCode: 'primitiveAt: anInteger put: anObject <primitive: AtPut>'.
 	int := spec at: #SmallInteger.
 	plus := int methodNamed: #+.
 	plus sourceCode: '+ anObject <primitive: SMIPlus>'.
@@ -73,6 +80,12 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 	divdiv sourceCode: '// anObject <primitive: SMIIntDiv>'.
 	quot := int methodNamed: #\\.
 	quot sourceCode: '\\ anObject <primitive: SMIIntQuot>'.
+	bitand := int methodNamed: #bitAnd:.
+	bitand sourceCode: 'bitAnd: aNumber <primitive: SMIBitAnd>'.
+	bitxor := int methodNamed: #bitXor:.
+	bitxor sourceCode: 'bitXor: aNumber <primitive: SMIBitXor>'.
+	bitshift := int methodNamed: #bitShift:.
+	bitshift sourceCode: 'bitShift: aNumber <primitive: SMIBitShift>'.
 	less := int methodNamed: #>.
 	less sourceCode: '> anObject <primitive: SMIGreaterThan>'.
 	less := int methodNamed: #>=.
@@ -82,6 +95,36 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 	closure := spec at: #Closure.
 	value := closure methodNamed: #value.
 	value sourceCode: 'value <primitive: ClosureValue>'.
+	atomic := closure methodNamed: #evaluateAtomically.
+	atomic sourceCode: 'evaluateAtomically <primitive: ClosureValue>'.
+	valueWith := closure methodNamed: #value:.
+	valueWith sourceCode: 'value: a1 <primitive: ClosureValueWithArgs>'.
+	valueWithWith := closure methodNamed: #value:value:.
+	valueWithWith
+		sourceCode: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>'.
+	valueWithWithWith := closure methodNamed: #value:value:value:.
+	valueWithWithWith
+		sourceCode: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>'.
+	evaluateWith := closure methodNamed: #evaluateWith:.
+	evaluateWith
+		sourceCode: 'evaluateWith: arg <primitive: ClosureValueWithArgs>'.
+	evaluateWithWith := closure methodNamed: #evaluateWith:with:.
+	evaluateWithWith
+		sourceCode: 'evaluateWith: a1 with: a2 <primitive: ClosureValueWithArgs>'.
+	whiletrue := closure methodNamed: #whileTrue:.
+	whiletrue
+		sourceCode: 'whileTrue: aBlock <primitive: ClosureWhileTrue>'.
+	whilefalse := closure methodNamed: #whileFalse:.
+	whilefalse
+		sourceCode: 'whileFalse: aBlock <primitive: ClosureWhileFalse>'.
+	argCount := closure methodNamed: #argumentCount.
+	argCount
+		sourceCode: 'argumentCount <primitive: ClosureArgumentCount>'.
+	string := spec at: #String.
+	replace := string methodNamed: #replaceFrom:to:with:startingAt:.
+	replace
+		sourceCode:
+			'replaceFrom: start to: end with: aCollection startingAt: position <primitive: StringReplaceFromToWithStartingAt>'.
 	table := spec at: #HashTable.
 	prime := table metaclass methodNamed: #primeFor:.
 	prime sourceCode: 'primeFor: anInteger <primitive: PrimeFor>'.
@@ -176,6 +219,13 @@ SmalltalkBootstrapper >> classes [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> compilerFor: anRGBehavior [
+	| c |
+	c := Compiler namespace: globals.
+	^c forClass: anRGBehavior
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> createClass: definition [
 	| name class behavior |
 	name := definition name.
@@ -191,24 +241,26 @@ SmalltalkBootstrapper >> createClass: definition [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createClassAssociations: definition [
-	| name class assoc symbol emulated cvarEmu |
+	| name class assoc emulated cvarEmu |
 	name := definition name.
 	class := classes at: definition.
-	assoc := self newSlots: #Association.
-	symbol := self newSymbol: name.
-	assoc
-		key: symbol;
-		value: class.
+	assoc := self newLiteralAssociation: name -> class.
 	globals at: name put: assoc.
 	definition classVariables
 		do: [ :cvar | 
-			assoc := self newSlots: #Association.
-			symbol := self newSymbol: cvar name.
-			assoc
-				key: symbol;
-				value: self nilObject.
+			assoc := self newLiteralAssociation: cvar name -> self nilObject.
 			cvar association: assoc.
-			emulated := emulator lookup spec at: name. cvarEmu := emulated classVarNamed: cvar name. cvarEmu association: assoc]
+			emulated := emulator spec at: name.
+			cvarEmu := emulated classVarNamed: cvar name.
+			cvarEmu association: assoc ]
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> createClassVars: definition [
+	| class classvars |
+	class := classes at: definition.
+	classvars := self newClassVarDictionary: definition classVariables.
+	class classVariables: classvars
 ]
 
 { #category : #initialization }
@@ -220,21 +272,36 @@ SmalltalkBootstrapper >> createClasses [
 			self
 				createClass: def;
 				createMetaclass: def ].
-	emulator bridge updateGlobals.
+	"emulator bridge updateGlobals."
 	all
 		do: [ :def | 
 			self
 				initializeClass: def;
 				initializeMetaclass: def;
 				createClassAssociations: def ].
-	self fixBehaviors.
-	all
-		do: [ :def | self initializeClassVars: def ]
+	self fixBehaviors; createGlobals.
+	all do: [ :def | self createClassVars: def ]
 ]
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createFalse [
 	falseObj := self basicNewSlots: #False
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> createGlobals [
+	| names assoc |
+	hash := self newLiteralAssociation: #LastHash -> 1.
+	globals at: #LastHash put: hash.
+	assoc := self newLiteralAssociation: #WordSize -> 8.
+	globals at: #WordSize put: assoc.
+	assoc := self newLiteralAssociation: #WordSizeShift -> 3.
+	globals at: #WordSizeShift put: assoc.
+	names := #(#ActiveProcess #ActiveLocale #ByteCharacters #CharacterConstants #FrameMarker #GC #KernelLibrary #NamedPrimitives #ProcessFrameOffsets #Processor #Reserved #Smalltalk #UnresolvedObjects #UserLibrary).
+	names
+		do: [ :g | 
+			assoc := self newLiteralAssociation: g -> nilObj.
+			globals at: g put: assoc ]
 ]
 
 { #category : #initialization }
@@ -262,6 +329,29 @@ SmalltalkBootstrapper >> createMetaclass: spec [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> createMethodDictionary: definition [
+	| class behavior md size dictionary |
+	class := classes at: definition.
+	behavior := class instanceBehavior.
+	md := self classNamed: #MethodDictionary.
+	size := self newSmallInteger: definition methods size.
+	dictionary := self emulateSend: md selector: #new: with: {size}.
+	behavior methods: dictionary.
+	^ self addObjectDeep: dictionary
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> createMethodDictionary: species sized: anInteger [
+	| behavior md size dictionary |
+	behavior := species instanceBehavior.
+	md := self classNamed: #MethodDictionary.
+	size := self newSmallInteger: anInteger.
+	dictionary := self emulateSend: md selector: #new: with: {size}.
+	behavior methods: dictionary.
+	^ self addObjectDeep: dictionary
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> createModule [
 	| module array |
 	module := self new: #Module.
@@ -286,11 +376,23 @@ SmalltalkBootstrapper >> define: anObject as: aSymbol [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> emulationSpec: anRGEnvironment [
-	emulator := Runtime forBootstrappingPst: self spec: anRGEnvironment.
-	emulator loadShapesFrom: anRGEnvironment.
-	emulator lookup globals: globals.
+SmalltalkBootstrapper >> emulateSend: receiver selector: aSymbol [
+^self emulateSend: receiver selector: aSymbol with: { }
 
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> emulateSend: receiver selector: aSymbol with: anArray [
+		| message |
+	message := MessageSend
+		receiver: receiver
+		selector: aSymbol arguments: anArray.
+	^emulator send: message
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> emulationSpec: anRGEnvironment [
+	emulator spec: anRGEnvironment
 ]
 
 { #category : #initialization }
@@ -301,6 +403,39 @@ SmalltalkBootstrapper >> emulator [
 { #category : #'as yet unclassified' }
 SmalltalkBootstrapper >> falseObject [
 	^ falseObj
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> fillClasses [
+	| class meta |
+	environment allClasses
+		do: [ :def | 
+			self log: 'filling ', def name, '...'.
+			class := classes at: def.
+			meta := class behavior slotNamed: #class.
+			self
+				initializeClassVariables: class with: def metaclass;
+				fillSpecies: meta with: def metaclass;
+				fillSpecies: class with: def ]
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> fillSpecies: species with: definition [
+	| dictionary compiler method transferred |
+	dictionary := self
+		createMethodDictionary: species
+		sized: definition methods size.
+	compiler := self compilerFor: definition.
+	definition methods
+		do: [ :m | 
+			method := compiler compile: m sourceCode.
+			transferred := self transferMethod: method in: species.
+			self emulateSend: dictionary
+				selector: #basicAt:put:
+				with:
+					{transferred selector.
+					transferred}.
+			 ]
 ]
 
 { #category : #initialization }
@@ -328,11 +463,11 @@ SmalltalkBootstrapper >> genesis [
 	self
 		createNil;
 		createTrue;
-		createFalse.
-	emulator loadBridge.
-	self
+		createFalse;
+		loadEmulator;
 		createClasses;
-		initializeObjects;
+		initializeSmalltalk;
+		fillClasses;
 		validate
 ]
 
@@ -348,7 +483,8 @@ SmalltalkBootstrapper >> initialize [
 	classes := OrderedDictionary new.
 	objects := OrderedCollection new.
 	symbols := OrderedDictionary new.
-	globals := BootstrapDictionary new
+	globals := BootstrapDictionary new.
+	emulator := BootstrapEmulator new bootstrapper: self; classes: classes; globals: globals
 ]
 
 { #category : #initialization }
@@ -384,11 +520,13 @@ SmalltalkBootstrapper >> initializeClass: definition [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> initializeClassVars: definition [
-	| class classvars |
-	class := classes at: definition.
-	classvars := self newClassVarDictionary: definition classVariables.
-	class classVariables: classvars
+SmalltalkBootstrapper >> initializeClassVariables: class with: definition [
+	| initializers |
+	initializers := definition methods
+		select: [ :m | m selector beginsWith: 'initialize' ].
+	initializers
+		do: [ :m | 
+			self emulateSend: class selector: m selector ]
 ]
 
 { #category : #initialization }
@@ -412,10 +550,14 @@ SmalltalkBootstrapper >> initializeMetaclass: definition [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> initializeObjects [
-	| handle |
-	handle := emulator handleOnGlobal: #SmalltalkSystem
-	"handle maneuverer initializeClasses"
+SmalltalkBootstrapper >> initializeSmalltalk [
+	| class smalltalk |
+	class := self classNamed: #SmalltalkSystem.
+	smalltalk := self emulateSend: class selector: #new.
+	globals
+		do:
+			[ :assoc | self emulateSend: smalltalk selector: #add: with: {assoc} ].
+	self emulateSend: smalltalk selector: #bootstrapInitialize
 ]
 
 { #category : #initialization }
@@ -431,6 +573,30 @@ SmalltalkBootstrapper >> instanceBehaviorOfSpec: spec [
 	| class |
 	class := classes at: spec.
 	^class instanceBehavior
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> lastHash [
+	^hash value value
+
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> lastHash: anInteger [
+	^hash value value: anInteger
+
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> loadEmulator [
+	emulator nilObject: nilObj; falseObject: falseObj; trueObject: trueObj
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> log: aString [
+	Transcript
+		show: aString;
+		cr
 ]
 
 { #category : #'as yet unclassified' }
@@ -461,10 +627,18 @@ SmalltalkBootstrapper >> new: classname sized: size [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> newArray: anArray [
-	| instance |
-	instance := self newSlots: 'Array' sized: anArray size.
-	anArray withIndexDo: [ :obj :i | instance at: i put: obj ].
-	^ instance
+	| assoc |
+	assoc := self newSlots: 'Array' sized: anArray size.
+	anArray withIndexDo: [ :obj :i | assoc at: i put: obj ].
+	^ assoc
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newAssociationKey: key value: value [
+	| assoc |
+	assoc := self newSlots: #Association.
+	assoc key: key; value: value .
+	^ assoc
 ]
 
 { #category : #initialization }
@@ -487,12 +661,11 @@ SmalltalkBootstrapper >> newBytesFrom: aByteObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> newClassVarDictionary: anArray [
-	| dict handle subject assoc |
+	| dict |
 	dict := self newDictionary.
-	handle := emulator handleOn: dict.
-	subject := handle maneuverer.
 	anArray
-		do: [ :cvar | assoc := emulator handleOn: cvar association. subject add: assoc maneuverer ].
+		do:
+			[ :cvar | self emulateSend: dict selector: #add: with: {cvar association} ].
 	^ self addObjectDeep: dict
 ]
 
@@ -503,10 +676,14 @@ SmalltalkBootstrapper >> newClosure: aPCompiledBlock [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> newDictionary [
-	| handle dict |
-	handle := emulator handleOnGlobal: 'Dictionary'.
-	dict := handle maneuverer new.
-	^dict _gate handle oid
+	| factory |
+	factory := self classNamed: 'Dictionary'.
+	^ self emulateSend: factory selector: #new
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newLiteralAssociation: anAssociation [
+	^self transferLiteralDeep: anAssociation
 ]
 
 { #category : #initialization }
@@ -521,6 +698,23 @@ SmalltalkBootstrapper >> newMethod: anAstcode selector: aSymbol in: classname fo
 		nativeCode: self nilObject;
 		astcodes: astcodes;
 		class: class;
+		selector: selector;
+		format: format;
+		source: self nilObject.
+	^ method
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newMethod: anAstcode selector: aSymbol in: species format: anInteger sized: size [
+	| method astcodes selector format |
+	method := self newSlots: 'CompiledMethod' sized: size.
+	astcodes := self transferLiteralDeep: anAstcode.
+	selector := self newSymbol: aSymbol.
+	format := self newSmallInteger: anInteger.
+	method
+		nativeCode: self nilObject;
+		astcodes: astcodes;
+		class: species;
 		selector: selector;
 		format: format;
 		source: self nilObject.
@@ -610,6 +804,16 @@ SmalltalkBootstrapper >> specNamed: aSymbol [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> speciesFrom: anRGBehavior [
+	| class species |
+	species := classes
+		at: anRGBehavior
+		ifAbsent: [ class := classes at: anRGBehavior instanceSide.
+			^class behavior ].
+	^ species instanceBehavior
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> testMethodAstcodes [
 	"m instVar1 := true
 	#(MethodId #(AssignmentId #(IdentifierId InstVarId 1) #(IdentifierId TrueId)))"
@@ -642,15 +846,89 @@ SmalltalkBootstrapper >> transferAstcodesFrom: anArray [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> transferObjectDeep: anObject [
-	| transferred slot |
-	anObject isSmallInteger ifTrue: [ ^self newSmallInteger: anObject ].
-	anObject isBytes ifTrue: [ ^self newBytesFrom: anObject ].
-	transferred := self newSlots: anObject class name sized: anObject size.
-	anObject withIndexDo: [ :elem :i | 
-			slot := self transferObjectDeep: elem.
-			transferred at: i put: slot ].
+SmalltalkBootstrapper >> transferBlock: anSCompiledBlock in: method [
+	| transferred |
+	transferred := self newSlots: #CompiledBlock.
+	transferred
+		method: method;
+		format: anSCompiledBlock format.
+		^transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferLiteralAt: anInteger in: method [
+	| literal class transferred |
+	literal := method at: anInteger.
+	class := literal class.
+	(class inheritsFrom: ObjectMap)
+		ifTrue: [ ^ self ].
+	transferred := class = SCompiledBlock
+		ifTrue: [ self transferBlock: literal in: method ]
+		ifFalse: [ self transferLiteralDeep: literal ].
+	^ method at: anInteger put: transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferLiteralDeep: anObject [
+	| class transferred slot size ivar |
+	class := anObject class.
+	class = SmallInteger
+		ifTrue: [ ^ self newSmallInteger: anObject ].
+	class = UndefinedObject
+		ifTrue: [ ^ nilObj ].
+	class = False
+		ifTrue: [ ^ falseObj ].
+	class = True
+		ifTrue: [ ^ trueObj ].
+	(class inheritsFrom: Symbol)
+		ifTrue: [ ^ self newSymbol: anObject ].
+	(class inheritsFrom: String)
+		ifTrue: [ ^ self newString: anObject ].
+	class = ByteArray
+		ifTrue: [ ^ self newBytesFrom: anObject ].
+	(class inheritsFrom: ObjectMap)
+		ifTrue: [ ^ anObject ].
+	size := class isVariable
+		ifTrue: [ anObject size ]
+		ifFalse: [ 0 ].
+	transferred := self newSlots: class name sized: size.
+	1 to: class instSize do: [ :i | 
+		ivar := anObject instVarAt: i.
+		slot := self transferLiteralDeep: ivar.
+		transferred slotAt: i put: slot ].
+	size > 0
+		ifTrue: [ anObject
+				withIndexDo: [ :elem :i | 
+					slot := self transferLiteralDeep: elem.
+					transferred at: i put: slot ] ].
 	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
+	| transferred size |
+	size := anSCompiledMethod size.
+	transferred := self
+		newMethod: anSCompiledMethod astcodes
+		selector: anSCompiledMethod selector
+		in: species
+		format: anSCompiledMethod format
+		sized: size.
+	1 to: size do: [ :i | self transferLiteralAt: i in: transferred ].
+	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferSimpleLiterals: method [
+	"fixme: to be used by emulator only"
+
+	| literal class |
+	1 to: method size do: [ :i | 
+		literal := method at: i.
+		class := literal class.
+		((class inheritsFrom: ObjectMap) or: [ class = SCompiledBlock ])
+			ifFalse: [ method at: i put: (self transferLiteralDeep: literal) ] ].
+	^method
 ]
 
 { #category : #'as yet unclassified' }

@@ -48,6 +48,11 @@ BootstrapDictionary >> at: aSymbol put: anAssociation [
 ]
 
 { #category : #accessing }
+BootstrapDictionary >> do: aBlock [
+	^globals do: aBlock
+]
+
+{ #category : #accessing }
 BootstrapDictionary >> initialize [
 	globals := Dictionary new
 ]
