@@ -134,7 +134,8 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 { #category : #accessing }
 SmalltalkBootstrapper class >> newSpec [
 	| repo spec |
-	repo := TonelRepository new directory: '../pst/open-dmr' asFileReference.
+	repo := TonelRepository new
+		directory: '../pst/spec' asFileReference.
 	spec := repo asRingEnvironmentWith: #(Kernel).
 	^ spec clean
 ]
