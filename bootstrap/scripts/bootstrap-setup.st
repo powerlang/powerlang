@@ -10,12 +10,10 @@ only load Ring2 on Pharo 7 (we don't care about older Pharos)
   load: 'runtimeSupport';
   load: 'calypso'].
 
-Gofer new smalltalkhubUser: 'Moose' project: 'PetitParser';
-    configurationOf: #PetitParser; load.
-
-(ConfigurationOfPetitParser project version: #development) load: 'Core'.
-(ConfigurationOfPetitParser project version: #development) load: 'PetitTests'.
-
+Metacello new
+   baseline: 'PetitParser';
+   repository: 'github://moosetechnology/PetitParser/src';
+   load.
 
 Author useAuthor: 'PowerSmalltalkLoader' during: [
     | repo |
