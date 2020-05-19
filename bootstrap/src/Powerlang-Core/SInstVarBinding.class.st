@@ -39,5 +39,5 @@ SInstVarBinding >> printOn: aStream [
 
 { #category : #accessing }
 SInstVarBinding >> valueWithin: evaluator [
-	^evaluator instVarAt: index
+	^evaluator instanceVarAt: index
 ]

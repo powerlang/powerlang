@@ -20,6 +20,11 @@ ParseNode >> ast [
 ]
 
 { #category : #testing }
+ParseNode >> hasAssign [
+	^false
+]
+
+{ #category : #testing }
 ParseNode >> isAssign [
 	^false
 ]
@@ -56,6 +61,16 @@ ParseNode >> isMessageNode [
 
 { #category : #testing }
 ParseNode >> isMethod [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isMethodArgument [
+	^false
+]
+
+{ #category : #testing }
+ParseNode >> isMethodTemporary [
 	^false
 ]
 

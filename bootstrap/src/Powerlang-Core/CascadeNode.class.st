@@ -14,6 +14,13 @@ CascadeNode >> acceptVisitor: visitor [
 	^visitor visitCascade: self
 ]
 
+{ #category : #testing }
+CascadeNode >> hasAssign [
+	receiver hasAssign ifTrue: [^true].
+	messages detect: [:msg | msg hasAssign] ifNone: [^false].
+	^true
+]
+
 { #category : #enumerating }
 CascadeNode >> isCascade [
 	^true

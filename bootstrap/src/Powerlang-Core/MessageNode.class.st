@@ -31,6 +31,33 @@ MessageNode >> beInlined [
 ]
 
 { #category : #testing }
+MessageNode >> hasAssign [
+	receiver hasAssign ifTrue: [^true].
+	^arguments anySatisfy: [:arg | arg hasAssign]
+]
+
+{ #category : #testing }
+MessageNode >> hasVolatileArguments [
+	^arguments anySatisfy: [:arg | 
+		arg isIdentifier
+			ifTrue: [arg binding canBeAssigned]
+			ifFalse: [arg isBlockNode not andNot: [arg isLiteral]]]
+]
+
+{ #category : #testing }
+MessageNode >> hasVolatileReceiver [
+	^ compiler hasBlocks
+		  or: [ receiver isMethodTemporary not ]
+		  or: [ arguments anySatisfy: [ :arg | arg hasAssign ] ]
+]
+
+{ #category : #testing }
+MessageNode >> initialize [
+	super initialize.
+	inlined := false
+]
+
+{ #category : #testing }
 MessageNode >> isCascadeMessage [
 	^false
 ]
@@ -43,6 +70,22 @@ MessageNode >> isInlined [
 { #category : #testing }
 MessageNode >> isMessageNode [
 	^true
+]
+
+{ #category : #testing }
+MessageNode >> needsStrictEvaluationOrder [
+	arguments size = 0 ifTrue: [^false].
+	receiver isBlockNode ifTrue: [^false].
+	receiver isLiteral ifTrue: [^false].
+	receiver isSelf ifTrue: [^false].
+	receiver isSuper ifTrue: [^false].
+	receiver isMethodArgument ifTrue: [^false].
+	self hasVolatileReceiver ifFalse: [^false].
+	(receiver isImmediate
+		and: [arguments conform: [:arg | arg isImmediate or: [arg isBlockNode]]])
+		ifTrue: [^false].
+	receiver hasAssign ifTrue: [^true].
+	^self hasVolatileArguments
 ]
 
 { #category : #enumerating }

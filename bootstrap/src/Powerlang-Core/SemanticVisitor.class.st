@@ -40,7 +40,7 @@ SemanticVisitor >> analyzeIdentifier: anIdentifierNode assignee: aBoolean [
 { #category : #analizing }
 SemanticVisitor >> analyzeMessage: aMessageNode [
 	inliner inline: aMessageNode.
-
+	aMessageNode isInlined ifFalse: [aMessageNode compiler noticeSend]
 ]
 
 { #category : #analizing }

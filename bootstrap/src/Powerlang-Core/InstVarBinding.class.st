@@ -12,6 +12,11 @@ InstVarBinding >> beReferencedFrom: aScriptNode [
 	aScriptNode useSelf
 ]
 
+{ #category : #private }
+InstVarBinding >> emitLoadAusing: anSExpressionNativizer [
+	anSExpressionNativizer encodeLoadAwithInstVar: index
+]
+
 { #category : #actions }
 InstVarBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeInstVar: index

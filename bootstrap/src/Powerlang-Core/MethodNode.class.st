@@ -22,13 +22,16 @@ MethodNode >> buildMethod [
 		tempCount: scope stackSize;
 		argumentCount: arguments size;
 		environmentCount: scope environmentSize;
+		capturesSelf: scope capturesSelf;
+		hasEnvironment: self needsEnvironment;
+		hasFrame: self needsFrame;
 		selector: self selector;
 		source: compiler sourceCode;
 		classBinding: scope classBinding.
 	cm blocks do: [ :block | block method: cm ].
 	encoder := AstcodeEncoder new method: cm.
 	astcodes := self acceptVisitor: encoder.
-	^cm astcodes: astcodes
+	^ cm astcodes: astcodes
 ]
 
 { #category : #parsing }
@@ -94,6 +97,15 @@ MethodNode >> methodClass [
 MethodNode >> needsEnvironment [
 	^scope environmentSize > 0
 		or: [children anySatisfy: [:block | block usesHome]]
+]
+
+{ #category : #testing }
+MethodNode >> needsFrame [
+	scope stackSize > 0 ifTrue: [ ^ true ].
+	arguments size > 16 ifTrue: [ ^ true ].
+	compiler hasSends ifTrue: [ ^ true ].
+	compiler hasBlocks ifTrue: [ ^ true ].
+	^ false
 ]
 
 { #category : #enumerating }

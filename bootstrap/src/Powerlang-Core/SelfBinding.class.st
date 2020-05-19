@@ -15,6 +15,11 @@ SelfBinding >> canBeAssigned [
 ]
 
 { #category : #testing }
+SelfBinding >> emitLoadAusing: anSExpressionNativizer [
+	anSExpressionNativizer encodeLoadAwithSelf
+]
+
+{ #category : #testing }
 SelfBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeSelf
 ]

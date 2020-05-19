@@ -143,6 +143,16 @@ SmalltalkCompiler >> frontend: aCompiler [
 ]
 
 { #category : #nodes }
+SmalltalkCompiler >> hasBlocks [
+	^ blocks > 0
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> hasSends [
+^ leaf not
+]
+
+{ #category : #nodes }
 SmalltalkCompiler >> identifierNode [
 	^IdentifierNode new compiler: self
 ]
@@ -171,6 +181,11 @@ SmalltalkCompiler >> methodNode [
 { #category : #accessing }
 SmalltalkCompiler >> newScope [
 	^frontend newScope
+]
+
+{ #category : #nodes }
+SmalltalkCompiler >> noticeSend [
+	leaf := false
 ]
 
 { #category : #nodes }

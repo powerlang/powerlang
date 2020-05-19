@@ -157,8 +157,68 @@ AstcodeEncoder >> encodeInstVar: index [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithArg: anInteger env: environment [
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	stream
+		nextPut: LoadAwithArgumentId;
+		nextPut: anInteger;
+		nextPut: encoded
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithInstVar: anInteger [
+	stream nextPut: LoadAwithInstVarId; nextPut: anInteger
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithLiteral: value [
+	| index |
+	index := method indexOf: value.
+	stream nextPut: LoadAwithLiteralId; nextPut: index.
+	index = 0 ifTrue: [stream nextPut: value]
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithSelf [
+	stream nextPut: LoadAwithSelfId
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithTemp: anInteger env: environment [
+	| encoded |
+	encoded := self encodedEnvironment: environment.
+	stream
+		nextPut: LoadAwithTemporaryId;
+		nextPut: anInteger;
+		nextPut: encoded
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadRvisitingReceiver [
+	stream nextPut: LoadRvisitingReceiverId
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodeNil [
 	stream nextPut: NilId
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeOptimizedBinary: aMessageNode [
+	| optimizer |
+	optimizer := BinaryMessageOptimizer on: aMessageNode using: self.
+	self nestedEncode: [optimizer emitOpcodes]
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeOptimizedMessage: aMessageNode [
+	| selector |
+	selector := aMessageNode selector.
+	aMessageNode isInlined ifTrue: [^self encodeInlinedMessage: aMessageNode].
+	(BinaryMessageOptimizer optimizesMessage: selector value) ifFalse: [^self].
+	aMessageNode arguments size = 1
+		ifTrue: [^self encodeOptimizedBinary: aMessageNode]
 ]
 
 { #category : #visiting }
@@ -303,12 +363,14 @@ AstcodeEncoder >> visitMessage: aMessageNode [
 	| symbol selector |
 	symbol := aMessageNode selector symbol.
 	selector := method indexOf: symbol.
-	self nextTypePut: MessageId; nextPut: selector.
-	selector = 0 ifTrue: [self nextPut: symbol].
-	self nestedEncode: [aMessageNode receiver acceptVisitor: self].
-	aMessageNode arguments do: [:arg | 
-		self nestedEncode: [arg acceptVisitor: self]].
-	
+	self
+		nextTypePut: MessageId;
+		nextPut: selector.
+	selector = 0 ifTrue: [ self nextPut: symbol ].
+	self nestedEncode: [ aMessageNode receiver acceptVisitor: self ].
+	aMessageNode arguments do: [ :arg | 
+		self nestedEncode: [ arg acceptVisitor: self ] ].
+	self encodeOptimizedMessage: aMessageNode
 ]
 
 { #category : #visiting }

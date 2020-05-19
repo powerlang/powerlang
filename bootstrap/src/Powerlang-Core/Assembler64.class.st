@@ -37,6 +37,12 @@ Assembler64 class >> growIndexedLabelsTo: anInteger [
 ]
 
 { #category : #initialization }
+Assembler64 class >> initialize [
+	self initializeIndexedLabels
+	
+]
+
+{ #category : #initialization }
 Assembler64 class >> initializeIndexedLabels [
 	IndexedLabels := #().
 	self growIndexedLabelsTo: 100
@@ -228,7 +234,8 @@ Assembler64 >> assembleBytes: aByteArray [
 
 { #category : #basic }
 Assembler64 >> assembleBytes: aByteArray count: integer [
-	1 to: integer do: [:i | memory nextBytePut: (aByteArray at: i)]
+	1 to: integer do: [:i | memory nextPut: (aByteArray byteAt: i)]
+
 ]
 
 { #category : #accessing }
@@ -336,6 +343,11 @@ Assembler64 >> exchange: op1 with: op2 [
 Assembler64 >> holdReference: reference [
 	reference sourceOffset: self currentAddress - self addressSize.
 	^references add: reference
+]
+
+{ #category : #accessing }
+Assembler64 >> holdReferenceTo: anObject [
+	self halt
 ]
 
 { #category : #private }

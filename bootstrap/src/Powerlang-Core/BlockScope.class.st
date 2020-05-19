@@ -3,8 +3,7 @@ Class {
 	#superclass : #ScriptScope,
 	#instVars : [
 		'environments',
-		'captured',
-		'captureSelf'
+		'captured'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -148,7 +147,6 @@ BlockScope >> home [
 { #category : #initialization }
 BlockScope >> initialize [
 	super initialize.
-	captureSelf := false.
 	captured := StaticBinder new.
 	environments := OrderedCollection new
 ]

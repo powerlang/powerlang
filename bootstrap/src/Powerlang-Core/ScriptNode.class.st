@@ -48,6 +48,12 @@ ScriptNode >> environmentSize [
 	^scope environmentSize
 ]
 
+{ #category : #testing }
+ScriptNode >> hasAssign [
+	statements do: [:s | s hasAssign ifTrue: [^true]].
+	^false
+]
+
 { #category : #initialization }
 ScriptNode >> initialize [
 	super initialize.

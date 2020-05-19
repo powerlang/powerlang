@@ -92,9 +92,9 @@ SExpressionInterpreter >> environmentFor: anInteger [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluate: aPCompiledMethod [
-	method := aPCompiledMethod.
-	^ self visitMethod: aPCompiledMethod sexpressions
+SExpressionInterpreter >> evaluate: anSCompiledMethod [
+	method := anSCompiledMethod.
+	^ self visitMethod: anSCompiledMethod sexpressions
 ]
 
 { #category : #visiting }

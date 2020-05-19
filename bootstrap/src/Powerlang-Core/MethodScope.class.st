@@ -44,7 +44,8 @@ MethodScope >> captureLocal: aLocalBinding [
 
 { #category : #services }
 MethodScope >> captureSelf [
-	
+	captureSelf := true.
+
 ]
 
 { #category : #initialization }

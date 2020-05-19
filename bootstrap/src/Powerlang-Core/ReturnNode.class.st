@@ -24,6 +24,11 @@ ReturnNode >> expression: node [
 ]
 
 { #category : #testing }
+ReturnNode >> hasAssign [
+	^expression hasAssign
+]
+
+{ #category : #testing }
 ReturnNode >> isReturn [
 	^true
 ]

@@ -248,6 +248,11 @@ JITAssembler64 >> compareSwithTindex: index [
 ]
 
 { #category : #comparing }
+JITAssembler64 >> compareTwithA [
+	self assemble: 'cmp' with: self regT with: self regA
+]
+
+{ #category : #comparing }
 JITAssembler64 >> compareTwithImmediate: imm [
 	#imm8.
 	#imm32.
@@ -1462,6 +1467,11 @@ JITAssembler64 >> shiftTright: count [
 { #category : #arithmetic }
 JITAssembler64 >> sqrtDoubleX0 [
 	self assemble: 'sqrtsd' with: xmm0 with: xmm0
+]
+
+{ #category : #storing }
+JITAssembler64 >> storeAinRindex: index [
+	self store: self regA in: self regR index: index
 ]
 
 { #category : #storing }

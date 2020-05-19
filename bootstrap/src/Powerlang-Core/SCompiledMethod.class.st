@@ -42,6 +42,11 @@ SCompiledMethod >> astcodes: aCollection [
 ]
 
 { #category : #constants }
+SCompiledMethod >> beDebugabble [
+	format := format bitOr: Debuggable
+]
+
+{ #category : #constants }
 SCompiledMethod >> blockCount [
 	^format bitsAt: BlockCount
 ]
@@ -55,6 +60,18 @@ SCompiledMethod >> blockCount: anInteger [
 SCompiledMethod >> blocks [
 	self hasBlocks ifFalse: [^#()].
 	^self select: [:literal | literal isBlock]
+]
+
+{ #category : #constants }
+SCompiledMethod >> capturesSelf [ 
+	^ format anyMask: CapturesSelf
+]
+
+{ #category : #constants }
+SCompiledMethod >> capturesSelf: aBoolean [
+	format := aBoolean
+		          ifTrue: [ format bitOr: CapturesSelf ]
+		          ifFalse: [ format bitClear: CapturesSelf ]
 ]
 
 { #category : #constants }
@@ -96,9 +113,53 @@ SCompiledMethod >> hasBlocks [
 ]
 
 { #category : #constants }
+SCompiledMethod >> hasEnvironment [
+	^ format anyMask: HasEnvironment
+]
+
+{ #category : #constants }
+SCompiledMethod >> hasEnvironment: aBoolean [
+	format := aBoolean
+		          ifTrue: [ format bitOr: HasEnvironment ]
+		          ifFalse: [ format bitClear: HasEnvironment ]
+]
+
+{ #category : #constants }
+SCompiledMethod >> hasFrame [
+	^ format anyMask: HasFrame
+]
+
+{ #category : #constants }
+SCompiledMethod >> hasFrame: aBoolean [
+	format := aBoolean
+		          ifTrue: [ format bitOr: HasFrame ]
+		          ifFalse: [ format bitClear: HasFrame ]
+]
+
+{ #category : #constants }
 SCompiledMethod >> initialize [
 	super initialize.
 	format := 0
+]
+
+{ #category : #constants }
+SCompiledMethod >> isCallback [
+	^false
+]
+
+{ #category : #constants }
+SCompiledMethod >> isDebuggable [
+	^ format anyMask: Debuggable
+]
+
+{ #category : #constants }
+SCompiledMethod >> isFFIMethod [
+	^ false
+]
+
+{ #category : #constants }
+SCompiledMethod >> isFrameless [
+	^ self hasFrame not
 ]
 
 { #category : #printing }

@@ -3,6 +3,7 @@ Class {
 	#superclass : #PSharedPool,
 	#classVars : [
 		'ArgCount',
+		'CapturesHome',
 		'CapturesSelf',
 		'EnvCount',
 		'Id',
@@ -13,10 +14,10 @@ Class {
 
 { #category : #'class initialization' }
 SCompiledBlockFlags class >> initialize [
-	ArgCount := 1 thru: 8.
-	TempCount := 9 thru: 16.
-	Id := 17 thru: 24.
-	CapturesSelf := 1 bitShift: 25 - 1.
-	EnvCount := 26 thru: 31.
-
+	ArgCount := 1 thru: 6.
+	TempCount := 7 thru: 14.
+	Id := 15 thru: 22.
+	CapturesSelf := 1 bitShift: 23 - 1.
+	CapturesHome := 1 bitShift: 24 - 1.
+	EnvCount := 25 thru: 31
 ]

@@ -24,6 +24,23 @@ SCompiledBlock >> argumentCount: anInteger [
 ]
 
 { #category : #constants }
+SCompiledBlock >> capturesHome [
+	^ format anyMask: CapturesHome
+]
+
+{ #category : #constants }
+SCompiledBlock >> capturesHome: aBoolean [
+	format := aBoolean
+		          ifTrue: [ format bitOr: CapturesHome ]
+		          ifFalse: [ format bitClear: CapturesHome ]
+]
+
+{ #category : #constants }
+SCompiledBlock >> capturesSelf [
+	^format anyMask: CapturesSelf
+]
+
+{ #category : #constants }
 SCompiledBlock >> capturesSelf: aBoolean [
 	format := aBoolean
 		ifTrue: [ format bitOr: CapturesSelf ]

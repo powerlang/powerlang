@@ -1,6 +1,11 @@
 Extension { #name : #String }
 
 { #category : #'*Powerlang-Core' }
+String >> arity [
+	^self numArgs
+]
+
+{ #category : #'*Powerlang-Core' }
 String >> existingSymbol [
 	^Symbol findInterned: self
 ]

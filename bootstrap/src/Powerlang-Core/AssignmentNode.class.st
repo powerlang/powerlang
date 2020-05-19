@@ -40,6 +40,11 @@ AssignmentNode >> expression [
 	^expression
 ]
 
+{ #category : #testing }
+AssignmentNode >> hasAssign [
+	^true
+]
+
 { #category : #initialization }
 AssignmentNode >> initialize [
 	super initialize.

@@ -9,6 +9,11 @@ TemporaryBinding >> description [
 	^'temporary ' , name
 ]
 
+{ #category : #private }
+TemporaryBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithTemp: index env: environment
+]
+
 { #category : #initialization }
 TemporaryBinding >> encodeUsing: anAstcodeEncoder [
 	anAstcodeEncoder encodeTemporary: index env: environment

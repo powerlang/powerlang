@@ -17,6 +17,11 @@ LiteralNode >> beSymbol [
 	value := value asSymbol
 ]
 
+{ #category : #'as yet unclassified' }
+LiteralNode >> emitLoadAusing: anSExpressionNativizer [
+	anSExpressionNativizer encodeLoadAwithLiteral: value
+]
+
 { #category : #testing }
 LiteralNode >> hasSymbol [
 	^value isSymbol

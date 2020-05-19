@@ -42,6 +42,11 @@ IdentifierNode >> checkLowercase [
 ]
 
 { #category : #private }
+IdentifierNode >> declaration [
+	^binding declaration
+]
+
+{ #category : #private }
 IdentifierNode >> defineArgumentIn: aScriptScope [
 	binding := aScriptScope defineArgument: name.
 	binding declaration: self
@@ -51,6 +56,11 @@ IdentifierNode >> defineArgumentIn: aScriptScope [
 IdentifierNode >> defineTemporaryIn: scope [
 	binding := scope defineTemporary: name.
 	binding declaration: self
+]
+
+{ #category : #private }
+IdentifierNode >> emitLoadAusing: anAstcodeEncoder [
+	binding emitLoadAusing: anAstcodeEncoder
 ]
 
 { #category : #accessing }
@@ -80,6 +90,19 @@ IdentifierNode >> isIdentifierLiteral [
 { #category : #testing }
 IdentifierNode >> isImmediate [
 	^true
+]
+
+{ #category : #testing }
+IdentifierNode >> isMethodArgument [
+	| ast |
+	binding isArgument ifFalse: [^false].
+	ast := self ast ifNil: [^false].
+	^ast arguments includes: self declaration
+]
+
+{ #category : #testing }
+IdentifierNode >> isMethodTemporary [
+	^self ast temporaries includes: self declaration
 ]
 
 { #category : #testing }

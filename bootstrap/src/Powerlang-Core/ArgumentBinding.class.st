@@ -19,6 +19,11 @@ ArgumentBinding >> description [
 	^'argument ' , name
 ]
 
+{ #category : #private }
+ArgumentBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithArg: index env: environment
+]
+
 { #category : #actions }
 ArgumentBinding >> encodeUsing: anAstcodeEncoder [
 	anAstcodeEncoder encodeArgument: index env: environment

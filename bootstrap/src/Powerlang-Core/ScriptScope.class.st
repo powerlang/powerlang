@@ -6,7 +6,8 @@ Class {
 		'arguments',
 		'temporaries',
 		'stackSize',
-		'envSize'
+		'envSize',
+		'captureSelf'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -19,6 +20,11 @@ ScriptScope class >> new [
 { #category : #'instance creation' }
 ScriptScope class >> on: aScriptNode [
 	^self new script: aScriptNode
+]
+
+{ #category : #services }
+ScriptScope >> capturesSelf [
+	^ captureSelf
 ]
 
 { #category : #binding }
@@ -73,7 +79,8 @@ ScriptScope >> initialize [
 	super initialize.
 	arguments := StaticBinder new.
 	temporaries := StaticBinder new.
-	stackSize := envSize := 0
+	stackSize := envSize := 0.
+		captureSelf := false.
 ]
 
 { #category : #binding }
