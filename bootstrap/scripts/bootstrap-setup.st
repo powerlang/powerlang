@@ -1,3 +1,7 @@
+"
+Starting with Pharo 8, Ring2 is pre-loaded. Therefore,
+only load Ring2 on Pharo 7 (we don't care about older Pharos)
+"
 (SystemVersion current version beginsWith: 'Pharo7') ifTrue: [
   Metacello new
   baseline: 'Ring2';
