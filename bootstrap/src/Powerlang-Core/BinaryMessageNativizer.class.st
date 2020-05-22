@@ -126,13 +126,13 @@ BinaryMessageNativizer >> inlinePlus [
 ]
 
 { #category : #private }
-BinaryMessageNativizer >> loadAwithArgument: index env: environment [
-	nativizer loadAwithArgument: index env: environment 
+BinaryMessageNativizer >> loadAwithArgument: index in: environment [
+	nativizer loadAwithArgument: index in: environment 
 ]
 
 { #category : #private }
-BinaryMessageNativizer >> loadAwithTemporary: index env: environment [
-	nativizer loadAwithTemporary: index env: environment 
+BinaryMessageNativizer >> loadAwithTemporary: index in: environment [
+	nativizer loadAwithTemporary: index in: environment 
 ]
 
 { #category : #private }

@@ -166,17 +166,34 @@ SExpressionNativizer >> addFallback: aBlock [
 
 { #category : #services }
 SExpressionNativizer >> argumentAt: index in: envIndex [
-	| end |
-	envIndex = 0
-		ifTrue: [ 
-			end := 3 + self argumentCount.
-			assembler loadRwithFPindex: end - index ]
-		ifFalse: [ assembler loadRwithEindex: index ]
+	envIndex ifNil: [ ^ self argumentInStackAt: index ].
+	envIndex < 0
+		ifTrue: [ self argumentInlinedAt: index ]
+		ifFalse: [ self argumentInEnvironmentAt: index ]
 ]
 
 { #category : #services }
 SExpressionNativizer >> argumentCount [
 	^activeScript argumentCount
+]
+
+{ #category : #services }
+SExpressionNativizer >> argumentInEnvironmentAt: index [
+	assembler loadRwithEindex: index
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> argumentInStackAt: index [
+	| end |
+	end := 3 + self argumentCount.
+	assembler loadRwithFPindex: end - index
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> argumentInlinedAt: index [
+	self temporaryInStackAt: index
 ]
 
 { #category : #services }
@@ -363,26 +380,63 @@ SExpressionNativizer >> instantiateClosure: aCompiledBlock [
 ]
 
 { #category : #services }
-SExpressionNativizer >> loadAwithArgument: index env: envIndex [
-	| end |
-	envIndex = 0
-		ifTrue: [ 
-			end := 3 + self argumentCount.
-			assembler loadAwithFPindex: end - index ]
-		ifFalse: [ assembler loadAwithEindex: index ]
+SExpressionNativizer >> loadAwithArgument: index in: envIndex [
+	envIndex
+		ifNil: [ ^ self loadAwithArgumentInStackAt: index ]. envIndex < 0
+		ifTrue: [ self loadAwithArgumentInlinedAt: index ]
+		ifFalse: [ self loadAwithArgumentInEnvironment: envIndex at: index ]
 ]
 
 { #category : #services }
-SExpressionNativizer >> loadAwithTemporary: position env: envIndex [
-	| start |
-	envIndex = 0 ifTrue: [
-		start := self pushesEnvironments ifTrue: [-3] ifFalse: [-1].
-		^assembler loadAwithFPindex: start - position].
-	envIndex = 1
-		ifTrue: [assembler loadAwithEindex: position]
-		ifFalse: [assembler
-			loadAwithEindex: envIndex;
-			loadAwithAindex: position]
+SExpressionNativizer >> loadAwithArgumentInEnvironment: envIndex at: index [
+	envIndex = 0 ifTrue: [ assembler loadAwithEindex: index ]
+	ifFalse: [ assembler loadAwithEindex: envIndex; loadAwithAindex: index ]
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadAwithArgumentInStackAt: index [
+		| end |
+	end := 3 + self argumentCount.
+			assembler loadAwithFPindex: end - index
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadAwithArgumentInlinedAt: index [
+	self loadAwithTemporaryInStackAt: index
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadAwithTemporary: index in: envIndex [
+
+	envIndex
+		ifNil: [ self loadAwithTemporaryInStackAt: index ]
+		ifNotNil: [ 
+		self loadAwithTemporaryInEnvironment: envIndex at: index ]
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadAwithTemporaryInEnvironment: envIndex at: index [
+		envIndex = 0
+		ifTrue: [ assembler loadAwithEindex: index ]
+		ifFalse: [ 
+			assembler
+				loadAwithEindex: envIndex;
+				loadAwithAindex: index ]
+	
+	
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
+			| start |
+	start := self pushesEnvironments
+			         ifTrue: [ -3 ]
+			         ifFalse: [ -1 ].
+		^ assembler loadAwithFPindex: start - index
+
 ]
 
 { #category : #services }
@@ -548,39 +602,59 @@ SExpressionNativizer >> sendMustBeBoolean [
 ]
 
 { #category : #services }
-SExpressionNativizer >> storeTemporary: position inEnvironment: env [
-	env = 1
-		ifTrue: [assembler storeRinEindex: position; pushE]
-		ifFalse: [assembler loadTwithEindex: env; storeRinTindex: position; pushT].
-	self emitSend: #holdRefererIfNeeded:
-]
-
-{ #category : #services }
 SExpressionNativizer >> temporaryAt: index in: envIndex [
-	| start |
-	envIndex = 0 ifTrue: [ 
-		start := self pushesEnvironments
-			         ifTrue: [ -3 ]
-			         ifFalse: [ -1 ].
-		^ assembler loadRwithFPindex: start - index ].
-	envIndex = 1
-		ifTrue: [ assembler loadRwithEindex: index ]
-		ifFalse: [ 
-			assembler
-				loadRwithEindex: envIndex;
-				loadRwithRindex: index ]
+	envIndex ifNil: [ self temporaryInStackAt: index ]
+ifNotNil: [ self temporaryInEnvironment: envIndex at: index ]
 ]
 
 { #category : #services }
 SExpressionNativizer >> temporaryAt: index in: envIndex put: dummy [
-	| start |
+	envIndex ifNil: [self temporaryInStackAtPut: index ] ifNotNil: [ 
+	self temporaryInEnvironment: envIndex atPut: index]
+]
+
+{ #category : #services }
+SExpressionNativizer >> temporaryInEnvironment: envIndex at: index [
+	envIndex = 0
+		ifTrue: [ assembler loadRwithEindex: index ]
+		ifFalse: [ assembler
+		loadRwithEindex: envIndex;
+		loadRwithRindex: index]
+]
+
+{ #category : #services }
+SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
 	envIndex = 0
 		ifTrue: [ 
-			start := self pushesEnvironments
+			assembler
+				storeRinEindex: index;
+				pushE ]
+		ifFalse: [ 
+			assembler
+				loadTwithEindex: envIndex;
+				storeRinTindex: index;
+				pushT ].
+	self emitSend: #holdRefererIfNeeded:
+]
+
+{ #category : #services }
+SExpressionNativizer >> temporaryInStackAt: index [
+		| start |
+	start := self pushesEnvironments
+			         ifTrue: [ -3 ]
+			         ifFalse: [ -1 ].
+		^ assembler loadRwithFPindex: start - index .
+
+]
+
+{ #category : #services }
+SExpressionNativizer >> temporaryInStackAtPut: index [
+			| start |
+	start := self pushesEnvironments
 				         ifTrue: [ -3 ]
 				         ifFalse: [ -1 ].
-			assembler storeRinFPindex: start - index ]
-		ifFalse: [ self storeTemporary: index inEnvironment: envIndex ]
+			assembler storeRinFPindex: start - index
+
 ]
 
 { #category : #services }

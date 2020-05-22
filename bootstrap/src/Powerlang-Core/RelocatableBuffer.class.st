@@ -72,7 +72,9 @@ RelocatableBuffer >> initialize [
 
 { #category : #writing }
 RelocatableBuffer >> nextBytePut: byte [
-	stream nextBytePut: byte
+	| value |
+	value := byte < 0 ifTrue: [ byte + 256 ] ifFalse: byte.
+	stream nextBytePut: value
 ]
 
 { #category : #writing }

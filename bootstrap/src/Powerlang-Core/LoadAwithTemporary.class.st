@@ -6,5 +6,5 @@ Class {
 
 { #category : #accessing }
 LoadAwithTemporary >> nativizeUsing: anAssembler for: aBinaryMessageNativizer [
-	aBinaryMessageNativizer loadAwithTemporary: index env: environment
+	aBinaryMessageNativizer loadAwithTemporary: index in: environment
 ]

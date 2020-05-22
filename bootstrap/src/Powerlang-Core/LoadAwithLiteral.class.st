@@ -19,7 +19,10 @@ LoadAwithLiteral class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #'as yet unclassified' }
 LoadAwithLiteral >> nativizeUsing: anAssembler for: messageNativizer [
-	anAssembler loadAwithPointer: value
+	self flag: #WordSizeFlag.
+	value isSmallInteger
+		ifTrue: [ anAssembler loadAwithSmallInteger: value ]
+		ifFalse: [ anAssembler loadAwithPointer: value ]
 ]
 
 { #category : #'as yet unclassified' }

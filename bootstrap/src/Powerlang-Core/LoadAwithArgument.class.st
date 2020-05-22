@@ -6,5 +6,5 @@ Class {
 
 { #category : #accessing }
 LoadAwithArgument >> nativizeUsing: anAssembler for: aBinaryMessageNativizer [
-	aBinaryMessageNativizer loadAwithArgument: index env: environment
+	aBinaryMessageNativizer loadAwithArgument: index in: environment
 ]
