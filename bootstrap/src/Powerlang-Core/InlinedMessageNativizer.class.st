@@ -53,12 +53,14 @@ InlinedMessageNativizer >> inlineMessage [
 
 { #category : #accessing }
 InlinedMessageNativizer >> inlineUnitaryWhileTrue [
-	| start continue failed first |
+	| continue failed first |
 	start := assembler newLabel.
 	continue := assembler newLabel.
 	failed := assembler newLabel.
-	assembler alignTo: 16; @ start.
-	message receiver statements do: [:s | s acceptVisitor: nativizer].
+	assembler
+		alignTo: 16;
+		@ start.
+	message receiver statements do: [ :s | s acceptVisitor: nativizer ].
 	first := true.
 	self compareRwithPointer: first.
 	assembler
@@ -66,10 +68,10 @@ InlinedMessageNativizer >> inlineUnitaryWhileTrue [
 		compareRwithPointer: first not;
 		shortJumpIfNotEqualTo: failed;
 		@ continue.
-	nativizer addFallback: [
+	nativizer addFallback: [ 
 		assembler @ failed.
 		nativizer sendMustBeBoolean.
-		assembler jumpTo: continue] 
+		assembler jumpTo: continue ]
 ]
 
 { #category : #accessing }
