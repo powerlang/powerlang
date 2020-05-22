@@ -347,7 +347,10 @@ Assembler64 >> holdReference: reference [
 
 { #category : #accessing }
 Assembler64 >> holdReferenceTo: anObject [
-	self halt
+	| reference |
+	reference := NativeCodeReference absoluteFor: anObject.
+	reference sourceOffset: self lastEmittedPointer.
+	^references add: reference
 ]
 
 { #category : #private }
@@ -668,6 +671,12 @@ Assembler64 >> or: op1 with: op2 [
 { #category : #private }
 Assembler64 >> pop: op1 [
 	self assemble: 'pop' with: op1
+]
+
+{ #category : #private }
+Assembler64 >> printOn: aStream [
+	aStream print: self class; cr; cr;
+		nextPutAll: memory bytes disassembledAmd64
 ]
 
 { #category : #accessing }

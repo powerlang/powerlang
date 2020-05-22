@@ -1448,7 +1448,7 @@ JITAssembler64 >> shiftRleft: count [
 
 { #category : #arithmetic }
 JITAssembler64 >> shiftRright: count [
-	self ASSERT: count < (WordSize * 8).
+	self ASSERT: count < (wordSize * 8).
 	self assemble: 'sar' with: self regR with: count
 ]
 
