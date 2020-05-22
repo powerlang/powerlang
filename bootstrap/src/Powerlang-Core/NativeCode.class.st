@@ -30,11 +30,5 @@ NativeCode >> code: bytes references: aCollection [
 
 { #category : #'as yet unclassified' }
 NativeCode >> disassembledAmd64 [
-	| filename output |
-	filename := './assembled-binary'.
-	filename asFileReference binaryWriteStreamDo: [ :s | 
-		s nextBytesPutAll: code ].
-	output := LibC resultOfCommand:
-		  'objdump -b binary -D -m i386:x86-64 -Mintel ' , filename.
-	^('<.data>:' split: output) second
+	^code disassembledAmd64
 ]

@@ -294,10 +294,11 @@ SExpressionInterpreter >> visitAssignment: anSAssignment [
 SExpressionInterpreter >> visitBlock: anSBlock [
 	| closure handle |
 	closure := anSBlock isInlined
-		ifTrue: [ SCompiledBlock new newClosure home: self ]
-		ifFalse: [ self captureClosure: anSBlock].
+		           ifTrue: [ SCompiledBlock new newClosure home: self ]
+		           ifFalse: [ self captureClosure: anSBlock ].
 	blockAstcodes at: closure block put: anSBlock.
-	handle := LocalHandle on: closure within: localRuntime.
+	self halt.
+	"	handle := LocalHandle on: closure within: localRuntime."
 	^ handle mirage
 ]
 

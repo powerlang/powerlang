@@ -11,13 +11,6 @@ SExpressionTest class >> isTestSelector: selector [
 ]
 
 { #category : #private }
-SExpressionTest class >> nativize: method using: environment [
-	| optimized |
-	optimized := environment astcodeNativizer nativeCodeFor: method.
-	method nativeCode: optimized 
-]
-
-{ #category : #private }
 SExpressionTest class >> supportMethods [
 	^self supportSelectors
 		collect: [:selector | (self >> selector) copy classBinding: Object]
@@ -53,7 +46,7 @@ SExpressionTest class >> templateSelectors [
 
 { #category : #private }
 SExpressionTest class >> testSelectors [
-	^super testSelectors addAll: self templateSelectors; yourself
+	^super testSelectors asOrderedCollection addAll: self templateSelectors; yourself
 ]
 
 { #category : #support }
@@ -68,21 +61,7 @@ SExpressionTest >> assertCorrectExecutionOfLibrary: filename [
 
 { #category : #templates }
 SExpressionTest >> assertCorrectExecutionOfTest: aSelector [
-	| failed bsl bsc |
-	failed := false.
-	bsl := self testLibraryPath.
-	[
-		self
-			generateMinimalLibraryWithEntryPoint: aSelector;
-			assertCorrectExecutionOfLibrary: bsl]
-		on: TestFailure
-		do: [:ex | 
-			failed := true.
-			ex pass].
-	failed ifFalse: [
-		bsl asFile remove.
-		bsc := bsl withExtension: 'bsc'.
-		bsc asFile remove]
+	(self nativize: aSelector) disassembledAmd64 halt
 ]
 
 { #category : #templates }
@@ -102,7 +81,7 @@ SExpressionTest >> generateMinimalLibraryWithEntryPoint: selector [
 	| builder entrypoint |
 	builder := #Librarian forBuilding newLibraryBuilder.
 	entrypoint := builder
-		              filename: self testLibraryPath asFilename;
+		              filename: self libraryPath asFileReference;
 		              addAll:
 			              (self class supportMethodsUsing: builder environment);
 		              entryPoint: self class >> selector.
@@ -110,31 +89,47 @@ SExpressionTest >> generateMinimalLibraryWithEntryPoint: selector [
 	builder generate
 ]
 
-{ #category : #templates }
-SExpressionTest >> performTest [
-	^ (testSelector beginsWith: 'test')
-		  ifTrue: [ super performTest ]
-		  ifFalse: [ 
-		  self assertCorrectExecutionOfTest: testSelector asSymbol ]
+{ #category : #generating }
+SExpressionTest >> libraryName [
+	^ self class name , '_' , testSelector , '.psl'
 ]
 
 { #category : #templates }
-SExpressionTest >> t010_message [
+SExpressionTest >> libraryPath [
+	^'./temp/', self libraryName
+]
+
+{ #category : #private }
+SExpressionTest >> nativize: aSymbol [
+	| method smethod |
+	method := self class >> aSymbol.
+	smethod := Compiler compile: method sourceCode in: self class.
+	^ NativizationEnvironment forTesting newExpressionNativizer 
+		  nativeCodeFor: smethod
+]
+
+{ #category : #templates }
+SExpressionTest >> performTest [
+	^ self assertCorrectExecutionOfTest: testSelector asSymbol 
+]
+
+{ #category : #templates }
+SExpressionTest >> test010_message [
 	^1 yourself 
 ]
 
 { #category : #templates }
-SExpressionTest >> t011_4minus3 [
+SExpressionTest >> test011_4minus3 [
 	^4 - 3 
 ]
 
 { #category : #templates }
-SExpressionTest >> t011_plus2 [
+SExpressionTest >> test011_plus2 [
 	^1 + 0 
 ]
 
 { #category : #templates }
-SExpressionTest >> t020_tempVars [
+SExpressionTest >> test020_tempVars [
 	| three four |
 	three := 3.
 	four := 4.
@@ -142,27 +137,27 @@ SExpressionTest >> t020_tempVars [
 ]
 
 { #category : #templates }
-SExpressionTest >> t030_messageArguments [
+SExpressionTest >> test030_messageArguments [
 	^self add: 1 to: 0 
 ]
 
 { #category : #templates }
-SExpressionTest >> t100_block [
+SExpressionTest >> test100_block [
 	^[1] value 
 ]
 
 { #category : #templates }
-SExpressionTest >> t110_block [
+SExpressionTest >> test110_block [
 	^[4 - 3] value 
 ]
 
 { #category : #templates }
-SExpressionTest >> t120_blockNonLocalReturn [
+SExpressionTest >> test120_blockNonLocalReturn [
 	[^1] value 
 ]
 
 { #category : #templates }
-SExpressionTest >> t130_blockTemps [
+SExpressionTest >> test130_blockTemps [
 	^[| three four |
 		three := 3.
 		four := 4.
@@ -170,12 +165,12 @@ SExpressionTest >> t130_blockTemps [
 ]
 
 { #category : #templates }
-SExpressionTest >> t140_blockArgs [
+SExpressionTest >> test140_blockArgs [
 	^[:arg1 :arg2 | arg2 - arg1] value: 3 value: 4 
 ]
 
 { #category : #templates }
-SExpressionTest >> t145_blockArgsAndTemps [
+SExpressionTest >> test145_blockArgsAndTemps [
 	^[:arg | | three |
 		three := 3.
 		arg - three]
@@ -183,27 +178,17 @@ SExpressionTest >> t145_blockArgsAndTemps [
 ]
 
 { #category : #templates }
-SExpressionTest >> t150_blockEnvironmentTemps [
+SExpressionTest >> test150_blockEnvironmentTemps [
 	| one |
 	one := 1.
 	^[one] value 
 ]
 
 { #category : #templates }
-SExpressionTest >> t151_blockEnvironmentTemps [
+SExpressionTest >> test151_blockEnvironmentTemps [
 	| three |
 	three := 3.
 	^[| four |
 		four := 4.
 		four - three] value 
-]
-
-{ #category : #generating }
-SExpressionTest >> testLibraryName [
-	^self class name , '_' , testSelector , '.bis'
-]
-
-{ #category : #generating }
-SExpressionTest >> testLibraryPath [
-	^#Librarian rootBuildDirectory \ 'temp' \ self testLibraryName
 ]

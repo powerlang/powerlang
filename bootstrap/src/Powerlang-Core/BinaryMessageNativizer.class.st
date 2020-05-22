@@ -8,9 +8,6 @@ Class {
 		'done',
 		'failed'
 	],
-	#pools : [
-		'SmalltalkOpcodes'
-	],
 	#category : #'Powerlang-Core-Nativization'
 }
 

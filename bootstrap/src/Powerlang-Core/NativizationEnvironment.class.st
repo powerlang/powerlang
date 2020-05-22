@@ -4,8 +4,11 @@ Class {
 	#instVars : [
 		'abi',
 		'safepointCheck',
-		'methodNativizer',
 		'messageLinker',
+		'spec',
+		'optimizedMethods',
+		'invokedMethods',
+		'cachedNativizer',
 		'busy'
 	],
 	#classVars : [
@@ -13,14 +16,6 @@ Class {
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
-
-{ #category : #initialization }
-NativizationEnvironment class >> commonMessageLinkersUsing: invokeStub [
-	| normal barrier |
-	normal := InvokeLinker with: self invokedMethods using: invokeStub.
-	barrier := InvokeLinker new addMethod: self writeBarrierMethod.
-	^InlineMessageLinker availableInliners , (Array with: normal with: barrier) 
-]
 
 { #category : #accessing }
 NativizationEnvironment class >> current [
@@ -34,62 +29,17 @@ NativizationEnvironment class >> current: anEnvironment [
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
-	^self new 
-]
-
-{ #category : #initialization }
-NativizationEnvironment class >> initializeInSelfHostedBee [
-	| invoke messageLinker common lookup checker |
-	invoke := Smalltalk at: #Invoke.
-	common := self commonMessageLinkersUsing: invoke.
-	lookup := LookupLinker new loadCodeFrom: Smalltalk.
-	messageLinker := CompositeMessageLinker new
-		denominateAll: common;
-		denominate: lookup.
-	checker := Heartbeat class >> #safepointCheck.
-	^self resetCurrent
-		messageLinker: messageLinker;
-		safepointCheck: checker;
-		completeInitialization 
+	^ self new
 ]
 
 { #category : #private }
-NativizationEnvironment class >> invokedMethods [
-	| methods |
-	methods := self primitiveObjectMethods copy.
-	methods add: Object >> #_replaceFrom:to:with:.
-	#(#allocate:size: #instanceBehavior
-		#_instancesAreArrayed #_instancesHavePointers #nil:slotsOf: #memory
-		#primitiveNewBytes:
-		#primitiveNewPointers: #zero:bytesOf:)
-		do: [:selector | methods add: Species >> selector].
-	"removed because of incorrectness:  isNullTerminated"
-	^methods 
-]
-
-{ #category : #testing }
-NativizationEnvironment class >> isUndermethod: selector [
-	^ self primitiveObject isUndermethod: selector 
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> primitiveObject [
-	^ ProtoObject 
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> primitiveObjectMethods [
-	^ self primitiveObject undermethods 
+NativizationEnvironment class >> forTesting: anRGEnvironment [ 
+	^ self new spec: anRGEnvironment
 ]
 
 { #category : #private }
 NativizationEnvironment class >> resetCurrent [
 	^ self current: self new 
-]
-
-{ #category : #initialization }
-NativizationEnvironment class >> writeBarrierMethod [
-	^ ProtoObject >> #holdRefererIfNeeded: 
 ]
 
 { #category : #initialization }
@@ -100,13 +50,6 @@ NativizationEnvironment >> abi [
 { #category : #initialization }
 NativizationEnvironment >> abi: anAbi [
 	abi := anAbi 
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> astcodeNativizer [
-	^ SExpressionNativizer new
-		  abi: abi;
-		  messageLinker: messageLinker 
 ]
 
 { #category : #initialization }
@@ -121,29 +64,21 @@ NativizationEnvironment >> be64bits [
 
 { #category : #initialization }
 NativizationEnvironment >> completeInitialization [
-	methodNativizer := self createMethodNativizer 
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> createMethodNativizer [
-	^ SExpressionNativizer new
-		  abi: abi;
-		  messageLinker: messageLinker;
-		  safepointCheck: safepointCheck
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> createMethodNativizerOn: anAssembler [
-	^ (SExpressionNativizer on: anAssembler)
-		  abi: abi;
-		  messageLinker: messageLinker;
-		  safepointCheck: safepointCheck
+	cachedNativizer := self newExpressionNativizer 
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> initialize [
 	busy := false.
-	abi := ABI forIntel: 8
+	abi := ABI forIntel: 8.
+	messageLinker := HaltingSend new.
+	optimizedMethods := OrderedCollection new.
+	invokedMethods := OrderedCollection new
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> messageLinker [
+	^ messageLinker
 ]
 
 { #category : #initialization }
@@ -153,7 +88,15 @@ NativizationEnvironment >> messageLinker: aLinker [
 
 { #category : #accessing }
 NativizationEnvironment >> methodNativizer [
-	^ methodNativizer 
+	^ cachedNativizer 
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> methodSubset: aDictionary [
+	| species |
+	^aDictionary flatCollect: [ :assoc | 
+		species := spec at: assoc key.
+		assoc values collect: [:sel | species >> sel ] ].	
 ]
 
 { #category : #services }
@@ -168,13 +111,18 @@ NativizationEnvironment >> nativizerDuring: aBlock [
 	^ busy
 		  ifFalse: [ 
 			  busy := true.
-			  [ aBlock value: methodNativizer ] ensure: [ busy := false ] ]
+			  [ aBlock value: cachedNativizer ] ensure: [ busy := false ] ]
 		  ifTrue: [ 
 			  | old |
-			  old := methodNativizer. 
+			  old := cachedNativizer. 
 			  [ 
-			  methodNativizer := self createMethodNativizer.
-			  aBlock value: methodNativizer ] ensure: [ methodNativizer := old ] ]
+			  cachedNativizer := self newExpressionNativizer.
+			  aBlock value: cachedNativizer ] ensure: [ cachedNativizer := old ] ]
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> newExpressionNativizer [
+	^ SExpressionNativizer new environment: self
 ]
 
 { #category : #services }
@@ -196,6 +144,46 @@ NativizationEnvironment >> safepointCheck: anObject [
 ]
 
 { #category : #initialization }
+NativizationEnvironment >> setupInvokedMethods [
+	| map methods |
+	map := { 
+		#ProtoObject -> #( behavior class primitiveAt: #initializeExtended:contentSize: ).
+		#Object -> #( #_replaceFrom:to:with: ).
+		#Species -> #( #allocate:size: instanceBehavior _instancesAreArrayed
+			           _instancesHavePointers #nil:slotsOf: memory primitiveNewBytes:
+			           primitiveNewPointers: #zero:bytesOf: )}.
+	methods := self methodSubset: map.
+	invokedMethods
+		addAll: self undermethods;
+		addAll: methods
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> setupOptimizedMethods [
+	| map methods |
+	map := {
+			#ProtoObject -> #(behavior class primitiveAt: initializeExtended:contentSize:).
+			#Object -> #(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid:
+		    #byteAtValid:put: basicObjectAt: #basicObjectAt:put:
+		    #primitiveAt:put: #replaceBytesForwardFrom:to:with:startingAt:).
+			#Array -> #(at: #at:put:).
+			#SendSite -> #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn:
+		    #_dispatchDebuggableOn:startingAt: ).
+			#Species -> #( #allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes:
+		    primitiveNewPointers: ).
+			#'Float class' -> #( basicNew new ).
+			#CompiledBlock -> #( argumentCount arity blockCode method ).
+			#Closure -> #( value value: #value:value: ).
+			#CompiledMethod -> #( at: blockCount isNativized ).
+			#String -> #( at: #at:put: byteAt: #byteAt:put: ).
+			#GCSpace -> #( lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy: ).
+			#Memory -> #( shallowCopy: ) 
+	}.
+	methods := self methodSubset: map.
+	optimizedMethods addAll: self undermethods; addAll: methods
+]
+
+{ #category : #initialization }
 NativizationEnvironment >> sexpressionOffsetsOf: code [
 	| method |
 	method := code method.
@@ -208,48 +196,20 @@ NativizationEnvironment >> sexpressionOffsetsOf: code [
 
 { #category : #private }
 NativizationEnvironment >> shouldOptimize: method [
-	method isDebuggable ifTrue: [ ^ false ].
-	method isCallback ifTrue: [ ^ false ].
-	(method classBinding == Object and: [ 
-		 self class isUndermethod: method selector ]) ifTrue: [ ^ true ].
-	(method classBinding == ProtoObject and: [ 
-		 #( behavior class primitiveAt: ) includes: method selector ])  
-		ifTrue: [ ^ true ].
-	(method classBinding == Object and: [ 
-		 #( at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid:
-		    #byteAtValid:put: basicObjectAt: #basicObjectAt:put:
-		    #primitiveAt:put: #replaceBytesForwardFrom:to:with:startingAt: ) 
-			 includes: method selector ]) ifTrue: [ ^ true ].
-	(method classBinding == Array and: [ 
-		 #( at: #at:put: ) includes: method selector ]) ifTrue: [ ^ true ].
-	(method classBinding == SendSite and: [ 
-		 #( _dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn:
-		    #_dispatchDebuggableOn:startingAt: ) includes: method selector ]) 
-		ifTrue: [ ^ true ].
-	(method classBinding == Species and: [ 
-		 #( #allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes:
-		    primitiveNewPointers: ) includes: method selector ]) ifTrue: [ 
-		^ true ].
-	(method classBinding == Float class and: [ 
-		 #( basicNew new ) includes: method selector ]) ifTrue: [ ^ true ].
-	(method classBinding == CompiledBlock and: [ 
-		 #( argumentCount arity blockCode method ) includes: method selector ]) 
-		ifTrue: [ ^ true ].
-	(method classBinding == Closure and: [ 
-		 #( value value: #value:value: ) includes: method selector ]) 
-		ifTrue: [ ^ true ].
-	(method classBinding == CompiledMethod and: [ 
-		 #( at: blockCount isNativized ) includes: method selector ]) 
-		ifTrue: [ ^ true ].
-	(method classBinding == String and: [ 
-		 #( at: #at:put: byteAt: #byteAt:put: ) includes: method selector ]) 
-		ifTrue: [ ^ true ].
-	(method classBinding == GCSpace and: [ 
-		 #( lockedAllocateIfPossible: lockedAllocateUnsafe:
-		    shallowCopy: ) includes: method selector ]) ifTrue: [ ^ true ].
-	(method classBinding == Memory and: [ 
-		 #( shallowCopy: ) includes: method selector ]) ifTrue: [ ^ true ].
-	^ false
+	^optimizedMethods includes: method
+
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> spec: anRGEnvironment [ 
+	spec := anRGEnvironment.
+	self setupOptimizedMethods; setupInvokedMethods
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> undermethods [
+	^(spec at: #ProtoObject) 
+		methodDictionary select: [:m | m selector beginsWith: '_'].	
 ]
 
 { #category : #services }

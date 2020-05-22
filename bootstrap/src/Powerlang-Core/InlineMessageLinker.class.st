@@ -8,6 +8,32 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
+{ #category : #accessing }
+InlineMessageLinker class >> availableInliners [
+	^ self supported collect: [ :selector | self for: selector ] 
+]
+
+{ #category : #'instance creation' }
+InlineMessageLinker class >> for: selector [
+	^ self new selector: selector 
+]
+
+{ #category : #private }
+InlineMessageLinker class >> supported [
+	| answer selectors | 
+	answer := OrderedCollection new.
+	selectors := self organization selectorsFor:
+		             #'private - instance behavior'.
+	selectors do: [ :selector | 
+		| cm |
+		cm := self >> selector.
+		cm literals
+			select: [ :literal | 
+			literal isString and: [ literal beginsWith: '_' ] ]
+			in: answer ].
+	^ answer
+]
+
 { #category : #private }
 InlineMessageLinker >> argumentCount [
 	^selector arity 
@@ -80,6 +106,38 @@ InlineMessageLinker >> assembleBasicCopyFromToWith [
 		addToTconstant: 1;
 		moveTslots;
 		popE 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicFlags [
+	self emitByteAtOffset: _Flags 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicFlagsPut [
+	self emitByteAtOffsetPut: _Flags 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicHash [
+	assembler loadZeroExtendShortRwithRoffset: _Hash; convertRtoSmallInteger 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicHashPut [
+	| nonInteger |
+	nonInteger := assembler labeledIntegerNativizationOfA.
+	assembler storeShortAinRoffset: _Hash; @ nonInteger 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicSize [
+	self emitByteAtOffset: _SmallSize 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleBasicSizePut [
+	self emitByteAtOffsetPut: _SmallSize 
 ]
 
 { #category : #'private - assemble' }
@@ -177,6 +235,33 @@ InlineMessageLinker >> assembleByteAtPut [
 ]
 
 { #category : #'private - assemble' }
+InlineMessageLinker >> assembleCDeclCallWithArguments [
+	assembler
+		loadZeroExtendByteTwithAindex: _SmallSize + 1;
+		shiftTright: assembler wordSizeShift;
+		pushS;
+		saveCallerFrame;
+		subTslotsToSP;
+		assemble: 'and' with: assembler regSP with: -16;
+		loopTtimes: [
+			assembler
+				load: assembler regS from: assembler regA atIndexAt: assembler regT;
+				store: assembler regS in: assembler regSP indexAt: assembler regT].
+	assembler addressSize = 8 ifTrue: [self loadArgumentsIntoRegisters].
+	assembler callR; restoreCallerFrame; popS 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleCallWithArguments [
+	assembler
+		loadZeroExtendByteTwithAindex: _SmallSize + 1;
+		shiftTright: assembler wordSizeShift;
+		loopTtimes: [assembler pushAatToffset: 0 - assembler addressSize].
+	assembler addressSize = 8 ifTrue: [self loadArgumentsIntoRegisters].
+	assembler callR 
+]
+
+{ #category : #'private - assemble' }
 InlineMessageLinker >> assembleEnvironment [
 	assembler loadRwithE 
 ]
@@ -194,6 +279,13 @@ InlineMessageLinker >> assembleExpandInStackSized [
 		convertAtoNativeInteger;
 		loadTwithA;
 		loopTtimes: [assembler pushIndirectR; addRconstant: assembler addressSize] 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> assembleExtendedSize [
+	assembler
+		loadZeroExtendLongRwithRindex: _ExtendedSize;
+		convertRtoSmallInteger 
 ]
 
 { #category : #'private - assemble' }
@@ -864,6 +956,19 @@ InlineMessageLinker >> emitSendDebuggable: aSymbol using: anAssembler [
 { #category : #private }
 InlineMessageLinker >> falseOop [
 	^assembler falseOop 
+]
+
+{ #category : #'private - assemble' }
+InlineMessageLinker >> loadArgumentsIntoRegisters [
+	assembler
+		load: rcx from: rsp atIndex: 1;
+		load: rdx from: rsp atIndex: 2;
+		load: r8 from: rsp atIndex: 3;
+		load: r9 from: rsp atIndex: 4;
+		assemble: 'movq' with: xmm0 with: rcx;
+		assemble: 'movq' with: xmm1 with: rdx;
+		assemble: 'movq' with: xmm2 with: r8;
+		assemble: 'movq' with: xmm3 with: r9 
 ]
 
 { #category : #'opcodes - loading' }

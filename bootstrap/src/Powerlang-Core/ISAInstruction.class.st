@@ -62,13 +62,8 @@ ISAInstruction >> encoder [
 ]
 
 { #category : #encoding }
-ISAInstruction >> encoding [
-	^ByteArray streamContents: [:strm | self writeEncodingOn: strm]
-]
-
-{ #category : #encoding }
 ISAInstruction >> encoding32 [
-	^ByteArray streamContents: [:strm | self writeEncoding32On: strm]
+	^ ByteArray streamContents: [ :strm | self writeEncoding32On: strm ]
 ]
 
 { #category : #encoding }
@@ -153,10 +148,19 @@ ISAInstruction >> isTestAL1 [
 ]
 
 { #category : #accessing }
-ISAInstruction >> jumpOffset [
-	self
-		ASSERT: ((self isJump or: [self isCall]) and: [operands anyone isImmediate]).
-	^operands first value + self sizeInBytes
+ISAInstruction >> jumpOffset32 [
+	self ASSERT:
+		((self isJump or: [ self isCall ]) and: [ 
+			 operands anyone isImmediate ]).
+	^ operands first value + self sizeInBytes32
+]
+
+{ #category : #accessing }
+ISAInstruction >> jumpOffset64 [
+	self ASSERT:
+		((self isJump or: [ self isCall ]) and: [ 
+			 operands anyone isImmediate ]).
+	^ operands first value + self sizeInBytes64
 ]
 
 { #category : #accessing }
@@ -251,11 +255,19 @@ ISAInstruction >> printOn: aStream [
 ]
 
 { #category : #accessing }
-ISAInstruction >> sizeInBytes [
+ISAInstruction >> sizeInBytes32 [
 	| stream |
-	stream := #[] writeStream.
-	self writeEncodingOn: stream.
-	^stream size
+	stream := #[  ] writeStream.
+	self writeEncoding32On: stream.
+	^ stream size
+]
+
+{ #category : #accessing }
+ISAInstruction >> sizeInBytes64 [
+	| stream |
+	stream := #[  ] writeStream.
+	self writeEncoding64On: stream.
+	^ stream size
 ]
 
 { #category : #accessing }
@@ -297,9 +309,4 @@ ISAInstruction >> writeEncoding32On: aStream [
 { #category : #encoding }
 ISAInstruction >> writeEncoding64On: aStream [
 	^self encoder wordSize: 8; writeEncodingOn: aStream
-]
-
-{ #category : #encoding }
-ISAInstruction >> writeEncodingOn: aStream [
-	^self encoder wordSize: WordSize; writeEncodingOn: aStream
 ]

@@ -2,10 +2,9 @@ Class {
 	#name : #SExpressionNativizer,
 	#superclass : #Object,
 	#instVars : [
+		'environment',
 		'assembler',
 		'method',
-		'messageLinker',
-		'environmentInfo',
 		'remainingBlocks',
 		'safepointCheck',
 		'mainCode',
@@ -14,15 +13,14 @@ Class {
 		'activeScript'
 	],
 	#pools : [
-		'ClosureElementTypes',
-		'SmalltalkOpcodes'
+		'ClosureElementTypes'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
 
 { #category : #'instance creation' }
 SExpressionNativizer class >> assemblyFor: anSCompiledMethod [
-	^ NativizationEnvironment forTesting astcodeNativizer nativeCodeFor:
+	^ NativizationEnvironment forTesting newExpressionNativizer nativeCodeFor:
 		  anSCompiledMethod
 ]
 
@@ -156,14 +154,9 @@ SExpressionNativizer class >> methodWithBlock [
 { #category : #'instance creation' }
 SExpressionNativizer class >> nativize: aCompiledMethod [
 	| code |
-	code := NativizationEnvironment forTesting astcodeNativizer 
+	code := NativizationEnvironment forTesting newExpressionNativizer 
 		        nativeCodeFor: aCompiledMethod.
 	^ aCompiledMethod nativeCode: code
-]
-
-{ #category : #services }
-SExpressionNativizer >> abi: anAbi [
-	assembler wordSize: anAbi wordSize
 ]
 
 { #category : #services }
@@ -301,9 +294,11 @@ SExpressionNativizer >> emitSafepointCheck [
 
 { #category : #services }
 SExpressionNativizer >> emitSend: selector [
+ 	| linker |
+	linker := environment messageLinker.
 	method isDebuggable
-		ifTrue: [messageLinker emitSendDebuggable: selector using: assembler]
-		ifFalse: [messageLinker emitSend: selector using: assembler]
+		ifTrue: [ linker emitSendDebuggable: selector using: assembler ]
+		ifFalse: [ linker emitSend: selector using: assembler ]
 ]
 
 { #category : #services }
@@ -311,11 +306,17 @@ SExpressionNativizer >> emitSend: selector to: anObject [
 	self loadObject: anObject; emitSend: selector
 ]
 
+{ #category : #accessing }
+SExpressionNativizer >> environment: aNativizationEnvironment [
+	environment := aNativizationEnvironment.
+	assembler wordSize: environment wordSize
+]
+
 { #category : #services }
 SExpressionNativizer >> initialize [
 	super initialize.
 	assembler := TemplateAssembler64 on: #[  ] writeStream.
-	messageLinker := InlineMessageLinker new
+
 ]
 
 { #category : #services }
@@ -401,12 +402,6 @@ SExpressionNativizer >> loadObject: anObject [
 { #category : #services }
 SExpressionNativizer >> loadRwithStack: anInteger [
 	assembler loadRwithFPindex: 1 - anInteger
-]
-
-{ #category : #services }
-SExpressionNativizer >> messageLinker: aMessageLinker [
-	messageLinker ifNil: [^self halt ].
-	messageLinker := aMessageLinker
 ]
 
 { #category : #accessing }
@@ -518,10 +513,16 @@ SExpressionNativizer >> resetFor: aCompiledMethod [
 
 { #category : #accessing }
 SExpressionNativizer >> saveContextSwitchPoint [
-	method isDebuggable ifTrue: [
-		assembler pushA; pushT; pushR.
-		messageLinker emitSend: #signalStep using: assembler.
-		assembler popR; popT; popA]
+	method isDebuggable ifTrue: [ 
+		assembler
+			pushA;
+			pushT;
+			pushR.
+		self emitSend: #signalStep using: assembler.
+		assembler
+			popR;
+			popT;
+			popA ]
 ]
 
 { #category : #services }

@@ -8,9 +8,6 @@ Class {
 		'start',
 		'end'
 	],
-	#pools : [
-		'SmalltalkOpcodes'
-	],
 	#category : #'Powerlang-Core-Nativization'
 }
 
