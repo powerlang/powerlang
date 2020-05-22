@@ -5,33 +5,34 @@ Class {
 		'selector',
 		'assembler'
 	],
+	#pools : [
+		'InlineMessageLinkerFlags',
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Nativization'
 }
 
 { #category : #accessing }
 InlineMessageLinker class >> availableInliners [
-	^ self supported collect: [ :selector | self for: selector ] 
+	^self supported collect: [:selector | self for: selector] 
 ]
 
 { #category : #'instance creation' }
 InlineMessageLinker class >> for: selector [
-	^ self new selector: selector 
+	^self new selector: selector 
 ]
 
 { #category : #private }
 InlineMessageLinker class >> supported [
-	| answer selectors | 
+	| answer selectors |
 	answer := OrderedCollection new.
-	selectors := self organization selectorsFor:
-		             #'private - instance behavior'.
-	selectors do: [ :selector | 
-		| cm |
+	selectors := self organization selectorsFor: #'private - instance behavior'.
+	selectors do: [:selector | | cm |
 		cm := self >> selector.
 		cm literals
-			select: [ :literal | 
-			literal isString and: [ literal beginsWith: '_' ] ]
-			in: answer ].
-	^ answer
+			select: [:literal | literal isString and: [literal beginsWith: '_']]
+			in: answer].
+	^answer 
 ]
 
 { #category : #private }
@@ -47,7 +48,7 @@ InlineMessageLinker >> assemble [
 			self assembleForObjects isNil and: [
 				self assembleForMath isNil and: [
 					self assembleEvents isNil
-						and: [self assembleHelpers isNil and: [self ASSERT: false. assembler breakpoint]]]]]] 
+						and: [self assembleHelpers isNil and: [self ASSERT: false]]]]]] 
 ]
 
 { #category : #'private - assemble' }
@@ -943,7 +944,7 @@ InlineMessageLinker >> emitPrologue [
 
 { #category : #nativizing }
 InlineMessageLinker >> emitSend: aSymbol using: anAssembler [
-	selector := aSymbol.
+	self ASSERT: aSymbol == selector.
 	self assembleUsing: anAssembler 
 ]
 

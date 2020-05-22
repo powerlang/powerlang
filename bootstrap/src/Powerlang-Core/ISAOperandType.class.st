@@ -48,24 +48,6 @@ ISAOperandType class >> initialize [
 ]
 
 { #category : #initialization }
-ISAOperandType class >> initializeFlags [
-	"
-	self initializeFlags
-	"
-	OperandTypeFlags := PoolDictionary new.
-	OperandTypeFlags
-		at: #ImmediateType put: 1;
-		at: #ConstantType put: 2;
-		at: #MemoryType put: 4;
-		at: #RegisterType put: 8;
-		at: #RegisterGroupMask put: 16rF00;
-		at: #RegisterGP put: 16r0;
-		at: #RegisterSIMD put: 16r100;
-		at: #RegisterSegment put: 16r200;
-		at: #RegisterSpecific put: 16r300
-]
-
-{ #category : #initialization }
 ISAOperandType class >> initializeTypes [
 	| dictionary |
 	dictionary := Dictionary new.

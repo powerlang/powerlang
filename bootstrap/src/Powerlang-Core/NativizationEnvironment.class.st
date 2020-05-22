@@ -11,21 +11,8 @@ Class {
 		'cachedNativizer',
 		'busy'
 	],
-	#classVars : [
-		'Current'
-	],
 	#category : #'Powerlang-Core-Nativization'
 }
-
-{ #category : #accessing }
-NativizationEnvironment class >> current [
-	^Current ifNil: [BeeKernelBootstrapper new environment] 
-]
-
-{ #category : #accessing }
-NativizationEnvironment class >> current: anEnvironment [
-	^ Current := anEnvironment 
-]
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
@@ -35,11 +22,6 @@ NativizationEnvironment class >> forTesting [
 { #category : #private }
 NativizationEnvironment class >> forTesting: anRGEnvironment [ 
 	^ self new spec: anRGEnvironment
-]
-
-{ #category : #private }
-NativizationEnvironment class >> resetCurrent [
-	^ self current: self new 
 ]
 
 { #category : #initialization }

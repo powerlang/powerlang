@@ -52,7 +52,9 @@ ProjectSpec >> load [
 
 { #category : #actions }
 ProjectSpec >> loadClasses: names [
-	names do: [:name | self loadEmptyClass: name]; do: [ :name | self parseClassDefinition: name ]
+	names
+		do: [ :n | self loadEmptyClass: n ];
+		do: [ :n | self parseClassDefinition: n ]
 ]
 
 { #category : #actions }
