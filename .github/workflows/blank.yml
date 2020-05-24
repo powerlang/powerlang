@@ -21,8 +21,9 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-      with:
-        all_commits: true
+      
+    - name: Fetch at least 2 commits so that Iceberg doesn't break
+      run: git fetch --depth=2 origin
 
     # Runs a single command using the runners shell
     - name: Create a bootstrap image
