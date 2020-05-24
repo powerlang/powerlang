@@ -30,6 +30,9 @@ release = '0.1.0'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+master_doc = 'index'
+
+
 extensions = [
     "sphinx_rtd_theme"
 ]
