@@ -1,48 +1,44 @@
 # Powerlang
 
 This is Powerlang, a research vehicle to explore about implementation of programming
-laguages. It is a language creation toolkit, something you can use to build a new
-Smalltalk implementation, or your own language of choice.
+laguages. While focused on Smalltalk, it aims to be a generic language creation
+toolkit, something you can use to either evolve Smalltalk, or either build
+a new language implementation of choice.
 We provide tools for coding, bootstrapping, compiling, jitting and debugging the
 implementation.
 
-Power Smalltalk serves as a reference implementation using the framework.
+Bee Smalltalk serves as a reference implementation using the framework.
+We are implementing an evolution of the classic Smalltalk-80. Something
+adapted to the new kinds of systems that are common these days: from
+embedded to servers, with or without a gui, supporting local and remote development.
+Visit [Powerlang docs]`https://powerlang.readthedocs.io/en/latest/`
+for documentation and `https://powerlang.github.com/docs` for the latest news.
 
-# Power Smalltalk
+# Quick setup
 
-This is also the main Power Smalltalk repo, clone here and then execute the init script
+After cloning the repo, run make to create a pharo bootstrap image. This image
+will contain all the tools you need to generate your new language. 
 
 ```
-git clone git@github.com:melkyades/pst.git
-cd pst
+git clone git@github.com:powerlang/powerlang.git
+cd powerlang
 make -C bootstrap
 ```
 
-to get all the others automatically loaded. Finally, to open the development environment just do:
+Additionaly, you will need the sources of your language, that have to be placed
+in `bootstrap/specs/<your lang>`. Lets say you want to boostrap Bee Smalltalk:
+
+```
+git clone git@github.com:aucerna/bee-dmr.git bootstrap/specs/bee-dmr
+```
+
+You are ready, you can start working with your language now. To open the
+development environment just do:
 
 ```
 cd bootstrap
 ./pharo-ui bootstrap.image
 ```
 
-Below is our humble vision of what a modern Smalltalk design
-should look like, the direction in which we want to go.
-
-- A minimal Smalltalk, running on top of a JIT-based DMR, for simplicity, security, dinamism and performance.
-- Namespace-based to ease modularity.
-- Windows, Linux, Mac and nopsys, on any 64-bit arch.
-- Supporting both live environment development using vdb<->gdb.
-- Supporting freezed-system development using specs from files, metaphysics for debugging.
-- Clean repeatable bootstrap from source code, using different dialects (Pharo et al).
-- Smalltalk source code is stored on git using tonel format. We store just code and
-  definitions in the repo, no artifacts. One repo per project.
-- Build artifacts go through Continuous Integration since the first commit.
-- Each project is built into a (binary) image segment (`.sis` file) that loads very quickly.
-- A package distribution system (ppm) shall compute dependencies and fetch prebuilt `.sis`s for
-  quick setup, update and deployment.
-- Each OS platform shall be in a separate project, stored in an image segment autoloaded
-  at startup according to the running platform.
-- Remotely debuggable through vdb<->gdb.
-- Use astcodes to represent computation, a lower-level representation of asts.
-- We want a fully smalltalk-written GC, but will start with kompressor GC on a dll (C++)
+You will find everything in Powerlang-* packages
 
