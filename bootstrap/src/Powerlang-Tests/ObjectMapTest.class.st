@@ -7,15 +7,11 @@ Class {
 	#category : #'Powerlang-Tests-Building'
 }
 
-{ #category : #accessing }
-ObjectMapTest class >> resources [
-	^ { KernelResource }
-]
-
 { #category : #running }
 ObjectMapTest >> setUp [
 	super setUp.
-	kernel := KernelResource current get
+	kernel := SmalltalkBootstrapper spec
+
 ]
 
 { #category : #running }
