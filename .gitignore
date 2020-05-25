@@ -6,5 +6,6 @@ bootstrap/*.image
 bootstrap/*.fuel
 bootstrap/*-Test.xml
 bootstrap/PharoDebug.log
+bootstrap/specs
 *.log
 pst/vm/build
