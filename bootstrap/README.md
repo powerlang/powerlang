@@ -1,18 +1,10 @@
 "
-## Browsing PST code
+## Browsing current kernel code
 
-Load PST smalltalk code.
+Load current kernel smalltalk code and browse it.
 "
 
-    repo := TonelRepository new directory: '../pst' asFileReference.
-    env := repo  asRingEnvironmentWith: #(kernel).
-    env clean.
-
-"
-Open a browser on PST code
-"
-
-    env browse.
+    SmalltalkBootstrapper newSpec browse.
 
 "
 
@@ -22,5 +14,4 @@ Open a browser on PST code
 
     Debugger new openWithSpec.
 
-"
-"
+

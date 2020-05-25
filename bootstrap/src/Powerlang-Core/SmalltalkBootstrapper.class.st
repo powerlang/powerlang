@@ -32,11 +32,6 @@ SmalltalkBootstrapper class >> fromSpec [
 ]
 
 { #category : #accessing }
-SmalltalkBootstrapper class >> initializePools [
-	Spec allClasses do: [ :b | PoolInitializer new initialize: b ]
-]
-
-{ #category : #accessing }
 SmalltalkBootstrapper class >> newEmulationSpec [
 	| spec species basicNew new basicNewSized newSized proto equal table prime int plus minus times divdiv bitand less closure value size quot at obj behavior undersize whiletrue whilefalse evaluateWith evaluateWithWith valueWith valueWithWith valueWithWithWith atomic hash argCount bitxor bitshift newBytes string replace |
 	spec := self newSpec.
@@ -133,9 +128,10 @@ SmalltalkBootstrapper class >> newEmulationSpec [
 
 { #category : #accessing }
 SmalltalkBootstrapper class >> newSpec [
-	| repo spec |
+	| current repo spec |
+	current := 'specs/current' asFileReference contents trim.
 	repo := TonelRepository new
-		directory: '../pst/spec' asFileReference.
+		directory: ('specs/', current) asFileReference.
 	spec := repo asRingEnvironmentWith: #(Kernel).
 	^ spec clean
 ]
@@ -144,8 +140,7 @@ SmalltalkBootstrapper class >> newSpec [
 SmalltalkBootstrapper class >> spec [
 	Spec
 		ifNil: [ Spec := self newSpec.
-			EmulationSpec := self newEmulationSpec.
-			self initializePools ].
+			EmulationSpec := self newEmulationSpec].
 	^ Spec
 ]
 
