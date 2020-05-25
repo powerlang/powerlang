@@ -30,6 +30,7 @@ in `bootstrap/specs/<your lang>`. Lets say you want to boostrap Bee Smalltalk:
 
 ```
 git clone git@github.com:aucerna/bee-dmr.git bootstrap/specs/bee-dmr
+echo "bee-dmr" >bootstrap/specs/current
 ```
 
 You are ready, you can start working with your language now. To open the
