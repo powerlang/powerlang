@@ -11,8 +11,8 @@ Bee Smalltalk serves as a reference implementation using the framework.
 We are implementing an evolution of the classic Smalltalk-80. Something
 adapted to the new kinds of systems that are common these days: from
 embedded to servers, with or without a gui, supporting local and remote development.
-Visit [Powerlang docs]`https://powerlang.readthedocs.io/en/latest/`
-for documentation and `https://powerlang.github.com/docs` for the latest news.
+Visit [Powerlang docs](https://powerlang.readthedocs.io/en/latest/)
+for documentation and [our blog](https://powerlang.github.io) for the latest news.
 
 # Quick setup
 
