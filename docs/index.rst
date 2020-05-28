@@ -15,10 +15,6 @@ adapted to the new kinds of systems that are common these days: from
 embedded to servers, with or without a gui, supporting remote development
 from scratch. 
 
-.. toctree::
-   :maxdepth: 2
-..   :caption: Contents:
-
 Setup
 *****
 
@@ -75,6 +71,20 @@ allows both local and remote debugging.
 Indices and tables
 ==================
 
+.. toctree::
+   :maxdepth: 2
+   :includehidden:
+   
+   dmr/dmr
+..   :caption: Contents:
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+Things to do (PRs are welcome!)
+===============================
+
+.. todolist::
+
+

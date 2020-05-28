@@ -24,7 +24,6 @@ author = 'Javier Pimás'
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
 
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -34,8 +33,13 @@ master_doc = 'index'
 
 
 extensions = [
-    "sphinx_rtd_theme"
+    "sphinx_rtd_theme",
+    "sphinx.ext.todo"
+
 ]
+
+todo_include_todos = True
+todo_link_only = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
