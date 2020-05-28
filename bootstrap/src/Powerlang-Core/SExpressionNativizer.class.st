@@ -555,6 +555,11 @@ SExpressionNativizer >> pushesEnvironments [
 ]
 
 { #category : #services }
+SExpressionNativizer >> receiver [
+	assembler loadRwithS
+]
+
+{ #category : #services }
 SExpressionNativizer >> resetFor: aCompiledMethod [
 	| fixed |
 	method := aCompiledMethod.

@@ -299,10 +299,11 @@ AstcodeEncoder >> visitMessage: aMessageNode [
 	self
 		nextTypePut: MessageId;
 		nextPut: selector.
-	selector = 0 ifTrue: [ self nextPut: symbol ].
+	selector = 0
+		ifTrue: [ self nextPut: symbol ].
 	self nestedEncode: [ aMessageNode receiver acceptVisitor: self ].
-	aMessageNode arguments do: [ :arg | 
-		self nestedEncode: [ arg acceptVisitor: self ] ].
+	self
+		nestedEncode: [ aMessageNode arguments do: [ :arg | arg acceptVisitor: self ] ].
 	self encodeOptimizedMessage: aMessageNode
 ]
 
