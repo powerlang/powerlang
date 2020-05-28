@@ -14,6 +14,9 @@ embedded to servers, with or without a gui, supporting local and remote developm
 Visit [Powerlang docs](https://powerlang.readthedocs.io/en/latest/)
 for documentation and [our blog](https://powerlang.github.io) for the latest news.
 
+[![Actions Status](https://github.com/powerlang/powerlang/workflows/CI/badge.svg)](https://github.com/powerlang/powerlang/actions)
+[![Documentation Status](https://readthedocs.org/projects/powerlang/badge/?version=latest)](https://powerlang.readthedocs.io/en/latest/?badge=latest)
+
 # Quick setup
 
 After cloning the repo, run make to create a pharo bootstrap image. This image
