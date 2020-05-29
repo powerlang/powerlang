@@ -374,7 +374,7 @@ SExpressionNativizer >> instanceVarAt: index [
 { #category : #services }
 SExpressionNativizer >> instantiateClosure: aCompiledBlock [
 	self
-		loadObject: self closureClass;
+		loadObject: SClosure;
 		pushObject: aCompiledBlock;
 		emitSend: #newFrom:
 ]

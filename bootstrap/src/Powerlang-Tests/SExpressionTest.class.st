@@ -61,7 +61,7 @@ SExpressionTest >> assertCorrectExecutionOfLibrary: filename [
 
 { #category : #templates }
 SExpressionTest >> assertCorrectExecutionOfTest: aSelector [
-	(self nativize: aSelector) disassembledAmd64 halt
+	(self nativize: aSelector) halt disassembledAmd64
 ]
 
 { #category : #templates }
