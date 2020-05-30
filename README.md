@@ -32,7 +32,7 @@ Additionaly, you will need the sources of your language, that have to be placed
 in `bootstrap/specs/<your lang>`. Lets say you want to boostrap Bee Smalltalk:
 
 ```
-git clone git@github.com:aucerna/bee-dmr.git bootstrap/specs/bee-dmr
+git clone git@github.com:powerlang/bee-dmr.git bootstrap/specs/bee-dmr
 echo "bee-dmr" >bootstrap/specs/current
 ```
 
