@@ -52,7 +52,9 @@ T is used to store temporary values during operations that require a free regist
 V is used to load constants. It is needed because typical ISAs do not let use full
 64-bit constants in instructions, so to use a big constant (like a pointer) you
 must first load it into some register.
-
+Nil, true and false registers are loaded when entering from C code, and leave like
+that forever (as in C they are callee-saved, it is not necessary to restore them
+when calling C code).
 
 
 Arguments, temporaries and environment
