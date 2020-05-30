@@ -20,6 +20,11 @@ GlobalBinding class >> usesSymbols [
 ]
 
 { #category : #testing }
+GlobalBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithGlobal: association
+]
+
+{ #category : #testing }
 GlobalBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeGlobalVar: association
 ]

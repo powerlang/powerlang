@@ -14,7 +14,7 @@ SInstVarBinding class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #testing }
 SInstVarBinding >> assign: value within: evaluator [
-	evaluator instVarAt: index put: value
+	evaluator instanceVarAt: index put: value
 ]
 
 { #category : #accessing }

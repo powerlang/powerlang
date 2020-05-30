@@ -100,6 +100,24 @@ AstcodeEncoder >> encodeLoadAwithArg: anInteger env: environment [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithClassVar: association [
+	| index |
+	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: LoadAwithClassVarId;
+		nextPut: index
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithGlobal: association [
+	| index |
+	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: LoadAwithGlobalId;
+		nextPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodeLoadAwithInstVar: anInteger [
 	stream nextPut: LoadAwithInstVarId; nextPut: anInteger
 ]
@@ -110,6 +128,11 @@ AstcodeEncoder >> encodeLoadAwithLiteral: value [
 	index := method indexOf: value.
 	stream nextPut: LoadAwithLiteralId; nextPut: index.
 	index = 0 ifTrue: [stream nextPut: value]
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithNil [
+	stream nextPut: LoadAwithNilId
 ]
 
 { #category : #visiting }
@@ -159,6 +182,16 @@ AstcodeEncoder >> encodePoolVar: association [
 	| index |
 	index := method indexOf: association ifAbsent: [self ASSERT: false].
 	stream nextPut: PoolVarId; nextPut: index
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodePopR [
+	stream nextPut: PopRid
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodePushR [
+	stream nextPut: PushRid
 ]
 
 { #category : #visiting }
@@ -303,7 +336,7 @@ AstcodeEncoder >> visitMessage: aMessageNode [
 		ifTrue: [ self nextPut: symbol ].
 	self nestedEncode: [ aMessageNode receiver acceptVisitor: self ].
 	self
-		nestedEncode: [ aMessageNode arguments do: [ :arg | arg acceptVisitor: self ] ].
+		nestedEncode: [ aMessageNode arguments do: [ :arg | self nestedEncode: [arg acceptVisitor: self] ] ].
 	self encodeOptimizedMessage: aMessageNode
 ]
 

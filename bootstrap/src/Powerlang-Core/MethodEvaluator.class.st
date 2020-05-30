@@ -371,13 +371,13 @@ MethodEvaluator >> initialize [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> instVarAt: anInteger [
+MethodEvaluator >> instanceVarAt: anInteger [
 	^ receiver slotAt: anInteger
 ]
 
 { #category : #visiting }
-MethodEvaluator >> instVarAt: index put: aValue [
-	^ receiver slotAt: index put: aValue 
+MethodEvaluator >> instanceVarAt: index put: aValue [
+	^ receiver slotAt: index put: aValue
 ]
 
 { #category : #visiting }
