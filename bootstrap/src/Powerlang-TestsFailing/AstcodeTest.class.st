@@ -8,7 +8,7 @@ Class {
 		'AstBindingTypes',
 		'AstNodeTypes'
 	],
-	#category : #'Powerlang-Tests-SExpressions'
+	#category : #'Powerlang-TestsFailing-SExpressions'
 }
 
 { #category : #private }

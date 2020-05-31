@@ -54,17 +54,19 @@ SExpressionTest >> add: arg1 to: arg2 [
 	^arg1 + arg2 
 ]
 
-{ #category : #templates }
+{ #category : #support }
 SExpressionTest >> assertCorrectExecutionOfLibrary: filename [
 	self assertCorrectExecutionUsing: ' ' loading: filename
 ]
 
-{ #category : #templates }
+{ #category : #support }
 SExpressionTest >> assertCorrectExecutionOfTest: aSelector [
-	(self nativize: aSelector) halt disassembledAmd64
+	| code |
+	code := (self nativize: aSelector).
+	"code halt disassembledAmd64"
 ]
 
-{ #category : #templates }
+{ #category : #support }
 SExpressionTest >> assertCorrectExecutionUsing: arguments [
 	| executor |
 	executor := self executeUsing: arguments.
@@ -94,7 +96,7 @@ SExpressionTest >> libraryName [
 	^ self class name , '_' , testSelector , '.psl'
 ]
 
-{ #category : #templates }
+{ #category : #private }
 SExpressionTest >> libraryPath [
 	^'./temp/', self libraryName
 ]
@@ -108,7 +110,7 @@ SExpressionTest >> nativize: aSymbol [
 		  nativeCodeFor: smethod
 ]
 
-{ #category : #templates }
+{ #category : #support }
 SExpressionTest >> performTest [
 	^ self assertCorrectExecutionOfTest: testSelector asSymbol 
 ]

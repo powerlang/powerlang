@@ -6,7 +6,7 @@ Class {
 		'builder',
 		'writer'
 	],
-	#category : #'Powerlang-Tests-Metaphysics'
+	#category : #'Powerlang-TestsFailing-Metaphysics'
 }
 
 { #category : #tests }

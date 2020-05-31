@@ -7,7 +7,7 @@ Class {
 		'runtime',
 		'kernel'
 	],
-	#category : #'Powerlang-Tests-Building'
+	#category : #'Powerlang-TestsFailing-Building'
 }
 
 { #category : #running }

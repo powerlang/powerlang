@@ -8,7 +8,7 @@ Class {
 	#pools : [
 		'Registers'
 	],
-	#category : #'Powerlang-Tests-Assembler-Intel'
+	#category : #'Powerlang-TestsFailing-Assembler-Intel'
 }
 
 { #category : #other }
