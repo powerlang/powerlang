@@ -27,5 +27,5 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Create a bootstrap image
-      run: make -C bootstrap
+      run: make -C test
 
