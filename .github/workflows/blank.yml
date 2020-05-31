@@ -28,7 +28,7 @@ jobs:
     
     #generate an ssh key pair for being able to clone bee-dmr
     - name: Generate SSH key pair
-      run: ssh-keygen -t rsa -N ''
+      run: ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
 
     # Runs a single command using the runners shell
     - name: Run tests in bootstrap image
