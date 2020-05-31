@@ -35,7 +35,7 @@ jobs:
       uses: AutoModality/action-xunit-viewer@v1.0.1
       with:
         # File/Folder of test results
-        results: bootstrap # default is test-reports
+        results: bootstrap/test-reports # default is test-reports
 
     - name: Attach the report
       uses: actions/upload-artifact@v1

@@ -14,6 +14,8 @@ bootstrap.image: pharo Pharo.image src scripts/bootstrap-setup.st
 
 test: bootstrap.image pharo
 	./pharo $< test --junit-xml-output Powerlang-Tests
+	mkdir -p test-reports
+	mv Powerlang-Tests-Test.xml test-reports
 
 clean:
 	rm -rf Pharo* pharo* bootstrap.image icon-packs
