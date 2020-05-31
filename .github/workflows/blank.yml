@@ -16,7 +16,7 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    name: Build bootstrap image
+    name: Build and Test bootstrap
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -27,26 +27,18 @@ jobs:
       run: git fetch --unshallow
 
     # Runs a single command using the runners shell
-    - name: Create a bootstrap image
-      run: make -C bootstrap
+    - name: Run tests in bootstrap image
+      run: make -C bootstrap test
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
-    name: Test bootstrap and gen report
-    steps:
-      - name: Run tests in bootstrap image
-        run: make -C bootstrap test
-        
-      - name: XUnit Viewer
-        id: xunit-viewer
-        uses: AutoModality/action-xunit-viewer@v1.0.1
-        with:
-          # File/Folder of test results
-          results: bootstrap # default is test-reports
-    
-      - name: Attach the report
-        uses: actions/upload-artifact@v1
-        with:
-          name: upload-result
-          path: ${{ steps.xunit-viewer.outputs.report-dir }}
+    - name: XUnit Viewer
+      id: xunit-viewer
+      uses: AutoModality/action-xunit-viewer@v1.0.1
+      with:
+        # File/Folder of test results
+        results: bootstrap # default is test-reports
+
+    - name: Attach the report
+      uses: actions/upload-artifact@v1
+      with:
+        name: upload-result
+        path: ${{ steps.xunit-viewer.outputs.report-dir }}
