@@ -28,7 +28,7 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Run tests in bootstrap image
-      run: make -C bootstrap test
+      run: make -C bootstrap beedmr test
 
     - name: XUnit Viewer
       id: xunit-viewer
