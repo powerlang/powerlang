@@ -342,7 +342,7 @@ SExpressionNativizer >> initializeMethodEnvironment [
 	assembler pushE.
 	method hasEnvironment
 		ifTrue: [
-			assembler pushSmallInteger: method environmentSize.
+			assembler pushSmallInteger: method environmentCount.
 			self emitSend: #new: to: Array.
 			assembler loadEwithR; pushE]
 		ifFalse: [self pushNil]
@@ -594,7 +594,7 @@ SExpressionNativizer >> saveMethodCode [
 { #category : #services }
 SExpressionNativizer >> saveReturnFrame [
 	assembler pushR.
-	self emitSend: #top to: self stackFrameCursorClass.
+	self emitSend: #top to: StackFrameCursor.
 	assembler
 		loadAwithR;
 		popR;
