@@ -27,5 +27,21 @@ jobs:
 
     # Runs a single command using the runners shell
     - name: Create a bootstrap image
-      run: make -C bootstrap test
+      run: make -C bootstrap
 
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    name: Generate Test Reports
+    steps:
+      - name: Run tests in bootstrap image
+        run: make -C bootstrap test
+        
+      - name: XUnit Viewer
+        id: xunit-viewer
+        uses: AutoModality/action-xunit-viewer@v1  
+      - name: Attach the report
+        uses: actions/upload-artifact@v1
+        with:
+          name: bootstrap
+          path: ${{ steps.xunit-viewer.outputs.report-dir }}
