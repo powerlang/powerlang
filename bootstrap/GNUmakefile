@@ -21,7 +21,7 @@ bee-dmr: specs/bee-dmr
 	echo "bee-dmr" >specs/current	
 
 specs/bee-dmr:
-	git clone git@github.com:powerlang/bee-dmr.git specs/bee-dmr
+	git clone git@github.com:powerlang/bee-dmr.git specs/bee-dmr || git clone https://github.com/powerlang/bee-dmr.git specs/bee-dmr
 
 clean:
 	rm -rf Pharo* pharo* bootstrap.image icon-packs

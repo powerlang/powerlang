@@ -26,10 +26,6 @@ jobs:
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
     
-    #generate an ssh key pair for being able to clone bee-dmr
-    - name: Generate SSH key pair
-      run: ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa
-
     # Runs a single command using the runners shell
     - name: Run tests in bootstrap image
       run: make -C bootstrap bee-dmr test
