@@ -10,7 +10,8 @@ Class {
 		'cache',
 		'globals',
 		'bootstrapper',
-		'symbolCache'
+		'symbolCache',
+		'overrides'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -77,7 +78,7 @@ BootstrapEmulator >> doLookup: aSymbol startingAt: aBehavior [
 	| next m c |
 	"emulated behavior can be different from the object one, so we first do the switch"
 	next := spec at: aBehavior name.
-	[ m := next methodNamed: aSymbol.
+	[ m := self methodFor: aSymbol in: next.
 	m ifNotNil: [ ^ self compile: m ].
 	next := next superclass.
 	next notNil ] whileTrue.
@@ -109,12 +110,61 @@ BootstrapEmulator >> globals: aDictionary [
 { #category : #accessing }
 BootstrapEmulator >> initialize [
 	cache := Dictionary new.
-	symbolCache := IdentityDictionary new
+	symbolCache := IdentityDictionary new.
+	overrides := Dictionary new.
+]
+
+{ #category : #accessing }
+BootstrapEmulator >> initializeEmulationOverrides [
+	self 
+	override: #Species->#basicNew with: 'basicNew <primitive: New>';
+	override: #Species->#basicNew: with: 'basicNew: anInteger <primitive: NewSized>';
+	override: #Species->#new with: 'new <primitive: New>';
+	override: #Species->#new: with: 'new: anInteger <primitive: NewSized>';
+	override: #Species->#primitiveNewBytes: with: 'primitiveNewBytes: anInteger <primitive: NewBytes>';
+	override: #ProtoObject->#_size with: '_size <primitive: UnderSize>';
+	override: #ProtoObject->#behavior with: 'behavior <primitive: Behavior>';
+	override: #ProtoObject->#== with: '== anObject <primitive: Equal>';
+	override: #ProtoObject->#primitiveSize with: 'primitiveSize <primitive: Size>';
+	override: #ProtoObject->#primitiveAt: with: 'primitiveAt: anInteger <primitive: At>';
+	override: #ProtoObject->#basicHash with: 'basicHash <primitive: Hash>';
+	override: #Object->#primitiveAt:put: with: 'primitiveAt: anInteger put: anObject <primitive: AtPut>';
+	override: #SmallInteger->#+ with: '+ anObject <primitive: SMIPlus>';
+	override: #SmallInteger-> #- with: '- anObject <primitive: SMIMinus>';
+	override: #SmallInteger-> #* with: '* anObject <primitive: SMITimes>';
+	override: #SmallInteger-> #// with: '// anObject <primitive: SMIIntDiv>';
+	override: #SmallInteger-> #\\ with: '\\ anObject <primitive: SMIIntQuot>';
+	override: #SmallInteger->#bitAnd: with: 'bitAnd: aNumber <primitive: SMIBitAnd>';
+	override: #SmallInteger->#bitXor: with: 'bitXor: aNumber <primitive: SMIBitXor>';
+	override: #SmallInteger->#bitShift: with: 'bitShift: aNumber <primitive: SMIBitShift>';
+	override: #SmallInteger->#> with: '> anObject <primitive: SMIGreaterThan>';
+	override: #SmallInteger->#>= with:'>= anObject <primitive: SMIGreaterEqualThan>';
+	override: #SmallInteger->#= with: '= anObject <primitive: SMIEqual>';
+	override: #Closure -> #value with: 'value <primitive: ClosureValue>';
+	override: #Closure -> #evaluateAtomically with: 'evaluateAtomically <primitive: ClosureValue>';
+	override: #Closure -> #value: with: 'value: a1 <primitive: ClosureValueWithArgs>';
+	override: #Closure -> #value:value: with: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>';
+	override: #Closure -> #value:value:value: with: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>';
+	override: #Closure -> #evaluateWith: with: 'evaluateWith: arg <primitive: ClosureValueWithArgs>';
+	override: #Closure -> #evaluateWith:with: with: 'evaluateWith: a1 with: a2 <primitive: ClosureValueWithArgs>';
+	override: #Closure -> #whileTrue: with: 'whileTrue: aBlock <primitive: ClosureWhileTrue>';
+	override: #Closure -> #whileFalse: with: 'whileFalse: aBlock <primitive: ClosureWhileFalse>';
+	override: #Closure -> #argumentCount with: 'argumentCount <primitive: ClosureArgumentCount>';
+	override: #String ->  #replaceFrom:to:with:startingAt: with:
+			'replaceFrom: start to: end with: aCollection startingAt: position <primitive: StringReplaceFromToWithStartingAt>';
+	override: #'HashTable class' -> #primeFor: with: 'primeFor: anInteger <primitive: PrimeFor>'.
+	
 ]
 
 { #category : #accessing }
 BootstrapEmulator >> lookup: aSymbol startingAt: aBehavior [
 	^cache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
+]
+
+{ #category : #accessing }
+BootstrapEmulator >> methodFor: aSymbol in: anRGBehavior [
+	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
+	^anRGBehavior methodNamed: aSymbol
 ]
 
 { #category : #'instance creation' }
@@ -182,6 +232,16 @@ BootstrapEmulator >> nilObject: anObjectMap [
 ]
 
 { #category : #accessing }
+BootstrapEmulator >> override: assoc with: source [
+	| species selector method override |
+	species := spec at: assoc key.
+	selector := assoc value.
+	method := species methodNamed: selector.
+	override := method copy sourceCode: source.
+	overrides at: species->selector put: override
+]
+
+{ #category : #accessing }
 BootstrapEmulator >> send: aMessage [
 	^ self send: aMessage super: false from: nil
 ]
@@ -204,7 +264,8 @@ BootstrapEmulator >> spec [
 
 { #category : #accessing }
 BootstrapEmulator >> spec: anObject [
-	spec := anObject
+	spec := anObject.
+	self initializeEmulationOverrides
 ]
 
 { #category : #accessing }

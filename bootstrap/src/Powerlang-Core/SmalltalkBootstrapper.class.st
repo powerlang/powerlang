@@ -15,115 +15,15 @@ Class {
 		'hash'
 	],
 	#classVars : [
-		'EmulationSpec',
 		'Spec'
 	],
 	#category : #'Powerlang-Core-Building'
 }
 
 { #category : #accessing }
-SmalltalkBootstrapper class >> emulationSpec [
-	^EmulationSpec
-]
-
-{ #category : #accessing }
 SmalltalkBootstrapper class >> fromSpec [
-	^ self new spec: self spec; emulationSpec: self emulationSpec 
-]
-
-{ #category : #accessing }
-SmalltalkBootstrapper class >> newEmulationSpec [
-	| spec species basicNew new basicNewSized newSized proto equal table prime int plus minus times divdiv bitand less closure value size quot at obj behavior undersize whiletrue whilefalse evaluateWith evaluateWithWith valueWith valueWithWith valueWithWithWith atomic hash argCount bitxor bitshift newBytes string replace |
-	spec := self newSpec.
-	species := spec at: #Species.
-	basicNew := species methodNamed: #basicNew.
-	basicNew sourceCode: 'basicNew <primitive: New>'.
-	new := species methodNamed: #new.
-	new sourceCode: 'new <primitive: New>'.
-	basicNewSized := species methodNamed: #basicNew:.
-	basicNewSized sourceCode: 'basicNew: anInteger <primitive: NewSized>'.
-	newSized := species methodNamed: #new:.
-	newSized sourceCode: 'new: anInteger <primitive: NewSized>'.
-	newBytes := species methodNamed: #primitiveNewBytes:.
-	newBytes
-		sourceCode: 'primitiveNewBytes: anInteger <primitive: NewBytes>'.
-	proto := spec at: #ProtoObject.
-	undersize := proto methodNamed: #_size.
-	undersize sourceCode: '_size <primitive: UnderSize>'.
-	behavior := proto methodNamed: #behavior.
-	behavior sourceCode: 'behavior <primitive: Behavior>'.
-	equal := proto methodNamed: #==.
-	equal sourceCode: '== anObject <primitive: Equal>'.
-	size := proto methodNamed: #primitiveSize.
-	size sourceCode: 'primitiveSize <primitive: Size>'.
-	at := proto methodNamed: #primitiveAt:.
-	at sourceCode: 'primitiveAt: anInteger <primitive: At>'.
-	hash := proto methodNamed: #basicHash.
-	hash sourceCode: 'basicHash <primitive: Hash>'.
-	obj := spec at: #Object.
-	at := obj methodNamed: #primitiveAt:put:.
-	at
-		sourceCode: 'primitiveAt: anInteger put: anObject <primitive: AtPut>'.
-	int := spec at: #SmallInteger.
-	plus := int methodNamed: #+.
-	plus sourceCode: '+ anObject <primitive: SMIPlus>'.
-	minus := int methodNamed: #-.
-	minus sourceCode: '- anObject <primitive: SMIMinus>'.
-	times := int methodNamed: #*.
-	times sourceCode: '* anObject <primitive: SMITimes>'.
-	divdiv := int methodNamed: #//.
-	divdiv sourceCode: '// anObject <primitive: SMIIntDiv>'.
-	quot := int methodNamed: #\\.
-	quot sourceCode: '\\ anObject <primitive: SMIIntQuot>'.
-	bitand := int methodNamed: #bitAnd:.
-	bitand sourceCode: 'bitAnd: aNumber <primitive: SMIBitAnd>'.
-	bitxor := int methodNamed: #bitXor:.
-	bitxor sourceCode: 'bitXor: aNumber <primitive: SMIBitXor>'.
-	bitshift := int methodNamed: #bitShift:.
-	bitshift sourceCode: 'bitShift: aNumber <primitive: SMIBitShift>'.
-	less := int methodNamed: #>.
-	less sourceCode: '> anObject <primitive: SMIGreaterThan>'.
-	less := int methodNamed: #>=.
-	less sourceCode: '>= anObject <primitive: SMIGreaterEqualThan>'.
-	less := int methodNamed: #=.
-	less sourceCode: '= anObject <primitive: SMIEqual>'.
-	closure := spec at: #Closure.
-	value := closure methodNamed: #value.
-	value sourceCode: 'value <primitive: ClosureValue>'.
-	atomic := closure methodNamed: #evaluateAtomically.
-	atomic sourceCode: 'evaluateAtomically <primitive: ClosureValue>'.
-	valueWith := closure methodNamed: #value:.
-	valueWith sourceCode: 'value: a1 <primitive: ClosureValueWithArgs>'.
-	valueWithWith := closure methodNamed: #value:value:.
-	valueWithWith
-		sourceCode: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>'.
-	valueWithWithWith := closure methodNamed: #value:value:value:.
-	valueWithWithWith
-		sourceCode: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>'.
-	evaluateWith := closure methodNamed: #evaluateWith:.
-	evaluateWith
-		sourceCode: 'evaluateWith: arg <primitive: ClosureValueWithArgs>'.
-	evaluateWithWith := closure methodNamed: #evaluateWith:with:.
-	evaluateWithWith
-		sourceCode: 'evaluateWith: a1 with: a2 <primitive: ClosureValueWithArgs>'.
-	whiletrue := closure methodNamed: #whileTrue:.
-	whiletrue
-		sourceCode: 'whileTrue: aBlock <primitive: ClosureWhileTrue>'.
-	whilefalse := closure methodNamed: #whileFalse:.
-	whilefalse
-		sourceCode: 'whileFalse: aBlock <primitive: ClosureWhileFalse>'.
-	argCount := closure methodNamed: #argumentCount.
-	argCount
-		sourceCode: 'argumentCount <primitive: ClosureArgumentCount>'.
-	string := spec at: #String.
-	replace := string methodNamed: #replaceFrom:to:with:startingAt:.
-	replace
-		sourceCode:
-			'replaceFrom: start to: end with: aCollection startingAt: position <primitive: StringReplaceFromToWithStartingAt>'.
-	table := spec at: #HashTable.
-	prime := table metaclass methodNamed: #primeFor:.
-	prime sourceCode: 'primeFor: anInteger <primitive: PrimeFor>'.
-	^ spec
+	^ self new
+		spec: self spec
 ]
 
 { #category : #accessing }
@@ -140,7 +40,7 @@ SmalltalkBootstrapper class >> newSpec [
 SmalltalkBootstrapper class >> spec [
 	Spec
 		ifNil: [ Spec := self newSpec.
-			EmulationSpec := self newEmulationSpec].
+			 ].
 	^ Spec
 ]
 
@@ -384,11 +284,6 @@ SmalltalkBootstrapper >> emulateSend: receiver selector: aSymbol with: anArray [
 		receiver: receiver
 		selector: aSymbol arguments: anArray.
 	^emulator send: message
-]
-
-{ #category : #initialization }
-SmalltalkBootstrapper >> emulationSpec: anRGEnvironment [
-	emulator spec: anRGEnvironment
 ]
 
 { #category : #initialization }
@@ -791,7 +686,8 @@ SmalltalkBootstrapper >> spec [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> spec: anRGEnvironment [
-	environment := anRGEnvironment
+	environment := anRGEnvironment.
+	emulator spec: anRGEnvironment
 ]
 
 { #category : #initialization }
