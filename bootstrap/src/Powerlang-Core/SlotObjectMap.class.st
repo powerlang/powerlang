@@ -17,13 +17,14 @@ SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
 ]
 
 { #category : #accessing }
-SlotObjectMap >> allInstVarNames [ 
+SlotObjectMap >> allInstVarNames [
 	| c |
-	^spec isMeta 
-		ifTrue: [ 
-			c := spec environment at: #Class.
-			c allInstVarNames, spec allInstVarNames ]
-		ifFalse: [ spec allInstVarNames ].
+	^ spec properties
+		at: #allInstVarNames
+		ifAbsentPut: [ spec isMeta
+				ifTrue: [ c := spec environment at: #Class.
+					c allInstVarNames , spec allInstVarNames ]
+				ifFalse: [ spec allInstVarNames ] ]
 ]
 
 { #category : #accessing }
@@ -127,10 +128,11 @@ SlotObjectMap >> initializeAs: anRGBehavior sized: size [
 { #category : #accessing }
 SlotObjectMap >> instSize [
 	| c |
-	^ spec isMeta
+	^ spec properties at: #instSize ifAbsentPut: [spec isMeta
 		ifTrue: [ c := spec environment at: #Class.
+			
 			c instSize + spec instSize ]
-		ifFalse: [ spec instSize ]
+		ifFalse: [ spec instSize ]]
 ]
 
 { #category : #accessing }
