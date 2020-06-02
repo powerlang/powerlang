@@ -27,6 +27,7 @@ Author useAuthor: 'PowerSmalltalkLoader' during: [
     (repo packageNamed: 'Powerlang-Core') load.
     (repo packageNamed: 'Powerlang-UI') load.
     (repo packageNamed: 'Powerlang-Tests') load.
+    (repo packageNamed: 'Powerlang-TestsFailing') load.
 ].
 
 SystemWindow closeTopWindow. "close HelpBrowser"
