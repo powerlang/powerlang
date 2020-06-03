@@ -38,13 +38,19 @@ SlotObjectMap >> arrayedSize [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> asBoolean [
+	spec name = #True ifTrue: [ ^true ].	spec name = #False ifTrue: [ ^false ].
+		self ASSERT: false
+]
+
+{ #category : #accessing }
 SlotObjectMap >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
 	 used for accessing named slots (aka, instance variables), to access 
 	 them use #instVarAt:"
 	
-	self assert: (index between: 1 and: slots size - spec instSize).
-	^slots at: spec instSize + index
+	self assert: (index between: 1 and: slots size - self instSize).
+	^slots at: self instSize + index
 ]
 
 { #category : #accessing }

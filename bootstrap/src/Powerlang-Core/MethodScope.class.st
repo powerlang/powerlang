@@ -94,9 +94,7 @@ MethodScope >> initializeClassVars [
 	species instanceSide withAllSuperclasses
 		do: [ :class | 
 			| binder |
-			vars := (class isKindOf: Behavior)
-				ifTrue: [ class classPool ]
-				ifFalse: [ BootstrapDictionary withAll: class classVariables ].
+			vars := class classPool.
 			binder := DynamicBinder on: vars of: ClassVarBinding.
 			cvars add: binder ]
 ]
@@ -112,7 +110,7 @@ MethodScope >> initializeInstVars [
 MethodScope >> initializePoolVars [
 	| instance |
 	instance := species instanceSide.
-	instance sharedPoolsDo: [:name |
+	instance sharedPools do: [:name |
 		globals
 			poolNamed: name
 			ifPresent: [:pool | self addPool: pool]].

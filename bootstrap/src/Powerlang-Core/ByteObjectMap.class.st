@@ -21,6 +21,11 @@ ByteObjectMap class >> new: anRGBehavior valued: bytes [
 	^self new initializeAs: anRGBehavior sized: bytes size; fillFrom: bytes
 ]
 
+{ #category : #testing }
+ByteObjectMap >> asString [
+	^ bytes allButLast asString
+]
+
 { #category : #accessing }
 ByteObjectMap >> at: index [
 	"Return indexed value at given index, starting with 1. This CANNOT be 
@@ -32,14 +37,18 @@ ByteObjectMap >> at: index [
 ]
 
 { #category : #accessing }
-ByteObjectMap >> at: index put: value [
+ByteObjectMap >> at: index put: anObjectMap [
 	"Set indexed value at given `index` to `value`. This CANNOT be used for 
 	 setting named slots (aka, instance variables), to access them use 
 	 #instVarAt:put:"
-	
+
+	| value |
 	self assert: (index between: 1 and: bytes size).
+	self assert: anObjectMap isImmediate.
+	value := anObjectMap value.
 	self assert: (value between: 0 and: 255).
-	bytes at: index put: value
+	bytes at: index put: value.
+	^anObjectMap
 ]
 
 { #category : #accessing }

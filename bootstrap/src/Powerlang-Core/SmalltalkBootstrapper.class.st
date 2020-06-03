@@ -12,7 +12,8 @@ Class {
 		'environment',
 		'emulator',
 		'globals',
-		'hash'
+		'hash',
+		'cvarMap'
 	],
 	#classVars : [
 		'Spec'
@@ -132,30 +133,30 @@ SmalltalkBootstrapper >> createClass: definition [
 	behavior class: class.
 	class instanceBehavior: behavior.
 	classes at: definition put: class.
-	self define: class as: name
+	self define: class as: name.
+
 ]
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createClassAssociations: definition [
-	| name class assoc emulated cvarEmu |
+	| name class assoc assocs cvars |
 	name := definition name.
 	class := classes at: definition.
 	assoc := self newLiteralAssociation: name -> class.
 	globals at: name put: assoc.
-	definition classVariables
-		do: [ :cvar | 
-			assoc := self newLiteralAssociation: cvar name -> self nilObject.
-			cvar association: assoc.
-			emulated := emulator spec at: name.
-			cvarEmu := emulated classVarNamed: cvar name.
-			cvarEmu association: assoc ]
+	assocs := definition classVariables
+		collect: [ :cvar | self newLiteralAssociation: cvar name -> self nilObject ].
+	cvars := BootstrapDictionary withAll: assocs.
+	cvarMap at: definition put: cvars.
+	^cvars
 ]
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createClassVars: definition [
-	| class classvars |
+	| class classvars cvars |
+	cvars := cvarMap at: definition.
+	classvars := self newClassVarDictionary: cvars associations.
 	class := classes at: definition.
-	classvars := self newClassVarDictionary: definition classVariables.
 	class classVariables: classvars
 ]
 
@@ -168,14 +169,14 @@ SmalltalkBootstrapper >> createClasses [
 			self
 				createClass: def;
 				createMetaclass: def ].
-	"emulator bridge updateGlobals."
+
 	all
 		do: [ :def | 
 			self
 				initializeClass: def;
-				initializeMetaclass: def;
-				createClassAssociations: def ].
-	self fixBehaviors; createGlobals.
+				initializeMetaclass: def ].
+	self loadEmulator;		fixBehaviors;
+		createGlobals.
 	all do: [ :def | self createClassVars: def ]
 ]
 
@@ -214,13 +215,15 @@ SmalltalkBootstrapper >> createLoadAction [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createMetaclass: spec [
-	|  meta ibehavior class |
+	| meta ibehavior class |
 	meta := self basicNewSlots: #Metaclass.
 	ibehavior := self basicNewSlots: #Behavior.
 	ibehavior class: meta.
 	class := classes at: spec.
 	class behavior: ibehavior.
-	meta instanceBehavior: ibehavior; class: class.
+	meta
+		instanceBehavior: ibehavior;
+		class: class.
 
 ]
 
@@ -355,7 +358,6 @@ SmalltalkBootstrapper >> genesis [
 		createNil;
 		createTrue;
 		createFalse;
-		loadEmulator;
 		createClasses;
 		initializeSmalltalk;
 		fillClasses;
@@ -374,8 +376,12 @@ SmalltalkBootstrapper >> initialize [
 	classes := OrderedDictionary new.
 	objects := OrderedCollection new.
 	symbols := OrderedDictionary new.
+	cvarMap := OrderedDictionary new.
 	globals := BootstrapDictionary new.
-	emulator := BootstrapEmulator new bootstrapper: self; classes: classes; globals: globals
+	emulator := BootstrapEmulator new
+		bootstrapper: self;
+		classes: classes;
+		globals: globals
 ]
 
 { #category : #initialization }
@@ -388,7 +394,8 @@ SmalltalkBootstrapper >> initializeBehavior: anObjectMap [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeClass: definition [
-	| class supername superclass name flag ivars pools subclasses format |
+	| class supername superclass name flag ivars poolnames pools subclasses
+	 format cvars |
 	class := classes at: definition.
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
@@ -399,7 +406,8 @@ SmalltalkBootstrapper >> initializeClass: definition [
 	flag := self formatOfClass: definition.
 	format := self newSmallInteger: flag.
 	ivars := self newStringArray: definition instVarNames.
-	pools := self newStringArray: definition sharedPools.
+	poolnames := definition sharedPools collect: #name.
+	pools := self newStringArray: poolnames.
 	class
 		superclass: superclass;
 		format: format;
@@ -407,7 +415,9 @@ SmalltalkBootstrapper >> initializeClass: definition [
 		organization: nilObj;
 		name: name;
 		subclasses: subclasses;
-		sharedPools: pools
+		sharedPools: pools.
+	cvars := self createClassAssociations: definition.
+	emulator wrap: class using: definition cvars: cvars
 ]
 
 { #category : #initialization }
@@ -422,22 +432,25 @@ SmalltalkBootstrapper >> initializeClassVariables: class with: definition [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeMetaclass: definition [
-	| class meta supername superclass ivars supermeta flags format |
+	| class meta metadef supername superclass ivars supermeta flags format cvars |
 	class := classes at: definition.
 	meta := class behavior slotNamed: #class.
+	metadef := definition metaclass.
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
 	supermeta := superclass == nilObj
 		ifTrue: [ self classNamed: #ProtoObject ]
-		ifFalse: [ superclass behavior slotNamed: #class].
-	ivars := self newStringArray: definition metaclass instVarNames.
-	flags := self formatOfClass: definition metaclass.
+		ifFalse: [ superclass behavior slotNamed: #class ].
+	ivars := self newStringArray: metadef instVarNames.
+	flags := self formatOfClass: metadef.
 	format := self newSmallInteger: flags.
 	meta
 		superclass: supermeta;
 		format: format;
 		instanceVariables: ivars;
-		organization: nilObj
+		organization: nilObj.
+	cvars := cvarMap at: definition.
+	emulator wrap: meta using: metadef cvars: cvars
 ]
 
 { #category : #initialization }
@@ -480,7 +493,13 @@ SmalltalkBootstrapper >> lastHash: anInteger [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> loadEmulator [
-	emulator nilObject: nilObj; falseObject: falseObj; trueObject: trueObj
+	| behavior |
+	behavior := (self classNamed: #SmallInteger) instanceBehavior.
+	emulator
+		nilObject: nilObj;
+		falseObject: falseObj;
+		trueObject: trueObj;
+		smallintBehavior: behavior
 ]
 
 { #category : #initialization }
@@ -556,7 +575,7 @@ SmalltalkBootstrapper >> newClassVarDictionary: anArray [
 	dict := self newDictionary.
 	anArray
 		do:
-			[ :cvar | self emulateSend: dict selector: #add: with: {cvar association} ].
+			[ :assoc | self emulateSend: dict selector: #add: with: {assoc} ].
 	^ self addObjectDeep: dict
 ]
 

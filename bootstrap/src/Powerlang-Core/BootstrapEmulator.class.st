@@ -5,13 +5,16 @@ Class {
 		'nilObj',
 		'falseObj',
 		'trueObj',
+		'smallintBehavior',
 		'classes',
 		'spec',
-		'cache',
 		'globals',
+		'cvarMap',
+		'cache',
 		'bootstrapper',
 		'symbolCache',
-		'overrides'
+		'overrides',
+		'wrappers'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -48,10 +51,11 @@ BootstrapEmulator >> classes: aDictionary [
 
 { #category : #accessing }
 BootstrapEmulator >> compile: anRGMethod [
-	| compiler method |
+	| compiler class method |
 	compiler := Compiler namespace: globals.
+	class := wrappers at: anRGMethod parent.
 	method := compiler
-		forClass: anRGMethod parent;
+		forClass: class;
 		compile: anRGMethod sourceCode.
 	^ bootstrapper transferSimpleLiterals: method
 ]
@@ -112,48 +116,81 @@ BootstrapEmulator >> initialize [
 	cache := Dictionary new.
 	symbolCache := IdentityDictionary new.
 	overrides := Dictionary new.
+	wrappers := OrderedDictionary new.
 ]
 
 { #category : #accessing }
 BootstrapEmulator >> initializeEmulationOverrides [
-	self 
-	override: #Species->#basicNew with: 'basicNew <primitive: New>';
-	override: #Species->#basicNew: with: 'basicNew: anInteger <primitive: NewSized>';
-	override: #Species->#new with: 'new <primitive: New>';
-	override: #Species->#new: with: 'new: anInteger <primitive: NewSized>';
-	override: #Species->#primitiveNewBytes: with: 'primitiveNewBytes: anInteger <primitive: NewBytes>';
-	override: #ProtoObject->#_size with: '_size <primitive: UnderSize>';
-	override: #ProtoObject->#behavior with: 'behavior <primitive: Behavior>';
-	override: #ProtoObject->#== with: '== anObject <primitive: Equal>';
-	override: #ProtoObject->#primitiveSize with: 'primitiveSize <primitive: Size>';
-	override: #ProtoObject->#primitiveAt: with: 'primitiveAt: anInteger <primitive: At>';
-	override: #ProtoObject->#basicHash with: 'basicHash <primitive: Hash>';
-	override: #Object->#primitiveAt:put: with: 'primitiveAt: anInteger put: anObject <primitive: AtPut>';
-	override: #SmallInteger->#+ with: '+ anObject <primitive: SMIPlus>';
-	override: #SmallInteger-> #- with: '- anObject <primitive: SMIMinus>';
-	override: #SmallInteger-> #* with: '* anObject <primitive: SMITimes>';
-	override: #SmallInteger-> #// with: '// anObject <primitive: SMIIntDiv>';
-	override: #SmallInteger-> #\\ with: '\\ anObject <primitive: SMIIntQuot>';
-	override: #SmallInteger->#bitAnd: with: 'bitAnd: aNumber <primitive: SMIBitAnd>';
-	override: #SmallInteger->#bitXor: with: 'bitXor: aNumber <primitive: SMIBitXor>';
-	override: #SmallInteger->#bitShift: with: 'bitShift: aNumber <primitive: SMIBitShift>';
-	override: #SmallInteger->#> with: '> anObject <primitive: SMIGreaterThan>';
-	override: #SmallInteger->#>= with:'>= anObject <primitive: SMIGreaterEqualThan>';
-	override: #SmallInteger->#= with: '= anObject <primitive: SMIEqual>';
-	override: #Closure -> #value with: 'value <primitive: ClosureValue>';
-	override: #Closure -> #evaluateAtomically with: 'evaluateAtomically <primitive: ClosureValue>';
-	override: #Closure -> #value: with: 'value: a1 <primitive: ClosureValueWithArgs>';
-	override: #Closure -> #value:value: with: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>';
-	override: #Closure -> #value:value:value: with: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>';
-	override: #Closure -> #evaluateWith: with: 'evaluateWith: arg <primitive: ClosureValueWithArgs>';
-	override: #Closure -> #evaluateWith:with: with: 'evaluateWith: a1 with: a2 <primitive: ClosureValueWithArgs>';
-	override: #Closure -> #whileTrue: with: 'whileTrue: aBlock <primitive: ClosureWhileTrue>';
-	override: #Closure -> #whileFalse: with: 'whileFalse: aBlock <primitive: ClosureWhileFalse>';
-	override: #Closure -> #argumentCount with: 'argumentCount <primitive: ClosureArgumentCount>';
-	override: #String ->  #replaceFrom:to:with:startingAt: with:
+	self
+		override: #Species -> #basicNew with: 'basicNew <primitive: New>';
+		override: #Species -> #basicNew:
+			with: 'basicNew: anInteger <primitive: NewSized>';
+		override: #Species -> #new with: 'new <primitive: New>';
+		override: #Species -> #new:
+			with: 'new: anInteger <primitive: NewSized>';
+		override: #Species -> #primitiveNewBytes:
+			with: 'primitiveNewBytes: anInteger <primitive: NewBytes>';
+		override: #ProtoObject -> #_size
+			with: '_size <primitive: UnderSize>';
+		override: #ProtoObject -> #behavior
+			with: 'behavior <primitive: Behavior>';
+		override: #ProtoObject -> #==
+			with: '== anObject <primitive: Equal>';
+		override: #ProtoObject -> #primitiveSize
+			with: 'primitiveSize <primitive: Size>';
+		override: #ProtoObject -> #primitiveAt:
+			with: 'primitiveAt: anInteger <primitive: At>';
+		override: #ProtoObject -> #basicHash
+			with: 'basicHash <primitive: Hash>';
+		override: #Object -> #primitiveAt:put:
+			with: 'primitiveAt: anInteger put: anObject <primitive: AtPut>';
+		override: #SmallInteger -> #+
+			with: '+ anObject <primitive: SMIPlus>';
+		override: #SmallInteger -> #-
+			with: '- anObject <primitive: SMIMinus>';
+		override: #SmallInteger -> #*
+			with: '* anObject <primitive: SMITimes>';
+		override: #SmallInteger -> #//
+			with: '// anObject <primitive: SMIIntDiv>';
+		override: #SmallInteger -> #\\
+			with: '\\ anObject <primitive: SMIIntQuot>';
+		override: #SmallInteger -> #bitAnd:
+			with: 'bitAnd: aNumber <primitive: SMIBitAnd>';
+		override: #SmallInteger -> #bitXor:
+			with: 'bitXor: aNumber <primitive: SMIBitXor>';
+		override: #SmallInteger -> #bitShift:
+			with: 'bitShift: aNumber <primitive: SMIBitShift>';
+		override: #SmallInteger -> #>
+			with: '> anObject <primitive: SMIGreaterThan>';
+		override: #SmallInteger -> #>=
+			with: '>= anObject <primitive: SMIGreaterEqualThan>';
+		override: #SmallInteger -> #=
+			with: '= anObject <primitive: SMIEqual>';
+		override: #Closure -> #value
+			with: 'value <primitive: ClosureValue>';
+		override: #Closure -> #evaluateAtomically
+			with: 'evaluateAtomically <primitive: ClosureValue>';
+		override: #Closure -> #value:
+			with: 'value: a1 <primitive: ClosureValueWithArgs>';
+		override: #Closure -> #value:value:
+			with: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>';
+		override: #Closure -> #value:value:value:
+			with: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>';
+		override: #Closure -> #evaluateWith:
+			with: 'evaluateWith: arg <primitive: ClosureValueWithArgs>';
+		override: #Closure -> #evaluateWith:with:
+			with: 'evaluateWith: a1 with: a2 <primitive: ClosureValueWithArgs>';
+		override: #Closure -> #whileTrue:
+			with: 'whileTrue: aBlock <primitive: ClosureWhileTrue>';
+		override: #Closure -> #whileFalse:
+			with: 'whileFalse: aBlock <primitive: ClosureWhileFalse>';
+		override: #Closure -> #argumentCount
+			with: 'argumentCount <primitive: ClosureArgumentCount>';
+		override: #String -> #replaceFrom:to:with:startingAt:
+			with:
 			'replaceFrom: start to: end with: aCollection startingAt: position <primitive: StringReplaceFromToWithStartingAt>';
-	override: #'HashTable class' -> #primeFor: with: 'primeFor: anInteger <primitive: PrimeFor>'.
-	
+		override: #'HashTable class' -> #primeFor:
+			with: 'primeFor: anInteger <primitive: PrimeFor>'
 ]
 
 { #category : #accessing }
@@ -174,13 +211,15 @@ BootstrapEmulator >> new: aSymbol [
 
 { #category : #'instance creation' }
 BootstrapEmulator >> new: anRGBehavior size: anInteger [
-	| base behavior |
+	| base behavior map |
 	self ASSERT: anRGBehavior isMeta.
 	base := anRGBehavior baseClass.
 	behavior := bootstrapper instanceBehaviorOfSpec: base.
-	^ (ObjectMap new: base size: anInteger)
-		behavior: behavior;
-		atAllPut: nilObj
+	map := (ObjectMap new: base size: anInteger)
+		behavior: behavior.
+	map isBytes ifFalse: [ 
+		map atAllPut: nilObj].
+	^map
 ]
 
 { #category : #'instance creation' }
@@ -250,11 +289,21 @@ BootstrapEmulator >> send: aMessage [
 BootstrapEmulator >> send: aMessage super: aBoolean from: anEvaluator [
 	| behavior method |
 	behavior := aBoolean
-		ifTrue: [ anEvaluator method classBinding superclass ]
+		ifTrue: [ anEvaluator method classBinding superclass spec ]
 		ifFalse: [ aMessage receiver spec ].
 	method := self lookup: aMessage selector startingAt: behavior.
 	self ASSERT: method notNil.
 	^ self dispatch: method with: aMessage from: anEvaluator
+]
+
+{ #category : #accessing }
+BootstrapEmulator >> smallintBehavior [
+	^smallintBehavior
+]
+
+{ #category : #accessing }
+BootstrapEmulator >> smallintBehavior: anObjectMap [ 
+	 smallintBehavior := anObjectMap 
 ]
 
 { #category : #accessing }
@@ -305,4 +354,11 @@ BootstrapEmulator >> trueObject [
 { #category : #accessing }
 BootstrapEmulator >> trueObject: anObjectMap [
 	trueObj := anObjectMap
+]
+
+{ #category : #accessing }
+BootstrapEmulator >> wrap: anObjectMap using: anRGBehavior cvars: aBootstrapDictionary [
+	| wrapper |
+	wrapper := BootstrapClass spec: anRGBehavior map: anObjectMap cvars: aBootstrapDictionary .
+	wrappers at: anRGBehavior put: wrapper
 ]

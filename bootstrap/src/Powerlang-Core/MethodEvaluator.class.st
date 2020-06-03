@@ -214,7 +214,8 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 	| index size argument |
 	returned := true.
 	primitive = #Behavior
-		ifTrue: [ ^ receiver behavior ].
+		ifTrue: [ ^ receiver isImmediate 
+			ifTrue: [ system smallintBehavior ] ifFalse: [receiver behavior ]].
 	primitive = #UnderSize
 		ifTrue: [ ^ self integerFor: receiver size ].
 	primitive = #Size
