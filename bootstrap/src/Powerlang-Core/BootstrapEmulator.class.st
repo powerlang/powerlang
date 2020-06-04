@@ -160,12 +160,16 @@ BootstrapEmulator >> initializeEmulationOverrides [
 			with: 'bitXor: aNumber <primitive: SMIBitXor>';
 		override: #SmallInteger -> #bitShift:
 			with: 'bitShift: aNumber <primitive: SMIBitShift>';
+		override: #SmallInteger -> #highBit
+			with: 'highBit <primitive: SMIHighBit>';
 		override: #SmallInteger -> #>
 			with: '> anObject <primitive: SMIGreaterThan>';
 		override: #SmallInteger -> #>=
 			with: '>= anObject <primitive: SMIGreaterEqualThan>';
 		override: #SmallInteger -> #=
 			with: '= anObject <primitive: SMIEqual>';
+		override: #SmallInteger -> #sizeInBytes
+			with: 'sizeInBytes <primitive: SMISize>';
 		override: #Closure -> #value
 			with: 'value <primitive: ClosureValue>';
 		override: #Closure -> #evaluateAtomically
@@ -230,6 +234,11 @@ BootstrapEmulator >> newBytes: anRGBehavior size: anInteger [
 	behavior := bootstrapper instanceBehaviorOfSpec: base.
 	^ (ByteObjectMap new: base size: anInteger)
 		behavior: behavior
+]
+
+{ #category : #'instance creation' }
+BootstrapEmulator >> newInteger: anInteger [
+	^ bootstrapper newInteger: anInteger
 ]
 
 { #category : #'instance creation' }
@@ -330,8 +339,8 @@ BootstrapEmulator >> transferLiteral: anObject [
 	class := anObject class.
 	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].
-	class = SmallInteger
-		ifTrue: [ ^ self newSmallInteger: anObject ].
+	(class inheritsFrom: Integer)
+		ifTrue: [ ^ self newInteger: anObject ].
 	(class inheritsFrom: Symbol)
 		ifTrue: [ ^ bootstrapper newSymbol: anObject ].
 	(class inheritsFrom: String)

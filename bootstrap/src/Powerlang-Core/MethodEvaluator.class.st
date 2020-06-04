@@ -29,7 +29,7 @@ MethodEvaluator class >> initialize [
 	self initialize
 	"
 
-	Undermessages := #(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt:)
+	Undermessages := #(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: _uShortAtOffset:put:)
 ]
 
 { #category : #'instance creation' }
@@ -136,7 +136,7 @@ MethodEvaluator >> dispatchUndermessage: message [
 		ifTrue: [ ^ recv slots at: args first value ].
 	selector == #_byteAt:
 		ifTrue: [ result := recv bytes at: args first value.
-			^self integerFor: result ].
+			^ self integerFor: result ].
 	selector == #_basicHash
 		ifTrue: [ ^ self integerFor: recv headerHash ].
 	selector == #_basicHash:
@@ -147,8 +147,16 @@ MethodEvaluator >> dispatchUndermessage: message [
 			^ self integerFor: result ].
 	selector == #_bitShiftLeft:
 		ifTrue: [ result := recv value bitShift: args first value.
-			(result isKindOf: LargeInteger) ifTrue: [ self halt ]. 
+			(result isKindOf: LargeInteger)
+				ifTrue: [ self halt ].
 			^ self integerFor: result ].
+	selector == #_uShortAtOffset:
+		ifTrue: [ ^ result := self
+				integerFor: (recv bytes unsignedShortAt: args first value + 1) ].
+	selector == #_uShortAtOffset:put:
+		ifTrue: [ result := args second.
+			recv bytes unsignedShortAt: args first value + 1 put: result value.
+			^ result ].
 	self ASSERT: false
 ]
 
@@ -214,8 +222,9 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 	| index size argument |
 	returned := true.
 	primitive = #Behavior
-		ifTrue: [ ^ receiver isImmediate 
-			ifTrue: [ system smallintBehavior ] ifFalse: [receiver behavior ]].
+		ifTrue: [ ^ receiver isImmediate
+				ifTrue: [ system smallintBehavior ]
+				ifFalse: [ receiver behavior ] ].
 	primitive = #UnderSize
 		ifTrue: [ ^ self integerFor: receiver size ].
 	primitive = #Size
@@ -258,6 +267,9 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 	primitive = #SMIBitShift
 		ifTrue:
 			[ ^ self integerFor: (receiver value bitShift: arguments first value) ].
+	primitive = #SMIHighBit
+		ifTrue:
+			[ ^ self integerFor: (receiver value highBit) ].
 	primitive = #SMIGreaterThan
 		ifTrue: [ ^ self booleanFor: receiver value > arguments first value ].
 	primitive = #SMIGreaterEqualThan
@@ -266,6 +278,8 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 		ifTrue: [ ^ self booleanFor: receiver value = arguments first value ].
 	primitive = #SMINotEqual
 		ifTrue: [ ^ self booleanFor: receiver value != arguments first value ].
+	primitive = #SMISize
+		ifTrue: [ ^ self integerFor: receiver value bytesCount ].
 	primitive = #ClosureValue
 		ifTrue: [ ^ self evaluatePrimitiveClosureValue ].
 	primitive = #ClosureValueWithArgs
@@ -383,7 +397,7 @@ MethodEvaluator >> instanceVarAt: index put: aValue [
 
 { #category : #visiting }
 MethodEvaluator >> integerFor: anInteger [
-	^ system newSmallInteger: anInteger
+	^ system newInteger: anInteger
 ]
 
 { #category : #visiting }

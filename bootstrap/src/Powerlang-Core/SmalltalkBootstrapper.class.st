@@ -13,7 +13,10 @@ Class {
 		'emulator',
 		'globals',
 		'hash',
-		'cvarMap'
+		'cvarMap',
+		'wordSize',
+		'maxSMI',
+		'minSMI'
 	],
 	#classVars : [
 		'Spec'
@@ -86,7 +89,12 @@ SmalltalkBootstrapper >> basicNewSlots: classname sized: size [
 
 { #category : #building }
 SmalltalkBootstrapper >> build [
-	self genesis
+	self build64
+]
+
+{ #category : #building }
+SmalltalkBootstrapper >> build64 [
+	self wordSize: 8; genesis
 ]
 
 { #category : #initialization }
@@ -322,7 +330,7 @@ SmalltalkBootstrapper >> fillSpecies: species with: definition [
 	compiler := self compilerFor: definition.
 	definition methods
 		do: [ :m | 
-			method := compiler compile: m sourceCode.
+			method := emulator compile: m.
 			transferred := self transferMethod: method in: species.
 			self emulateSend: dictionary
 				selector: #basicAt:put:
@@ -592,6 +600,35 @@ SmalltalkBootstrapper >> newDictionary [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> newInteger: anInteger [
+	anInteger > maxSMI
+		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
+	anInteger < minSMI
+		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
+	^self newSmallInteger: anInteger
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newLargeNegativeInteger: anInteger [
+	| size bytes byte |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	bytes := ByteArray new: size withAll: 16rFF.
+	1 to: anInteger bytesCount do: [ :i | 
+		byte := anInteger byteAt: i.
+		byte > 0 ifTrue: [ byte := 256 - byte].
+		bytes at: i put: byte].
+	^ ByteObjectMap new: self => #LargeNegativeInteger valued: bytes
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newLargePositiveInteger: anInteger [
+	| size bytes |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	bytes := anInteger asByteArrayOfSize: size.
+	^ByteObjectMap new: self => #LargePositiveInteger valued: bytes
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> newLiteralAssociation: anAssociation [
 	^self transferLiteralDeep: anAssociation
 ]
@@ -850,6 +887,13 @@ SmalltalkBootstrapper >> trueObject [
 { #category : #validating }
 SmalltalkBootstrapper >> validate [
 	objects do:[:obj | obj validate]
+]
+
+{ #category : #validating }
+SmalltalkBootstrapper >> wordSize: anInteger [
+	wordSize := anInteger.
+	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
+	minSMI := maxSMI negated - 1
 ]
 
 { #category : #validating }
