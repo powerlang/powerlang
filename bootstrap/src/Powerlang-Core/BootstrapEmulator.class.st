@@ -330,7 +330,7 @@ BootstrapEmulator >> spec: anObject [
 BootstrapEmulator >> symbolFrom: anObjectMap [
 	^ symbolCache
 		at: anObjectMap
-		ifAbsentPut: [ anObjectMap bytes allButLast asString asSymbol ]
+		ifAbsentPut: [ anObjectMap asString asSymbol ]
 ]
 
 { #category : #'as yet unclassified' }

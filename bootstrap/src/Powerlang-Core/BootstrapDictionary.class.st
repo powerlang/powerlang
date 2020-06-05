@@ -9,6 +9,14 @@ Class {
 }
 
 { #category : #'instance creation' }
+BootstrapDictionary class >> fromPool: aSlotObjectMap [
+	| entries  |
+	entries := aSlotObjectMap table slots
+		select: [ :s | s spec name = #Association ].
+	^ self withAll: entries constant: aSlotObjectMap constant asBoolean
+]
+
+{ #category : #'instance creation' }
 BootstrapDictionary class >> withAll: variables [
 	^self withAll: variables constant: false
 ]

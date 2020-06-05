@@ -23,12 +23,12 @@ BootstrapClass >> allInstVarNames [
 ]
 
 { #category : #accessing }
-BootstrapClass >> allSharedPools [
+BootstrapClass >> allSharedPoolsUsing: globals [
 	| pools class |
 	pools := Set new.
 	class := self.
 	[ class isNil ]
-		whileFalse: [ pools addAll: class sharedPools.
+		whileFalse: [ pools addAll: (class sharedPoolsUsing: globals).
 			class := class superclass ].
 	^ pools
 ]
@@ -50,10 +50,9 @@ BootstrapClass >> instanceSide [
 
 { #category : #accessing }
 BootstrapClass >> localPools [
-	| pools dict name entries pool |
+	| pools dict name pool |
 	spec isMeta
-		ifTrue: [ ^ self instanceSide sharedPools ].
-
+		ifTrue: [ ^ self instanceSide localPools ].
 	pools := cvars associations
 		select: [ :assoc | assoc value spec name = #PoolDictionary ].
 	dict := Dictionary new.
@@ -61,14 +60,7 @@ BootstrapClass >> localPools [
 		do: [ :assoc | 
 			name := assoc key asString.
 			pool := assoc value.
-			entries := pool table slots
-				select: [ :s | s spec name = #Association ].
-			dict
-				at: name
-				put:
-					(BootstrapDictionary
-						withAll: entries
-						constant: pool constant asBoolean) ].
+			dict at: name put: (BootstrapDictionary fromPool: pool) ].
 	^ dict
 ]
 
@@ -77,19 +69,28 @@ BootstrapClass >> map: anObjectMap [
 	map := anObjectMap
 ]
 
+{ #category : #accessing }
+BootstrapClass >> name [
+	^spec name
+]
+
 { #category : #printing }
 BootstrapClass >> printOn: aStream [
 	aStream nextPut: $<; print: spec; nextPut: $>
 ]
 
 { #category : #accessing }
-BootstrapClass >> sharedPools [
-	| pools |
+BootstrapClass >> sharedPoolsUsing: globals [
+	| pools dicts |
 	spec isMeta
-		ifTrue: [ ^ self instanceSide sharedPools ].
+		ifTrue: [ ^ self instanceSide sharedPoolsUsing: globals ].
 	pools := OrderedCollection new.
 	spec sharedPoolsDo: [ :p | pools add: p ].
-	^ pools
+	dicts := pools
+		collect: [ :p | (globals at: p name) association value ].
+	^dicts
+		select: [ :d | d spec name = #PoolDictionary ]
+		thenCollect: [ :d | BootstrapDictionary fromPool: d ]
 ]
 
 { #category : #accessing }

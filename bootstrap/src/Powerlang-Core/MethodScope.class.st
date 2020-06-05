@@ -15,7 +15,7 @@ Class {
 { #category : #initialization }
 MethodScope >> addPool: aPoolDictionary [
 	| binder |
-	binder := DynamicBinder on: aPoolDictionary.
+	binder := DynamicBinder on: aPoolDictionary .
 	pools add: binder
 ]
 
@@ -110,12 +110,11 @@ MethodScope >> initializeInstVars [
 MethodScope >> initializePoolVars [
 	| instance |
 	instance := species instanceSide.
-	instance sharedPools do: [:name |
-		globals
-			poolNamed: name
-			ifPresent: [:pool | self addPool: pool]].
+	(instance allSharedPoolsUsing: globals)
+		do:
+			[ :pool | self addPool: pool ] .
 	instance withAllSuperclasses
-		do: [:class | class localPools do: [:pool | self addPool: pool]]
+		do: [ :class | class localPools do: [ :pool | self addPool: pool ] ]
 ]
 
 { #category : #initialization }

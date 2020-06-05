@@ -32,7 +32,7 @@ DynamicBinder >> at: aString [
 	key := self keyFor: aString.
 	key ifNil: [ ^nil ].
 	assoc := contents associationAt: key ifAbsent: [^nil].
-	^type on: assoc
+	^(type on: assoc) name: key
 ]
 
 { #category : #accessing }

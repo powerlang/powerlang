@@ -103,9 +103,10 @@ Compiler >> namespace: aDictionary [
 { #category : #initialization }
 Compiler >> newScope [
 	^MethodScope new
+		namespace: namespace;
 		species: class;
-		addPoolBinders: pools;
-		namespace: namespace
+		addPoolBinders: pools
+
 ]
 
 { #category : #services }

@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #testing }
+PoolVarBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithPoolVar: association
+]
+
+{ #category : #testing }
 PoolVarBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodePoolVar: self literal
 ]

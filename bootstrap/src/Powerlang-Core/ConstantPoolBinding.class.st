@@ -10,6 +10,11 @@ ConstantPoolBinding >> canBeAssigned [
 ]
 
 { #category : #testing }
+ConstantPoolBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithConstPoolVar: association value
+]
+
+{ #category : #testing }
 ConstantPoolBinding >> isConstantBinding [
 	^true
 ]

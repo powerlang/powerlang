@@ -14,22 +14,26 @@ Class {
 		'LoadAvisitingArgumentId',
 		'LoadAwithArgumentId',
 		'LoadAwithClassVarId',
+		'LoadAwithConstPoolId',
 		'LoadAwithFalseId',
 		'LoadAwithGlobalId',
 		'LoadAwithInstVarId',
 		'LoadAwithLiteralId',
 		'LoadAwithNilId',
+		'LoadAwithPoolVarId',
 		'LoadAwithSelfId',
 		'LoadAwithTemporaryId',
 		'LoadAwithTrueId',
 		'LoadRvisitingReceiverId',
 		'LoadRwithArgumentId',
 		'LoadRwithClassVarId',
+		'LoadRwithConstPoolId',
 		'LoadRwithFalseId',
 		'LoadRwithGlobalId',
 		'LoadRwithInstVarId',
 		'LoadRwithLiteralId',
 		'LoadRwithNilId',
+		'LoadRwithPoolVarId',
 		'LoadRwithSelfId',
 		'LoadRwithTemporaryId',
 		'LoadRwithTrueId',
@@ -84,6 +88,10 @@ AstBindingTypes class >> initialize [
 	LoadAwithGlobalId := 41.
 	LoadRwithClassVarId := 42.
 	LoadAwithClassVarId := 43.
-	PushRid := 44.
-	PopRid := 45
+	LoadRwithPoolVarId := 44.
+	LoadAwithPoolVarId := 45.
+	LoadRwithConstPoolId := 46.
+	LoadAwithConstPoolId := 47.
+	PushRid := 48.
+	PopRid := 49
 ]

@@ -109,6 +109,15 @@ AstcodeEncoder >> encodeLoadAwithClassVar: association [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithConstPoolVar: value [
+	| index |
+	index := method indexOf: value ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: LoadAwithConstPoolId;
+		nextPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodeLoadAwithGlobal: association [
 	| index |
 	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
@@ -133,6 +142,15 @@ AstcodeEncoder >> encodeLoadAwithLiteral: value [
 { #category : #visiting }
 AstcodeEncoder >> encodeLoadAwithNil [
 	stream nextPut: LoadAwithNilId
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithPoolVar: association [
+	| index |
+	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: LoadAwithPoolVarId;
+		nextPut: index
 ]
 
 { #category : #visiting }

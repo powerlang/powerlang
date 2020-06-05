@@ -152,11 +152,15 @@ SmalltalkBootstrapper >> createClassAssociations: definition [
 	class := classes at: definition.
 	assoc := self newLiteralAssociation: name -> class.
 	globals at: name put: assoc.
+	definition
+		sharedPoolsDo: [ :pool | 
+			assoc := self newLiteralAssociation: pool name -> nilObj.
+			globals at: pool name put: assoc ].
 	assocs := definition classVariables
 		collect: [ :cvar | self newLiteralAssociation: cvar name -> self nilObject ].
 	cvars := BootstrapDictionary withAll: assocs.
 	cvarMap at: definition put: cvars.
-	^cvars
+	^ cvars
 ]
 
 { #category : #initialization }
