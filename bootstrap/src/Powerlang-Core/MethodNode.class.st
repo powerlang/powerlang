@@ -75,17 +75,27 @@ MethodNode >> isMethod [
 
 { #category : #parsing }
 MethodNode >> literals [
-	| literals v l |
+	| literals v l binding |
 	literals := OrderedCollection new.
-	self nodesDo: [ :n |
-		n isLiteral ifTrue: [ v := n value. v isSmallInteger ifFalse: [ literals add: v] ].
-		n isMessageNode ifTrue: [ literals add: n symbol].
-		(n isIdentifier and: [ l := n binding literal. l notNil ])
-			ifTrue: [literals add: l].
-		(n isBlockNode andNot: [n isInlined]) ifTrue: [ literals add: n buildBlock. ]
-	].
-	
-	^literals removeDuplicates
+	self
+		nodesDo: [ :n | 
+			n isLiteral
+				ifTrue: [ v := n value.
+					v isSmallInteger
+						ifFalse: [ literals add: v ] ].
+			n isMessageNode
+				ifTrue: [ literals add: n symbol ].
+			n isBraceNode
+				ifTrue: [ n isLiteral
+						ifTrue: [ self halt ]
+						ifFalse: [ binding := scope resolve: #Array. literals add: binding association ] ].
+			(n isIdentifier
+				and: [ l := n binding literal.
+					l notNil ])
+				ifTrue: [ literals add: l ].
+			(n isBlockNode andNot: [ n isInlined ])
+				ifTrue: [ literals add: n buildBlock ] ].
+	^ literals removeDuplicates
 ]
 
 { #category : #parsing }

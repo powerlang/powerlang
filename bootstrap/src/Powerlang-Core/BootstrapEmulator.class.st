@@ -130,6 +130,7 @@ BootstrapEmulator >> initializeEmulationOverrides [
 			with: 'new: anInteger <primitive: NewSized>';
 		override: #Species -> #primitiveNewBytes:
 			with: 'primitiveNewBytes: anInteger <primitive: NewBytes>';
+		override: #'Float class' -> #new with: 'new <primitive: FloatNew>';
 		override: #ProtoObject -> #_size
 			with: '_size <primitive: UnderSize>';
 		override: #ProtoObject -> #behavior
@@ -140,10 +141,10 @@ BootstrapEmulator >> initializeEmulationOverrides [
 			with: 'primitiveSize <primitive: Size>';
 		override: #ProtoObject -> #primitiveAt:
 			with: 'primitiveAt: anInteger <primitive: At>';
+		override: #ProtoObject -> #primitiveAt:put:
+			with: 'primitiveAt: anInteger put: anObject <primitive: AtPut>';
 		override: #ProtoObject -> #basicHash
 			with: 'basicHash <primitive: Hash>';
-		override: #Object -> #primitiveAt:put:
-			with: 'primitiveAt: anInteger put: anObject <primitive: AtPut>';
 		override: #SmallInteger -> #+
 			with: '+ anObject <primitive: SMIPlus>';
 		override: #SmallInteger -> #-

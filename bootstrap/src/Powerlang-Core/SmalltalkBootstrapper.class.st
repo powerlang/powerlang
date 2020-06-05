@@ -316,11 +316,10 @@ SmalltalkBootstrapper >> fillClasses [
 	| class meta |
 	environment allClasses
 		do: [ :def | 
-			self log: 'filling ', def name, '...'.
+			self log: 'filling ' , def name , '...'.
 			class := classes at: def.
 			meta := class behavior slotNamed: #class.
 			self
-				initializeClassVariables: class with: def metaclass;
 				fillSpecies: meta with: def metaclass;
 				fillSpecies: class with: def ]
 ]
@@ -430,16 +429,6 @@ SmalltalkBootstrapper >> initializeClass: definition [
 		sharedPools: pools.
 	cvars := self createClassAssociations: definition.
 	emulator wrap: class using: definition cvars: cvars
-]
-
-{ #category : #initialization }
-SmalltalkBootstrapper >> initializeClassVariables: class with: definition [
-	| initializers |
-	initializers := definition methods
-		select: [ :m | m selector beginsWith: 'initialize' ].
-	initializers
-		do: [ :m | 
-			self emulateSend: class selector: m selector ]
 ]
 
 { #category : #initialization }
@@ -601,6 +590,13 @@ SmalltalkBootstrapper >> newDictionary [
 	| factory |
 	factory := self classNamed: 'Dictionary'.
 	^ self emulateSend: factory selector: #new
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> newFloatFrom: aFloat [
+	| bytes |
+bytes := aFloat pointerDouble.
+	^ self newBytes: 'Float' contents: bytes
 ]
 
 { #category : #initialization }
@@ -838,6 +834,8 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
+	(class inheritsFrom: Float)
+		ifTrue: [ ^ self newFloatFrom: anObject ].
 	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].
 	size := class isVariable
