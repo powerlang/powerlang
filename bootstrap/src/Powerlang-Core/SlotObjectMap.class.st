@@ -59,9 +59,9 @@ SlotObjectMap >> at: index put: value [
 	 setting named slots (aka, instance variables), to access them use 
 	 #instVarAt:put:"
 	self assert: spec isVariable.
-	self assert: (index between: 1 and: slots size - spec instSize).
+	self assert: (index between: 1 and: slots size - self instSize).
 	self assert: (value isKindOf: ObjectMap).
-	^slots at: spec instSize + index put: value
+	^slots at: self instSize + index put: value
 ]
 
 { #category : #initialization }
