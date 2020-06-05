@@ -219,7 +219,7 @@ MethodEvaluator >> evaluateBlock: closure withArgs: anArray [
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitive: primitive [
-	| index size argument |
+	| index size argument value |
 	returned := true.
 	primitive = #Behavior
 		ifTrue: [ ^ receiver isImmediate
@@ -231,7 +231,8 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 		ifTrue: [ ^ self integerFor: receiver arrayedSize ].
 	primitive = #At
 		ifTrue: [ index := arguments first value.
-			^ receiver at: index ].
+			value := receiver at: index.
+			^ receiver isBytes ifTrue: [ self integerFor: value ] ifFalse: [ value ] ].
 	primitive = #AtPut
 		ifTrue: [ index := arguments first value.
 			^ receiver at: index put: arguments second ].
@@ -268,8 +269,7 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 		ifTrue:
 			[ ^ self integerFor: (receiver value bitShift: arguments first value) ].
 	primitive = #SMIHighBit
-		ifTrue:
-			[ ^ self integerFor: (receiver value highBit) ].
+		ifTrue: [ ^ self integerFor: receiver value highBit ].
 	primitive = #SMIGreaterThan
 		ifTrue: [ ^ self booleanFor: receiver value > arguments first value ].
 	primitive = #SMIGreaterEqualThan
@@ -297,6 +297,9 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 				with: arguments third bytes
 				startingAt: arguments fourth value.
 			^ receiver ].
+	primitive = #FloatNew
+		ifTrue: [ ^ system new: receiver spec size: 8 ].
+
 	primitive = #PrimeFor
 		ifTrue: [ ^ self evaluatePrimitivePrimeFor ].
 	self ASSERT: false
