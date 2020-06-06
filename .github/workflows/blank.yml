@@ -33,6 +33,7 @@ jobs:
       run: make -C bootstrap bee-dmr test
 
     - name: XUnit Viewer
+      if: matrix.os == 'ubuntu-latest'
       id: xunit-viewer
       uses: AutoModality/action-xunit-viewer@v1.0.1
       with:
@@ -40,6 +41,7 @@ jobs:
         results: bootstrap/test-reports # default is test-reports
 
     - name: Attach the report
+      if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v1
       with:
         name: upload-result
