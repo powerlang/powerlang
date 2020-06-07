@@ -405,8 +405,7 @@ SmalltalkBootstrapper >> initializeBehavior: anObjectMap [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeClass: definition [
-	| class supername superclass name flag ivars poolnames pools subclasses
-	 format cvars |
+	| class supername superclass name flag ivars poolnames pools subclasses format cvars |
 	class := classes at: definition.
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
@@ -427,6 +426,8 @@ SmalltalkBootstrapper >> initializeClass: definition [
 		name: name;
 		subclasses: subclasses;
 		sharedPools: pools.
+	definition metaclass allInstVarNames
+		do: [ :ivar | class slotNamed: ivar put: nilObj ].
 	cvars := self createClassAssociations: definition.
 	emulator wrap: class using: definition cvars: cvars
 ]

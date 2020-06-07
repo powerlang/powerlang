@@ -10,6 +10,11 @@ Class {
 	#category : #'Powerlang-TestsFailing-Building'
 }
 
+{ #category : #accessing }
+BootstrapTest class >> defaultTimeLimit [
+	^ 30 seconds
+]
+
 { #category : #running }
 BootstrapTest >> setUp [
 	kernel := SmalltalkBootstrapper spec.
