@@ -91,3 +91,8 @@ BootstrapDictionary >> isConstant [
 BootstrapDictionary >> keys [
 	^globals keys
 ]
+
+{ #category : #accessing }
+BootstrapDictionary >> valuesDo: aBlock [
+	^ self associations do: [:a | aBlock value: a value ]
+]

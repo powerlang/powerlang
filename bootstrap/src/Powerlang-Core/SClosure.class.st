@@ -45,17 +45,17 @@ SClosure >> isSelfEvaluating [
 
 { #category : #accessing }
 SClosure >> value [
-	^home evaluateBlock: self
+	^home evaluateClosure: self
 ]
 
 { #category : #accessing }
 SClosure >> value: anObject [
-	^home evaluateBlock: self with: anObject
+	^home evaluateClosure: self with: anObject
 ]
 
 { #category : #accessing }
 SClosure >> value: anObject1 value: anObject2 [ 
-	^ home evaluateBlock: self with: anObject1 with: anObject2
+	^ home evaluateClosure: self with: anObject1 with: anObject2
 ]
 
 { #category : #accessing }
@@ -66,15 +66,15 @@ SClosure >> value: anObject1 value: anObject2 with: anObject3 [
 { #category : #accessing }
 SClosure >> whileFalse: aBlockSubject [
 	| result |
-	[ result := home evaluateBlock: self.
+	[ result := home evaluateClosure: self.
 	result _gate handle asLocalBoolean ] 
-		whileFalse: [ home evaluateBlock: aBlockSubject _gate handle oid ]
+		whileFalse: [ home evaluateClosure: aBlockSubject _gate handle oid ]
 ]
 
 { #category : #accessing }
 SClosure >> whileTrue: aBlockSubject [
 	| result |
-	[ result := home evaluateBlock: self.
+	[ result := home evaluateClosure: self.
 	result _gate handle asLocalBoolean ]
-		whileTrue: [ home evaluateBlock: aBlockSubject _gate handle oid ]
+		whileTrue: [ home evaluateClosure: aBlockSubject _gate handle oid ]
 ]

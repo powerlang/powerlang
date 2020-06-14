@@ -19,7 +19,13 @@ BootstrapClass class >> spec: anRGBehavior map: anObjectMap cvars: aBootstrapDic
 
 { #category : #accessing }
 BootstrapClass >> allInstVarNames [
-	^spec allInstVarNames
+	| other |
+	other := spec isMeta
+	
+		ifTrue:
+			[ (spec environment at: #Class) allInstVarNames]
+		ifFalse: [ #() ].
+	^ other , spec allInstVarNames
 ]
 
 { #category : #accessing }

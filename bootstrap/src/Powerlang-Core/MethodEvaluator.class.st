@@ -8,11 +8,12 @@ Class {
 		'arguments',
 		'temporaries',
 		'environment',
-		'returned',
 		'returnValue',
 		'closures',
 		'blockAstcodes',
-		'system'
+		'system',
+		'returning',
+		'isBlock'
 	],
 	#classVars : [
 		'Undermessages'
@@ -46,6 +47,11 @@ MethodEvaluator >> argumentAt: index in: anInteger [
 ]
 
 { #category : #visiting }
+MethodEvaluator >> arguments [
+	^arguments
+]
+
+{ #category : #visiting }
 MethodEvaluator >> arguments: aCollection [
 	arguments := aCollection
 ]
@@ -53,6 +59,30 @@ MethodEvaluator >> arguments: aCollection [
 { #category : #visiting }
 MethodEvaluator >> association: association put: value [
 	^ association value: value
+]
+
+{ #category : #visiting }
+MethodEvaluator >> backtrace [
+	| bt next |
+	bt := OrderedCollection new.
+	next := self.
+	[ next notNil ]
+		whileTrue: [ bt
+				add:
+					{next method signature.
+					next receiver} , next arguments.
+			next := next parent ].
+	^ bt
+]
+
+{ #category : #visiting }
+MethodEvaluator >> beBlock [
+	isBlock := true
+]
+
+{ #category : #visiting }
+MethodEvaluator >> blockAstcodesOf: anSCompiledBlock [
+	^blockAstcodes at: anSCompiledBlock
 ]
 
 { #category : #visiting }
@@ -180,47 +210,59 @@ MethodEvaluator >> evaluate: sexpressions [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluateBlock: aPClosure [
-	^self evaluateBlock: aPClosure withArgs: {}
+MethodEvaluator >> evaluateBlock: sblock args: anArray [
+	" as this block is inlined, we didn't capture parent environment.
+	Thus, we don't know if environment is a closure or a method home.
+	We unwind to that environment and clean up later if it was a closure. "
+
+	anArray
+		with: sblock inlinedArgs
+		do: [ :arg :i | temporaries at: i put: arg ].
+	^ self visitScript: sblock
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluateBlock: aPClosure with: anObject [
-	 ^self evaluateBlock: aPClosure withArgs: { anObject }
-]
+MethodEvaluator >> evaluateBlock: sblock args: anArray closure: closure [
+	" inlined blocks can only return to their real parent environment.
+	Here we complete the non-local return process for them, unwinding
+	to the real home environment "
 
-{ #category : #visiting }
-MethodEvaluator >> evaluateBlock: aPClosure with: anObject with: anotherObject [
-	^ self evaluateBlock: aPClosure withArgs: {anObject. anotherObject}
-]
-
-{ #category : #visiting }
-MethodEvaluator >> evaluateBlock: closure withArgs: anArray [
-	| oldArgs oldTemps oldEnv block sblock result |
-	block := self blockOf: closure.
-	sblock := blockAstcodes at: block.
-	sblock isInlined
-		ifTrue: [ anArray
-				with: sblock inlinedArgs
-				do: [ :arg :i | temporaries at: i put: arg ].
-			^ self visitScript: sblock ].
-	oldArgs := arguments.
-	oldTemps := temporaries.
-	oldEnv := environment.
-	arguments := anArray.
-	temporaries := Array new: block tempCount.
+	temporaries := Array new: sblock tempCount.
 	environment := closure.
-	result := self visitScript: sblock.
-	environment := oldEnv.
-	temporaries := oldTemps.
-	arguments := oldArgs.
-	^ result
+	arguments := anArray.
+	^ self visitScript: sblock
+]
+
+{ #category : #visiting }
+MethodEvaluator >> evaluateClosure: aPClosure [
+	^self evaluateClosure: aPClosure withArgs: {}
+]
+
+{ #category : #visiting }
+MethodEvaluator >> evaluateClosure: aPClosure with: anObject [
+	 ^self evaluateClosure: aPClosure withArgs: { anObject }
+]
+
+{ #category : #visiting }
+MethodEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject [
+	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
+]
+
+{ #category : #visiting }
+MethodEvaluator >> evaluateClosure: closure withArgs: anArray [
+	| home block sblock evaluator |
+	home := self homeOf: closure.
+	block := home blockOf: closure.
+	sblock := home blockAstcodesOf: block.
+	evaluator := home copy parent: self; beBlock.
+	^ sblock isInlined
+		ifTrue: [ evaluator evaluateBlock: sblock args: anArray ]
+		ifFalse: [ evaluator evaluateBlock: sblock args: anArray closure: closure ]
 ]
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitive: primitive [
 	| index size argument value |
-	returned := true.
 	primitive = #Behavior
 		ifTrue: [ ^ receiver isImmediate
 				ifTrue: [ system smallintBehavior ]
@@ -232,7 +274,9 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 	primitive = #At
 		ifTrue: [ index := arguments first value.
 			value := receiver at: index.
-			^ receiver isBytes ifTrue: [ self integerFor: value ] ifFalse: [ value ] ].
+			^ receiver isBytes
+				ifTrue: [ self integerFor: value ]
+				ifFalse: [ value ] ].
 	primitive = #AtPut
 		ifTrue: [ index := arguments first value.
 			^ receiver at: index put: arguments second ].
@@ -299,7 +343,6 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 			^ receiver ].
 	primitive = #FloatNew
 		ifTrue: [ ^ system new: receiver spec size: 8 ].
-
 	primitive = #PrimeFor
 		ifTrue: [ ^ self evaluatePrimitivePrimeFor ].
 	self ASSERT: false
@@ -315,37 +358,34 @@ MethodEvaluator >> evaluatePrimitiveClosureArgumentCount [
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitiveClosureValue [
-	| interpreter |
-	interpreter := self homeOf: receiver.
-	^ interpreter evaluateBlock: receiver
+	^ self evaluateClosure: receiver
 ]
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitiveClosureValueWithArgs [
-	| interpreter |
-	interpreter := self homeOf: receiver.
-	^ interpreter evaluateBlock: receiver withArgs: arguments
+	^ self evaluateClosure: receiver withArgs: arguments
 ]
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitiveClosureWhileFalse [
-	| homeR result arg homeA |
-	homeR := self homeOf: receiver.
+	| result arg |
 	arg := arguments first.
-	homeA := self homeOf: arg.
-	[ result := homeR evaluateBlock: receiver.
-	system booleanFrom: result ] whileFalse: [ homeA evaluateBlock: arg ].
+	[ result := self evaluateClosure: receiver.
+	returning
+		ifTrue: [ ^ returnValue ].
+	system booleanFrom: result ]
+		whileFalse: [ self evaluateClosure: arg.
+			returning
+				ifTrue: [ ^ returnValue ] ].
 	^ receiver
 ]
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitiveClosureWhileTrue [
-	| homeR result arg homeA |
-	homeR := self homeOf: receiver.
+	| result arg |
 	arg := arguments first.
-	homeA := self homeOf: arg.
-	[ result := homeR evaluateBlock: receiver.
-	system booleanFrom: result ] whileTrue: [ homeA evaluateBlock: arg ].
+	[ result := self evaluateClosure: receiver. returning ifTrue: [^returnValue].
+	system booleanFrom: result ] whileTrue: [ self evaluateClosure: arg. returning ifTrue: [^returnValue]].
 	^ receiver
 ]
 
@@ -383,9 +423,10 @@ MethodEvaluator >> homeOf: closure [
 
 { #category : #visiting }
 MethodEvaluator >> initialize [
-	returned := false.
 	blockAstcodes := IdentityDictionary new.
-	closures := IdentityDictionary new
+	closures := IdentityDictionary new.
+	returning := false.
+	isBlock := false
 ]
 
 { #category : #visiting }
@@ -401,6 +442,11 @@ MethodEvaluator >> instanceVarAt: index put: aValue [
 { #category : #visiting }
 MethodEvaluator >> integerFor: anInteger [
 	^ system newInteger: anInteger
+]
+
+{ #category : #visiting }
+MethodEvaluator >> isHomeOf: env [
+	^ environment == env andNot: [ isBlock ]
 ]
 
 { #category : #visiting }
@@ -441,26 +487,12 @@ MethodEvaluator >> parent: anInterpreter [
 
 { #category : #printing }
 MethodEvaluator >> printOn: aStream [
-	aStream
-		nextPutAll: self class name withArticle;
-		cr;
-		print: method classBinding;
-		nextPutAll: '>>';
-		print: method selector;
-		cr.
-	aStream
-		nextPutAll: 'rcvr -> ';
-		print: receiver;
-		cr.
-	arguments
-		withIndexDo: [ :a :i | 
-			aStream
-				nextPutAll: 'arg ';
-				print: i;
-				nextPutAll: ' -> ';
-				print: a;
-				cr ].
-	aStream nextPutAll: method source
+ self backtrace
+				do: [ :frame | 
+					frame
+						do: [ :elem | elem printOn: aStream ]
+						separatedBy: [ aStream nextPutAll: '. ' ].
+					aStream cr ]
 ]
 
 { #category : #visiting }
@@ -471,6 +503,12 @@ MethodEvaluator >> receiver [
 { #category : #visiting }
 MethodEvaluator >> receiver: anObject [
 	receiver := anObject.
+	returnValue := anObject
+]
+
+{ #category : #visiting }
+MethodEvaluator >> returning: anObject [
+	returning := true.
 	returnValue := anObject
 ]
 
@@ -498,6 +536,13 @@ MethodEvaluator >> temporaryAt: index in: anInteger put: aValue [
 { #category : #visiting }
 MethodEvaluator >> trueLiteral [
 	^system trueObject
+]
+
+{ #category : #visiting }
+MethodEvaluator >> unwindTo: env returning: value [
+	| evaluator |
+	evaluator := self.
+	[ evaluator returning: value. evaluator isHomeOf: env ] whileFalse: [ evaluator := evaluator parent ]
 ]
 
 { #category : #visiting }
@@ -560,6 +605,7 @@ MethodEvaluator >> visitMessage: anSMessage [
 	args := anSMessage arguments
 		collect: [ :code | code acceptVisitor: self ].
 	selector := system symbolFrom: anSMessage selector.
+	self ASSERT: selector !== #error:.
 	message := MessageSend
 		receiver: recv
 		selector: selector
@@ -571,31 +617,42 @@ MethodEvaluator >> visitMessage: anSMessage [
 
 { #category : #visiting }
 MethodEvaluator >> visitMethod: anSMethod [
-	| primitive value |
+	| primitive |
 	primitive := anSMethod primitive.
-	primitive ifNotNil: [ ^ self evaluatePrimitive: primitive ].
+	primitive
+		ifNotNil: [ ^self evaluatePrimitive: primitive].
 	environment := system newNamed: #Array size: method environmentCount.
-	value := self visitScript: anSMethod.
-	^ returned
-		ifTrue: [ value ]
+	self visitScript: anSMethod.
+	^ returning
+		ifTrue: [ returnValue ]
 		ifFalse: [ receiver ]
 ]
 
 { #category : #visiting }
 MethodEvaluator >> visitReturn: anSReturn [
-	returnValue := anSReturn expression acceptVisitor: self.
-	returned := true.
-	^returnValue
+	| value home |
+	value := anSReturn expression acceptVisitor: self.
+	"it could happen that while we were going to return, the
+	expression contained a non-local return that was reached.
+	In that case we just keep unwinding without altering the
+	unwindLimit"
+	returning
+		ifTrue: [ ^ returnValue ].
+	home := anSReturn local
+		ifTrue: [ environment ]
+		ifFalse: [ environment at: 1 ].
+	self unwindTo: home returning: value
 ]
 
 { #category : #visiting }
 MethodEvaluator >> visitScript: anSScript [
 	| result |
-	anSScript statements do: [:node | 
-		result := node acceptVisitor: self.
-		returned ifTrue: [^returnValue]
-	].
-	^result
+	anSScript statements
+		do: [ :node | 
+			result := node acceptVisitor: self.
+			returning
+				ifTrue: [ ^ returnValue ] ].
+	^ result
 ]
 
 { #category : #visiting }

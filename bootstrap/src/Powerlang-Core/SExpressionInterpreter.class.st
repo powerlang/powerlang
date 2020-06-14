@@ -98,22 +98,22 @@ SExpressionInterpreter >> evaluate: anSCompiledMethod [
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluateBlock: aPClosure [
-	^self evaluateBlock: aPClosure withArgs: {}
+SExpressionInterpreter >> evaluateClosure: aPClosure [
+	^self evaluateClosure: aPClosure withArgs: {}
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluateBlock: aPClosure with: anObject [
-	 ^self evaluateBlock: aPClosure withArgs: { anObject }
+SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject [
+	 ^self evaluateClosure: aPClosure withArgs: { anObject }
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluateBlock: aPClosure with: anObject with: anotherObject [
-	^ self evaluateBlock: aPClosure withArgs: {anObject. anotherObject}
+SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject with: anotherObject [
+	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
 { #category : #visiting }
-SExpressionInterpreter >> evaluateBlock: aPClosure withArgs: anArray [
+SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 	| oldArgs oldTemps oldEnv block sblock result |
 	block := aPClosure block.
 	sblock := blockAstcodes at: block.

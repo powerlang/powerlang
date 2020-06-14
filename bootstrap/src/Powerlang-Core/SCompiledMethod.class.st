@@ -162,6 +162,16 @@ SCompiledMethod >> isFrameless [
 	^ self hasFrame not
 ]
 
+{ #category : #accessing }
+SCompiledMethod >> nativeCode [
+	^nativeCode
+]
+
+{ #category : #accessing }
+SCompiledMethod >> nativeCode: aNativeCode [ 
+	nativeCode := aNativeCode 
+]
+
 { #category : #printing }
 SCompiledMethod >> printOn: aStream [
 	aStream nextPutAll: self classBinding name; nextPutAll: '>>'; print: selector; cr.
@@ -188,6 +198,11 @@ SCompiledMethod >> sexpressions [
 		stream: astcodes readStream;
 		method: self.
 	^decoder decodeMethod
+]
+
+{ #category : #constants }
+SCompiledMethod >> signature [
+	^class-> selector
 ]
 
 { #category : #constants }

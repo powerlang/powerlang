@@ -58,12 +58,25 @@ SmalltalkBootstrapper >> addObjectDeep: anObject [
 	self ASSERT: (anObject isKindOf: ObjectMap).
 	anObject isImmediate
 		ifTrue: [ ^ self ].
+	(objects includes: anObject)  ifTrue: [ ^self ].
 	objects add: anObject.
 	anObject
 		slotsDo: [ :s | 
-			(objects includes: s)
-				ifFalse: [ self addObjectDeep: s ] ].
+			 self addObjectDeep: s ].
 	^ anObject
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> addRemainingObjects [
+	| slot |
+	globals valuesDo: [ :obj | self addObjectDeep: obj ].
+	classes
+		do: [ :c | 
+			1 to: c instSize do: [ :i | 
+				slot := c slotAt: i.
+				self addObjectDeep: slot ] ].
+	cvarMap
+		valuesDo: [ :dict | dict valuesDo: [ :v | self addObjectDeep: v ] ]
 ]
 
 { #category : #initialization }
@@ -240,23 +253,11 @@ SmalltalkBootstrapper >> createMetaclass: spec [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> createMethodDictionary: definition [
-	| class behavior md size dictionary |
-	class := classes at: definition.
-	behavior := class instanceBehavior.
-	md := self classNamed: #MethodDictionary.
-	size := self newSmallInteger: definition methods size.
-	dictionary := self emulateSend: md selector: #new: with: {size}.
-	behavior methods: dictionary.
-	^ self addObjectDeep: dictionary
-]
-
-{ #category : #initialization }
 SmalltalkBootstrapper >> createMethodDictionary: species sized: anInteger [
 	| behavior md size dictionary |
 	behavior := species instanceBehavior.
 	md := self classNamed: #MethodDictionary.
-	size := self newSmallInteger: anInteger.
+	size := self newInteger: anInteger.
 	dictionary := self emulateSend: md selector: #new: with: {size}.
 	behavior methods: dictionary.
 	^ self addObjectDeep: dictionary
@@ -326,21 +327,20 @@ SmalltalkBootstrapper >> fillClasses [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> fillSpecies: species with: definition [
-	| dictionary compiler method transferred |
+	| dictionary method transferred |
 	dictionary := self
 		createMethodDictionary: species
 		sized: definition methods size.
-	compiler := self compilerFor: definition.
 	definition methods
 		do: [ :m | 
-			method := emulator compile: m.
+			method := emulator compile: m nativize: true.
 			transferred := self transferMethod: method in: species.
-			self emulateSend: dictionary
+			self
+				emulateSend: dictionary
 				selector: #basicAt:put:
 				with:
 					{transferred selector.
-					transferred}.
-			 ]
+					transferred} ]
 ]
 
 { #category : #initialization }
@@ -372,6 +372,7 @@ SmalltalkBootstrapper >> genesis [
 		createClasses;
 		initializeSmalltalk;
 		fillClasses;
+		addRemainingObjects;
 		validate
 ]
 
