@@ -15,9 +15,7 @@ Class {
 		'encoder',
 		'wordSize',
 		'memory',
-		'labels',
-		'references',
-		'lastPointer'
+		'labels'
 	],
 	#classVars : [
 		'IndexedLabels'
@@ -158,7 +156,6 @@ Assembler64 >> assemble: mnemonic with: op1 withImm64: op2 [
 	v := self regV.
 	self
 		assemble: 'mov' with: v with: op2;
-		saveLastEmittedPointer;
 		assemble: mnemonic with: op1 with: v
 ]
 
@@ -176,7 +173,6 @@ Assembler64 >> assemble: mnemonic withImm64: op1 [
 	v := self regV.
 	self
 		assemble: 'mov' with: v with: op1;
-		saveLastEmittedPointer;
 		assemble: mnemonic with: v
 ]
 
@@ -310,13 +306,6 @@ Assembler64 >> compare: op1 with: op2 [
 	self assemble: 'cmp' with: op1 with: op2
 ]
 
-{ #category : #services }
-Assembler64 >> compare: op1 withPointer: op2 [
-	self
-		assemble: 'cmp' with: op1 withImm: self dummyPointer;
-		holdReferenceTo: op2
-]
-
 { #category : #integers }
 Assembler64 >> convertToNativeInteger: reg [
 	self assemble: 'sar' with: reg with: 1
@@ -339,25 +328,6 @@ Assembler64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
 ]
 
-{ #category : #accessing }
-Assembler64 >> holdReference: reference [
-	reference sourceOffset: self currentAddress - self addressSize.
-	^references add: reference
-]
-
-{ #category : #accessing }
-Assembler64 >> holdReferenceTo: anObject [
-	| reference |
-	reference := NativeCodeReference absoluteFor: anObject.
-	reference sourceOffset: self lastEmittedPointer.
-	^references add: reference
-]
-
-{ #category : #private }
-Assembler64 >> incrementLastEmittedPointer: anInteger [
-	lastPointer := lastPointer + anInteger
-]
-
 { #category : #initialization }
 Assembler64 >> initialize [
 	super initialize.
@@ -369,8 +339,6 @@ Assembler64 >> initialize [
 	pointer := MemoryOperand new.
 	encoder := instruction encoder.
 	labels := Dictionary new: 100.
-	references := OrderedCollection new.
-	lastPointer := 0
 ]
 
 { #category : #'private - jumps' }
@@ -471,24 +439,6 @@ Assembler64 >> jumpToReg: reg [
 	self assemble: 'jmp' with: reg
 ]
 
-{ #category : #accessing }
-Assembler64 >> lastEmittedPointer [
-	| patch |
-	patch := self currentAddress.
-	self lastInstructionUsedV ifTrue: [patch := lastPointer].
-	^patch - wordSize
-]
-
-{ #category : #accessing }
-Assembler64 >> lastInstructionUsedV [
-	^wordSize = 8 and: [self currentAddress - lastPointer <= 7]
-]
-
-{ #category : #accessing }
-Assembler64 >> lastPointer [
-	^lastPointer
-]
-
 { #category : #integers }
 Assembler64 >> leadingRzeroCount [
 	"
@@ -532,13 +482,6 @@ Assembler64 >> load: reg1 from: reg2 atIndexAt: reg3 [
 { #category : #jumps }
 Assembler64 >> load: reg withImmediate: imm [
 	self assemble: 'mov' with: reg with: imm
-]
-
-{ #category : #jumps }
-Assembler64 >> load: reg withPointer: object [
-	self
-		assemble: 'mov' with: reg withImm: self dummyPointer;
-		holdReferenceTo: object
 ]
 
 { #category : #storing }
@@ -696,11 +639,6 @@ Assembler64 >> putPointer: oop at: position [
 		ensure: [memory position: original]
 ]
 
-{ #category : #initialization }
-Assembler64 >> references [
-	^references
-]
-
 { #category : #private }
 Assembler64 >> regV [
 	^r11
@@ -757,8 +695,6 @@ Assembler64 >> renameRegisterPreserving: preserved1 preserving: preserved2 [
 { #category : #initialization }
 Assembler64 >> reset [
 	labels := Dictionary new: 100.
-	references := OrderedCollection new.
-	lastPointer := 0.
 	memory reset
 ]
 
@@ -789,11 +725,6 @@ Assembler64 >> rotateLeft: op1 count: count [
 Assembler64 >> rotateRight: op1 count: count [
 	self ASSERT: count < 32.
 	self assemble: 'ror' with: op1 with: count
-]
-
-{ #category : #private }
-Assembler64 >> saveLastEmittedPointer [
-	lastPointer := self currentAddress
 ]
 
 { #category : #accessing }
@@ -924,25 +855,6 @@ Assembler64 >> storeByte: byte in: reg2 offset: offset [
 		base: reg2;
 		displacement: offset.
 	self assemble: 'mov' with: pointer with: byte
-]
-
-{ #category : #storing }
-Assembler64 >> storePointer: object in: reg2 index: index [
-	| offset |
-	offset := self offsetOfIndex: index.
-	self storePointer: object in: reg2 offset: offset
-]
-
-{ #category : #storing }
-Assembler64 >> storePointer: object in: reg2 offset: offset [
-	object isSmallInteger ifTrue: [self halt].
-	self loadVwithPointer: object.
-	pointer
-		reset;
-		length: self addressLength;
-		base: reg2;
-		displacement: offset.
-	self assemble: 'mov' with: pointer with: self regV
 ]
 
 { #category : #initialization }

@@ -1,6 +1,6 @@
 Class {
 	#name : #LoadAwithLiteral,
-	#superclass : #LoadAOpcode,
+	#superclass : #LoadAwithLiteralVar,
 	#instVars : [
 		'value'
 	],
@@ -9,20 +9,21 @@ Class {
 
 { #category : #unclassified }
 LoadAwithLiteral class >> decodeUsing: anAstcodeDecoder [
-	| index value |
-	index := anAstcodeDecoder nextInteger.
-	value := index = 0
-		ifTrue: [anAstcodeDecoder next]
-		ifFalse: [anAstcodeDecoder literalAt: index].
-	^self new value: value
+	| instance index  |
+	instance := super decodeUsing: anAstcodeDecoder.
+	index := instance index.
+	index = 0
+		ifTrue: [ instance value: anAstcodeDecoder next ].
+	^ instance
 ]
 
 { #category : #'as yet unclassified' }
 LoadAwithLiteral >> nativizeUsing: anAssembler for: messageNativizer [
-	self flag: #WordSizeFlag.
-	value isSmallInteger
+	| i |
+	value notNil
 		ifTrue: [ anAssembler loadAwithSmallInteger: value ]
-		ifFalse: [ anAssembler loadAwithPointer: value ]
+		ifFalse: [ 	i := messageNativizer methodLiteralIndexFrom: index.
+	anAssembler loadAwithMindex: i]
 ]
 
 { #category : #'as yet unclassified' }

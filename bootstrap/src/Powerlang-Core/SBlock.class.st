@@ -2,6 +2,7 @@ Class {
 	#name : #SBlock,
 	#superclass : #SScript,
 	#instVars : [
+		'index',
 		'capturedVariables',
 		'inlinedArgs'
 	],
@@ -26,6 +27,16 @@ SBlock >> capturedVariables [
 { #category : #accessing }
 SBlock >> capturedVariables: aCollection [
 	capturedVariables := aCollection
+]
+
+{ #category : #accessing }
+SBlock >> index [
+	^index
+]
+
+{ #category : #accessing }
+SBlock >> index: anInteger [
+	index := anInteger
 ]
 
 { #category : #initialization }

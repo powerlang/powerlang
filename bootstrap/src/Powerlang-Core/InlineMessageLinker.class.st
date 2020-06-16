@@ -186,9 +186,8 @@ InlineMessageLinker >> assembleBitShiftLeft [
 		ensureSafeRintegerBit;
 		compareRwithA;
 		popR;
-		shortJumpIfEqualTo: success.
-	self loadObject: nil.
-	assembler @ success 
+		shortJumpIfEqualTo: success;
+		loadRwithNil; @ success
 ]
 
 { #category : #'private - assemble' }
@@ -489,9 +488,10 @@ InlineMessageLinker >> assembleGetThreadValue [
 		loadRwithThreadVariableAtIndexR;
 		compareRwithImmediate: 0;
 		shortJumpIfEqualTo: uninitialized.
-	assembler jumpOver: [
-		assembler @ uninitialized; @ nonInteger.
-		self loadObject: nil] 
+	assembler
+		jumpOver: [ assembler
+				@ uninitialized;
+				@ nonInteger; loadRwithNil ]
 ]
 
 { #category : #'private - instance behavior' }
@@ -604,11 +604,11 @@ InlineMessageLinker >> assembleNilSlots [
 	assembler
 		pushE;
 		loadEwithR;
-		loadRwithPointer: nil;
+		loadRwithNil;
 		loadTwithA;
 		convertTtoNativeInteger;
 		writeTslots;
-		popE 
+		popE
 ]
 
 { #category : #'private - assemble' }
@@ -760,11 +760,7 @@ InlineMessageLinker >> assembleStoreFloatStatusInto [
 InlineMessageLinker >> assembleTestSmallInteger [
 	| integer |
 	integer := assembler newLabel.
-	assembler testRintegerBit.
-	self loadObject: true.
-	assembler shortJumpIfNotZeroTo: integer.
-	self loadObject: false.
-	assembler @ integer 
+	assembler testRintegerBit; loadRwithTrue; shortJumpIfNotZeroTo: integer; loadRwithFalse; @ integer
 ]
 
 { #category : #'private - assemble' }
@@ -801,9 +797,9 @@ InlineMessageLinker >> assembleULargeAtOffset [
 		shortJumpIfSignTo: overflow2;
 		ensureRintegerBit;
 		shortJumpTo: end.
-	assembler @ overflow1; @ overflow2.
-	self loadObject: nil.
-	assembler @ end 
+	assembler
+		@ overflow1;
+		@ overflow2; loadRwithNil; @ end
 ]
 
 { #category : #'private - assemble' }
@@ -843,9 +839,9 @@ InlineMessageLinker >> assembleULongAtOffset [
 		shortJumpIfSignTo: overflow2;
 		ensureRintegerBit;
 		shortJumpTo: end.
-	assembler @ overflow1; @ overflow2.
-	self loadObject: nil.
-	assembler @ end 
+	assembler
+		@ overflow1;
+		@ overflow2; loadRwithNil; @ end
 ]
 
 { #category : #'private - assemble' }
@@ -972,11 +968,6 @@ InlineMessageLinker >> loadArgumentsIntoRegisters [
 		assemble: 'movq' with: xmm3 with: r9 
 ]
 
-{ #category : #'opcodes - loading' }
-InlineMessageLinker >> loadObject: anObject [
-	assembler loadRwithPointer: anObject 
-]
-
 { #category : #printing }
 InlineMessageLinker >> printOn: aStream [
 	aStream nextPutAll: 'Inliner for: ' , selector storeString 
@@ -984,16 +975,16 @@ InlineMessageLinker >> printOn: aStream [
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> readFPUStatus [
-	| status |
-	status := Float statusVar.
-	assembler loadAwithPointer: status; readFPUStatusOnA 
+	assembler
+		loadAwithKnown: #FloatStatus;
+		readFPUStatusOnA
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> readFloatStatus [
-	| status |
-	status := Float statusVar.
-	assembler loadAwithPointer: status; storeMXCSRintoA 
+	assembler
+		loadAwithKnown: #FloatStatus;
+		storeMXCSRintoA
 ]
 
 { #category : #accessing }

@@ -9,14 +9,15 @@ Class {
 		'optimizedMethods',
 		'invokedMethods',
 		'cachedNativizer',
-		'busy'
+		'busy',
+		'methodInstSize'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
-	^ self new
+	^ self forTesting: SmalltalkBootstrapper spec
 ]
 
 { #category : #private }
@@ -69,6 +70,11 @@ NativizationEnvironment >> messageLinker: aLinker [
 ]
 
 { #category : #accessing }
+NativizationEnvironment >> methodInstSize [
+^methodInstSize 
+]
+
+{ #category : #accessing }
 NativizationEnvironment >> methodNativizer [
 	^ cachedNativizer 
 ]
@@ -78,7 +84,7 @@ NativizationEnvironment >> methodSubset: aDictionary [
 	| species |
 	^aDictionary flatCollect: [ :assoc | 
 		species := spec at: assoc key.
-		assoc values collect: [:sel | species >> sel ] ].	
+		assoc value collect: [:sel | species >> sel ] ].	
 ]
 
 { #category : #services }
@@ -183,15 +189,17 @@ NativizationEnvironment >> shouldOptimize: method [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> spec: anRGEnvironment [ 
+NativizationEnvironment >> spec: anRGEnvironment [
 	spec := anRGEnvironment.
-	self setupOptimizedMethods; setupInvokedMethods
+	methodInstSize := (spec at: #CompiledMethod) instSize.
+	self
+		setupOptimizedMethods;
+		setupInvokedMethods
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> undermethods [
-	^(spec at: #ProtoObject) 
-		methodDictionary select: [:m | m selector beginsWith: '_'].	
+	^(spec at: #ProtoObject) methods select: [:m | m selector beginsWith: '_'].	
 ]
 
 { #category : #services }

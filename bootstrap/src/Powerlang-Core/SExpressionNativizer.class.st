@@ -269,10 +269,14 @@ SExpressionNativizer >> emitEpilogueNoFrame [
 
 { #category : #services }
 SExpressionNativizer >> emitFFICall [
-	self loadObject: method.
-	assembler pushR; pushS.
+	assembler loadRwithM;
+		pushR;
+		pushS.
 	self emitSend: #_ffiCall:.
-	assembler restoreCallerFrame; restoreCallerSelf; return
+	assembler
+		restoreCallerFrame;
+		restoreCallerSelf;
+		return
 ]
 
 { #category : #services }
@@ -318,11 +322,6 @@ SExpressionNativizer >> emitSend: selector [
 		ifFalse: [ linker emitSend: selector using: assembler ]
 ]
 
-{ #category : #services }
-SExpressionNativizer >> emitSend: selector to: anObject [
-	self loadObject: anObject; emitSend: selector
-]
-
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
@@ -338,14 +337,18 @@ SExpressionNativizer >> initialize [
 
 { #category : #services }
 SExpressionNativizer >> initializeMethodEnvironment [
-	method hasBlocks ifFalse: [^self].
+	method hasBlocks
+		ifFalse: [ ^ self ].
 	assembler pushE.
 	method hasEnvironment
-		ifTrue: [
-			assembler pushSmallInteger: method environmentCount.
-			self emitSend: #new: to: Array.
-			assembler loadEwithR; pushE]
-		ifFalse: [self pushNil]
+		ifTrue: [ assembler
+				pushSmallInteger: method environmentCount;
+				loadRwithM.
+			self emitSend: #newEnvironment:.
+			assembler
+				loadEwithR;
+				pushE ]
+		ifFalse: [ assembler pushNil ]
 ]
 
 { #category : #services }
@@ -355,15 +358,12 @@ SExpressionNativizer >> initializeMethodTemporaries [
 
 { #category : #services }
 SExpressionNativizer >> initializeTemporaries: count [
-	count = 0 ifTrue: [^self].
+	count = 0
+		ifTrue: [ ^ self ].
 	count <= 6
-		ifTrue: [
-			assembler loadAwithPointer: nil.
-			count timesRepeat: [assembler pushA]]
-		ifFalse: [
-			assembler
-				loadAwithPointer: nil;
-				loop: [assembler pushA] times: count]
+		ifTrue: [ count timesRepeat: [ assembler pushNil ] ]
+		ifFalse: [ assembler
+				loop: [ assembler pushNil ] times: count ]
 ]
 
 { #category : #services }
@@ -372,11 +372,8 @@ SExpressionNativizer >> instanceVarAt: index [
 ]
 
 { #category : #services }
-SExpressionNativizer >> instantiateClosure: aCompiledBlock [
-	self
-		loadObject: SClosure;
-		pushObject: aCompiledBlock;
-		emitSend: #newFrom:
+SExpressionNativizer >> instantiateClosure: anSBlock [
+	self loadLiteralAt: anSBlock index; emitSend: #newClosure
 ]
 
 { #category : #services }
@@ -442,15 +439,18 @@ SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 { #category : #services }
 SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 	aCompiledBlock capturesSelf
-		ifTrue: [ 
-		assembler loadSwithRindex: SClosure instSize + SClosure receiverIndex ]
-		ifFalse: [ assembler loadSwithPointer: nil ].
+		ifTrue: [ assembler
+				loadSwithRindex: SClosure instSize + SClosure receiverIndex ]
+		ifFalse: [ assembler loadSwithNil ].
 	assembler pushS
 ]
 
 { #category : #services }
-SExpressionNativizer >> loadObject: anObject [
-	assembler loadRwithPointer: anObject
+SExpressionNativizer >> loadLiteralAt: anInteger [
+	| index |
+	index := self
+		methodLiteralIndexFrom: anInteger. assembler
+		loadRwithMindex: index
 ]
 
 { #category : #services }
@@ -461,6 +461,11 @@ SExpressionNativizer >> loadRwithStack: anInteger [
 { #category : #accessing }
 SExpressionNativizer >> method [
 	^method
+]
+
+{ #category : #services }
+SExpressionNativizer >> methodLiteralIndexFrom: anInteger [
+	^environment methodInstSize + anInteger
 ]
 
 { #category : #services }
@@ -504,7 +509,8 @@ SExpressionNativizer >> popR [
 { #category : #services }
 SExpressionNativizer >> prepareCallbackFrame [
 	assembler saveCallerFrame.
-	assembler wordSize = 8 ifTrue: [ assembler storeArgumentsInStack ].
+	assembler wordSize = 8
+		ifTrue: [ assembler storeArgumentsInStack ].
 	assembler
 		pushS;
 		pushE;
@@ -514,8 +520,8 @@ SExpressionNativizer >> prepareCallbackFrame [
 		pushR;
 		pushSmallInteger: 0;
 		xorFPwithFP;
-		loadEwithPointer: nil;
-		loadRwithPointer: method
+		loadEwithNil;
+		loadRwithM
 ]
 
 { #category : #services }
@@ -525,22 +531,12 @@ SExpressionNativizer >> pushCompiledBlock [
 
 { #category : #services }
 SExpressionNativizer >> pushCompiledMethod [
-	assembler pushPointer: method
+	assembler pushM
 ]
 
 { #category : #services }
 SExpressionNativizer >> pushEnvironments [
 	assembler pushE; loadEwithR; pushE
-]
-
-{ #category : #services }
-SExpressionNativizer >> pushNil [
-	self pushObject: nil
-]
-
-{ #category : #services }
-SExpressionNativizer >> pushObject: anObject [
-	assembler pushPointer: anObject
 ]
 
 { #category : #services }
@@ -593,8 +589,8 @@ SExpressionNativizer >> saveMethodCode [
 
 { #category : #services }
 SExpressionNativizer >> saveReturnFrame [
-	assembler pushR.
-	self emitSend: #top to: StackFrameCursor.
+	assembler pushR; loadRwithM.
+	self emitSend: #topFrameCursor.
 	assembler
 		loadAwithR;
 		popR;
@@ -673,14 +669,15 @@ SExpressionNativizer >> visitAssignment: anSAssignment [
 SExpressionNativizer >> visitBlock: anSBlock [
 	| block slot variables |
 	remainingBlocks add: anSBlock.
-	block := anSBlock compiledCode.
-	self instantiateClosure: block.
+	self instantiateClosure: anSBlock.
 	slot := 3.
 	variables := anSBlock capturedVariables readStream.
-	[ variables atEnd ] whileFalse: [ 
-		self captureVariable: variables index: slot.
-		slot := slot + 1 ].
-	block capturesHome ifTrue: [ self saveReturnFrame ]
+	[ variables atEnd ]
+		whileFalse: [ self captureVariable: variables index: slot.
+			slot := slot + 1 ].
+	block := anSBlock compiledCode.
+	block capturesHome
+		ifTrue: [ self saveReturnFrame ]
 ]
 
 { #category : #services }
@@ -720,11 +717,11 @@ SExpressionNativizer >> visitInlinedMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitLiteral: anSLiteral [
-	| literal |
-	literal := anSLiteral value.
-	literal isSmallInteger
-		ifTrue: [assembler loadRwithSmallInteger: literal]
-		ifFalse: [self loadObject: literal]
+	| value |
+	value := anSLiteral value.
+	value isSmallInteger
+		ifTrue: [ assembler loadRwithSmallInteger: value ]
+		ifFalse: [ self loadLiteralAt: anSLiteral index ]
 ]
 
 { #category : #services }
