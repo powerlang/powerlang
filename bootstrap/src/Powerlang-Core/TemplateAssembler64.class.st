@@ -1115,7 +1115,7 @@ TemplateAssembler64 >> multiplyRbyA [
 
 { #category : #arithmetic }
 TemplateAssembler64 >> nativeCode [
-	^ NativeCode code: memory bytes
+	^ NativeCode new code: memory bytes
 ]
 
 { #category : #logic }
