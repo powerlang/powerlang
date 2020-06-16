@@ -32,26 +32,24 @@ BinaryMessageNativizer >> inlineEquals [
 	failed := assembler newLabel.
 	self loadOperands.
 	nativizer saveContextSwitchPoint.
-	assembler loadTwithR.
-	nativizer loadObject: true.
-	assembler compareTwithA; jumpIfNotEqualTo: done.
-	nativizer loadObject: false.
-	assembler @ done.
-	nativizer addFallback: [
-		assembler @ failed; pushA.
-		nativizer emitSend: #'='.
-		assembler jumpTo: done] 
+	assembler loadTwithR; loadRwithTrue;
+		compareTwithA;
+		jumpIfNotEqualTo: done; loadRwithFalse; @ done.
+	nativizer
+		addFallback: [ assembler
+				@ failed;
+				pushA.
+			nativizer emitSend: #=.
+			assembler jumpTo: done ]
 ]
 
 { #category : #private }
 BinaryMessageNativizer >> inlineIdentityEquals [
 	done := assembler newLabel.
 	self loadOperands.
-	assembler loadTwithR.
-	nativizer loadObject: true.
-	assembler compareTwithA; jumpIfNotEqualTo: done.
-	nativizer loadObject: false.
-	assembler @ done 
+	assembler loadTwithR; loadRwithTrue;
+		compareTwithA;
+		jumpIfNotEqualTo: done; loadRwithFalse; @ done
 ]
 
 { #category : #private }
@@ -159,6 +157,11 @@ BinaryMessageNativizer >> message: aMessageAstcode [
 { #category : #private }
 BinaryMessageNativizer >> method [
 	^nativizer method 
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> methodLiteralIndexFrom: anInteger [
+	^nativizer methodLiteralIndexFrom: anInteger 
 ]
 
 { #category : #private }

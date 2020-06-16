@@ -269,10 +269,14 @@ SExpressionNativizer >> emitEpilogueNoFrame [
 
 { #category : #services }
 SExpressionNativizer >> emitFFICall [
-	self loadObject: method.
-	assembler pushR; pushS.
+	assembler loadRwithM;
+		pushR;
+		pushS.
 	self emitSend: #_ffiCall:.
-	assembler restoreCallerFrame; restoreCallerSelf; return
+	assembler
+		restoreCallerFrame;
+		restoreCallerSelf;
+		return
 ]
 
 { #category : #services }
@@ -355,15 +359,12 @@ SExpressionNativizer >> initializeMethodTemporaries [
 
 { #category : #services }
 SExpressionNativizer >> initializeTemporaries: count [
-	count = 0 ifTrue: [^self].
+	count = 0
+		ifTrue: [ ^ self ].
 	count <= 6
-		ifTrue: [
-			assembler loadAwithPointer: nil.
-			count timesRepeat: [assembler pushA]]
-		ifFalse: [
-			assembler
-				loadAwithPointer: nil;
-				loop: [assembler pushA] times: count]
+		ifTrue: [ count timesRepeat: [ assembler pushNil ] ]
+		ifFalse: [ assembler
+				loop: [ assembler pushNil ] times: count ]
 ]
 
 { #category : #services }
@@ -442,9 +443,9 @@ SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 { #category : #services }
 SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 	aCompiledBlock capturesSelf
-		ifTrue: [ 
-		assembler loadSwithRindex: SClosure instSize + SClosure receiverIndex ]
-		ifFalse: [ assembler loadSwithPointer: nil ].
+		ifTrue: [ assembler
+				loadSwithRindex: SClosure instSize + SClosure receiverIndex ]
+		ifFalse: [ assembler loadSwithNil ].
 	assembler pushS
 ]
 
@@ -504,7 +505,8 @@ SExpressionNativizer >> popR [
 { #category : #services }
 SExpressionNativizer >> prepareCallbackFrame [
 	assembler saveCallerFrame.
-	assembler wordSize = 8 ifTrue: [ assembler storeArgumentsInStack ].
+	assembler wordSize = 8
+		ifTrue: [ assembler storeArgumentsInStack ].
 	assembler
 		pushS;
 		pushE;
@@ -514,8 +516,8 @@ SExpressionNativizer >> prepareCallbackFrame [
 		pushR;
 		pushSmallInteger: 0;
 		xorFPwithFP;
-		loadEwithPointer: nil;
-		loadRwithPointer: method
+		loadEwithNil;
+		loadRwithM
 ]
 
 { #category : #services }
@@ -525,7 +527,7 @@ SExpressionNativizer >> pushCompiledBlock [
 
 { #category : #services }
 SExpressionNativizer >> pushCompiledMethod [
-	assembler pushPointer: method
+	assembler pushM
 ]
 
 { #category : #services }
