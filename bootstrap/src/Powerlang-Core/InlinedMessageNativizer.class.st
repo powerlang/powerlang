@@ -27,8 +27,7 @@ InlinedMessageNativizer >> inlineIfTrue [
 	assembler
 		compareRwithBoolean: first;
 		jumpIfEqualTo: end;
-		compareRwithBoolean: first not.
-	assembler
+		compareRwithBoolean: first not;
 		shortJumpIfNotEqualTo: failed;
 		@ continue.
 	nativizer
