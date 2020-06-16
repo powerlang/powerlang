@@ -9,3 +9,5 @@ bootstrap/PharoDebug.log
 bootstrap/specs
 *.log
 pst/vm/build
+
+build
