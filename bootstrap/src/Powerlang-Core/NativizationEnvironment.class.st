@@ -17,7 +17,7 @@ Class {
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
-	^ self new
+	^ self forTesting: SmalltalkBootstrapper spec
 ]
 
 { #category : #private }
@@ -84,7 +84,7 @@ NativizationEnvironment >> methodSubset: aDictionary [
 	| species |
 	^aDictionary flatCollect: [ :assoc | 
 		species := spec at: assoc key.
-		assoc values collect: [:sel | species >> sel ] ].	
+		assoc value collect: [:sel | species >> sel ] ].	
 ]
 
 { #category : #services }
@@ -199,8 +199,7 @@ NativizationEnvironment >> spec: anRGEnvironment [
 
 { #category : #initialization }
 NativizationEnvironment >> undermethods [
-	^(spec at: #ProtoObject) 
-		methodDictionary select: [:m | m selector beginsWith: '_'].	
+	^(spec at: #ProtoObject) methods select: [:m | m selector beginsWith: '_'].	
 ]
 
 { #category : #services }
