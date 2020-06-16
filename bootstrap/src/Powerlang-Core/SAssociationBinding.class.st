@@ -2,6 +2,7 @@ Class {
 	#name : #SAssociationBinding,
 	#superclass : #SBinding,
 	#instVars : [
+		'index',
 		'association'
 	],
 	#category : #'Powerlang-Core-SExpressions'
@@ -20,6 +21,16 @@ SAssociationBinding >> association [
 { #category : #accessing }
 SAssociationBinding >> association: anAssociation [
 	association := anAssociation
+]
+
+{ #category : #testing }
+SAssociationBinding >> index [ 
+	^ index
+]
+
+{ #category : #testing }
+SAssociationBinding >> index: anInteger [
+	 index := anInteger 
 ]
 
 { #category : #testing }

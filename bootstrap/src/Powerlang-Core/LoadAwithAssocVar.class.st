@@ -1,12 +1,14 @@
 Class {
-	#name : #LoadAwithConstPoolVar,
+	#name : #LoadAwithAssocVar,
 	#superclass : #LoadAwithLiteralVar,
 	#category : #'Powerlang-Core-Nativization'
 }
 
 { #category : #accessing }
-LoadAwithConstPoolVar >> nativizeUsing: anAssembler for: messageNativizer [
+LoadAwithAssocVar >> nativizeUsing: anAssembler for: messageNativizer [
 	| i |
 	i := messageNativizer methodLiteralIndexFrom: index.
-	anAssembler loadAwithMindex: i
+	anAssembler
+		loadAwithMindex: i;
+		loadAwithAindex: 2
 ]

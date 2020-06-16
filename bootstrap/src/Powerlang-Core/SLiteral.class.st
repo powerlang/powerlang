@@ -1,6 +1,6 @@
 Class {
 	#name : #SLiteral,
-	#superclass : #SExpression,
+	#superclass : #SLiteralVar,
 	#instVars : [
 		'value'
 	],
