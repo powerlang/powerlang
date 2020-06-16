@@ -61,22 +61,6 @@ BootstrapEmulator >> compile: anRGMethod [
 ]
 
 { #category : #accessing }
-BootstrapEmulator >> compile: anRGMethod nativize: aBoolean [
-	| compiler class method code |
-	compiler := Compiler namespace: globals.
-	class := wrappers at: anRGMethod parent.
-	method := compiler
-		forClass: class;
-		compile: anRGMethod sourceCode.
-	aBoolean
-		ifTrue: [ code := true ifTrue: [nilObj] ifFalse: [(NativizationEnvironment forTesting completeInitialization
-						nativeCodeFor: method)]. method
-				nativeCode: code
-					 ].
-	^ bootstrapper transferSimpleLiterals: method
-]
-
-{ #category : #accessing }
 BootstrapEmulator >> dispatch: aMethod with: aMessage [
 	^self dispatch: aMethod with: aMessage from: nil
 ]

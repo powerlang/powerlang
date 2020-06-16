@@ -184,8 +184,8 @@ NativizationEnvironment >> sexpressionOffsetsOf: code [
 
 { #category : #private }
 NativizationEnvironment >> shouldOptimize: method [
-	^optimizedMethods includes: method
-
+	true ifTrue: [ ^false ].
+	^ optimizedMethods includes: method
 ]
 
 { #category : #initialization }

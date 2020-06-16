@@ -11,6 +11,7 @@ Class {
 		'falseObj',
 		'environment',
 		'emulator',
+		'nativizer',
 		'globals',
 		'hash',
 		'cvarMap',
@@ -327,14 +328,16 @@ SmalltalkBootstrapper >> fillClasses [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> fillSpecies: species with: definition [
-	| dictionary method transferred |
+	| dictionary smethod code transferred |
 	dictionary := self
 		createMethodDictionary: species
 		sized: definition methods size.
 	definition methods
 		do: [ :m | 
-			method := emulator compile: m nativize: true.
-			transferred := self transferMethod: method in: species.
+			smethod := emulator compile: m.
+			code := nativizer nativeCodeFor: smethod.
+			smethod nativeCode: code.
+			transferred := self transferMethod: smethod in: species.
 			self
 				emulateSend: dictionary
 				selector: #basicAt:put:
@@ -745,7 +748,9 @@ SmalltalkBootstrapper >> spec [
 { #category : #initialization }
 SmalltalkBootstrapper >> spec: anRGEnvironment [
 	environment := anRGEnvironment.
-	emulator spec: anRGEnvironment
+	emulator spec: anRGEnvironment.
+	nativizer := NativizationEnvironment forTesting: anRGEnvironment.
+	nativizer completeInitialization
 ]
 
 { #category : #initialization }

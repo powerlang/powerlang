@@ -475,7 +475,10 @@ SExpressionNativizer >> nativeCode [
 
 { #category : #services }
 SExpressionNativizer >> nativeCodeFor: aCompiledMethod [
-	^self compile: aCompiledMethod; nativeCode
+	true ifTrue: [ ^NativeCode new code: #[16rCC]].
+	^ self
+		compile: aCompiledMethod;
+		nativeCode
 ]
 
 { #category : #services }
