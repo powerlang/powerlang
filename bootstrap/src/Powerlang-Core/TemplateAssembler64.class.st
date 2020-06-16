@@ -506,6 +506,11 @@ TemplateAssembler64 >> loadAwithFPindex: index [
 ]
 
 { #category : #loading }
+TemplateAssembler64 >> loadAwithFalse [
+	self assembleBytes: #[16r4C 16r89 16rF2]
+]
+
+{ #category : #loading }
 TemplateAssembler64 >> loadAwithImmediate: imm [
 	
 	(-16r80000000 <= imm and: [imm < 16r80000000])
@@ -517,6 +522,11 @@ TemplateAssembler64 >> loadAwithImmediate: imm [
 		assembleBytes: #[16r48 16rBA];
 		assembleBytes: imm count: 8;
 		saveLastEmittedPointer
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadAwithNil [
+	self assembleBytes: #[16r4C 16r89 16rE2]
 ]
 
 { #category : #loading }
@@ -573,6 +583,11 @@ TemplateAssembler64 >> loadAwithSindex: index [
 TemplateAssembler64 >> loadAwithT [
 	self assembleBytes: #[16r48 16r89 16rCA].
 	
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadAwithTrue [
+	self assembleBytes: #[16r4C 16r89 16rEA]
 ]
 
 { #category : #integers }
@@ -728,6 +743,11 @@ TemplateAssembler64 >> loadRwithFPindex: index [
 ]
 
 { #category : #loading }
+TemplateAssembler64 >> loadRwithFalse [
+	self assembleBytes: #[16r4C 16r89 16rF0]
+]
+
+{ #category : #loading }
 TemplateAssembler64 >> loadRwithImmediate: imm [
 	
 	(-16r80000000 <= imm and: [imm < 16r80000000])
@@ -739,6 +759,31 @@ TemplateAssembler64 >> loadRwithImmediate: imm [
 		assembleBytes: #[16r48 16rB8];
 		assembleBytes: imm count: 8;
 		saveLastEmittedPointer
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadRwithM [
+	self assembleBytes: #[16r48 16r89 16rD8]
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadRwithMindex: index [
+	| offset |
+	offset := (index - 1) * wordSize.
+	offset = 0
+		ifTrue: [ ^ self assembleBytes: #[16r48 16r8B 16r03] ].
+	(-128 <= offset and: [ offset < 128 ])
+		ifTrue: [ self
+				assembleBytes: #[16r48 16r8B 16r43];
+				assembleByte: offset ]
+		ifFalse: [ self
+				assembleBytes: #[16r48 16r8B 16r83];
+				assembleBytes: offset count: 4 ]
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadRwithNil [
+	self assembleBytes: #[16r4C 16r89 16rE0]
 ]
 
 { #category : #integers }
@@ -845,6 +890,11 @@ TemplateAssembler64 >> loadRwithTindex: index [
 TemplateAssembler64 >> loadRwithTos [
 	self assembleBytes: #[16r48 16r8B 16r4 16r24].
 	
+]
+
+{ #category : #loading }
+TemplateAssembler64 >> loadRwithTrue [
+	self assembleBytes: #[16r4C 16r89 16rE8]
 ]
 
 { #category : #loading }
