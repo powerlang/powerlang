@@ -205,3 +205,24 @@ ImageSegmentWriter >> writeSignature [
 		nextPut: Character lf asInteger;
 		nextPut: 0
 ]
+
+{ #category : #writing }
+ImageSegmentWriter >> writeTo: aStream [
+	self stream: aStream.
+	self write.
+
+]
+
+{ #category : #writing }
+ImageSegmentWriter >> writeToFile: filename [
+	filename asFileReference binaryWriteStreamDo: [ :fileStream |
+		| bytes |
+		
+		"Bit stupid - we write into internal ByteArray backed stream and
+      then write it to real file. That's because WriteStream and ZnWriteStream
+      are not polymorphic. Sigh"
+		bytes := ByteArray streamContents:[:byteStream | self writeTo: byteStream ].
+		fileStream nextPutAll: bytes.
+	]
+
+]
