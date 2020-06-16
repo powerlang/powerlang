@@ -28,18 +28,17 @@ TemplateAssembler64 >> addSPtoT [
 
 { #category : #logic }
 TemplateAssembler64 >> addSPwithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16rC4]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16rC4];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r81 16rC4];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r1 16rDC]
 ]
 
@@ -69,35 +68,33 @@ TemplateAssembler64 >> andRwithA [
 
 { #category : #logic }
 TemplateAssembler64 >> andRwithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16rE0]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16rE0];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r25];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r21 16rD8]
 ]
 
 { #category : #logic }
 TemplateAssembler64 >> andTosWithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16r24 16r24]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16r24 16r24];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r81 16r24 16r24];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r21 16r1C 16r24]
 ]
 
@@ -157,18 +154,17 @@ TemplateAssembler64 >> clearSafeRintegerBit [
 
 { #category : #comparing }
 TemplateAssembler64 >> compareAwithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16rFA]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16rFA];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r81 16rFA];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r39 16rDA]
 ]
 
@@ -224,18 +220,17 @@ TemplateAssembler64 >> compareRwithFPindex: index [
 
 { #category : #comparing }
 TemplateAssembler64 >> compareRwithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16rF8]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16rF8];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r3D];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r39 16rD8]
 ]
 
@@ -295,18 +290,17 @@ TemplateAssembler64 >> compareSwithTindex: index [
 
 { #category : #comparing }
 TemplateAssembler64 >> compareTwithImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r48 16r83 16rF9]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r48 16r83 16rF9];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r81 16rF9];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r4C 16r39 16rD9]
 ]
 
@@ -512,16 +506,13 @@ TemplateAssembler64 >> loadAwithFalse [
 
 { #category : #loading }
 TemplateAssembler64 >> loadAwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC2];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r48 16rBA];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -614,16 +605,13 @@ TemplateAssembler64 >> loadEwithFPindex: index [
 
 { #category : #loading }
 TemplateAssembler64 >> loadEwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC7];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r48 16rBF];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -749,16 +737,13 @@ TemplateAssembler64 >> loadRwithFalse [
 
 { #category : #loading }
 TemplateAssembler64 >> loadRwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC0];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r48 16rB8];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -945,16 +930,13 @@ TemplateAssembler64 >> loadSwithFPindex: index [
 
 { #category : #loading }
 TemplateAssembler64 >> loadSwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC6];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r48 16rBE];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -1035,16 +1017,13 @@ TemplateAssembler64 >> loadTwithFPindex: index [
 
 { #category : #loading }
 TemplateAssembler64 >> loadTwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC1];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r48 16rB9];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -1071,16 +1050,13 @@ TemplateAssembler64 >> loadTwithTindex: index [
 
 { #category : #loading }
 TemplateAssembler64 >> loadVwithImmediate: imm [
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r49 16rC7 16rC3];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
-		assembleBytes: imm count: 8;
-		saveLastEmittedPointer
+		assembleBytes: imm count: 8
 ]
 
 { #category : #loading }
@@ -1139,7 +1115,7 @@ TemplateAssembler64 >> multiplyRbyA [
 
 { #category : #arithmetic }
 TemplateAssembler64 >> nativeCode [
-	^NativeCode code: memory bytes references: references
+	^ NativeCode code: memory bytes
 ]
 
 { #category : #logic }
@@ -1266,18 +1242,17 @@ TemplateAssembler64 >> pushFPindex: index [
 
 { #category : #'push/pop' }
 TemplateAssembler64 >> pushImmediate: imm [
-	(-128 <= imm and: [imm < 128])
-		ifTrue: [^self assembleBytes: #[16r6A]; assembleByte: imm].
-	
-	(-16r80000000 <= imm and: [imm < 16r80000000])
-		ifTrue: [
-			^self
+	(-128 <= imm and: [ imm < 128 ])
+		ifTrue: [ ^ self
+				assembleBytes: #[16r6A];
+				assembleByte: imm ].
+	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
+		ifTrue: [ ^ self
 				assembleBytes: #[16r68];
-				assembleBytes: imm count: 4].
-	self 
+				assembleBytes: imm count: 4 ].
+	self
 		assembleBytes: #[16r49 16rBB];
 		assembleBytes: imm count: 8;
-		saveLastEmittedPointer;
 		assembleBytes: #[16r41 16r53]
 ]
 

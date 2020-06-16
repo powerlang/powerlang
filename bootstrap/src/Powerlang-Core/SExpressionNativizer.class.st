@@ -454,11 +454,6 @@ SExpressionNativizer >> loadLiteralAt: anInteger [
 ]
 
 { #category : #services }
-SExpressionNativizer >> loadObject: anObject [
-	assembler loadRwithPointer: anObject
-]
-
-{ #category : #services }
 SExpressionNativizer >> loadRwithStack: anInteger [
 	assembler loadRwithFPindex: 1 - anInteger
 ]
@@ -542,16 +537,6 @@ SExpressionNativizer >> pushCompiledMethod [
 { #category : #services }
 SExpressionNativizer >> pushEnvironments [
 	assembler pushE; loadEwithR; pushE
-]
-
-{ #category : #services }
-SExpressionNativizer >> pushNil [
-	self pushObject: nil
-]
-
-{ #category : #services }
-SExpressionNativizer >> pushObject: anObject [
-	assembler pushPointer: anObject
 ]
 
 { #category : #services }

@@ -968,11 +968,6 @@ InlineMessageLinker >> loadArgumentsIntoRegisters [
 		assemble: 'movq' with: xmm3 with: r9 
 ]
 
-{ #category : #'opcodes - loading' }
-InlineMessageLinker >> loadObject: anObject [
-	assembler loadRwithPointer: anObject 
-]
-
 { #category : #printing }
 InlineMessageLinker >> printOn: aStream [
 	aStream nextPutAll: 'Inliner for: ' , selector storeString 

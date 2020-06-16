@@ -213,25 +213,10 @@ JITAssembler64 >> compareRwithImmediate: imm [
 	self assemble: 'cmp' with: self regR withImm: imm
 ]
 
-{ #category : #comparing }
-JITAssembler64 >> compareRwithIndirect: object [
-	wordSize = 8
-		ifTrue: [^self loadVwithPointer: object; compareRwithVindex: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'cmp' with: self regR with: pointer;
-		holdReferenceTo: object
-]
-
 { #category : #storing }
 JITAssembler64 >> compareRwithIndirect: reg1 andExchange: reg2 [
 	pointer reset; length: self addressLength; base: reg1.
 	self assemble: 'cmpxchg' with: pointer with: reg2
-]
-
-{ #category : #comparing }
-JITAssembler64 >> compareRwithPointer: object [
-	self compareRwithImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #comparing }
@@ -530,15 +515,6 @@ JITAssembler64 >> loadAwithImmediate: imm [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithIndirect: object [
-	wordSize = 8 ifTrue: [^self loadAwithPointer: object; loadAwithAindex: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'mov' with: self regA with: pointer;
-		holdReferenceTo: object
-]
-
-{ #category : #loading }
 JITAssembler64 >> loadAwithMindex: index [
 	self
 		assemble: 'mov'
@@ -550,11 +526,6 @@ JITAssembler64 >> loadAwithMindex: index [
 { #category : #loading }
 JITAssembler64 >> loadAwithNil [
 	self assemble: 'mov' with: self regA with: self regNil
-]
-
-{ #category : #loading }
-JITAssembler64 >> loadAwithPointer: object [
-	self loadAwithImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #loading }
@@ -628,11 +599,6 @@ JITAssembler64 >> loadEwithImmediate: imm [
 { #category : #loading }
 JITAssembler64 >> loadEwithNil [
 	self assemble: 'mov' with: self regE with: self regNil
-]
-
-{ #category : #loading }
-JITAssembler64 >> loadEwithPointer: object [
-	self loadEwithImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #loading }
@@ -765,15 +731,6 @@ JITAssembler64 >> loadRwithImmediate: imm [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithIndirect: object [
-	wordSize = 8 ifTrue: [^self loadRwithPointer: object; loadRwithRindex: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'mov' with: self regR with: pointer;
-		holdReferenceTo: object
-]
-
-{ #category : #loading }
 JITAssembler64 >> loadRwithM [
 	self assemble: 'mov' with: self regR with: self regM
 ]
@@ -790,11 +747,6 @@ JITAssembler64 >> loadRwithMindex: index [
 { #category : #loading }
 JITAssembler64 >> loadRwithNil [
 	self assemble: 'mov' with: self regR with: self regNil
-]
-
-{ #category : #loading }
-JITAssembler64 >> loadRwithPointer: object [
-	self loadRwithImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #integers }
@@ -992,11 +944,6 @@ JITAssembler64 >> loadSwithNil [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithPointer: object [
-	self loadSwithImmediate: self dummyPointer; holdReferenceTo: object
-]
-
-{ #category : #loading }
 JITAssembler64 >> loadSwithRindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regR index: index
 ]
@@ -1033,20 +980,6 @@ JITAssembler64 >> loadTwithImmediate: imm [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithIndirect: object [
-	wordSize = 8 ifTrue: [^self loadTwithPointer: object; loadTwithTindex: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'mov' with: self regT with: pointer;
-		holdReferenceTo: object
-]
-
-{ #category : #loading }
-JITAssembler64 >> loadTwithPointer: object [
-	self loadTwithImmediate: self dummyPointer; holdReferenceTo: object
-]
-
-{ #category : #loading }
 JITAssembler64 >> loadTwithR [
 	self assemble: 'mov' with: self regT with: self regR
 ]
@@ -1060,11 +993,6 @@ JITAssembler64 >> loadTwithTindex: index [
 JITAssembler64 >> loadVwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regV withImm: imm
-]
-
-{ #category : #loading }
-JITAssembler64 >> loadVwithPointer: object [
-	self loadVwithImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #loading }
@@ -1288,15 +1216,6 @@ JITAssembler64 >> pushImmediate: imm [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushIndirect: object [
-	wordSize = 8 ifTrue: [^self loadVwithPointer: object; pushVindex: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'push' with: pointer;
-		holdReferenceTo: object
-]
-
-{ #category : #'push/pop' }
 JITAssembler64 >> pushIndirectR [
 	pointer reset; length: self addressLength; base: self regR.
 	self assemble: 'push' with: pointer
@@ -1310,11 +1229,6 @@ JITAssembler64 >> pushM [
 { #category : #'push/pop' }
 JITAssembler64 >> pushNil [
 	self assemble: 'push' with: self regNil
-]
-
-{ #category : #'push/pop' }
-JITAssembler64 >> pushPointer: object [
-	self pushImmediate: self dummyPointer; holdReferenceTo: object
 ]
 
 { #category : #'push/pop' }
@@ -1727,18 +1641,6 @@ JITAssembler64 >> storeRinEindex: index [
 { #category : #storing }
 JITAssembler64 >> storeRinFPindex: index [
 	self store: self regR in: self regFP index: index
-]
-
-{ #category : #storing }
-JITAssembler64 >> storeRinIndirect: object [
-	wordSize = 8 ifTrue: [
-		^self
-			loadVwithPointer: object;
-			store: self regR in: self regV index: 1].
-	pointer reset; length: self addressLength; displacement: self dummyPointer.
-	self
-		assemble: 'mov' with: pointer with: self regR;
-		holdReferenceTo: object
 ]
 
 { #category : #storing }
