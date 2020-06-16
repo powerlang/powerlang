@@ -322,11 +322,6 @@ SExpressionNativizer >> emitSend: selector [
 		ifFalse: [ linker emitSend: selector using: assembler ]
 ]
 
-{ #category : #services }
-SExpressionNativizer >> emitSend: selector to: anObject [
-	self loadObject: anObject; emitSend: selector
-]
-
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
@@ -342,14 +337,18 @@ SExpressionNativizer >> initialize [
 
 { #category : #services }
 SExpressionNativizer >> initializeMethodEnvironment [
-	method hasBlocks ifFalse: [^self].
+	method hasBlocks
+		ifFalse: [ ^ self ].
 	assembler pushE.
 	method hasEnvironment
-		ifTrue: [
-			assembler pushSmallInteger: method environmentCount.
-			self emitSend: #new: to: Array.
-			assembler loadEwithR; pushE]
-		ifFalse: [self pushNil]
+		ifTrue: [ assembler
+				pushSmallInteger: method environmentCount;
+				loadRwithM.
+			self emitSend: #newEnvironment:.
+			assembler
+				loadEwithR;
+				pushE ]
+		ifFalse: [ assembler pushNil ]
 ]
 
 { #category : #services }
@@ -373,11 +372,8 @@ SExpressionNativizer >> instanceVarAt: index [
 ]
 
 { #category : #services }
-SExpressionNativizer >> instantiateClosure: aCompiledBlock [
-	self
-		loadObject: SClosure;
-		pushObject: aCompiledBlock;
-		emitSend: #newFrom:
+SExpressionNativizer >> instantiateClosure: anSBlock [
+	self loadLiteralAt: anSBlock index; emitSend: #newClosure
 ]
 
 { #category : #services }
@@ -450,6 +446,14 @@ SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 ]
 
 { #category : #services }
+SExpressionNativizer >> loadLiteralAt: anInteger [
+	| index |
+	index := self
+		methodLiteralIndexFrom: anInteger. assembler
+		loadRwithMindex: index
+]
+
+{ #category : #services }
 SExpressionNativizer >> loadObject: anObject [
 	assembler loadRwithPointer: anObject
 ]
@@ -462,6 +466,11 @@ SExpressionNativizer >> loadRwithStack: anInteger [
 { #category : #accessing }
 SExpressionNativizer >> method [
 	^method
+]
+
+{ #category : #services }
+SExpressionNativizer >> methodLiteralIndexFrom: anInteger [
+	^environment methodInstSize + anInteger
 ]
 
 { #category : #services }
@@ -595,8 +604,8 @@ SExpressionNativizer >> saveMethodCode [
 
 { #category : #services }
 SExpressionNativizer >> saveReturnFrame [
-	assembler pushR.
-	self emitSend: #top to: StackFrameCursor.
+	assembler pushR; loadRwithM.
+	self emitSend: #topFrameCursor.
 	assembler
 		loadAwithR;
 		popR;
@@ -675,14 +684,15 @@ SExpressionNativizer >> visitAssignment: anSAssignment [
 SExpressionNativizer >> visitBlock: anSBlock [
 	| block slot variables |
 	remainingBlocks add: anSBlock.
-	block := anSBlock compiledCode.
-	self instantiateClosure: block.
+	self instantiateClosure: anSBlock.
 	slot := 3.
 	variables := anSBlock capturedVariables readStream.
-	[ variables atEnd ] whileFalse: [ 
-		self captureVariable: variables index: slot.
-		slot := slot + 1 ].
-	block capturesHome ifTrue: [ self saveReturnFrame ]
+	[ variables atEnd ]
+		whileFalse: [ self captureVariable: variables index: slot.
+			slot := slot + 1 ].
+	block := anSBlock compiledCode.
+	block capturesHome
+		ifTrue: [ self saveReturnFrame ]
 ]
 
 { #category : #services }
@@ -722,11 +732,11 @@ SExpressionNativizer >> visitInlinedMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitLiteral: anSLiteral [
-	| literal |
-	literal := anSLiteral value.
-	literal isSmallInteger
-		ifTrue: [assembler loadRwithSmallInteger: literal]
-		ifFalse: [self loadObject: literal]
+	| value |
+	value := anSLiteral value.
+	value isSmallInteger
+		ifTrue: [ assembler loadRwithSmallInteger: value ]
+		ifFalse: [ self loadLiteralAt: anSLiteral index ]
 ]
 
 { #category : #services }

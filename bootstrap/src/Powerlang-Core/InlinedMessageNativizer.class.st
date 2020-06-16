@@ -17,11 +17,6 @@ InlinedMessageNativizer >> assembler: anAssembler [
 ]
 
 { #category : #accessing }
-InlinedMessageNativizer >> compareRwithPointer: anObject [
-	assembler compareRwithPointer: anObject 
-]
-
-{ #category : #accessing }
 InlinedMessageNativizer >> inlineIfTrue [
 	| continue failed first |
 	continue := assembler newLabel.
@@ -29,17 +24,20 @@ InlinedMessageNativizer >> inlineIfTrue [
 	end := assembler newLabel.
 	message receiver acceptVisitor: nativizer.
 	first := false.
-	self
-		compareRwithPointer: first;
-		jumpToEndIfEqual;
-		compareRwithPointer: first not.
-	assembler shortJumpIfNotEqualTo: failed; @ continue.
-	nativizer addFallback: [
-		assembler @ failed.
-		nativizer sendMustBeBoolean.
-		assembler jumpTo: continue].
-	message arguments first statements do: [:s | s acceptVisitor: nativizer].
-	assembler @ end 
+	assembler
+		compareRwithBoolean: first;
+		jumpIfEqualTo: end;
+		compareRwithBoolean: first not.
+	assembler
+		shortJumpIfNotEqualTo: failed;
+		@ continue.
+	nativizer
+		addFallback: [ assembler @ failed.
+			nativizer sendMustBeBoolean.
+			assembler jumpTo: continue ].
+	message arguments first statements
+		do: [ :s | s acceptVisitor: nativizer ].
+	assembler @ end
 ]
 
 { #category : #accessing }
@@ -62,21 +60,15 @@ InlinedMessageNativizer >> inlineUnitaryWhileTrue [
 		@ start.
 	message receiver statements do: [ :s | s acceptVisitor: nativizer ].
 	first := true.
-	self compareRwithPointer: first.
-	assembler
+	assembler compareRwithBoolean: first;
 		jumpIfEqualTo: start;
-		compareRwithPointer: first not;
+		compareRwithBoolean: first not;
 		shortJumpIfNotEqualTo: failed;
 		@ continue.
-	nativizer addFallback: [ 
-		assembler @ failed.
-		nativizer sendMustBeBoolean.
-		assembler jumpTo: continue ]
-]
-
-{ #category : #accessing }
-InlinedMessageNativizer >> jumpToEndIfEqual [
-	assembler jumpIfEqualTo: end 
+	nativizer
+		addFallback: [ assembler @ failed.
+			nativizer sendMustBeBoolean.
+			assembler jumpTo: continue ]
 ]
 
 { #category : #accessing }

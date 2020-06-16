@@ -980,16 +980,16 @@ InlineMessageLinker >> printOn: aStream [
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> readFPUStatus [
-	| status |
-	status := Float statusVar.
-	assembler loadAwithPointer: status; readFPUStatusOnA 
+	assembler
+		loadAwithKnown: #FloatStatus;
+		readFPUStatusOnA
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> readFloatStatus [
-	| status |
-	status := Float statusVar.
-	assembler loadAwithPointer: status; storeMXCSRintoA 
+	assembler
+		loadAwithKnown: #FloatStatus;
+		storeMXCSRintoA
 ]
 
 { #category : #accessing }

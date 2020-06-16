@@ -9,7 +9,8 @@ Class {
 		'optimizedMethods',
 		'invokedMethods',
 		'cachedNativizer',
-		'busy'
+		'busy',
+		'methodInstSize'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
@@ -66,6 +67,11 @@ NativizationEnvironment >> messageLinker [
 { #category : #initialization }
 NativizationEnvironment >> messageLinker: aLinker [
 	messageLinker := aLinker 
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> methodInstSize [
+^methodInstSize 
 ]
 
 { #category : #accessing }
@@ -183,9 +189,12 @@ NativizationEnvironment >> shouldOptimize: method [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> spec: anRGEnvironment [ 
+NativizationEnvironment >> spec: anRGEnvironment [
 	spec := anRGEnvironment.
-	self setupOptimizedMethods; setupInvokedMethods
+	methodInstSize := (spec at: #CompiledMethod) instSize.
+	self
+		setupOptimizedMethods;
+		setupInvokedMethods
 ]
 
 { #category : #initialization }
