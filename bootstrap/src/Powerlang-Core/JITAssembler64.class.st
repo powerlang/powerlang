@@ -671,6 +671,17 @@ JITAssembler64 >> loadMXCSRfromA [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadMwithRIPoffset: imm [
+	pointer
+		reset;
+		length: self addressLength;
+		base: rip;
+		displacement: imm.
+
+	self assemble: 'lea' with: self regM with: pointer
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadRConvertingDoubleRindirect [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'cvttsd2si' with: self regR with: pointer
@@ -1431,6 +1442,11 @@ JITAssembler64 >> restoreCallerFrame [
 	self
 		move: self regFP to: self regSP;
 		pop: self regFP
+]
+
+{ #category : #epilogue }
+JITAssembler64 >> restoreCallerM [
+	self loadSwithFPindex: -1
 ]
 
 { #category : #epilogue }

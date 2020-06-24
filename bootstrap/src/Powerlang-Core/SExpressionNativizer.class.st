@@ -280,7 +280,10 @@ SExpressionNativizer >> emitEpilogueCommon [
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueNoFrame [
-	assembler restoreCallerSelf; return
+	assembler
+		restoreCallerSelf;
+		restoreCallerM;
+		return
 ]
 
 { #category : #services }
@@ -302,13 +305,21 @@ SExpressionNativizer >> emitFallbacks [
 
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
-	method isCallback ifTrue: [self prepareCallbackFrame].
-	assembler saveCallerFrame; pushR; initializeS.
-	method isFFIMethod ifTrue: [self emitFFICall] ifFalse: [
-		self pushCompiledMethod
-			initializeMethodEnvironment;
-			initializeMethodTemporaries;
-			emitSafepointCheck]
+	| placeholder |
+	placeholder := 16r12345678.
+	assembler loadMwithRIPoffset: placeholder.
+	method isCallback
+		ifTrue: [ self prepareCallbackFrame ].
+	assembler
+		saveCallerFrame;
+		pushR;
+		initializeS.
+	method isFFIMethod
+		ifTrue: [ self emitFFICall ]
+		ifFalse: [ self pushCompiledMethod;
+				initializeMethodEnvironment;
+				initializeMethodTemporaries;
+				emitSafepointCheck ]
 ]
 
 { #category : #services }
