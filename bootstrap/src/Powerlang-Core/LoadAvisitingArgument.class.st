@@ -8,3 +8,9 @@ Class {
 LoadAvisitingArgument class >> decodeUsing: anAstcodeDecoder [
 	^ self new
 ]
+
+{ #category : #'as yet unclassified' }
+LoadAvisitingArgument >> nativizeUsing: anAssembler for: messageNativizer [
+	messageNativizer loadRvisitingArgument.
+	anAssembler loadAwithR
+]

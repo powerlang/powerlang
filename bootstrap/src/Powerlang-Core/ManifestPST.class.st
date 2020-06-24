@@ -78,6 +78,11 @@ ManifestPST class >> ruleRBToDoRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBUnaryAccessingMethodWithoutReturnRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#InlinedMessageNativizer #inlineOr #false)) #'2020-06-18T04:18:13.832024-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
 	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-29T19:59:46.632993-03:00') )
 ]

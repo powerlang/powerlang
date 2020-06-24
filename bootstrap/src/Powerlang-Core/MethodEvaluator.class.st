@@ -57,8 +57,15 @@ MethodEvaluator >> arguments: aCollection [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> association: association put: value [
-	^ association value: value
+MethodEvaluator >> associationValueAt: anInteger [
+	^ (method at: anInteger) value
+]
+
+{ #category : #visiting }
+MethodEvaluator >> associationValueAt: anInteger put: value [
+	| association |
+	association := (method at: anInteger).
+	^association value: value
 ]
 
 { #category : #visiting }

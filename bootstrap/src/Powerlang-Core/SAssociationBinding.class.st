@@ -10,7 +10,7 @@ Class {
 
 { #category : #testing }
 SAssociationBinding >> assign: value within: evaluator [
-	^evaluator association: association put: value
+	^ evaluator associationValueAt: index put: value
 ]
 
 { #category : #accessing }
@@ -40,5 +40,6 @@ SAssociationBinding >> isAssociation [
 
 { #category : #testing }
 SAssociationBinding >> valueWithin: evaluator [
-	^evaluator literal: association value
+	^evaluator associationValueAt: index
+
 ]

@@ -220,6 +220,11 @@ JITAssembler64 >> compareRwithIndirect: reg1 andExchange: reg2 [
 ]
 
 { #category : #comparing }
+JITAssembler64 >> compareRwithNil [
+	self assemble: 'cmp' with: self regR with: self regNil
+]
+
+{ #category : #comparing }
 JITAssembler64 >> compareRwithS [
 	self assemble: 'cmp' with: self regR with: self regS
 ]
