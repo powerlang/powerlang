@@ -220,6 +220,11 @@ JITAssembler64 >> compareRwithIndirect: reg1 andExchange: reg2 [
 ]
 
 { #category : #comparing }
+JITAssembler64 >> compareRwithNil [
+	self assemble: 'cmp' with: self regR with: self regNil
+]
+
+{ #category : #comparing }
 JITAssembler64 >> compareRwithS [
 	self assemble: 'cmp' with: self regR with: self regS
 ]
@@ -663,6 +668,17 @@ JITAssembler64 >> loadLongSwithRindex: index [
 JITAssembler64 >> loadMXCSRfromA [
 	pointer reset; length: 32; base: self regA.
 	self assemble: 'ldmxcsr' with: pointer
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithRIPoffset: imm [
+	pointer
+		reset;
+		length: self addressLength;
+		base: rip;
+		displacement: imm.
+
+	self assemble: 'lea' with: self regM with: pointer
 ]
 
 { #category : #loading }
@@ -1426,6 +1442,11 @@ JITAssembler64 >> restoreCallerFrame [
 	self
 		move: self regFP to: self regSP;
 		pop: self regFP
+]
+
+{ #category : #epilogue }
+JITAssembler64 >> restoreCallerM [
+	self loadSwithFPindex: -1
 ]
 
 { #category : #epilogue }

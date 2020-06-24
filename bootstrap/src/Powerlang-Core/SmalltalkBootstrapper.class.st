@@ -656,23 +656,6 @@ SmalltalkBootstrapper >> newMethod: anAstcode selector: aSymbol in: classname fo
 	^ method
 ]
 
-{ #category : #initialization }
-SmalltalkBootstrapper >> newMethod: anAstcode selector: aSymbol in: species format: anInteger sized: size [
-	| method astcodes selector format |
-	method := self newSlots: 'CompiledMethod' sized: size.
-	astcodes := self transferLiteralDeep: anAstcode.
-	selector := self newSymbol: aSymbol.
-	format := self newSmallInteger: anInteger.
-	method
-		nativeCode: self nilObject;
-		astcodes: astcodes;
-		class: species;
-		selector: selector;
-		format: format;
-		source: self nilObject.
-	^ method
-]
-
 { #category : #'as yet unclassified' }
 SmalltalkBootstrapper >> newNamed: aSymbol [
 	| obj |
@@ -863,14 +846,21 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
-	| transferred size |
+	| size transferred astcodes mcode selector format |
 	size := anSCompiledMethod size.
-	transferred := self
-		newMethod: anSCompiledMethod astcodes
-		selector: anSCompiledMethod selector
-		in: species
-		format: anSCompiledMethod format
-		sized: size.
+	transferred := self newSlots: 'CompiledMethod' sized: size.
+	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
+	mcode := self newBytesFrom: anSCompiledMethod nativeCode code.
+	selector := self newSymbol: anSCompiledMethod selector.
+	format := self newSmallInteger: anSCompiledMethod format.
+	transferred
+		nativeCode: mcode;
+		astcodes: astcodes;
+		class: species;
+		selector: selector;
+		format: format;
+		source: self nilObject.
+
 	1 to: size do: [ :i | self transferLiteralAt: i in: transferred ].
 	^ transferred
 ]

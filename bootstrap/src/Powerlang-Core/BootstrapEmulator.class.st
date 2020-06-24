@@ -51,13 +51,13 @@ BootstrapEmulator >> classes: aDictionary [
 
 { #category : #accessing }
 BootstrapEmulator >> compile: anRGMethod [
-	| compiler class method |
+	| compiler class |
 	compiler := Compiler namespace: globals.
 	class := wrappers at: anRGMethod parent.
-	method := compiler
+	^compiler
 		forClass: class;
 		compile: anRGMethod sourceCode.
-	^ bootstrapper transferSimpleLiterals: method
+
 ]
 
 { #category : #accessing }
@@ -79,11 +79,13 @@ BootstrapEmulator >> dispatch: aMethod with: aMessage from: parent [
 
 { #category : #accessing }
 BootstrapEmulator >> doLookup: aSymbol startingAt: aBehavior [
-	| next m c |
+	| next m c smethod |
 	"emulated behavior can be different from the object one, so we first do the switch"
 	next := spec at: aBehavior name.
 	[ m := self methodFor: aSymbol in: next.
-	m ifNotNil: [ ^ self compile: m ].
+	m
+		ifNotNil: [ smethod := self compile: m.
+			^ bootstrapper transferSimpleLiterals: smethod ].
 	next := next superclass.
 	next notNil ] whileTrue.
 	^ aBehavior isMeta

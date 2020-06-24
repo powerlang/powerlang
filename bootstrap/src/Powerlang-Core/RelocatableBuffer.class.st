@@ -159,11 +159,12 @@ RelocatableBuffer >> stream [
 
 { #category : #writing }
 RelocatableBuffer >> writeByte: byte at: location [
-	| previous |
+	| previous value |
 	previous := stream position.
+	value := byte < 0 ifTrue: [ byte + 256 ] ifFalse: [ byte ].
 	stream
 		position: location - address;
-		nextBytePut: byte;
+		nextBytePut: value;
 		position: previous
 ]
 
