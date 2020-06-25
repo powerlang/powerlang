@@ -35,6 +35,11 @@ NativizationEnvironment >> abi: anAbi [
 	abi := anAbi 
 ]
 
+{ #category : #'*Powerlang-Core-OCompiler' }
+NativizationEnvironment >> bareMetalNativizer [
+	^OptimizingNativizer
+]
+
 { #category : #initialization }
 NativizationEnvironment >> be32bits [
 	abi := X86ABI new 

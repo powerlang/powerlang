@@ -121,6 +121,11 @@ Object >> isEmptyOrNil [
 	^false
 ]
 
+{ #category : #'*Powerlang-Core-OCompiler' }
+Object >> isInstruction [
+	^false
+]
+
 { #category : #'*Powerlang-Core' }
 Object >> isSmallInteger [
 	^false
