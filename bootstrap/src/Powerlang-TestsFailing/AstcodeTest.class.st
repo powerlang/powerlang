@@ -2,7 +2,9 @@ Class {
 	#name : #AstcodeTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'method'
+		'method',
+		'gdb',
+		'memory'
 	],
 	#pools : [
 		'AstBindingTypes',
@@ -14,6 +16,20 @@ Class {
 { #category : #private }
 AstcodeTest >> compile: source in: aSpecies [
 	^SCompiler compile: source in: aSpecies
+]
+
+{ #category : #private }
+AstcodeTest >> connectGdb [
+	gdb := RemoteGDBSession 
+		host: '192.168.75.2'
+		port: 7000
+		processorDescription: AcProcessorDescriptions x86
+]
+
+{ #category : #private }
+AstcodeTest >> createRAM [
+	memory := Gem5SharedRAM gdb: gdb.
+	memory shmemSize: 20*1024*1024.
 ]
 
 { #category : #private }
@@ -213,6 +229,21 @@ AstcodeTest >> test024encodeLiteral [
 ]
 
 { #category : #private }
+AstcodeTest >> test025encodeReturn42 [
+	| astcodes root ret |
+	astcodes := self encode: 'm ^42'.
+	self assert: astcodes = {MethodId. {ReturnId. true. {LiteralId. 0. 42}}}.
+	root := self decode: astcodes of: method.
+	self
+		assert: root isMethod;
+		assert: root statements size = 1.
+	ret := root statements first.
+	self
+		assert: ret isReturn;
+		assert: ret expression value = 42
+]
+
+{ #category : #private }
 AstcodeTest >> test030encodeUnaryMessage [
 	| astcodes root return message identifier |
 	astcodes := self encode: 'm ^self foo'.
@@ -314,4 +345,35 @@ AstcodeTest >> test050instVarAssignment [
 		assert: expression isVariable;
 		assert: expression binding isLiteral;
 		assert: expression binding value = true
+]
+
+{ #category : #private }
+AstcodeTest >> test100nativizeReturn42 [
+	| astcodes root nativizer |
+	astcodes := self encode: 'm ^42'.
+	nativizer := NativizationEnvironment forTesting: SmalltalkBootstrapper spec.
+	nativizer completeInitialization.
+	nativizer nativeCodeFor: method 
+]
+
+{ #category : #private }
+AstcodeTest >> test200runReturn42 [
+	| astcodes nativizer nc wherePC |
+	astcodes := self encode: 'm ^42'.
+	nativizer := NativizationEnvironment forTesting: SmalltalkBootstrapper spec.
+	nativizer completeInitialization.
+	nc := nativizer nativeCodeFor: method.
+	self connectGdb; createRAM.
+	self halt.
+	gdb c.
+	wherePC := (gdb getRegister: 'rip')+1. "advance past the int3"
+	gdb setRegister: 'rip' to: wherePC.
+	memory writeBytes: nc code toAddr: wherePC.
+	"step through the mov rax,0x55"
+	gdb s. self assert: (gdb getRegister: 'rax') equals: 42<<1+1.
+	"step through the mov rsi,QWORD PTR [rbp-0x8]"
+	gdb s. self assert: (gdb getRegister: 'rsi') equals: 16r5555555555555555.
+	"step through the mov rbx,QWORD PTR [rbp-0x10]"
+	gdb s. self assert: (gdb getRegister: 'rbx') equals: 16r6666666666666666.
+
 ]
