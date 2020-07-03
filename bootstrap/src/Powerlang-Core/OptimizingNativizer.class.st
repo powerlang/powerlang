@@ -6,37 +6,20 @@ Class {
 	#name : #OptimizingNativizer,
 	#superclass : #Object,
 	#instVars : [
+		'environment',
 		'method',
-		'firstBlock',
-		'messageLinker',
-		'inlinedMethods',
-		'abi'
+		'firstBlock'
 	],
 	#category : #'Powerlang-Core-OCompiler'
 }
-
-{ #category : #unclassified }
-OptimizingNativizer class >> new [
-	^self basicNew initialize
-]
-
-{ #category : #unclassified }
-OptimizingNativizer class >> on: aCompiledMethod [
-	^self new method: aCompiledMethod
-]
-
-{ #category : #unclassified }
-OptimizingNativizer >> abi: anAbi [
-	abi := anAbi
-]
 
 { #category : #allocation }
 OptimizingNativizer >> allocate [
 	| allocator |
 	allocator := OptimizingRegisterAllocator new
-		abi: abi;
+		abi: environment abi;
 		firstBlock: firstBlock.
-	^allocator doAllocation
+	^ allocator doAllocation
 ]
 
 { #category : #unclassified }
@@ -44,17 +27,17 @@ OptimizingNativizer >> assembleUsing: allocation [
 	| assembler |
 	assembler := OptimizingCodeEmitter new
 		method: method;
-		abi: abi;
+		abi: environment abi;
 		allocation: allocation;
-		messageLinker: messageLinker.
+		messageLinker: environment messageLinker.
 	assembler assembleFrom: firstBlock.
-	^assembler nativeCode
+	^ assembler nativeCode
 ]
 
 { #category : #unclassified }
 OptimizingNativizer >> bindVariables [
 	| binder |
-	binder := OptimizingVariableBinder new abi: abi.
+	binder := OptimizingVariableBinder new abi: environment abi.
 	binder doBindingFrom: firstBlock
 ]
 
@@ -68,47 +51,6 @@ OptimizingNativizer >> decompose [
 		unifyReturns;
 		verifyPredecessors;
 		bindVariables
-]
-
-{ #category : #private }
-OptimizingNativizer >> defaultInlinedMethods [
-	^ NativizationEnvironment primitiveObjectMethods
-		,
-			((OrderedCollection new
-				add: Object >> #byteAtValid:;
-				add: Object >> #byteAtValid:put:;
-				add: ProtoObject >> #objectAtValid:;
-				add: ProtoObject >> #objectAtValid:put:;
-				add: Object >> #basicObjectIndexOf:;
-				add: Object >> #primitiveAt:put:;
-				add: ProtoObject >> #behavior;
-				add: ProtoObject >> #class;
-				add: Species >> #instSize;
-				add: Species >> #_instancesAreArrayed;
-				add: Species >> #_instancesHavePointers;
-				add: Species >> #memory;
-				add: Species >> #instanceBehavior;
-				add: Species >> #primitiveNew;
-				add: Species >> #primitiveNew:;
-				add: ProtoObject >> #primitiveAt:;
-				add: ProtoObject >> #_cachedLookup:;
-				add: ProtoObject >> #_cachedLookup:in:;
-				add: CompiledMethod >> #prepareForExecution;
-				add: CompiledMethod >> #isNativized;
-				add: CompiledMethod >> #nativeCode;
-				add: CompiledMethod >> #blockCount;
-				add: CompiledMethod >> #literalIndexFrom:;
-				add: CompiledBlock >> #argumentCount;
-				add: CompiledBlock >> #blockNumber;
-				add: CompiledBlock >> #blockCode;
-				add: CompiledBlock >> #method;
-				add: NativeCode >> #code;
-				add: NativeCode >> #isFresh;
-				add: CharacterArray >> #characterAtValid:;
-				add: GCSpace >> #commitedLimit;
-				add: GCSpace >> #nextFree;
-				add: GCSpace >> #nextFree:;
-				yourself) )
 ]
 
 { #category : #unclassified }
@@ -126,6 +68,11 @@ OptimizingNativizer >> enforceTwoAddressCodeUsing: allocation [
 ]
 
 { #category : #unclassified }
+OptimizingNativizer >> environment: aNativizationEnvironment [
+	environment := aNativizationEnvironment
+]
+
+{ #category : #unclassified }
 OptimizingNativizer >> firstBlock [
 	^firstBlock
 ]
@@ -133,15 +80,10 @@ OptimizingNativizer >> firstBlock [
 { #category : #unclassified }
 OptimizingNativizer >> fragmentInstructions [
 	| binder |
-	binder := OptimizingInstructionFragmenter new abi: abi.
+	binder := OptimizingInstructionFragmenter new abi: environment abi.
 	binder
 		fragmentArgumentsIn: firstBlock with: method;
 		fragmentInstructionsFrom: firstBlock
-]
-
-{ #category : #unclassified }
-OptimizingNativizer >> initialize [
-	inlinedMethods := self defaultInlinedMethods
 ]
 
 { #category : #unclassified }
@@ -151,43 +93,24 @@ OptimizingNativizer >> inlineBlocks [
 
 { #category : #unclassified }
 OptimizingNativizer >> inlineMethods [
-	(OptimizingMethodInliner on: firstBlock)
-		abi: abi;
-		methods: self inlinedMethods;
+	OptimizingMethodInliner new
+		environment: environment;
+		firstBlock: firstBlock;
 		inlineAllMessages
 ]
 
-{ #category : #private }
-OptimizingNativizer >> inlinedMethods [
-	^inlinedMethods
-]
-
-{ #category : #private }
-OptimizingNativizer >> inlinedMethods: aCollection [
-	inlinedMethods := aCollection
-]
-
 { #category : #unclassified }
-OptimizingNativizer >> irFor: aCompiledMethod [
+OptimizingNativizer >> irFor: anSCompiledMethod [
 	| visitor ir cm |
-	visitor := OptimizingVisitor new.
-	cm := (NativizationEnvironment class
-		isUndermethod: aCompiledMethod selector)
-		ifTrue: [ ProtoObject >> aCompiledMethod selector ]
-		ifFalse: [ aCompiledMethod ].
-	ir := visitor visit: cm parseTree.
+	visitor := OptimizingVisitor new method: anSCompiledMethod.
+	ir := visitor visit: anSCompiledMethod sexpressions.
 	^ ir
 ]
 
 { #category : #unclassified }
-OptimizingNativizer >> messageLinker: aMessageLinker [
-	messageLinker := aMessageLinker
-]
-
-{ #category : #unclassified }
-OptimizingNativizer >> method: aCompiledMethod [
-	method := aCompiledMethod.
-	firstBlock := self irFor: aCompiledMethod
+OptimizingNativizer >> method: anSCompiledMethod [
+	method := anSCompiledMethod.
+	firstBlock := self irFor: anSCompiledMethod
 ]
 
 { #category : #unclassified }

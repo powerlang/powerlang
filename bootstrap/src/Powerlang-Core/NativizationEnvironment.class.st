@@ -8,6 +8,7 @@ Class {
 		'spec',
 		'optimizedMethods',
 		'invokedMethods',
+		'inlinedMethods',
 		'cachedNativizer',
 		'busy',
 		'methodInstSize'
@@ -51,6 +52,13 @@ NativizationEnvironment >> be64bits [
 ]
 
 { #category : #initialization }
+NativizationEnvironment >> compileOptimizedMethodsWith: compiler [
+	| smethod |
+	optimizedMethods withIndexDo:[:method :i | smethod := compiler compile: method. optimizedMethods at: i put: smethod ]
+
+]
+
+{ #category : #initialization }
 NativizationEnvironment >> completeInitialization [
 	cachedNativizer := self newExpressionNativizer 
 ]
@@ -61,7 +69,13 @@ NativizationEnvironment >> initialize [
 	abi := ABI forIntel: 8.
 	messageLinker := HaltingSend new.
 	optimizedMethods := OrderedCollection new.
-	invokedMethods := OrderedCollection new
+	invokedMethods := OrderedCollection new.
+	inlinedMethods := OrderedCollection new
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> inlinedMethods [
+	^inlinedMethods
 ]
 
 { #category : #accessing }
@@ -119,21 +133,45 @@ NativizationEnvironment >> newExpressionNativizer [
 ]
 
 { #category : #services }
-NativizationEnvironment >> optimizedNativeCodeFor: aCompiledMethod [
-	^ (self optimizingNativizer on: aCompiledMethod)
-		  messageLinker: messageLinker;
-		  abi: abi;
-		  nativeCode
+NativizationEnvironment >> optimizedNativeCodeFor: anSCompiledMethod [
+	^ self optimizingNativizer
+		method: anSCompiledMethod;
+		nativeCode
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> optimizingNativizer [
-	^OptimizingNativizer
+	^OptimizingNativizer new environment: self
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> safepointCheck: anObject [
 	safepointCheck := anObject 
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> setupInlinedMethods [
+	| map methods |
+	map := {(#ProtoObject
+		->
+			#(#objectAtValid: #objectAtValid:put: #behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
+	(#Object
+		->
+			#(#byteAtValid: #byteAtValid:put: #basicObjectIndexOf: #at:put:)).
+	(#Species
+		->
+			#(#instSize #_instancesAreArrayed #_instancesHavePointers #memory #instanceBehavior #primitiveNew #primitiveNew:)).
+	(#CompiledMethod
+		->
+			#(#prepareForExecution #isNativized #nativeCode #blockCount #literalIndexFrom:)).
+	(#CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
+	(#NativeCode -> #(#code #isFresh)).
+	(#GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
+	(#CharacterArray -> #(#characterAtValid:))}.
+	methods := self methodSubset: map.
+	inlinedMethods
+		addAll: self undermethods;
+		addAll: methods
 ]
 
 { #category : #initialization }
@@ -182,15 +220,14 @@ NativizationEnvironment >> sexpressionOffsetsOf: code [
 	method := code method.
 	(self shouldOptimize: method) ifTrue: [ ^ #(  ) ].
 	^ self nativizerDuring: [ :nativizer | 
-		  method nativeCode isNil ifFalse: [ method := method copy ]. 
+		  method nativeCode ifNotNil: [ method := method copy ]. 
 		  nativizer compile: method.
 		  nativizer sexpressionOffsetsOf: code ]
 ]
 
-{ #category : #private }
+{ #category : #'*Powerlang-Core-OCompiler' }
 NativizationEnvironment >> shouldOptimize: method [
-	true ifTrue: [ ^false ].
-	^ optimizedMethods includes: method
+	^optimizedMethods includes: method
 ]
 
 { #category : #initialization }
@@ -199,6 +236,7 @@ NativizationEnvironment >> spec: anRGEnvironment [
 	methodInstSize := (spec at: #CompiledMethod) instSize.
 	self
 		setupOptimizedMethods;
+		setupInlinedMethods;
 		setupInvokedMethods
 ]
 

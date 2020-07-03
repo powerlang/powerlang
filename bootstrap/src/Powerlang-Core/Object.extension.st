@@ -11,6 +11,11 @@ Object >> ASSERT: aBoolean [
 ]
 
 { #category : #'*Powerlang-Core' }
+Object >> DENY: aBoolean [
+	self ASSERT: aBoolean not
+]
+
+{ #category : #'*Powerlang-Core' }
 Object class >> disableCode: aBlock [
 	"the block has been disabled"
 ]

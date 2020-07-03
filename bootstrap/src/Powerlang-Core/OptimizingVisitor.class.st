@@ -6,6 +6,7 @@ Class {
 	#name : #OptimizingVisitor,
 	#superclass : #ParseTreeVisitor,
 	#instVars : [
+		'method',
 		'firstBlock',
 		'currentBlock',
 		'isReceiver',
@@ -42,16 +43,21 @@ OptimizingVisitor >> insertReturnSelf [
 	instruction := OReturn new
 		source: receiver;
 		frame: frame;
-		argumentsCount: argumentsCount.
+		argumentsCount: method argumentCount.
 	receiver addUse: instruction at: #source.
 	frame addUse: instruction at: #frame.
 	currentBlock add: instruction.
-	^instruction
+	^ instruction
 ]
 
 { #category : #unclassified }
 OptimizingVisitor >> isReceiver [
 	^isReceiver
+]
+
+{ #category : #unclassified }
+OptimizingVisitor >> method: anSCompiledMethod [
+	method := anSCompiledMethod
 ]
 
 { #category : #unclassified }
@@ -138,13 +144,12 @@ OptimizingVisitor >> visitMessage: aMessageNode [
 ]
 
 { #category : #unclassified }
-OptimizingVisitor >> visitMethod: aMethodNode [
+OptimizingVisitor >> visitMethod: anSMethod [
 	| last |
 	self insertDefineArgument: #activationRecord; insertDefineArgument: #self.
-	aMethodNode arguments
-		do: [:node | self insertDefineArgument: node value asSymbol].
-	argumentsCount := aMethodNode arguments size.
-	self visitScript: aMethodNode.
+	1 to: anSMethod argumentCount
+		do: [:i | self insertDefineArgument: i printString asSymbol].
+	self visitScript: anSMethod.
 	last := currentBlock lastValue.
 	last isReturn ifFalse: [self insertReturnSelf]
 ]
@@ -162,11 +167,11 @@ OptimizingVisitor >> visitReturn: aReturnNode [
 	instruction := OReturn new
 		source: source;
 		frame: frame;
-		argumentsCount: argumentsCount.
+		argumentsCount: method argumentCount.
 	source addUse: instruction at: #source.
 	frame addUse: instruction at: #frame.
 	currentBlock add: instruction.
-	^instruction
+	^ instruction
 ]
 
 { #category : #unclassified }

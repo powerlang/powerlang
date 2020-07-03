@@ -335,7 +335,7 @@ SmalltalkBootstrapper >> fillSpecies: species with: definition [
 	definition methods
 		do: [ :m | 
 			smethod := emulator compile: m.
-			code := nativizer nativeCodeFor: smethod.
+			code := nativizer nativeCodeFor: smethod from: m.
 			smethod nativeCode: code.
 			transferred := self transferMethod: smethod in: species.
 			self
