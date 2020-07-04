@@ -155,6 +155,15 @@ JITAssembler64 >> clearSafeRintegerBit [
 	self assemble: 'and' with: al with: immediate
 ]
 
+{ #category : #loading }
+JITAssembler64 >> compare: register withMindex: index [
+	self
+		assemble: 'cmp'
+		withReg: register
+		withReg: self regM
+		index: index
+]
+
 { #category : #comparing }
 JITAssembler64 >> compareAwithImmediate: imm [
 	#imm8.
@@ -264,6 +273,21 @@ JITAssembler64 >> compareTwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'cmp' with: self regT withImm: imm
+]
+
+{ #category : #loading }
+JITAssembler64 >> compareWithFalse: register [
+	self assemble: 'cmp' with: register with: self regFalse
+]
+
+{ #category : #loading }
+JITAssembler64 >> compareWithNil: register [
+	self assemble: 'cmp' with: register with: self regNil
+]
+
+{ #category : #loading }
+JITAssembler64 >> compareWithTrue: register [
+	self assemble: 'cmp' with: register with: self regTrue
 ]
 
 { #category : #integers }
@@ -484,6 +508,15 @@ JITAssembler64 >> labeledNonIntegerBitTestOf: aRegister [
 { #category : #integers }
 JITAssembler64 >> labeledNonIntegerBitTestOfR [
 	^self labeledNonIntegerBitTestOf: self regR8
+]
+
+{ #category : #loading }
+JITAssembler64 >> load: register withMindex: index [
+	self
+		assemble: 'mov'
+		withReg: register
+		withReg: self regM
+		index: index
 ]
 
 { #category : #loading }
@@ -1009,6 +1042,24 @@ JITAssembler64 >> loadTwithTindex: index [
 JITAssembler64 >> loadVwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regV withImm: imm
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadWithFalse: register [
+	self assemble: 'mov' with: register with: self regFalse
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadWithNil: register [
+	self
+		assemble: 'mov'
+		with: register
+		with: self regNil
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadWithTrue: register [
+	self assemble: 'mov' with: register with: self regTrue
 ]
 
 { #category : #loading }

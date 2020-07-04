@@ -517,6 +517,11 @@ Assembler64 >> move: reg2 to: reg1 [
 ]
 
 { #category : #'private - jumps' }
+Assembler64 >> nativeCode [
+	^ NativeCode new code: memory bytes
+]
+
+{ #category : #'private - jumps' }
 Assembler64 >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4
 ]

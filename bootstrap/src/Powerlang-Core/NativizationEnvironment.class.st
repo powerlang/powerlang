@@ -36,11 +36,6 @@ NativizationEnvironment >> abi: anAbi [
 	abi := anAbi 
 ]
 
-{ #category : #'*Powerlang-Core-OCompiler' }
-NativizationEnvironment >> bareMetalNativizer [
-	^OptimizingNativizer
-]
-
 { #category : #initialization }
 NativizationEnvironment >> be32bits [
 	abi := X86ABI new 
@@ -52,10 +47,12 @@ NativizationEnvironment >> be64bits [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> compileOptimizedMethodsWith: compiler [
+NativizationEnvironment >> compileInlinedMethodsWith: compiler [
 	| smethod |
-	optimizedMethods withIndexDo:[:method :i | smethod := compiler compile: method. optimizedMethods at: i put: smethod ]
-
+	inlinedMethods
+		withIndexDo: [ :method :i | 
+			smethod := compiler compile: method.
+			inlinedMethods at: i put: smethod ]
 ]
 
 { #category : #initialization }
@@ -100,17 +97,32 @@ NativizationEnvironment >> methodNativizer [
 
 { #category : #initialization }
 NativizationEnvironment >> methodSubset: aDictionary [
-	| species |
+	| species m |
 	^aDictionary flatCollect: [ :assoc | 
 		species := spec at: assoc key.
-		assoc value collect: [:sel | species >> sel ] ].	
+		assoc value collect: [:sel | m := species >> sel. self ASSERT: m notNil. m ] ].	
 ]
 
 { #category : #services }
-NativizationEnvironment >> nativeCodeFor: aCompiledMethod [
+NativizationEnvironment >> nativize: aCompiledMethod [
 	^ (self shouldOptimize: aCompiledMethod)
-		  ifTrue: [ self optimizedNativeCodeFor: aCompiledMethod ]
-		  ifFalse: [ self unoptimizedNativeCodeFor: aCompiledMethod ] 
+		  ifTrue: [ self nativizeOptimizing: aCompiledMethod ]
+		  ifFalse: [ self nativizeWithoutOptimizing: aCompiledMethod ] 
+]
+
+{ #category : #services }
+NativizationEnvironment >> nativizeOptimizing: anSCompiledMethod [
+	^ self optimizingNativizer
+		method: anSCompiledMethod;
+		nativize
+]
+
+{ #category : #services }
+NativizationEnvironment >> nativizeWithoutOptimizing: aCompiledMethod [
+	| method |
+	method := self
+		nativizerDuring: [ :nativizer | nativizer nativize: aCompiledMethod ].
+	^ method 
 ]
 
 { #category : #initialization }
@@ -130,13 +142,6 @@ NativizationEnvironment >> nativizerDuring: aBlock [
 { #category : #initialization }
 NativizationEnvironment >> newExpressionNativizer [
 	^ SExpressionNativizer new environment: self
-]
-
-{ #category : #services }
-NativizationEnvironment >> optimizedNativeCodeFor: anSCompiledMethod [
-	^ self optimizingNativizer
-		method: anSCompiledMethod;
-		nativeCode
 ]
 
 { #category : #initialization }
@@ -193,19 +198,18 @@ NativizationEnvironment >> setupInvokedMethods [
 NativizationEnvironment >> setupOptimizedMethods [
 	| map methods |
 	map := {
-			#ProtoObject -> #(behavior class primitiveAt: initializeExtended:contentSize:).
+			#ProtoObject -> #(behavior class primitiveAt: #primitiveAt:put: initializeExtended:contentSize:).
 			#Object -> #(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid:
 		    #byteAtValid:put: basicObjectAt: #basicObjectAt:put:
-		    #primitiveAt:put: #replaceBytesForwardFrom:to:with:startingAt:).
-			#Array -> #(at: #at:put:).
+		    #replaceBytesForwardFrom:to:with:startingAt:).
 			#SendSite -> #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn:
 		    #_dispatchDebuggableOn:startingAt: ).
 			#Species -> #( #allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes:
 		    primitiveNewPointers: ).
-			#'Float class' -> #( basicNew new ).
+			#'Float class' -> #( new ).
 			#CompiledBlock -> #( argumentCount arity blockCode method ).
 			#Closure -> #( value value: #value:value: ).
-			#CompiledMethod -> #( at: blockCount isNativized ).
+			#CompiledMethod -> #( blockCount isNativized ).
 			#String -> #( at: #at:put: byteAt: #byteAt:put: ).
 			#GCSpace -> #( lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy: ).
 			#Memory -> #( shallowCopy: ) 
@@ -225,9 +229,17 @@ NativizationEnvironment >> sexpressionOffsetsOf: code [
 		  nativizer sexpressionOffsetsOf: code ]
 ]
 
+{ #category : #initialization }
+NativizationEnvironment >> shouldInline: aSymbol [
+	^ inlinedMethods anySatisfy: [ :m | m selector = aSymbol ]
+]
+
 { #category : #'*Powerlang-Core-OCompiler' }
 NativizationEnvironment >> shouldOptimize: method [
-	^optimizedMethods includes: method
+	| selector classname |
+	selector := method selector.
+	classname := method classBinding name.
+	^ optimizedMethods anySatisfy: [:m | m selector = selector and: [ m parent name = classname ]  ]
 ]
 
 { #category : #initialization }
@@ -243,14 +255,6 @@ NativizationEnvironment >> spec: anRGEnvironment [
 { #category : #initialization }
 NativizationEnvironment >> undermethods [
 	^(spec at: #ProtoObject) methods select: [:m | m selector beginsWith: '_'].	
-]
-
-{ #category : #services }
-NativizationEnvironment >> unoptimizedNativeCodeFor: aCompiledMethod [
-	| code |
-	code := self nativizerDuring: [ :nativizer | 
-		        nativizer nativeCodeFor: aCompiledMethod ].
-	^ code 
 ]
 
 { #category : #initialization }

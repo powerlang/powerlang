@@ -63,12 +63,7 @@ OptimizingMethodInliner >> inlinedMethodFor: aMessageSend [
 ]
 
 { #category : #unclassified }
-OptimizingMethodInliner >> selectors [
-	^environment inlinedMethods collect: #selector
-]
-
-{ #category : #unclassified }
 OptimizingMethodInliner >> shouldInline: instruction [
-	^instruction isMessageSend
-		and: [self selectors includes: instruction selector]
+	^ instruction isMessageSend
+		and: [ environment shouldInline: instruction selector ]
 ]

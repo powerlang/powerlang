@@ -173,33 +173,38 @@ OBasicBlock >> dominatorTree [
 	idoms at: 1 put: 1.
 	root := all first.
 	indices := Dictionary new.
-	all withIndexDo: [:block :index | indices at: block put: index].
-	intersect := [:index1 :index2 | | finger1 finger2 |
-		finger1 := index1.
-		finger2 := index2.
-		[finger1 != finger2] whileTrue: [
-			finger1 > finger2
-				ifTrue: [finger1 := idoms at: finger1]
-				ifFalse: [finger2 := idoms at: finger2]].
-		finger1].
+	all withIndexDo: [ :block :index | indices at: block put: index ].
+	intersect := [ :index1 :index2 | 
+	| finger1 finger2 |
+	finger1 := index1.
+	finger2 := index2.
+	[ finger1 != finger2 ]
+		whileTrue: [ finger1 > finger2
+				ifTrue: [ finger1 := idoms at: finger1 ]
+				ifFalse: [ finger2 := idoms at: finger2 ] ].
+	finger1 ].
 	changed := true.
-	[changed] whileTrue: [
-		changed := false.
-		(all copyFrom: 2)
-			withIndexDo: [:block :index | | processed initial intersection |
-				processed := block predecessors select: [:predecessor | | i |
-					i := indices at: predecessor.
-					(idoms at: i) notNil].
-				initial := indices at: processed first.
-				intersection := processed
-					inject: initial
-					into: [:actual :predecessor | | candidate |
-						candidate := indices at: predecessor.
-						intersect value: actual value: candidate].
-				intersection != (idoms at: index + 1) ifTrue: [
-					idoms at: index + 1 put: intersection.
-					changed := true]]].
-	^ODominatorTree from: root with: all dominators: idoms
+	[ changed ]
+		whileTrue: [ changed := false.
+			(all beeCopyFrom: 2)
+				withIndexDo: [ :block :index | 
+					| processed initial intersection |
+					processed := block predecessors
+						select: [ :predecessor | 
+							| i |
+							i := indices at: predecessor.
+							(idoms at: i) notNil ].
+					initial := indices at: processed first.
+					intersection := processed
+						inject: initial
+						into: [ :actual :predecessor | 
+							| candidate |
+							candidate := indices at: predecessor.
+							intersect value: actual value: candidate ].
+					intersection != (idoms at: index + 1)
+						ifTrue: [ idoms at: index + 1 put: intersection.
+							changed := true ] ] ].
+	^ ODominatorTree from: root with: all dominators: idoms
 ]
 
 { #category : #unclassified }
@@ -620,7 +625,7 @@ OBasicBlock >> replaceAsPredecessor: old [
 { #category : #unclassified }
 OBasicBlock >> replacePredecessor: old with: new [
 	self phisDo: [:phi | phi replaceBlock: old with: new].
-	predecessors replace: old with: new
+	predecessors replaceAll: old with: new
 ]
 
 { #category : #unclassified }

@@ -17,13 +17,14 @@ Class {
 ODominatorTree class >> from: root with: aBlocksCollection dominators: dominators [
 	| trees |
 	trees := Array
-		withAll: (aBlocksCollection collect: [:block | self new block: block]).
-	(dominators copyFrom: 2)
-		withIndexDo: [:dominator :correspondingIndex | | imm child |
+		withAll: (aBlocksCollection collect: [ :block | self new block: block ]).
+	(dominators beeCopyFrom: 2)
+		withIndexDo: [ :dominator :correspondingIndex | 
+			| imm child |
 			imm := trees at: dominator.
 			child := trees at: correspondingIndex + 1.
-			imm addDominated: child].
-	^trees first
+			imm addDominated: child ].
+	^ trees first
 ]
 
 { #category : #unclassified }

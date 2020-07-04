@@ -15,7 +15,8 @@ Class {
 		'firstBlock',
 		'currentBlockIndex',
 		'blocks',
-		'messageLinker'
+		'messageLinker',
+		'literals'
 	],
 	#pools : [
 		'ObjectHeaderMasks',
@@ -350,14 +351,25 @@ OptimizingCodeEmitter >> assembleCompare: instruction [
 OptimizingCodeEmitter >> assembleCompareConstant: instruction jumpTrue: trueBlock jumpFalse: falseBlock [
 	| left value |
 	left := allocation at: instruction left.
-	instruction right isSmallInteger
-		ifTrue: [
-			value := instruction right * 2 + 1.
-			assembler compare: left with: value]
-		ifFalse: [
-			value := instruction right.
-			assembler compare: left withPointer: value].
-	self assembleJumpTrue: trueBlock orJumpFalse: falseBlock in: instruction
+	self assembleCompareConstant: left with: instruction right;
+	assembleJumpTrue: trueBlock orJumpFalse: falseBlock in: instruction
+]
+
+{ #category : #private }
+OptimizingCodeEmitter >> assembleCompareConstant: left with: right [
+	| index |
+	right isSmallInteger
+		ifTrue: [ ^ assembler compare: left with: right * 2 + 1 ].
+	right ifNil: [ ^ assembler compareWithNil: left ].
+	right = false
+		ifTrue: [ ^ assembler compareWithFalse: left ].
+	right = true
+		ifTrue: [ ^ assembler compareWithTrue: left ].
+	index := literals
+		indexOf: right
+		ifAbsent: [ literals add: right.
+			literals size ].
+	assembler compare: left withMindex: index
 ]
 
 { #category : #private }
@@ -410,9 +422,14 @@ OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
+	| result |
 	firstBlock := aBasicBlock.
 	blocks := firstBlock withSuccessorsPostOrder reversed.
-	self doAssemble
+	self doAssemble.
+	result := literals size > method size
+		ifTrue: [ method copyWithLiterals: literals ]
+		ifFalse: [ method ].
+	^result nativeCode: assembler nativeCode
 ]
 
 { #category : #unclassified }
@@ -507,17 +524,25 @@ OptimizingCodeEmitter >> assembleJumpTrue: blockJumpTrue orJumpFalse: blockJumpF
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleLoadConstant: value to: register [
-	| constant |
+	| constant index |
 	value isSmallInteger
-		ifTrue: [
-			constant := value * 2 + 1.
-			assembler load: register withImmediate: constant]
-		ifFalse: [assembler load: register withPointer: value]
+		ifTrue: [ constant := value * 2 + 1.
+			^ assembler load: register withImmediate: constant ].
+	value ifNil: [ ^ assembler loadWithNil: register ].
+	value = false
+		ifTrue: [ ^ assembler loadWithFalse: register ].
+	value = true
+		ifTrue: [ ^ assembler loadWithTrue: register ].
+	index := literals
+		indexOf: value
+		ifAbsent: [ literals add: value.
+			literals size ].
+	assembler load: register withMindex: index
 ]
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleLookup: selector [
-	self haltWhen: selector = #'&'.
+	self haltIf: selector = #'&'.
 	messageLinker emitSend: selector using: assembler
 ]
 
@@ -740,7 +765,7 @@ OptimizingCodeEmitter >> initializeAssemblers [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := JITAssembler64 on: #[] writeStream
+	assembler := TemplateAssembler64 on: #[] writeStream
 ]
 
 { #category : #unclassified }
@@ -773,13 +798,9 @@ OptimizingCodeEmitter >> messageLinker: aMessageLinker [
 ]
 
 { #category : #accessing }
-OptimizingCodeEmitter >> method: aCompiledMethod [
-	method := aCompiledMethod
-]
-
-{ #category : #unclassified }
-OptimizingCodeEmitter >> nativeCode [
-	^assembler nativeCode
+OptimizingCodeEmitter >> method: anSCompiledMethod [
+	method := anSCompiledMethod.
+	literals := OrderedCollection withAll: method literals.
 ]
 
 { #category : #unclassified }
@@ -850,16 +871,19 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 
 { #category : #visiting }
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
-	| frame |
-	instruction name == #activationRecord ifTrue: [^assembler buildFrame].
+	| frame placeholder |
+	instruction name == #activationRecord ifTrue: [
+		instruction hasFrame ifTrue: [
+			placeholder := 16r12345678.
+			assembler loadMwithRIPoffset: placeholder ].
+		^assembler buildFrame].
 	instruction name == #self ifTrue: [
 		frame := instruction prev.
 		^frame hasFrame ifTrue: [
 			assembler
 				reserveStackSlots: frame temporaries + 2;
 				store: assembler regR in: assembler regFP index: 0;
-				loadVwithPointer: method;
-				store: assembler regV in: assembler regFP index: -1.
+				store: assembler regM in: assembler regFP index: -1.
 			self savesPreviousSelf ifTrue: [assembler push: assembler regS]]]
 ]
 

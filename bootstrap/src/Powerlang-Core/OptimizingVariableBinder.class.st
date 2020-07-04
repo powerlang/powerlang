@@ -177,29 +177,28 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: 
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asArgument: binding [
 	| source |
-	source := self definitionOf: binding name asSymbol.
+	source := self definitionOf: binding index asString asSymbol.
 	aReadVariable replaceAllUsesWith: source; dissolve
 ]
 
 { #category : #private }
 OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 	| global read value name load |
-	name := binding association key.
+	binding isPoolVar
+		ifTrue: [
+			load := OLoadConstant valued: binding value.
+			^aReadVariable dissolveReplacingWith: load].
+	name := binding association key asString asSymbol.
 	(name == #WordSize or: [name == #WordSizeShift]) ifTrue: [
 		value := name == #WordSize
 			ifTrue: [abi wordSize]
 			ifFalse: [abi wordSizeShift].
 		load := OLoadConstant valued: value.
 		^aReadVariable dissolveReplacingWith: load].
-	binding isPoolVariableBinding
-		ifTrue: [
-			load := OLoadConstant valued: binding association value.
-			aReadVariable dissolveReplacingWith: load]
-		ifFalse: [
-			global := OLoadConstant valued: binding association.
-			read := OBinaryConstantOperation left: global right: 1 name: #_basicAt:.
-			global addUse: read at: #left.
-			aReadVariable beforeInsert: global; dissolveReplacingWith: read]
+	global := OLoadConstant valued: binding association.
+	read := OBinaryConstantOperation left: global right: 1 name: #_basicAt:.
+	global addUse: read at: #left.
+	aReadVariable beforeInsert: global; dissolveReplacingWith: read
 ]
 
 { #category : #unclassified }
@@ -218,10 +217,8 @@ OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> resolve: aReadVariable asLiteral: binding [
-	| name value constant |
-	name := binding name asSymbol.
-	value := self valueOfSpecial: name.
-	constant := OLoadConstant valued: value.
+	| constant |
+	constant := OLoadConstant valued: binding value.
 	aReadVariable dissolveReplacingWith: constant
 ]
 
@@ -263,14 +260,6 @@ OptimizingVariableBinder >> rewritePhis [
 					phi variables at: i put: source.
 					source addUse: phi at: predecessor]]
 			ifFalse: [phi clearVariables; dissolve]]
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> valueOfSpecial: name [
-	name == #true ifTrue: [^true].
-	name == #false ifTrue: [^false].
-	name == #nil ifTrue: [^nil].
-	self halt
 ]
 
 { #category : #unclassified }
@@ -321,7 +310,7 @@ OptimizingVariableBinder >> visitPhi: aPhi [
 { #category : #unclassified }
 OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	| binding |
-	self ASSERT: (aReadVariable binding isKindOf: Binding).
+	self ASSERT: (aReadVariable binding isKindOf: SBinding).
 	binding := aReadVariable binding.
 	binding isTemporary
 		ifTrue: [^self resolve: aReadVariable asTemporary: binding].
@@ -331,7 +320,7 @@ OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	binding isLiteral ifTrue: [^self resolve: aReadVariable asLiteral: binding].
 	binding isInstVar
 		ifTrue: [^self resolve: aReadVariable asInstanceVar: binding].
-	binding refersToAssoc
+	binding isAssociation
 		ifTrue: [^self resolve: aReadVariable asAssociationValue: binding].
 	self ASSERT: false
 ]
@@ -353,7 +342,7 @@ OptimizingVariableBinder >> visitUnary: instruction [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> visitWriteVariable: aWriteVariable [
-	self ASSERT: (aWriteVariable binding isKindOf: Binding).
+	self ASSERT: (aWriteVariable binding isKindOf: SBinding).
 	self instructionsForWriting: aWriteVariable
 ]
 

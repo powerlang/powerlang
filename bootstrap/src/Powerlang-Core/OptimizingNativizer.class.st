@@ -24,14 +24,12 @@ OptimizingNativizer >> allocate [
 
 { #category : #unclassified }
 OptimizingNativizer >> assembleUsing: allocation [
-	| assembler |
-	assembler := OptimizingCodeEmitter new
+	^OptimizingCodeEmitter new
 		method: method;
 		abi: environment abi;
 		allocation: allocation;
-		messageLinker: environment messageLinker.
-	assembler assembleFrom: firstBlock.
-	^ assembler nativeCode
+		messageLinker: environment messageLinker;
+		assembleFrom: firstBlock
 ]
 
 { #category : #unclassified }
@@ -111,11 +109,6 @@ OptimizingNativizer >> irFor: anSCompiledMethod [
 OptimizingNativizer >> method: anSCompiledMethod [
 	method := anSCompiledMethod.
 	firstBlock := self irFor: anSCompiledMethod
-]
-
-{ #category : #unclassified }
-OptimizingNativizer >> nativeCode [
-	^self nativize
 ]
 
 { #category : #nativizing }

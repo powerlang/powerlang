@@ -65,5 +65,6 @@ OLoadConstant >> value [
 
 { #category : #unclassified }
 OLoadConstant >> value: value [
-	constant := value
+	constant := value. constant class = SmallintObjectMap
+		ifTrue: [ constant := constant value ]
 ]

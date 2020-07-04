@@ -1113,11 +1113,6 @@ TemplateAssembler64 >> multiplyRbyA [
 	
 ]
 
-{ #category : #arithmetic }
-TemplateAssembler64 >> nativeCode [
-	^ NativeCode new code: memory bytes
-]
-
 { #category : #logic }
 TemplateAssembler64 >> orRwithA [
 	self assembleBytes: #[16r48 16r9 16rD0].

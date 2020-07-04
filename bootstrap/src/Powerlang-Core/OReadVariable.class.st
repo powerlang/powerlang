@@ -33,7 +33,8 @@ OReadVariable >> basicAcceptVisitor: aVisitor [
 
 { #category : #unclassified }
 OReadVariable >> basicPrintString [
-	^'[read var #' , (binding ifNil: ['#error'] ifNotNil: [binding name]) , ']'
+	^ '[read var #'
+		, (binding ifNil: [ '#error' ] ifNotNil: [ binding printString ]) , ']'
 ]
 
 { #category : #unclassified }
@@ -43,7 +44,7 @@ OReadVariable >> operandsDo: aBlock [
 
 { #category : #unclassified }
 OReadVariable >> primitivePrintString [
-	^'{#' , (binding ifNil: ['#error'] ifNotNil: [binding name]) , ' read}'
+	^'{#' , (binding ifNil: ['#error'] ifNotNil: [binding printString]) , ' read}'
 ]
 
 { #category : #printing }

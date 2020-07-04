@@ -82,7 +82,7 @@ OTernaryOperation >> operandsDo: aBlock [
 { #category : #unclassified }
 OTernaryOperation >> printStringUsing: names [
 	^(receiver isInstruction
-		ifTrue: [names at: receiver]
+		ifTrue: [names at: receiver ifAbsent: ['{missing', receiver printString, '}']]
 		ifFalse: [receiver printString]) , ' ' , name , ' '
 		, (left isInstruction ifTrue: [names at: left] ifFalse: [left printString])
 		, ', '

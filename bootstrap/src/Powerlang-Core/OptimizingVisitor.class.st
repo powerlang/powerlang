@@ -8,9 +8,7 @@ Class {
 	#instVars : [
 		'method',
 		'firstBlock',
-		'currentBlock',
-		'isReceiver',
-		'argumentsCount'
+		'currentBlock'
 	],
 	#category : #'Powerlang-Core-OCompiler'
 }
@@ -23,8 +21,7 @@ OptimizingVisitor class >> new [
 { #category : #unclassified }
 OptimizingVisitor >> initialize [
 	firstBlock := OBasicBlock new.
-	currentBlock := firstBlock.
-	isReceiver := true
+	currentBlock := firstBlock
 ]
 
 { #category : #unclassified }
@@ -51,11 +48,6 @@ OptimizingVisitor >> insertReturnSelf [
 ]
 
 { #category : #unclassified }
-OptimizingVisitor >> isReceiver [
-	^isReceiver
-]
-
-{ #category : #unclassified }
 OptimizingVisitor >> method: anSCompiledMethod [
 	method := anSCompiledMethod
 ]
@@ -71,20 +63,20 @@ OptimizingVisitor >> store: operation into: anIdentifierNode [
 	^instruction
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visit: aParseNode [
 	super visit: aParseNode.
 	^firstBlock
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitAssignment: anAssignmentNode [
 	| result |
 	result := anAssignmentNode expression acceptVisitor: self.
 	anAssignmentNode assignees do: [:node | self store: result into: node]
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitBlock: aBlockNode [
 	| previous cfg |
 	previous := currentBlock.
@@ -95,20 +87,29 @@ OptimizingVisitor >> visitBlock: aBlockNode [
 	^OBlockClosure containing: cfg
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitCascade: aCascadeNode [
-	| result |
-	aCascadeNode receiver acceptVisitor: self.
-	aCascadeNode messages do: [:node | result := node acceptVisitor: self].
-	^result
+	| receiver arguments send block |
+	block := currentBlock.
+	receiver := aCascadeNode receiver acceptVisitor: self.
+	aCascadeNode messages
+		do: [ :msg | 
+			arguments := msg arguments
+				collect: [ :node | node acceptVisitor: self ].
+			send := OMessageSend
+				receiver: receiver
+				selector: msg selector value asSymbol
+				arguments: arguments.
+			receiver addUse: send at: #receiver.
+			arguments
+				withIndexDo: [ :argument :i | 
+					argument isInstruction
+						ifTrue: [ argument addUse: send at: i ] ].
+			block add: send ].
+	^ send
 ]
 
-{ #category : #unclassified }
-OptimizingVisitor >> visitCascadeReceiver: aCascadeReceiverNode [
-	^aCascadeReceiverNode receiver acceptVisitor: self
-]
-
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitIdentifier: anIdentifierNode [
 	| load |
 	load := OReadVariable binding: anIdentifierNode binding.
@@ -116,7 +117,7 @@ OptimizingVisitor >> visitIdentifier: anIdentifierNode [
 	^load
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitLiteral: aLiteralNode [
 	| load |
 	load := OLoadConstant valued: aLiteralNode value.
@@ -124,7 +125,7 @@ OptimizingVisitor >> visitLiteral: aLiteralNode [
 	^load
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitMessage: aMessageNode [
 	| receiver arguments send block |
 	block := currentBlock.
@@ -143,7 +144,7 @@ OptimizingVisitor >> visitMessage: aMessageNode [
 	^send
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitMethod: anSMethod [
 	| last |
 	self insertDefineArgument: #activationRecord; insertDefineArgument: #self.
@@ -154,12 +155,12 @@ OptimizingVisitor >> visitMethod: anSMethod [
 	last isReturn ifFalse: [self insertReturnSelf]
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitNumericLiteral: aNumericLiteralNode [
 	^self visitLiteral: aNumericLiteralNode
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitReturn: aReturnNode [
 	| source frame instruction |
 	source := aReturnNode expression acceptVisitor: self.
@@ -174,7 +175,7 @@ OptimizingVisitor >> visitReturn: aReturnNode [
 	^ instruction
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitScript: aScriptNode [
 	[
 		aScriptNode arguments do: [:node | node acceptVisitor: self].
@@ -182,7 +183,7 @@ OptimizingVisitor >> visitScript: aScriptNode [
 	aScriptNode statements do: [:node | node acceptVisitor: self]
 ]
 
-{ #category : #unclassified }
+{ #category : #visiting }
 OptimizingVisitor >> visitSelector: aSelectorNode [
 	
 ]

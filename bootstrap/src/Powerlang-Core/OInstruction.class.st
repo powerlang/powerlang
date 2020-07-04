@@ -314,6 +314,11 @@ OInstruction >> isStoreVariable [
 ]
 
 { #category : #unclassified }
+OInstruction >> isUnaryOperation [
+	^ false
+]
+
+{ #category : #unclassified }
 OInstruction >> isUnconditionalJump [
 	^self isJump andNot: [self isConditionalJump]
 ]

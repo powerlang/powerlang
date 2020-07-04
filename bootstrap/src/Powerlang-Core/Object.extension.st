@@ -140,3 +140,8 @@ Object >> isSmallInteger [
 Object >> isSpecies [
 	^false
 ]
+
+{ #category : #'*Powerlang-Core' }
+Object >> primitivePrintString [
+	^self printString
+]

@@ -194,39 +194,41 @@ OptimizingInstructionFragmenter >> fragmentSelfDeclarationIn: aBasicBlock [
 OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
 	| literals i actual next load |
 	literals := method literals.
-	literals size = 0 ifTrue: [^self].
-	(literals at: 1) == #savePreviousSelf ifTrue: [
-		aBasicBlock activationRecord doSavePreviousSelf.
-		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
-		load dissolve.
-		literals := literals copyFrom: 2].
-	literals size = 0 ifTrue: [^self].
-	(literals at: 1) == #specialABIBegin ifFalse: [^self].
+	literals size = 0
+		ifTrue: [ ^ self ].
+	(literals at: 1) == #savePreviousSelf
+		ifTrue: [ aBasicBlock activationRecord doSavePreviousSelf.
+			load := aBasicBlock firstInstruction
+				detect: [ :inst | inst isConstant ].
+			load dissolve.
+			literals := literals beeCopyFrom: 2 ].
+	literals size = 0
+		ifTrue: [ ^ self ].
+	(literals at: 1) == #specialABIBegin
+		ifFalse: [ ^ self ].
 	i := 2.
-	[(literals at: i) == #specialABIEnd]
-		whileFalse: [| name register implicit argument receiver regname |
+	[ (literals at: i) == #specialABIEnd ]
+		whileFalse: [ | name register implicit argument receiver regname |
 			name := literals at: i.
 			regname := literals at: i + 1.
 			register := self registerNamed: regname.
 			name = #self
-				ifTrue: [
-					receiver := aBasicBlock firstInstruction
-						detect: [:instruction | instruction isLoadImplicit
-							and: [instruction name = #self]].
-					receiver source: register]
-				ifFalse: [
-					implicit := (OLoadImplicit named: name) source: register.
+				ifTrue: [ receiver := aBasicBlock firstInstruction
+						detect:
+							[ :instruction | instruction isLoadImplicit and: [ instruction name = #self ] ].
+					receiver source: register ]
+				ifFalse: [ implicit := (OLoadImplicit named: name) source: register.
 					argument := aBasicBlock firstInstruction
-						detect: [:instruction | instruction isDefineArgument
-							and: [instruction name = name]].
-					argument dissolveReplacingWith: implicit].
-			i := i + 2].
-	actual := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
-	[
-		next := actual next.
-		actual dissolve.
-		actual isConstant and: [actual value == #specialABIEnd]]
-		whileFalse: [actual := next]
+						detect:
+							[ :instruction | instruction isDefineArgument and: [ instruction name = name ] ].
+					argument dissolveReplacingWith: implicit ].
+			i := i + 2 ].
+	actual := aBasicBlock firstInstruction
+		detect: [ :inst | inst isConstant ].
+	[ next := actual next.
+	actual dissolve.
+	actual isConstant and: [ actual value == #specialABIEnd ] ]
+		whileFalse: [ actual := next ]
 ]
 
 { #category : #unclassified }
