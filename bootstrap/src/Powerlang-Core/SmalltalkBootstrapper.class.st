@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'index',
 		'classes',
+		'methods',
 		'objects',
 		'symbols',
 		'nilObj',
@@ -17,7 +18,8 @@ Class {
 		'cvarMap',
 		'wordSize',
 		'maxSMI',
-		'minSMI'
+		'minSMI',
+		'module'
 	],
 	#classVars : [
 		'Spec'
@@ -229,14 +231,7 @@ SmalltalkBootstrapper >> createGlobals [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createLoadAction [
-	|  message receiver selector argument arguments |
-	message := self new: #MessageSend.
-	receiver := self newSmallInteger: 10.
-	selector := self newSymbol: #gcd:.
-	argument := self newSmallInteger: 15.
-	arguments := self newArray: {argument}.
-	message receiver: receiver; selector: selector; arguments: arguments.
-	^message
+	^ nilObj
 ]
 
 { #category : #initialization }
@@ -266,10 +261,17 @@ SmalltalkBootstrapper >> createMethodDictionary: species sized: anInteger [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createModule [
-	| module array |
-	module := self new: #Module.
-	array := self newArray: classes values.
-	module classes: array; loadAction: self createLoadAction.
+	module := self new: #Kernel.
+	module 
+		classes: (self newArray: classes values); 
+		loadAction: self createLoadAction;
+		entryPointReceiver: module;
+		entryPointCode: (methods at: (environment at: #Kernel) >> #entry:argv:) nativeCode;
+		nilObj: nilObj;
+		trueObj: trueObj;
+		falseObj: falseObj;
+		dlopenPtr: nilObj;
+		dlsymPtr: nilObj.
 	^module
 ]
 
@@ -327,17 +329,18 @@ SmalltalkBootstrapper >> fillClasses [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> fillSpecies: species with: definition [
+SmalltalkBootstrapper >> fillSpecies: species with: classDefinition [
 	| dictionary smethod code transferred |
 	dictionary := self
 		createMethodDictionary: species
-		sized: definition methods size.
-	definition methods
-		do: [ :m | 
-			smethod := emulator compile: m.
+		sized: classDefinition methods size.
+	classDefinition methods
+		do: [ :methodDefinition | 
+			smethod := emulator compile: methodDefinition.
 			code := nativizer nativeCodeFor: smethod.
 			smethod nativeCode: code.
 			transferred := self transferMethod: smethod in: species.
+			methods at: methodDefinition put: transferred.
 			self
 				emulateSend: dictionary
 				selector: #basicAt:put:
@@ -376,6 +379,7 @@ SmalltalkBootstrapper >> genesis [
 		initializeSmalltalk;
 		fillClasses;
 		addRemainingObjects;
+		createModule;
 		validate
 ]
 
@@ -389,6 +393,7 @@ SmalltalkBootstrapper >> globals [
 SmalltalkBootstrapper >> initialize [
 	index := OrderedDictionary new.
 	classes := OrderedDictionary new.
+	methods := OrderedDictionary new.
 	objects := OrderedCollection new.
 	symbols := OrderedDictionary new.
 	cvarMap := OrderedDictionary new.
@@ -897,5 +902,8 @@ SmalltalkBootstrapper >> wordSize: anInteger [
 
 { #category : #validating }
 SmalltalkBootstrapper >> writer [
-	^ImageSegmentWriter new objects: objects; module: self createModule
+	^ImageSegmentWriter new 
+		objects: objects; 
+		module: module;
+		yourself 
 ]
