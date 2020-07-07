@@ -155,6 +155,13 @@ JITAssembler64 >> clearSafeRintegerBit [
 	self assemble: 'and' with: al with: immediate
 ]
 
+{ #category : #comparing }
+JITAssembler64 >> compare: register withBoolean: aBoolean [
+	aBoolean
+		ifTrue: [ self compareWithTrue: register ]
+		ifFalse: [ self compareWithFalse: register ]
+]
+
 { #category : #loading }
 JITAssembler64 >> compare: register withMindex: index [
 	self

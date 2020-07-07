@@ -67,6 +67,7 @@ OptimizingValueNumbering >> resultOfBinaryWithConstants: aBinaryInstruction [
 	operation = #'*' ifTrue: [^left * right].
 	operation = #'//' ifTrue: [^left // right].
 	operation = #'=' ifTrue: [^left = right].
+	operation = #'>' ifTrue: [^left > right].
 	self halt
 ]
 
@@ -82,8 +83,8 @@ OptimizingValueNumbering >> unifyPredecessorHashes [
 		unanimous := incoming
 			conform: [:dict | dict
 				at: hash
-				ifAbsent: false
-				ifPresent: [:prev | prev = value]].
+				ifPresent: [:prev | prev = value]
+				ifAbsent: false].
 		unanimous ifTrue: [hashes at: hash put: value]]
 ]
 
@@ -262,7 +263,8 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 		names at: inst put: '{v' , count printString , '}'.
 		count := count + 1].
 	aBasicBlock withSuccessorsPostOrder
-		reverseDo: [:block | self workOn: block]
+		reverseDo: [:block | self workOn: block].
+
 ]
 
 { #category : #unclassified }

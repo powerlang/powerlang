@@ -131,7 +131,7 @@ OptimizingVariableBinder >> instructionsForWriting: aWriteVariable [
 		ifTrue: [^self
 			instructionsForWriting: aWriteVariable
 			toInstanceVariable: binding].
-	binding refersToAssoc
+	binding isAssociation
 		ifTrue: [^self
 			instructionsForWriting: aWriteVariable
 			toAssociation: binding].

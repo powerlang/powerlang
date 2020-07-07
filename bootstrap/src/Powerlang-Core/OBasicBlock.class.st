@@ -135,9 +135,9 @@ OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 
 { #category : #unclassified }
 OBasicBlock >> dissolveIfUnreachable [
-	predecessors isEmpty ifTrue: [
-		self lastValue
-			ifNotNil: [:last | last reverseDo: [:instruction | instruction dissolve]]]
+	| value |
+	predecessors isEmpty 
+		ifTrue: [	[value := self lastValue. value notNil] whileTrue: [value dissolveDeep] ]
 ]
 
 { #category : #unclassified }
@@ -233,6 +233,35 @@ OBasicBlock >> endWithJumpTo: target [
 { #category : #unclassified }
 OBasicBlock >> endWithJumpTrueTo: target skipping: skipped if: condition [
 	self endWith: OJumpTrue to: target skipping: skipped if: condition
+]
+
+{ #category : #unclassified }
+OBasicBlock >> export [
+	| map name result instructions inst names ops |
+	map := IdentityDictionary new.
+	self
+		instructionsWithReversePostOrderSuccessorsDo: [ :i | 
+			name := i primitivePrintString.
+			[ names := map values collect: [ :d | d at: 'name' ].
+			names includes: name ] whileTrue: [ name := name , '_' ].
+			inst := Dictionary new
+				at: 'name' put: name asSymbol;
+				yourself.
+			map at: i put: inst ].
+	result := OrderedDictionary new.
+	self
+		reversePostOrderDo: [ :b | 
+			instructions := OrderedCollection new.
+			b
+				instructionsDo: [ :i | 
+					inst := (map at: i).
+					instructions add: inst.
+					ops := OrderedCollection new.
+					inst at: 'ops' put: ops.
+					i operandsDo: [ :op | ops add: (map at: op) ]
+					 ].
+			result at: b name put: instructions ].
+	^ result
 ]
 
 { #category : #unclassified }

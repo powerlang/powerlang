@@ -77,11 +77,11 @@ OptimizingNativizer >> firstBlock [
 
 { #category : #unclassified }
 OptimizingNativizer >> fragmentInstructions [
-	| binder |
-	binder := OptimizingInstructionFragmenter new abi: environment abi.
-	binder
-		fragmentArgumentsIn: firstBlock with: method;
-		fragmentInstructionsFrom: firstBlock
+	OptimizingInstructionFragmenter new
+		abi: environment abi;
+		method: method;
+		firstBlock: firstBlock;
+		doFragment
 ]
 
 { #category : #unclassified }
@@ -123,7 +123,7 @@ OptimizingNativizer >> nativize [
 		splitCriticalEdges;
 		transformToCSSA;
 		allocate.
-	^self
+	^ self
 		enforceTwoAddressCodeUsing: allocation;
 		simplifyCFG;
 		assembleUsing: allocation

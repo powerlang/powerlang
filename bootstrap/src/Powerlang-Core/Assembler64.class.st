@@ -99,6 +99,11 @@ Assembler64 >> and: op1 with: op2 [
 	self assemble: 'and' with: op1 with: op2
 ]
 
+{ #category : #services }
+Assembler64 >> and: op1 withImm: op2 [
+	self assemble: 'and' with: op1 withImm: op2
+]
+
 { #category : #relocation }
 Assembler64 >> applyFixups [
 	memory applyFixupsWith: self
@@ -745,7 +750,7 @@ Assembler64 >> shiftLeft: op1 by: count [
 
 { #category : #accessing }
 Assembler64 >> shiftRight: op1 by: op2 [
-	self ASSERT: (op2 isInteger not or: [op2 < 32]).
+	self ASSERT: (op2 isInteger not or: [op2 < op1 length]).
 	self assemble: 'sar' with: op1 with: op2
 ]
 

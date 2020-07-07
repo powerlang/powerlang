@@ -43,10 +43,8 @@ SmalltalkBootstrapper class >> newSpec [
 
 { #category : #accessing }
 SmalltalkBootstrapper class >> spec [
-	Spec
-		ifNil: [ Spec := self newSpec.
-			 ].
-	^ Spec
+	^Spec ifNil: [ Spec := self newSpec ].
+
 ]
 
 { #category : #initialization }

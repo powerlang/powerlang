@@ -27,6 +27,11 @@ OLoadConstant >> basicPrintString [
 ]
 
 { #category : #unclassified }
+OLoadConstant >> canHaveSideEffects [
+	^false
+]
+
+{ #category : #unclassified }
 OLoadConstant >> isConstant [
 	^true
 ]

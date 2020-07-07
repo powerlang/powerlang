@@ -112,9 +112,9 @@ NativizationEnvironment >> nativize: aCompiledMethod [
 
 { #category : #services }
 NativizationEnvironment >> nativizeOptimizing: anSCompiledMethod [
-	^ self optimizingNativizer
+	^self optimizingNativizer
 		method: anSCompiledMethod;
-		nativize
+		nativize 
 ]
 
 { #category : #services }
@@ -254,7 +254,7 @@ NativizationEnvironment >> spec: anRGEnvironment [
 
 { #category : #initialization }
 NativizationEnvironment >> undermethods [
-	^(spec at: #ProtoObject) methods select: [:m | m selector beginsWith: '_'].	
+	^(spec at: #ProtoObject) methods select: [:m | m category = 'header access'].	
 ]
 
 { #category : #initialization }

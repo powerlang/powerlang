@@ -122,6 +122,11 @@ count: n [
 ]
 
 { #category : #'*Powerlang-Core' }
+Object >> isBoolean [
+	^false
+]
+
+{ #category : #'*Powerlang-Core' }
 Object >> isEmptyOrNil [
 	^false
 ]

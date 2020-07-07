@@ -33,6 +33,11 @@ OBinaryOperation >> atOperand: operandName put: instruction [
 ]
 
 { #category : #unclassified }
+OBinaryOperation >> canHaveSideEffects [
+	^false
+]
+
+{ #category : #unclassified }
 OBinaryOperation >> invertOperation [
 	name == #'<' ifTrue: [^name := #'>'].
 	name == #'<=' ifTrue: [^name := #'>='].

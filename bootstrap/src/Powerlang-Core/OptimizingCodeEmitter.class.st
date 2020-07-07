@@ -228,7 +228,7 @@ OptimizingCodeEmitter >> assembleBitAndConstant: instruction [
 	| left value |
 	left := allocation at: instruction.
 	value := instruction right * 2 + 1.
-	assembler and: left with: value
+	assembler and: left withImm: value
 ]
 
 { #category : #unclassified }
@@ -668,8 +668,8 @@ OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	| left value shift |
 	left := allocation at: instruction left.
 	value := instruction right.
-	self ASSERT: (value == 4 or: [value == 8]).
-	shift := value == 4 ifTrue: [2] ifFalse: [3].
+	self ASSERT: (value == 4 or: [value == 8 or: [value == 2]]).
+	shift := value == 4 ifTrue: [2] ifFalse: [value == 8 ifTrue: [3] ifFalse: [1]].
 	assembler
 		clearIntegerBit: left;
 		shiftLeft: left by: shift;
@@ -837,7 +837,7 @@ OptimizingCodeEmitter >> visitBranch: branch comparing: aBoolean [
 	| reg |
 	(self jumpWasAssembledInComparison: branch) ifTrue: [^self].
 	reg := allocation at: branch variable.
-	assembler compare: reg withPointer: aBoolean.
+	assembler compare: reg withBoolean: aBoolean.
 	self assembleJumpIfEqualTo: branch target.
 	branch implicitTarget != self nextBlock
 		ifTrue: [self assembleJumpTo: branch implicitTarget]
