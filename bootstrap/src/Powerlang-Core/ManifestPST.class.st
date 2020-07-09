@@ -33,6 +33,11 @@ ManifestPST class >> ruleRBEmptyExceptionHandlerRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBEqualsTrueRuleV1FalsePositive [
+	^ #(#(#(#RGClassDefinition #(#OptimizingCodeEmitter)) #'2020-07-04T00:11:03.866483-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBIfTrueReturnsRuleV1FalsePositive [
 	^ #(#(#(#RGPackage #(#'Powerlang-Core')) #'2019-07-24T02:26:09.214605-03:00') )
 ]

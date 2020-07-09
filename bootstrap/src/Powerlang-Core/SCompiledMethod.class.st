@@ -18,7 +18,7 @@ Class {
 
 { #category : #'instance creation' }
 SCompiledMethod class >> new: anInteger [
-	^(super new: anInteger) initialize
+	^ (self basicNew: anInteger) initialize
 ]
 
 { #category : #constants }
@@ -85,6 +85,20 @@ SCompiledMethod >> classBinding: aClass [
 ]
 
 { #category : #constants }
+SCompiledMethod >> copyWithLiterals: aCollection [
+	| result |
+	result := self species withAll: aCollection.
+	^ result
+		astcodes: astcodes;
+		classBinding: class;
+		format: format;
+		nativeCode: nativeCode;
+		selector: selector;
+		source: source;
+		yourself
+]
+
+{ #category : #constants }
 SCompiledMethod >> environmentCount [
 	^format bitsAt: EnvCount
 ]
@@ -97,6 +111,11 @@ SCompiledMethod >> environmentCount: anInteger [
 { #category : #accessing }
 SCompiledMethod >> format [
 	^format
+]
+
+{ #category : #accessing }
+SCompiledMethod >> format: anInteger [
+	format := anInteger
 ]
 
 { #category : #printing }
@@ -160,6 +179,11 @@ SCompiledMethod >> isFFIMethod [
 { #category : #constants }
 SCompiledMethod >> isFrameless [
 	^ self hasFrame not
+]
+
+{ #category : #constants }
+SCompiledMethod >> literals [
+	^Array withAll: self
 ]
 
 { #category : #accessing }

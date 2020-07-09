@@ -27,6 +27,11 @@ OLoadConstant >> basicPrintString [
 ]
 
 { #category : #unclassified }
+OLoadConstant >> canHaveSideEffects [
+	^false
+]
+
+{ #category : #unclassified }
 OLoadConstant >> isConstant [
 	^true
 ]
@@ -65,5 +70,6 @@ OLoadConstant >> value [
 
 { #category : #unclassified }
 OLoadConstant >> value: value [
-	constant := value
+	constant := value. constant class = SmallintObjectMap
+		ifTrue: [ constant := constant value ]
 ]

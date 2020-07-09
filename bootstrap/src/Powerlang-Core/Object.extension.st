@@ -11,6 +11,11 @@ Object >> ASSERT: aBoolean [
 ]
 
 { #category : #'*Powerlang-Core' }
+Object >> DENY: aBoolean [
+	self ASSERT: aBoolean not
+]
+
+{ #category : #'*Powerlang-Core' }
 Object class >> disableCode: aBlock [
 	"the block has been disabled"
 ]
@@ -117,6 +122,11 @@ count: n [
 ]
 
 { #category : #'*Powerlang-Core' }
+Object >> isBoolean [
+	^false
+]
+
+{ #category : #'*Powerlang-Core' }
 Object >> isEmptyOrNil [
 	^false
 ]
@@ -134,4 +144,9 @@ Object >> isSmallInteger [
 { #category : #'*Powerlang-Core' }
 Object >> isSpecies [
 	^false
+]
+
+{ #category : #'*Powerlang-Core' }
+Object >> primitivePrintString [
+	^self printString
 ]

@@ -30,27 +30,28 @@ OptimizingInstructionFragmenter >> activationRecord [
 ]
 
 { #category : #unclassified }
+OptimizingInstructionFragmenter >> doFragment [
+	self
+		fragmentActivationRecordDeclaration;
+		fragmentSelfDeclaration;
+		fragmentSpecialABIArguments;
+		fragmentNormalArguments.
+	firstBlock
+		reversePostOrderDo: [:block | self fragmentInstructionsOf: block]
+]
+
+{ #category : #unclassified }
 OptimizingInstructionFragmenter >> firstBlock: aBasicBlock [
 	firstBlock := aBasicBlock
 ]
 
 { #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentActivationRecordDeclarationIn: aBasicBlock [
+OptimizingInstructionFragmenter >> fragmentActivationRecordDeclaration [
 	| declaration implicit |
-	declaration := aBasicBlock firstInstruction.
+	declaration := firstBlock firstInstruction.
 	implicit := OActivationContext named: #activationRecord.
 	implicit source: abi regFP.
 	declaration dissolveReplacingWith: implicit
-]
-
-{ #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentArgumentsIn: aBasicBlock with: aCompiledMethod [
-	method := aCompiledMethod.
-	self
-		fragmentActivationRecordDeclarationIn: aBasicBlock;
-		fragmentSelfDeclarationIn: aBasicBlock;
-		fragmentSpecialABIArgumentsIn: aBasicBlock;
-		fragmentNormalArgumentsIn: aBasicBlock
 ]
 
 { #category : #unclassified }
@@ -101,21 +102,15 @@ OptimizingInstructionFragmenter >> fragmentCallSite: instruction [
 
 { #category : #unclassified }
 OptimizingInstructionFragmenter >> fragmentGenericMessage: instruction [
-	| arguments new |
+	| arguments new push |
 	arguments := instruction arguments.
-	new := arguments
-		collect: [:argument | self insertPush: argument before: instruction].
+	new := arguments	withIndexCollect: [:argument :i | 
+			push := self insertPush: argument before: instruction.
+			push addUse: instruction at: i].
 	instruction arguments: new.
 	arguments
 		do: [:argument | argument removeUse: instruction; dissolveIfUnused].
 	firstBlock activationRecord haveFrame
-]
-
-{ #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentInstructionsFrom: aBasicBlock [
-	self firstBlock: aBasicBlock.
-	aBasicBlock
-		reversePostOrderDo: [:block | self fragmentInstructionsOf: block]
 ]
 
 { #category : #unclassified }
@@ -124,10 +119,10 @@ OptimizingInstructionFragmenter >> fragmentInstructionsOf: block [
 ]
 
 { #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentNormalArgumentsIn: aBasicBlock [
+OptimizingInstructionFragmenter >> fragmentNormalArguments [
 	| count argument position context |
 	count := 0.
-	context := aBasicBlock firstInstruction.
+	context := firstBlock firstInstruction.
 	argument := context next next.
 	[argument isDefineArgument] whileTrue: [
 		argument := argument next.
@@ -183,50 +178,55 @@ OptimizingInstructionFragmenter >> fragmentPatchIndirectCallSiteTo: instruction 
 ]
 
 { #category : #unclassified }
-OptimizingInstructionFragmenter >> fragmentSelfDeclarationIn: aBasicBlock [
+OptimizingInstructionFragmenter >> fragmentSelfDeclaration [
 	| declaration implicit |
-	declaration := aBasicBlock firstInstruction next.
+	declaration := firstBlock firstInstruction next.
 	implicit := OLoadImplicit named: #self.
 	declaration dissolveReplacingWith: implicit
 ]
 
 { #category : #private }
-OptimizingInstructionFragmenter >> fragmentSpecialABIArgumentsIn: aBasicBlock [
-	| literals i actual next load |
+OptimizingInstructionFragmenter >> fragmentSpecialABIArguments [
+	| literals i actual next load ast names index |
 	literals := method literals.
-	literals size = 0 ifTrue: [^self].
-	(literals at: 1) == #savePreviousSelf ifTrue: [
-		aBasicBlock activationRecord doSavePreviousSelf.
-		load := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
-		load dissolve.
-		literals := literals copyFrom: 2].
-	literals size = 0 ifTrue: [^self].
-	(literals at: 1) == #specialABIBegin ifFalse: [^self].
-	i := 2.
-	[(literals at: i) == #specialABIEnd]
-		whileFalse: [| name register implicit argument receiver regname |
+	literals size = 0
+		ifTrue: [ ^ self ].
+	(literals at: 1) == #savePreviousSelf
+		ifTrue: [ firstBlock activationRecord doSavePreviousSelf.
+			load := firstBlock firstInstruction
+				detect: [ :inst | inst isConstant ].
+			load dissolve.
+			literals := literals beeCopyFrom: 2 ].
+	literals size = 0
+		ifTrue: [ ^ self ].
+	(literals at: 1) == #specialABIBegin
+		ifFalse: [ ^ self ].
+	i := 3.
+	ast := Compiler parse: method source lines first in: nil.
+	names := ast arguments collect: #name.
+	[ (literals at: i) == #specialABIEnd ]
+		whileFalse: [ | name register implicit argument receiver regname |
 			name := literals at: i.
 			regname := literals at: i + 1.
 			register := self registerNamed: regname.
 			name = #self
-				ifTrue: [
-					receiver := aBasicBlock firstInstruction
-						detect: [:instruction | instruction isLoadImplicit
-							and: [instruction name = #self]].
-					receiver source: register]
-				ifFalse: [
-					implicit := (OLoadImplicit named: name) source: register.
-					argument := aBasicBlock firstInstruction
-						detect: [:instruction | instruction isDefineArgument
-							and: [instruction name = name]].
-					argument dissolveReplacingWith: implicit].
-			i := i + 2].
-	actual := aBasicBlock firstInstruction detect: [:inst | inst isConstant].
-	[
-		next := actual next.
-		actual dissolve.
-		actual isConstant and: [actual value == #specialABIEnd]]
-		whileFalse: [actual := next]
+				ifTrue: [ receiver := firstBlock firstInstruction
+						detect:
+							[ :instruction | instruction isLoadImplicit and: [ instruction name = #self ] ].
+					receiver source: register ]
+				ifFalse: [ implicit := (OLoadImplicit named: name) source: register.
+					index := names indexOf: name.
+					argument := firstBlock firstInstruction
+						detect:
+							[ :instruction | instruction isDefineArgument and: [ instruction name = index asString ] ].
+					argument dissolveReplacingWith: implicit ].
+			i := i + 2 ].
+	actual := firstBlock firstInstruction
+		detect: [ :inst | inst isConstant ].
+	[ next := actual next.
+	actual dissolve.
+	actual isConstant and: [ actual value == #specialABIEnd ] ]
+		whileFalse: [ actual := next ]
 ]
 
 { #category : #unclassified }
@@ -278,6 +278,7 @@ OptimizingInstructionFragmenter >> initializeMessages [
 		at: #'+' put: #BinaryCommutative:;
 		at: #'-' put: #BinaryNonCommutative:;
 		at: #'*' put: #BinaryCommutative:;
+		at: #'//' put: #BinaryNonCommutative:;
 		at: #'<' put: #BinaryCompare:;
 		at: #'<=' put: #BinaryCompare:;
 		at: #'=' put: #BinaryCompare:;
@@ -334,6 +335,11 @@ OptimizingInstructionFragmenter >> insertPush: anInstruction before: instruction
 	^push
 ]
 
+{ #category : #unclassified }
+OptimizingInstructionFragmenter >> method: anSCompiledMethod [
+	method := anSCompiledMethod
+]
+
 { #category : #private }
 OptimizingInstructionFragmenter >> registerNamed: regname [
 	^abi perform: regname
@@ -349,7 +355,6 @@ OptimizingInstructionFragmenter >> replace: instruction withBinary: left withCon
 		name: instruction selector.
 	left addUse: new at: #left.
 	instruction dissolveReplacingWith: new.
-	right dissolveIfUnused.
 	^new
 ]
 

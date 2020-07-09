@@ -20,7 +20,7 @@ Class {
 
 { #category : #'instance creation' }
 SExpressionNativizer class >> assemblyFor: anSCompiledMethod [
-	^ NativizationEnvironment forTesting newExpressionNativizer nativeCodeFor:
+	^ NativizationEnvironment forTesting newExpressionNativizer nativize:
 		  anSCompiledMethod
 ]
 
@@ -119,7 +119,7 @@ SExpressionNativizer class >> assemblyForWhileTrue [
 
 { #category : #'instance creation' }
 SExpressionNativizer class >> assemblyOrigFor: aCompiledMethod [
-	^ NativizationEnvironment forTesting nativeCodeFor:
+	^ NativizationEnvironment forTesting nativize:
 		  aCompiledMethod
 ]
 
@@ -153,10 +153,9 @@ SExpressionNativizer class >> methodWithBlock [
 
 { #category : #'instance creation' }
 SExpressionNativizer class >> nativize: aCompiledMethod [
-	| code |
-	code := NativizationEnvironment forTesting newExpressionNativizer 
-		        nativeCodeFor: aCompiledMethod.
-	^ aCompiledMethod nativeCode: code
+
+	^ NativizationEnvironment forTesting newExpressionNativizer
+		nativize: aCompiledMethod
 ]
 
 { #category : #services }
@@ -229,11 +228,6 @@ SExpressionNativizer >> captureVariable: stream index: anInteger [
 ]
 
 { #category : #services }
-SExpressionNativizer >> compile: aCompiledMethod [
-	self resetFor: aCompiledMethod; nativize
-]
-
-{ #category : #services }
 SExpressionNativizer >> dropTos [
 	assembler dropTos: 1.
 	^stackCount := stackCount - 1
@@ -275,14 +269,13 @@ SExpressionNativizer >> emitEpilogue [
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueCommon [
-	assembler restoreCallerFrame; restoreCallerSelf; return
+	assembler restoreCallerFrame; restoreCallerM; restoreCallerSelf; return
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueNoFrame [
 	assembler
 		restoreCallerSelf;
-		restoreCallerM;
 		return
 ]
 
@@ -519,25 +512,18 @@ SExpressionNativizer >> nativeCode [
 ]
 
 { #category : #services }
-SExpressionNativizer >> nativeCodeFor: aCompiledMethod [
-	^ [ self
-		compile: aCompiledMethod;
-		nativeCode ]
-		on: Error
-		do: [ :e | 
-						e halt.
-
-			Transcript
-				print: aCompiledMethod signature;
-				cr.
-			NativeCode new code: #[16rCC] ]
-]
-
-{ #category : #services }
 SExpressionNativizer >> nativize [
 	method sexpressions acceptVisitor: self.
 	[remainingBlocks isEmpty]
 		whileFalse: [self nativizeBlock: remainingBlocks removeFirst]
+]
+
+{ #category : #services }
+SExpressionNativizer >> nativize: aCompiledMethod [
+	self
+		resetFor: aCompiledMethod;
+		nativize.
+	^ aCompiledMethod nativeCode: mainCode
 ]
 
 { #category : #services }

@@ -43,10 +43,8 @@ SmalltalkBootstrapper class >> newSpec [
 
 { #category : #accessing }
 SmalltalkBootstrapper class >> spec [
-	Spec
-		ifNil: [ Spec := self newSpec.
-			 ].
-	^ Spec
+	^Spec ifNil: [ Spec := self newSpec ].
+
 ]
 
 { #category : #initialization }
@@ -316,6 +314,7 @@ SmalltalkBootstrapper >> falseObject [
 { #category : #initialization }
 SmalltalkBootstrapper >> fillClasses [
 	| class meta |
+	nativizer compileInlinedMethodsWith: emulator.
 	environment allClasses
 		do: [ :def | 
 			self log: 'filling ' , def name , '...'.
@@ -335,8 +334,7 @@ SmalltalkBootstrapper >> fillSpecies: species with: definition [
 	definition methods
 		do: [ :m | 
 			smethod := emulator compile: m.
-			code := nativizer nativeCodeFor: smethod.
-			smethod nativeCode: code.
+			smethod := nativizer nativize: smethod.
 			transferred := self transferMethod: smethod in: species.
 			self
 				emulateSend: dictionary

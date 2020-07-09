@@ -135,9 +135,9 @@ OBasicBlock >> computeLiveOutInto: liveOut andLiveInInto: liveIn [
 
 { #category : #unclassified }
 OBasicBlock >> dissolveIfUnreachable [
-	predecessors isEmpty ifTrue: [
-		self lastValue
-			ifNotNil: [:last | last reverseDo: [:instruction | instruction dissolve]]]
+	| value |
+	predecessors isEmpty 
+		ifTrue: [	[value := self lastValue. value notNil] whileTrue: [value dissolveDeep] ]
 ]
 
 { #category : #unclassified }
@@ -173,33 +173,38 @@ OBasicBlock >> dominatorTree [
 	idoms at: 1 put: 1.
 	root := all first.
 	indices := Dictionary new.
-	all withIndexDo: [:block :index | indices at: block put: index].
-	intersect := [:index1 :index2 | | finger1 finger2 |
-		finger1 := index1.
-		finger2 := index2.
-		[finger1 != finger2] whileTrue: [
-			finger1 > finger2
-				ifTrue: [finger1 := idoms at: finger1]
-				ifFalse: [finger2 := idoms at: finger2]].
-		finger1].
+	all withIndexDo: [ :block :index | indices at: block put: index ].
+	intersect := [ :index1 :index2 | 
+	| finger1 finger2 |
+	finger1 := index1.
+	finger2 := index2.
+	[ finger1 != finger2 ]
+		whileTrue: [ finger1 > finger2
+				ifTrue: [ finger1 := idoms at: finger1 ]
+				ifFalse: [ finger2 := idoms at: finger2 ] ].
+	finger1 ].
 	changed := true.
-	[changed] whileTrue: [
-		changed := false.
-		(all copyFrom: 2)
-			withIndexDo: [:block :index | | processed initial intersection |
-				processed := block predecessors select: [:predecessor | | i |
-					i := indices at: predecessor.
-					(idoms at: i) notNil].
-				initial := indices at: processed first.
-				intersection := processed
-					inject: initial
-					into: [:actual :predecessor | | candidate |
-						candidate := indices at: predecessor.
-						intersect value: actual value: candidate].
-				intersection != (idoms at: index + 1) ifTrue: [
-					idoms at: index + 1 put: intersection.
-					changed := true]]].
-	^ODominatorTree from: root with: all dominators: idoms
+	[ changed ]
+		whileTrue: [ changed := false.
+			(all beeCopyFrom: 2)
+				withIndexDo: [ :block :index | 
+					| processed initial intersection |
+					processed := block predecessors
+						select: [ :predecessor | 
+							| i |
+							i := indices at: predecessor.
+							(idoms at: i) notNil ].
+					initial := indices at: processed first.
+					intersection := processed
+						inject: initial
+						into: [ :actual :predecessor | 
+							| candidate |
+							candidate := indices at: predecessor.
+							intersect value: actual value: candidate ].
+					intersection != (idoms at: index + 1)
+						ifTrue: [ idoms at: index + 1 put: intersection.
+							changed := true ] ] ].
+	^ ODominatorTree from: root with: all dominators: idoms
 ]
 
 { #category : #unclassified }
@@ -228,6 +233,35 @@ OBasicBlock >> endWithJumpTo: target [
 { #category : #unclassified }
 OBasicBlock >> endWithJumpTrueTo: target skipping: skipped if: condition [
 	self endWith: OJumpTrue to: target skipping: skipped if: condition
+]
+
+{ #category : #unclassified }
+OBasicBlock >> export [
+	| map name result instructions inst names ops |
+	map := IdentityDictionary new.
+	self
+		instructionsWithReversePostOrderSuccessorsDo: [ :i | 
+			name := i primitivePrintString.
+			[ names := map values collect: [ :d | d at: 'name' ].
+			names includes: name ] whileTrue: [ name := name , '_' ].
+			inst := Dictionary new
+				at: 'name' put: name asSymbol;
+				yourself.
+			map at: i put: inst ].
+	result := OrderedDictionary new.
+	self
+		reversePostOrderDo: [ :b | 
+			instructions := OrderedCollection new.
+			b
+				instructionsDo: [ :i | 
+					inst := (map at: i).
+					instructions add: inst.
+					ops := OrderedCollection new.
+					inst at: 'ops' put: ops.
+					i operandsDo: [ :op | ops add: (map at: op) ]
+					 ].
+			result at: b name put: instructions ].
+	^ result
 ]
 
 { #category : #unclassified }
@@ -620,7 +654,7 @@ OBasicBlock >> replaceAsPredecessor: old [
 { #category : #unclassified }
 OBasicBlock >> replacePredecessor: old with: new [
 	self phisDo: [:phi | phi replaceBlock: old with: new].
-	predecessors replace: old with: new
+	predecessors replaceAll: old with: new
 ]
 
 { #category : #unclassified }

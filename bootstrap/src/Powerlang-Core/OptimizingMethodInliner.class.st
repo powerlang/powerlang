@@ -6,22 +6,11 @@ Class {
 	#name : #OptimizingMethodInliner,
 	#superclass : #Object,
 	#instVars : [
-		'firstBlock',
-		'methods',
-		'abi'
+		'environment',
+		'firstBlock'
 	],
 	#category : #'Powerlang-Core-OCompiler'
 }
-
-{ #category : #unclassified }
-OptimizingMethodInliner class >> on: basicBlock [
-	^self basicNew firstBlock: basicBlock
-]
-
-{ #category : #unclassified }
-OptimizingMethodInliner >> abi: anAbi [
-	abi := anAbi
-]
 
 { #category : #unclassified }
 OptimizingMethodInliner >> bindVariablesOf: initialBlock with: aMessageSend [
@@ -35,6 +24,11 @@ OptimizingMethodInliner >> bindVariablesOf: initialBlock with: aMessageSend [
 			instruction replaceAllUsesWith: values first.
 			values removeFirst].
 		instruction dissolve]
+]
+
+{ #category : #unclassified }
+OptimizingMethodInliner >> environment: aNativizationEnvironment [
+	environment:= aNativizationEnvironment
 ]
 
 { #category : #unclassified }
@@ -52,41 +46,24 @@ OptimizingMethodInliner >> inlineAllMessages [
 ]
 
 { #category : #unclassified }
-OptimizingMethodInliner >> inlineMessages [
-	self inlineMessagesIn: firstBlock
-]
-
-{ #category : #unclassified }
 OptimizingMethodInliner >> inlineMethod: aMessageSend in: block [
 	| method nativizer initialBlock |
 	method := self inlinedMethodFor: aMessageSend.
-	nativizer := OptimizingNativizer on: method.
+	nativizer := OptimizingNativizer new environment: environment; method: method.
 	initialBlock := nativizer
-		abi: abi;
-		inlinedMethods: methods;
 		decompose;
 		firstBlock.
 	self bindVariablesOf: initialBlock with: aMessageSend.
-	^block inline: initialBlock replacing: aMessageSend
+	^ block inline: initialBlock replacing: aMessageSend
 ]
 
 { #category : #unclassified }
 OptimizingMethodInliner >> inlinedMethodFor: aMessageSend [
-	^methods detect: [:m | m selector == aMessageSend selector]
-]
-
-{ #category : #unclassified }
-OptimizingMethodInliner >> methods: methodsToInline [
-	methods := methodsToInline
-]
-
-{ #category : #unclassified }
-OptimizingMethodInliner >> selectors [
-	^methods collect: #selector
+	^environment inlinedMethods detect: [ :m | m selector == aMessageSend selector ]
 ]
 
 { #category : #unclassified }
 OptimizingMethodInliner >> shouldInline: instruction [
-	^instruction isMessageSend
-		and: [self selectors includes: instruction selector]
+	^ instruction isMessageSend
+		and: [ environment shouldInline: instruction selector ]
 ]

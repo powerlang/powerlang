@@ -464,7 +464,8 @@ OptimizingRegisterAllocator >> usedRangeReadLast [
 { #category : #unclassified }
 OptimizingRegisterAllocator >> usedRangeReadLastAfter: first [
 	| ranges |
-	ranges := (used copy removeKey: abi regFP) values asOrderedCollection.
+	ranges := used copy removeKey: abi regFP; values.
+	ranges := ranges asOrderedCollection.
 	currentBlock
 		instructionsAfter: first
 		withReversePostOrderSuccessorsDo: [:instruction | | candidate |

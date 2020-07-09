@@ -126,6 +126,11 @@ OInstruction >> beforeInsertAll: anInstruction [
 ]
 
 { #category : #unclassified }
+OInstruction >> canHaveSideEffects [
+	^true
+]
+
+{ #category : #unclassified }
 OInstruction >> cutFollowing [
 	| end |
 	end := OEndInstruction new.
@@ -161,8 +166,19 @@ OInstruction >> dissolve [
 ]
 
 { #category : #unclassified }
+OInstruction >> dissolveDeep [
+	prev ifNil: [^self].
+	self untie; operandsDo: [:instruction | instruction removeUse: self; dissolveIfUseless]
+]
+
+{ #category : #unclassified }
 OInstruction >> dissolveIfUnused [
-	self isUsed ifFalse: [self dissolve]
+	self isUsed ifFalse: [self dissolveDeep]
+]
+
+{ #category : #unclassified }
+OInstruction >> dissolveIfUseless [
+	self isUseless ifTrue: [self dissolveDeep]
 ]
 
 { #category : #unclassified }
@@ -172,7 +188,8 @@ OInstruction >> dissolveReplacingWith: anInstruction [
 	anInstruction prev: prev.
 	anInstruction next: next.
 	prev := next := nil.
-	self operandsDo: [:instruction | instruction removeUse: self].
+	self operandsDo: [:instruction | 
+		instruction removeUse: self; dissolveIfUseless].
 	self replaceAllUsesWith: anInstruction
 ]
 
@@ -314,6 +331,11 @@ OInstruction >> isStoreVariable [
 ]
 
 { #category : #unclassified }
+OInstruction >> isUnaryOperation [
+	^ false
+]
+
+{ #category : #unclassified }
 OInstruction >> isUnconditionalJump [
 	^self isJump andNot: [self isConditionalJump]
 ]
@@ -331,6 +353,11 @@ OInstruction >> isUsedJustOnce [
 { #category : #unclassified }
 OInstruction >> isUsedOnlyBy: instruction [
 	^self isUsedJustOnce and: [firstUse user == instruction]
+]
+
+{ #category : #unclassified }
+OInstruction >> isUseless [
+	^firstUse isNil andNot: [ self canHaveSideEffects ]
 ]
 
 { #category : #unclassified }
@@ -479,7 +506,8 @@ OInstruction >> realReverseDo: aBlock [
 OInstruction >> removeUse: instruction [
 	firstUse instruction == instruction
 		ifTrue: [firstUse := firstUse nextUse]
-		ifFalse: [firstUse removeUse: instruction]
+		ifFalse: [firstUse removeUse: instruction].
+
 ]
 
 { #category : #unclassified }
@@ -492,10 +520,10 @@ OInstruction >> removeUse: instruction at: name [
 { #category : #unclassified }
 OInstruction >> replaceAllUsesWith: anInstruction [
 	self == anInstruction ifTrue: [^self].
-	firstUse ifNotNil: [
-		firstUse replaceAllUsesWith: anInstruction.
-		anInstruction addUse: firstUse.
-		firstUse := nil]
+	firstUse ifNil: [^self].
+	anInstruction addUse: firstUse.
+	firstUse replaceAllUsesWith: anInstruction.
+	firstUse := nil
 ]
 
 { #category : #unclassified }

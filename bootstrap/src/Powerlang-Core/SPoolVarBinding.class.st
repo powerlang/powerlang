@@ -13,3 +13,8 @@ SPoolVarBinding class >> decodeUsing: anAstcodeDecoder [
 SPoolVarBinding >> isPoolVar [
 	^true
 ]
+
+{ #category : #evaluating }
+SPoolVarBinding >> value [
+	^association value
+]

@@ -65,6 +65,11 @@ SBinding >> isTemporary [
 ]
 
 { #category : #testing }
+SBinding >> name [
+	^self printString
+]
+
+{ #category : #testing }
 SBinding >> valueWithin: evaluator [
 	^self subclassResponsibility
 ]

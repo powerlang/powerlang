@@ -52,7 +52,7 @@ OUnaryOperation >> operandsDo: aBlock [
 { #category : #unclassified }
 OUnaryOperation >> printStringUsing: names [
 	^(receiver isInstruction
-		ifTrue: [names at: receiver]
+		ifTrue: [names at: receiver ifAbsent: ['{missing ', receiver printString, '}']]
 		ifFalse: [receiver printString]) , ' ' , name
 ]
 

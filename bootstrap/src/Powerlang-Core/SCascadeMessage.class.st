@@ -14,6 +14,11 @@ SCascadeMessage class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> acceptVisitor: visitor [
+	^ visitor visitCascadeMessage: self
+]
+
+{ #category : #accessing }
 SCascadeMessage >> arguments [
 	^arguments
 ]

@@ -30,7 +30,7 @@ OBeginInstruction >> printBackwardOn: aStream [
 
 { #category : #printing }
 OBeginInstruction >> printOn: aStream [
-	aStream nextPutAll: '[' , self basicHash printString , '] '.
+	aStream nextPutAll: '[' , self hash printString , '] '.
 	next printForwardOn: aStream
 ]
 

@@ -62,7 +62,7 @@ OMessageSend >> basicPrintString [
 			, (arguments gather: [:arg | arg primitivePrintString , ' '])]
 		ifFalse: [''].
 	^'[send #' , selector , ' to ' , receiver primitivePrintString
-		, string trimTrailingBlanks
+		, string trim
 		, ']'
 ]
 

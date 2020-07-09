@@ -61,8 +61,8 @@ SExpressionTest >> assertCorrectExecutionOfLibrary: filename [
 
 { #category : #support }
 SExpressionTest >> assertCorrectExecutionOfTest: aSelector [
-	| code |
-	code := (self nativize: aSelector).
+	| method |
+	method := self nativize: aSelector
 	"code halt disassembledAmd64"
 ]
 
@@ -107,7 +107,7 @@ SExpressionTest >> nativize: aSymbol [
 	method := self class >> aSymbol.
 	smethod := Compiler compile: method sourceCode in: self class.
 	^ NativizationEnvironment forTesting newExpressionNativizer 
-		  nativeCodeFor: smethod
+		  nativize: smethod
 ]
 
 { #category : #support }
