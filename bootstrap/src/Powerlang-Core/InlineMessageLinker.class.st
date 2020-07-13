@@ -12,27 +12,13 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
-{ #category : #accessing }
-InlineMessageLinker class >> availableInliners [
-	^self supported collect: [:selector | self for: selector] 
-]
-
-{ #category : #'instance creation' }
-InlineMessageLinker class >> for: selector [
-	^self new selector: selector 
-]
-
 { #category : #private }
 InlineMessageLinker class >> supported [
-	| answer selectors |
-	answer := OrderedCollection new.
-	selectors := self organization selectorsFor: #'private - instance behavior'.
-	selectors do: [:selector | | cm |
+	| selectors |
+	selectors := self organization selectorsFor: #'private - assemble'.
+	^selectors collect: [:selector | | cm |
 		cm := self >> selector.
-		cm literals
-			select: [:literal | literal isString and: [literal beginsWith: '_']]
-			in: answer].
-	^answer 
+		cm literals last -> selector]. 
 ]
 
 { #category : #'private - assemble' }
@@ -918,19 +904,25 @@ InlineMessageLinker >> emitByteAtOffsetPut: offset [
 { #category : #nativizing }
 InlineMessageLinker >> emitSend: aSymbol using: anAssembler [
 	| arity selector | 
+	assembler := anAssembler.
 	arity := aSymbol arity. 
 	arity > 2 ifTrue: [assembler pop: assembler regS].
 	arity > 1 ifTrue: [assembler pop: assembler regT].
 	arity > 0 ifTrue: [assembler pop: assembler regA].
 	self ASSERT: arity <= 3 .
 	selector := map at: aSymbol.
-	assembler := anAssembler.
 	self perform: selector
 ]
 
 { #category : #nativizing }
 InlineMessageLinker >> emitSendDebuggable: aSymbol using: anAssembler [
 	self emitSend: aSymbol using: anAssembler 
+]
+
+{ #category : #initialization }
+InlineMessageLinker >> initialize [
+	map := self class supported asDictionary.
+	self filter: map keys asIdentitySet
 ]
 
 { #category : #'private - helpers' }

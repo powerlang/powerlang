@@ -69,7 +69,7 @@ ManifestPST class >> ruleRBSentNotImplementedRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBStringConcatenationRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SlotObjectMap #printOn: #false)) #'2019-05-19T00:11:27.865645-03:00') #(#(#RGMetaclassDefinition #(#'HeapModel class' #HeapModel)) #'2019-05-28T11:56:52.832767-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#SlotObjectMap #printOn: #false)) #'2019-05-19T00:11:27.865645-03:00') #(#(#RGMetaclassDefinition #(#'HeapModel class' #HeapModel)) #'2019-05-28T11:56:52.832767-03:00') #(#(#RGPackageDefinition #(#'Powerlang-Core')) #'2020-07-12T18:56:24.522032-03:00') )
 ]
 
 { #category : #'code-critics' }

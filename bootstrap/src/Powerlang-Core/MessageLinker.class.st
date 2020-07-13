@@ -13,3 +13,8 @@ MessageLinker >> canInline: aSymbol [
 	filter == aSymbol ifTrue: [ ^true ].
 	^(filter includes: aSymbol)
 ]
+
+{ #category : #testing }
+MessageLinker >> filter: anObject [
+	filter := anObject
+]
