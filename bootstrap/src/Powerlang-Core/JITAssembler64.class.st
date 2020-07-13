@@ -444,12 +444,6 @@ JITAssembler64 >> incC [
 ]
 
 { #category : #private }
-JITAssembler64 >> initialize [
-	super initialize.
-	literals := OrderedCollection new
-]
-
-{ #category : #private }
 JITAssembler64 >> initializeS [
 	self assemble: 'mov' with: self regS with: self regR
 ]
@@ -1570,6 +1564,12 @@ JITAssembler64 >> regTrue [
 { #category : #private }
 JITAssembler64 >> reserveStackSlots: amount [
 	self subtract: amount * self addressSize from: self regSP
+]
+
+{ #category : #comparing }
+JITAssembler64 >> reset [
+	super reset.
+	literals := OrderedCollection new
 ]
 
 { #category : #epilogue }
