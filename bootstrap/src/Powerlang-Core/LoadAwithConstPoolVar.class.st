@@ -6,7 +6,7 @@ Class {
 
 { #category : #accessing }
 LoadAwithConstPoolVar >> nativizeUsing: anAssembler for: messageNativizer [
-	| i |
-	i := messageNativizer methodLiteralIndexFrom: index.
-	anAssembler loadAwithMindex: i
+	| literal |
+	literal := messageNativizer methodLiteralAt: index.
+	anAssembler loadAwithLiteral: literal
 ]

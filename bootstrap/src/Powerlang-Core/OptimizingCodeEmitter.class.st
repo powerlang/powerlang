@@ -15,8 +15,7 @@ Class {
 		'firstBlock',
 		'currentBlockIndex',
 		'blocks',
-		'messageLinker',
-		'literals'
+		'messageLinker'
 	],
 	#pools : [
 		'ObjectHeaderMasks',
@@ -365,11 +364,7 @@ OptimizingCodeEmitter >> assembleCompareConstant: left with: right [
 		ifTrue: [ ^ assembler compareWithFalse: left ].
 	right = true
 		ifTrue: [ ^ assembler compareWithTrue: left ].
-	index := literals
-		indexOf: right
-		ifAbsent: [ literals add: right.
-			literals size ].
-	assembler compare: left withMindex: index
+	assembler compare: left withLiteral: right
 ]
 
 { #category : #private }
@@ -422,14 +417,12 @@ OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
-	| result |
+	| code |
 	firstBlock := aBasicBlock.
 	blocks := firstBlock withSuccessorsPostOrder reversed.
 	self doAssemble.
-	result := literals size > method size
-		ifTrue: [ method copyWithLiterals: literals ]
-		ifFalse: [ method ].
-	^result nativeCode: assembler nativeCode
+	code := assembler nativeCode compiledCode: method.
+	^method nativeCode: code
 ]
 
 { #category : #unclassified }
@@ -533,11 +526,7 @@ OptimizingCodeEmitter >> assembleLoadConstant: value to: register [
 		ifTrue: [ ^ assembler loadWithFalse: register ].
 	value = true
 		ifTrue: [ ^ assembler loadWithTrue: register ].
-	index := literals
-		indexOf: value
-		ifAbsent: [ literals add: value.
-			literals size ].
-	assembler load: register withMindex: index
+	assembler load: register withLiteral: value
 ]
 
 { #category : #unclassified }
@@ -799,8 +788,7 @@ OptimizingCodeEmitter >> messageLinker: aMessageLinker [
 
 { #category : #accessing }
 OptimizingCodeEmitter >> method: anSCompiledMethod [
-	method := anSCompiledMethod.
-	literals := OrderedCollection withAll: method literals.
+	method := anSCompiledMethod
 ]
 
 { #category : #unclassified }
@@ -871,20 +859,20 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 
 { #category : #visiting }
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
-	| frame placeholder |
-	instruction name == #activationRecord ifTrue: [
-		instruction hasFrame ifTrue: [
-			placeholder := 16r12345678.
-			assembler loadMwithRIPoffset: placeholder ].
-		^assembler buildFrame].
-	instruction name == #self ifTrue: [
-		frame := instruction prev.
-		^frame hasFrame ifTrue: [
-			assembler
+	| frame |
+	instruction name == #activationRecord
+		ifTrue: [ ^ assembler buildFrame ].
+	instruction name == #self
+		ifFalse: [ ^ self ].
+	frame := instruction prev.
+	frame hasFrame ifFalse: [ ^self ].
+	assembler
 				reserveStackSlots: frame temporaries + 2;
 				store: assembler regR in: assembler regFP index: 0;
+				loadTwithMindex: (NativeCode indexOfSlot: 'compiledCode');
 				store: assembler regM in: assembler regFP index: -1.
-			self savesPreviousSelf ifTrue: [assembler push: assembler regS]]]
+			self savesPreviousSelf
+				ifTrue: [ assembler push: assembler regS ] 
 ]
 
 { #category : #unclassified }

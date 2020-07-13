@@ -1349,7 +1349,7 @@ TemplateAssembler64 >> restoreCallerFrame [
 
 { #category : #epilogue }
 TemplateAssembler64 >> restoreCallerM [
-	self assembleBytes: #[16r48 16r8B 16r5D 16rF0]
+	self assembleBytes: #[16r48 16r8B 16r5D 16rF0 16r48 16r8B 16r1B]
 ]
 
 { #category : #epilogue }

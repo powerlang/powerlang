@@ -347,8 +347,8 @@ BinaryMessageNativizer >> method [
 ]
 
 { #category : #private }
-BinaryMessageNativizer >> methodLiteralIndexFrom: anInteger [
-	^nativizer methodLiteralIndexFrom: anInteger 
+BinaryMessageNativizer >> methodLiteralAt: index [
+	^nativizer methodLiteralAt: index
 ]
 
 { #category : #private }

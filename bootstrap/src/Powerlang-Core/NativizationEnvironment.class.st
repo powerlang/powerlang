@@ -2,16 +2,16 @@ Class {
 	#name : #NativizationEnvironment,
 	#superclass : #Object,
 	#instVars : [
-		'abi',
-		'safepointCheck',
-		'messageLinker',
 		'spec',
 		'optimizedMethods',
 		'invokedMethods',
 		'inlinedMethods',
+		'messageLinker',
+		'writeBarrier',
+		'abi',
+		'safepointCheck',
 		'cachedNativizer',
-		'busy',
-		'methodInstSize'
+		'busy'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
@@ -47,12 +47,16 @@ NativizationEnvironment >> be64bits [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> compileInlinedMethodsWith: compiler [
+NativizationEnvironment >> compileSpecialMethodsWith: compiler [
 	| smethod |
 	inlinedMethods
 		withIndexDo: [ :method :i | 
 			smethod := compiler compile: method.
-			inlinedMethods at: i put: smethod ]
+			inlinedMethods at: i put: smethod ].
+	invokedMethods
+		withIndexDo: [ :method :i | 
+			smethod := compiler compile: method.
+			invokedMethods at: i put: smethod ]
 ]
 
 { #category : #initialization }
@@ -75,6 +79,16 @@ NativizationEnvironment >> inlinedMethods [
 	^inlinedMethods
 ]
 
+{ #category : #initialization }
+NativizationEnvironment >> inlinedMethods: aCollection [
+	inlinedMethods := aCollection
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> invokedMethods [
+	^invokedMethods
+]
+
 { #category : #accessing }
 NativizationEnvironment >> messageLinker [
 	^ messageLinker
@@ -86,21 +100,17 @@ NativizationEnvironment >> messageLinker: aLinker [
 ]
 
 { #category : #accessing }
-NativizationEnvironment >> methodInstSize [
-^methodInstSize 
-]
-
-{ #category : #accessing }
 NativizationEnvironment >> methodNativizer [
 	^ cachedNativizer 
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> methodSubset: aDictionary [
-	| species m |
-	^aDictionary flatCollect: [ :assoc | 
+	| all species m |
+	all := aDictionary flatCollect: [ :assoc | 
 		species := spec at: assoc key.
-		assoc value collect: [:sel | m := species >> sel. self ASSERT: m notNil. m ] ].	
+		assoc value collect: [:sel | m := species >> sel. self ASSERT: m notNil. m ] ].
+	^all asOrderedCollection
 ]
 
 { #category : #services }
@@ -245,7 +255,6 @@ NativizationEnvironment >> shouldOptimize: method [
 { #category : #initialization }
 NativizationEnvironment >> spec: anRGEnvironment [
 	spec := anRGEnvironment.
-	methodInstSize := (spec at: #CompiledMethod) instSize.
 	self
 		setupOptimizedMethods;
 		setupInlinedMethods;
@@ -265,4 +274,15 @@ NativizationEnvironment >> wordSize [
 { #category : #initialization }
 NativizationEnvironment >> wordSizeShift [
 	^ abi wordSizeShift 
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> writeBarrier [
+	^writeBarrier
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> writeBarrier: anSCompiledMethod [
+	writeBarrier := anSCompiledMethod.
+	invokedMethods add: writeBarrier 
 ]

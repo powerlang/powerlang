@@ -6,9 +6,9 @@ Class {
 
 { #category : #accessing }
 LoadAwithAssocVar >> nativizeUsing: anAssembler for: messageNativizer [
-	| i |
-	i := messageNativizer methodLiteralIndexFrom: index.
+	| assoc |
+	assoc := messageNativizer methodLiteralAt: index.
 	anAssembler
-		loadAwithMindex: i;
+		loadAwithLiteral: assoc;
 		loadAwithAindex: 2
 ]

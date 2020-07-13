@@ -1,24 +1,32 @@
 Class {
 	#name : #NativeCode,
-	#superclass : #Object,
+	#superclass : #Array,
+	#type : #variable,
 	#instVars : [
-		'code'
+		'machineCode',
+		'compiledCode'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
 
 { #category : #'as yet unclassified' }
 NativeCode >> code [
-	^code
+	^machineCode
 ]
 
 { #category : #'as yet unclassified' }
 NativeCode >> code: bytes [
-	code := bytes.
+	machineCode := bytes.
+
+]
+
+{ #category : #'as yet unclassified' }
+NativeCode >> compiledCode: anObject [
+	compiledCode := anObject
 
 ]
 
 { #category : #'as yet unclassified' }
 NativeCode >> disassembledAmd64 [
-	^code disassembledAmd64
+	^machineCode disassembledAmd64
 ]

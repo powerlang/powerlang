@@ -99,7 +99,7 @@ OptimizingNativizer >> inlineMethods [
 
 { #category : #unclassified }
 OptimizingNativizer >> irFor: anSCompiledMethod [
-	| visitor ir cm |
+	| visitor ir |
 	visitor := OptimizingVisitor new method: anSCompiledMethod.
 	ir := visitor visit: anSCompiledMethod sexpressions.
 	^ ir

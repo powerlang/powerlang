@@ -6,6 +6,12 @@ ClassDescription >> allSharedPoolsUsing: globals [
 ]
 
 { #category : #'*Powerlang-Core' }
+ClassDescription >> indexOfSlot: instVarName [
+	^self instVarIndexFor: instVarName
+
+]
+
+{ #category : #'*Powerlang-Core' }
 ClassDescription >> localPools [
 	^#()
 ]

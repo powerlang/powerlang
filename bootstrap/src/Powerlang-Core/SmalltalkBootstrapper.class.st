@@ -13,6 +13,10 @@ Class {
 		'emulator',
 		'nativizer',
 		'globals',
+		'lookup',
+		'lookupSuper',
+		'invoke',
+		'writeBarrier',
 		'hash',
 		'cvarMap',
 		'wordSize',
@@ -50,6 +54,11 @@ SmalltalkBootstrapper class >> spec [
 { #category : #initialization }
 SmalltalkBootstrapper >> => aSymbol [
 	^environment at: aSymbol
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> abi [
+	^nativizer abi
 ]
 
 { #category : #initialization }
@@ -133,6 +142,11 @@ SmalltalkBootstrapper >> classNamedOrNil: aSymbol [
 { #category : #initialization }
 SmalltalkBootstrapper >> classes [
 	^classes
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> compile: anRGMethod [
+	^emulator compile: anRGMethod
 ]
 
 { #category : #initialization }
@@ -314,7 +328,7 @@ SmalltalkBootstrapper >> falseObject [
 { #category : #initialization }
 SmalltalkBootstrapper >> fillClasses [
 	| class meta |
-	nativizer compileInlinedMethodsWith: emulator.
+	self nativizeSpecialMethods.
 	environment allClasses
 		do: [ :def | 
 			self log: 'filling ' , def name , '...'.
@@ -327,7 +341,7 @@ SmalltalkBootstrapper >> fillClasses [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> fillSpecies: species with: definition [
-	| dictionary smethod code transferred |
+	| dictionary smethod transferred |
 	dictionary := self
 		createMethodDictionary: species
 		sized: definition methods size.
@@ -484,6 +498,11 @@ SmalltalkBootstrapper >> instanceBehaviorOfSpec: spec [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> invoke [
+	^invoke
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> lastHash [
 	^hash value value
 
@@ -516,6 +535,63 @@ SmalltalkBootstrapper >> log: aString [
 { #category : #'as yet unclassified' }
 SmalltalkBootstrapper >> nameOf: anObject [
 	^ index keyAtValue: anObject ifAbsent: nil
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> nativizeInvoke [
+	invoke := (environment at: #SendSite) >> #_invokeOn:.
+	invoke := emulator compile: invoke.
+	OptimizingNativizer new
+		environment: nativizer;
+		method: invoke;
+		nativize
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> nativizeLookup [
+	| n |
+	n := LookupNativizer new bootstrapper: self; nativizeMethods.
+	lookup := n methodFor: #_dispatchOn:.
+	lookupSuper := n methodFor: #_dispatchOn:startingAt:
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> nativizeSpecialMethods [
+	| sends dispatch |
+	nativizer compileSpecialMethodsWith: self.
+	sends := self nativizeWriteBarrier.
+	self nativizeInvoke; nativizeLookup.
+	sends do: [ :send | dispatch := send isSuperSend 
+				ifTrue: [ lookupSuper ]
+				ifFalse: [ lookup ].
+			send instructions: dispatch nativeCode code ]
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> nativizeWriteBarrier [
+	| proto inlined lazy map env |
+	map := {('Memory class' -> #(current)).
+	(#Memory -> #(isYoung: isYoungSafe: remember:)).
+	(#CriticalArray -> #(unsafeAdd: #unsafeAt:put:)).
+	(#Magnitude -> #(#between:and:))}.
+	inlined := nativizer methodSubset: map.
+	inlined addAll: self undermethods.
+	inlined := inlined collect: [ :m | emulator compile: m ].
+	proto := environment at: #ProtoObject.
+	writeBarrier := emulator compile: proto >> #holdRefererIfNeeded:.
+	lazy := LazyLinker new.
+	env := nativizer copy inlinedMethods: inlined; messageLinker: lazy.
+	OptimizingNativizer new
+		environment: env;
+		method: writeBarrier;
+		nativize.
+	nativizer writeBarrier: writeBarrier.
+	^ lazy sends
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> nativizer [
+	^nativizer
 ]
 
 { #category : #initialization }
@@ -881,6 +957,11 @@ SmalltalkBootstrapper >> trueObject [
 	^ trueObj
 ]
 
+{ #category : #initialization }
+SmalltalkBootstrapper >> undermethods [
+	^ nativizer undermethods
+]
+
 { #category : #validating }
 SmalltalkBootstrapper >> validate [
 	objects do:[:obj | obj validate]
@@ -891,6 +972,11 @@ SmalltalkBootstrapper >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> writeBarrier [
+	^writeBarrier
 ]
 
 { #category : #validating }

@@ -19,11 +19,12 @@ LoadAwithLiteral class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #'as yet unclassified' }
 LoadAwithLiteral >> nativizeUsing: anAssembler for: messageNativizer [
-	| i |
-	value notNil
-		ifTrue: [ anAssembler loadAwithSmallInteger: value ]
-		ifFalse: [ 	i := messageNativizer methodLiteralIndexFrom: index.
-	anAssembler loadAwithMindex: i]
+
+	| literal |
+	value
+		ifNil: [ literal := messageNativizer methodLiteralAt: index.
+			anAssembler loadAwithLiteral: literal ]
+		ifNotNil: [ anAssembler loadAwithSmallInteger: value ]
 ]
 
 { #category : #'as yet unclassified' }

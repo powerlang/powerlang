@@ -5,6 +5,9 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #JITAssembler64,
 	#superclass : #Assembler64,
+	#instVars : [
+		'literals'
+	],
 	#classVars : [
 		'ExternalFunctions'
 	],
@@ -30,6 +33,15 @@ JITAssembler64 >> addAtoR [
 { #category : #arithmetic }
 JITAssembler64 >> addDoubleX1toX0 [
 	self assemble: 'addsd' with: xmm0 with: xmm1
+]
+
+{ #category : #loading }
+JITAssembler64 >> addLiteral: anObject [
+	^literals
+		indexOf: anObject
+		ifAbsent: [ literals
+				add: anObject;
+				size ].
 ]
 
 { #category : #arithmetic }
@@ -163,7 +175,9 @@ JITAssembler64 >> compare: register withBoolean: aBoolean [
 ]
 
 { #category : #loading }
-JITAssembler64 >> compare: register withMindex: index [
+JITAssembler64 >> compare: register withLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
 	self
 		assemble: 'cmp'
 		withReg: register
@@ -430,6 +444,12 @@ JITAssembler64 >> incC [
 ]
 
 { #category : #private }
+JITAssembler64 >> initialize [
+	super initialize.
+	literals := OrderedCollection new
+]
+
+{ #category : #private }
 JITAssembler64 >> initializeS [
 	self assemble: 'mov' with: self regS with: self regR
 ]
@@ -518,7 +538,9 @@ JITAssembler64 >> labeledNonIntegerBitTestOfR [
 ]
 
 { #category : #loading }
-JITAssembler64 >> load: register withMindex: index [
+JITAssembler64 >> load: register withLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
 	self
 		assemble: 'mov'
 		withReg: register
@@ -557,6 +579,13 @@ JITAssembler64 >> loadAwithFalse [
 JITAssembler64 >> loadAwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regA withImm: imm
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadAwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadAwithMindex: index
 ]
 
 { #category : #loading }
@@ -711,6 +740,31 @@ JITAssembler64 >> loadMXCSRfromA [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadMwithFPindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regM
+		withReg: self regFP
+		index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadMwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithMindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regM
+		withReg: self regM
+		index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadMwithRIPoffset: imm [
 	pointer
 		reset;
@@ -784,6 +838,13 @@ JITAssembler64 >> loadRwithFalse [
 JITAssembler64 >> loadRwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regR withImm: imm
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadRwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadRwithMindex: index
 ]
 
 { #category : #loading }
@@ -1036,6 +1097,22 @@ JITAssembler64 >> loadTwithImmediate: imm [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadTwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadTwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadTwithMindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regT
+		withReg: self regM
+		index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadTwithR [
 	self assemble: 'mov' with: self regT with: self regR
 ]
@@ -1181,6 +1258,11 @@ JITAssembler64 >> multiplyRbyA [
 { #category : #arithmetic }
 JITAssembler64 >> multiplyRbyConstant: imm [
 	self assemble: 'imul' with: self regR with: self regR with: imm
+]
+
+{ #category : #arithmetic }
+JITAssembler64 >> nativeCode [
+	^(NativeCode withAll: literals) code: memory bytes
 ]
 
 { #category : #logic }
@@ -1504,7 +1586,9 @@ JITAssembler64 >> restoreCallerFrame [
 
 { #category : #epilogue }
 JITAssembler64 >> restoreCallerM [
-	self loadSwithFPindex: -1
+	| index |
+	index := SCompiledMethod indexOfSlot: 'nativeCode'.
+	self loadMwithFPindex: -1; loadMwithMindex: index
 ]
 
 { #category : #epilogue }

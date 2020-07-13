@@ -197,17 +197,19 @@ SExpressionNativizer >> argumentInlinedAt: index [
 
 { #category : #services }
 SExpressionNativizer >> associationValueAt: anInteger [
-	| index |
-	index := self methodLiteralIndexFrom: anInteger.
-	assembler loadRwithMindex: index; loadRwithRindex: 2
+	| literal |
+	literal := self methodLiteralAt: anInteger.
+	assembler
+		loadRwithLiteral: literal;
+		loadRwithRindex: 2
 ]
 
 { #category : #services }
 SExpressionNativizer >> associationValueAt: anInteger put: dummy [
-	| index |
-	index := self methodLiteralIndexFrom: anInteger.
+	| literal |
+	literal := self methodLiteralAt: anInteger.
 	assembler
-		loadAwithMindex: index;
+		loadAwithLiteral: literal;
 		storeRinAindex: 2
 ]
 
@@ -298,9 +300,6 @@ SExpressionNativizer >> emitFallbacks [
 
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
-	| placeholder |
-	placeholder := 16r12345678.
-	assembler loadMwithRIPoffset: placeholder.
 	method isCallback
 		ifTrue: [ self prepareCallbackFrame ].
 	assembler
@@ -309,7 +308,8 @@ SExpressionNativizer >> emitFramedMethodPrologue [
 		initializeS.
 	method isFFIMethod
 		ifTrue: [ self emitFFICall ]
-		ifFalse: [ self pushCompiledMethod;
+		ifFalse: [ self
+				pushCompiledMethod;
 				initializeMethodEnvironment;
 				initializeMethodTemporaries;
 				emitSafepointCheck ]
@@ -485,10 +485,9 @@ SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 
 { #category : #services }
 SExpressionNativizer >> loadLiteralAt: anInteger [
-	| index |
-	index := self
-		methodLiteralIndexFrom: anInteger. assembler
-		loadRwithMindex: index
+	| literal |
+	literal := self methodLiteralAt: anInteger.
+	assembler loadRwithLiteral: literal
 ]
 
 { #category : #services }
@@ -502,8 +501,14 @@ SExpressionNativizer >> method [
 ]
 
 { #category : #services }
-SExpressionNativizer >> methodLiteralIndexFrom: anInteger [
-	^environment methodInstSize + anInteger
+SExpressionNativizer >> methodLiteralAt: anInteger [
+	^ method at: anInteger
+	
+]
+
+{ #category : #services }
+SExpressionNativizer >> methodLiteralFrom: anInteger [
+	^ method at: anInteger
 ]
 
 { #category : #services }
@@ -577,7 +582,10 @@ SExpressionNativizer >> pushCompiledBlock [
 
 { #category : #services }
 SExpressionNativizer >> pushCompiledMethod [
-	assembler pushM
+	| offset |
+	offset := (NativeCode indexOfSlot: 'compiledCode').
+	assembler loadTwithMindex: offset;
+		pushT
 ]
 
 { #category : #services }
