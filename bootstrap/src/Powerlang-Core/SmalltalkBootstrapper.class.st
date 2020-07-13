@@ -348,7 +348,7 @@ SmalltalkBootstrapper >> fillSpecies: species with: definition [
 	definition methods
 		do: [ :m | 
 			smethod := emulator compile: m.
-			smethod := nativizer nativize: smethod.
+			nativizer nativize: smethod.
 			transferred := self transferMethod: smethod in: species.
 			self
 				emulateSend: dictionary
@@ -560,7 +560,7 @@ SmalltalkBootstrapper >> nativizeSpecialMethods [
 	| sends dispatch |
 	nativizer compileSpecialMethodsWith: self.
 	sends := self nativizeWriteBarrier.
-	self nativizeInvoke; nativizeLookup.
+	self nativizeInvoke; nativizeLookup; setupMessageLinkers.
 	sends do: [ :send | dispatch := send isSuperSend 
 				ifTrue: [ lookupSuper ]
 				ifFalse: [ lookup ].
@@ -795,6 +795,16 @@ SmalltalkBootstrapper >> objectNamed: aSymbol [
 { #category : #accessing }
 SmalltalkBootstrapper >> objects [
 	^ objects
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> setupMessageLinkers [
+	| inl inv look composite |
+	inl := InlineMessageLinker new.
+	inv := InvokeLinker new methods: nativizer invokedMethods.
+	look := LookupLinker new lookup: lookup; lookupSuper: lookupSuper.
+	composite := CompositeMessageLinker new add: inl; add: inv; add: look; yourself.
+	nativizer messageLinker: composite
 ]
 
 { #category : #initialization }

@@ -31,3 +31,13 @@ LookupLinker >> emitSendSuper: aSymbol from: aClass using: anAssembler [
 		discardArguments: aSymbol arity.
 	^send
 ]
+
+{ #category : #accessing }
+LookupLinker >> lookup: aByteArray [
+	lookup := aByteArray
+]
+
+{ #category : #accessing }
+LookupLinker >> lookupSuper: aByteArray [
+	lookupSuper := aByteArray
+]

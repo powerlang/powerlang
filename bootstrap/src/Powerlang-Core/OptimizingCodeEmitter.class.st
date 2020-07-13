@@ -418,6 +418,7 @@ OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
 	| code |
+	assembler reset.
 	firstBlock := aBasicBlock.
 	blocks := firstBlock withSuccessorsPostOrder reversed.
 	self doAssemble.
