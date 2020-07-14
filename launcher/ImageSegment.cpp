@@ -12,6 +12,7 @@
 #include "Memory.h"
 
 
+
 ImageSegment*
 ImageSegment::alloc(uintptr_t base, size_t size)
 {

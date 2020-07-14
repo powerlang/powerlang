@@ -11,6 +11,7 @@
 #include "Launcher.h"
 #include "ImageSegment.h"
 #include "Util.h"
+#include "Kernel.h"
 
 int
 Launcher::main(const int argc, const char** argv)
@@ -24,9 +25,11 @@ Launcher::main(const int argc, const char** argv)
         printf("No such file: %s\n", argv[1]);
         return 1;
     }
-    auto kernel = load(file);
+    auto kernel = ImageSegment::load(&file);
 
-    auto retval = launch(kernel, Object::smallIntObj(argc), Object::smallPtrObj(argv));
+    auto retval = launch((Kernel*)kernel->header.module,
+                            Object::smallIntObj(argc),
+                            Object::smallPtrObj(argv));
 
     if (retval->isSmallInt()) {
     	return retval->smallIntVal();
@@ -35,27 +38,41 @@ Launcher::main(const int argc, const char** argv)
     }
 }
 
-ImageSegment*
-Launcher::load(std::ifstream &data)
-{
-	return ImageSegment::load(&data);
-}
-
 Object*
-Launcher::launch(ImageSegment* kernel, Object* argc, Object* argv)
+Launcher::launch(Kernel* kernel, Object* argc, Object* argv)
 {
 	ASSERT(kernel != nullptr);
 	ASSERT(argc != nullptr);
 	ASSERT(argv != nullptr);
 
-	/*
-	 * Now, what to do here? How to reach an entry point's native code and
-	 * set up caller frame?
-	 */
-    //
-	// ASSERT(false && "What to do here?");
-    //
-    // auto entry = kernel->header.module->slot(5 /* or whatever the slot index of entrypoint is at the moment*/);
+    /*
+     * First, validate kernel object
+     */
+    ASSERT(kernel->size() >= (sizeof(Kernel) / sizeof(Object*)));
 
-	return Object::smallIntObj(42);
+
+    /*
+     * Finally, setup a call frame and call Smalltalk code.
+     */
+
+    Object* retvalObj = Object::smallIntObj(127);
+
+#   ifdef __x86_64__
+    asm (
+       "push %[argc]               \n"
+       "push %[argv]               \n"
+
+       "call *%[entry]             \n"
+       : "=rax" (retvalObj)
+       : "rsi" (kernel->entrypointReceiver),
+
+         [entry] "g" (kernel->entrypointCode),
+         [argc] "g" (argc),
+         [argv] "g" (argv)
+    );
+#   else
+#   error "Unsupported architecture, please fix!"
+#   endif
+
+	return retvalObj;
 }

@@ -17,7 +17,7 @@
 
 typedef enum
 {
-    IsBytes	     = 0x01,
+    IsBytes      = 0x01,
     IsVariable   = 0x02,
     IsNamed      = 0x04,
     IsRemembered = 0x08,
@@ -25,7 +25,6 @@ typedef enum
     HasBeenSeen  = 0x20,
     IsSecondGen  = 0x40,
     IsSmall      = 0x80,
-
 } ObjectFlags;
 
 /**
