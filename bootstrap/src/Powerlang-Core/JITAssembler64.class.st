@@ -576,6 +576,11 @@ JITAssembler64 >> loadAwithImmediate: imm [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadAwithKnown: anObject [
+	self breakpoint
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadAwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
