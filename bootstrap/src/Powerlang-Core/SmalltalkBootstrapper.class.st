@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'index',
 		'classes',
+		'methods',
 		'objects',
 		'symbols',
 		'nilObj',
@@ -21,7 +22,8 @@ Class {
 		'cvarMap',
 		'wordSize',
 		'maxSMI',
-		'minSMI'
+		'minSMI',
+		'module'
 	],
 	#classVars : [
 		'Spec'
@@ -102,9 +104,8 @@ SmalltalkBootstrapper >> basicNewSlots: classname [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> basicNewSlots: classname sized: size [
-	| spec instance |
-	spec := environment at: classname.
-	instance := SlotObjectMap new: spec size: size withAll: nilObj.
+	| instance |
+	instance := SlotObjectMap new: self => classname size: size withAll: nilObj.
 	^ objects add: instance
 ]
 
@@ -241,14 +242,7 @@ SmalltalkBootstrapper >> createGlobals [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createLoadAction [
-	|  message receiver selector argument arguments |
-	message := self new: #MessageSend.
-	receiver := self newSmallInteger: 10.
-	selector := self newSymbol: #gcd:.
-	argument := self newSmallInteger: 15.
-	arguments := self newArray: {argument}.
-	message receiver: receiver; selector: selector; arguments: arguments.
-	^message
+	^nilObj
 ]
 
 { #category : #initialization }
@@ -278,11 +272,14 @@ SmalltalkBootstrapper >> createMethodDictionary: species sized: anInteger [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createModule [
-	| module array |
-	module := self new: #Module.
-	array := self newArray: classes values.
-	module classes: array; loadAction: self createLoadAction.
-	^module
+	| entrypoint |
+	module := self new: #Kernel.
+	entrypoint := (methods at: self => #Kernel >> #entry:argv:).
+	module 
+		classes: (self newArray: classes values); 
+		loadAction: self createLoadAction;
+		entryPointReceiver: module;
+		entryPointCode: entrypoint nativeCode
 ]
 
 { #category : #initialization }
@@ -539,8 +536,7 @@ SmalltalkBootstrapper >> nameOf: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeInvoke [
-	invoke := (environment at: #SendSite) >> #_invokeOn:.
-	invoke := emulator compile: invoke.
+	invoke := emulator compile: self => #SendSite >> #_invokeOn:.
 	OptimizingNativizer new
 		environment: nativizer;
 		method: invoke;
@@ -569,7 +565,7 @@ SmalltalkBootstrapper >> nativizeSpecialMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeWriteBarrier [
-	| proto inlined lazy map env |
+	| inlined lazy map env |
 	map := {('Memory class' -> #(current)).
 	(#Memory -> #(isYoung: isYoungSafe: remember:)).
 	(#CriticalArray -> #(unsafeAdd: #unsafeAt:put:)).
@@ -577,8 +573,7 @@ SmalltalkBootstrapper >> nativizeWriteBarrier [
 	inlined := nativizer methodSubset: map.
 	inlined addAll: self undermethods.
 	inlined := inlined collect: [ :m | emulator compile: m ].
-	proto := environment at: #ProtoObject.
-	writeBarrier := emulator compile: proto >> #holdRefererIfNeeded:.
+	writeBarrier := emulator compile: self => #ProtoObject >> #holdRefererIfNeeded:.
 	lazy := LazyLinker new.
 	env := nativizer copy inlinedMethods: inlined; messageLinker: lazy.
 	OptimizingNativizer new
@@ -818,11 +813,6 @@ SmalltalkBootstrapper >> spec: anRGEnvironment [
 	emulator spec: anRGEnvironment.
 	nativizer := NativizationEnvironment forTesting: anRGEnvironment.
 	nativizer completeInitialization
-]
-
-{ #category : #initialization }
-SmalltalkBootstrapper >> specNamed: aSymbol [
-	^environment at: aSymbol
 ]
 
 { #category : #initialization }
