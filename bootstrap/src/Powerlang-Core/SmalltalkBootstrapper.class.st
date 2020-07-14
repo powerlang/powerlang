@@ -278,8 +278,8 @@ SmalltalkBootstrapper >> createModule [
 	module 
 		classes: (self newArray: classes values); 
 		loadAction: self createLoadAction;
-		entryPointReceiver: module;
-		entryPointCode: entrypoint nativeCode
+		entrypointReceiver: module;
+		entrypointCode: entrypoint nativeCode
 ]
 
 { #category : #initialization }
@@ -337,16 +337,17 @@ SmalltalkBootstrapper >> fillClasses [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> fillSpecies: species with: definition [
+SmalltalkBootstrapper >> fillSpecies: species with: classDefinition [
 	| dictionary smethod transferred |
 	dictionary := self
 		createMethodDictionary: species
-		sized: definition methods size.
-	definition methods
-		do: [ :m | 
-			smethod := emulator compile: m.
+		sized: classDefinition methods size.
+	classDefinition methods
+		do: [ :methodDefinition | 
+			smethod := emulator compile: methodDefinition.
 			nativizer nativize: smethod.
 			transferred := self transferMethod: smethod in: species.
+			methods at: methodDefinition put: transferred.
 			self
 				emulateSend: dictionary
 				selector: #basicAt:put:
@@ -385,6 +386,7 @@ SmalltalkBootstrapper >> genesis [
 		initializeSmalltalk;
 		fillClasses;
 		addRemainingObjects;
+		createModule;
 		validate
 ]
 
@@ -398,6 +400,7 @@ SmalltalkBootstrapper >> globals [
 SmalltalkBootstrapper >> initialize [
 	index := OrderedDictionary new.
 	classes := OrderedDictionary new.
+	methods := OrderedDictionary new.
 	objects := OrderedCollection new.
 	symbols := OrderedDictionary new.
 	cvarMap := OrderedDictionary new.
@@ -981,5 +984,8 @@ SmalltalkBootstrapper >> writeBarrier [
 
 { #category : #validating }
 SmalltalkBootstrapper >> writer [
-	^ImageSegmentWriter new objects: objects; module: self createModule
+	^ImageSegmentWriter new 
+		objects: objects; 
+		module: module;
+		yourself 
 ]
