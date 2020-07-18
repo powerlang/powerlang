@@ -395,7 +395,7 @@ SExpressionNativizer >> emitWriteBarrier [
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
-	assembler wordSize: environment wordSize
+	assembler := aNativizationEnvironment createJIT.
 ]
 
 { #category : #services }
@@ -406,7 +406,7 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	assembler := TemplateAssembler64 new
+	assembler := #TemplateAssembler64XXXX new
 ]
 
 { #category : #services }
@@ -586,7 +586,14 @@ SExpressionNativizer >> methodLiteralFrom: anInteger [
 
 { #category : #services }
 SExpressionNativizer >> nativeCode [
-	^mainCode
+	^self shouldBeImplemented mainCode
+]
+
+{ #category : #services }
+SExpressionNativizer >> nativeCodeFor: aCompiledMethod [
+	^self
+		compile: aCompiledMethod;
+		nativeCode
 ]
 
 { #category : #services }

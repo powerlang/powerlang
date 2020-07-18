@@ -16,14 +16,12 @@ NativeCode >> code [
 
 { #category : #'as yet unclassified' }
 NativeCode >> code: bytes [
-	machineCode := bytes.
-
+self shouldBeImplemented.
 ]
 
 { #category : #'as yet unclassified' }
 NativeCode >> compiledCode: anObject [
-	compiledCode := anObject
-
+self shouldBeImplemented.
 ]
 
 { #category : #'as yet unclassified' }

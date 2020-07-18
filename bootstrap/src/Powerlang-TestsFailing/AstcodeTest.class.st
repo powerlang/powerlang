@@ -23,13 +23,12 @@ AstcodeTest >> connectGdb [
 	gdb := RemoteGDBSession 
 		host: '192.168.75.2'
 		port: 7000
-		processorDescription: AcProcessorDescriptions x86
 ]
 
 { #category : #private }
 AstcodeTest >> createRAM [
-	memory := Gem5SharedRAM gdb: gdb.
-	memory shmemSize: 20*1024*1024.
+	memory := RemoteRAM gdb: gdb.
+	"memory shmemSize: 20*1024*1024."
 ]
 
 { #category : #private }
@@ -359,11 +358,14 @@ AstcodeTest >> test100nativizeReturn42 [
 { #category : #private }
 AstcodeTest >> test200runReturn42 [
 	| astcodes nativizer nc wherePC |
+	
+self connectGdb; createRAM. 
+		
 	astcodes := self encode: 'm ^42'.
 	nativizer := NativizationEnvironment forTesting: SmalltalkBootstrapper spec.
 	nativizer completeInitialization.
 	nc := nativizer nativeCodeFor: method.
-	self connectGdb; createRAM.
+
 	self halt.
 	gdb c.
 	wherePC := (gdb getRegister: 'rip')+1. "advance past the int3"

@@ -48,6 +48,7 @@ Assembler64 class >> initializeIndexedLabels [
 
 { #category : #'instance creation' }
 Assembler64 class >> new [
+self halt.
 	^super new initialize
 ]
 
