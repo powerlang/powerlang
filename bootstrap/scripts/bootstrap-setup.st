@@ -20,6 +20,14 @@ Metacello new
    load: 'Core';
    load: 'Analyzer'.
 
+"
+Load Roassal
+"
+Metacello new
+    baseline: 'Roassal3';
+    repository: 'github://ObjectProfile/Roassal3:v0.9.2';
+    load.
+
 Author useAuthor: 'PowerSmalltalkLoader' during: [
     | repo |
     "Based on the same file from the pharo-vm project"
