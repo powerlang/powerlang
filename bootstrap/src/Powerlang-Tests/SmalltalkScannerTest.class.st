@@ -10,15 +10,15 @@ Class {
 { #category : #setup }
 SmalltalkScannerTest >> setUp [
 	super setUp.
-	scanner := Compiler new smalltalkScanner
+	scanner := SCompiler new smalltalkScanner
 ]
 
 { #category : #numbers }
 SmalltalkScannerTest >> test0xNotation [
 	| node |
-	node := Compiler new smalltalkParser parseExpression: '0x10'.
+	node := SCompiler new smalltalkParser parseExpression: '0x10'.
 	self assert: node statements first value = 16.
-	node := Compiler new smalltalkParser parseExpression: '0X10'.
+	node := SCompiler new smalltalkParser parseExpression: '0X10'.
 	self assert: node statements first value = 16
 ]
 
@@ -129,7 +129,7 @@ SmalltalkScannerTest >> testColon2 [
 	scanner on: '::'.
 	node := scanner next.
 	self
-		assert: node class = StringToken;
+		assert: node class = SStringToken;
 		assert: node source = '::'
 ]
 

@@ -13,7 +13,7 @@ Class {
 
 { #category : #private }
 AstcodeTest >> compile: source in: aSpecies [
-	^Compiler compile: source in: aSpecies
+	^SCompiler compile: source in: aSpecies
 ]
 
 { #category : #private }
@@ -34,7 +34,7 @@ AstcodeTest >> encode: source [
 AstcodeTest >> encode: source in: aSpecies [
 	| ring compiler |
 	ring := SmalltalkBootstrapper spec bindingOf: aSpecies name.
-	compiler := Compiler forClass: ring value.
+	compiler := SCompiler forClass: ring value.
 	method := compiler compile: source.
 	^method astcodes
 ]

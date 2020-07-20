@@ -4,7 +4,7 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #OptimizingVisitor,
-	#superclass : #ParseTreeVisitor,
+	#superclass : #SParseTreeVisitor,
 	#instVars : [
 		'method',
 		'firstBlock',

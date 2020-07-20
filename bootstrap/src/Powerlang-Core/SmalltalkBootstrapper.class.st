@@ -153,7 +153,7 @@ SmalltalkBootstrapper >> compile: anRGMethod [
 { #category : #initialization }
 SmalltalkBootstrapper >> compilerFor: anRGBehavior [
 	| c |
-	c := Compiler namespace: globals.
+	c := SCompiler namespace: globals.
 	^c forClass: anRGBehavior
 ]
 

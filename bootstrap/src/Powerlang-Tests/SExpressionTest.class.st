@@ -105,7 +105,7 @@ SExpressionTest >> libraryPath [
 SExpressionTest >> nativize: aSymbol [
 	| method smethod |
 	method := self class >> aSymbol.
-	smethod := Compiler compile: method sourceCode in: self class.
+	smethod := SCompiler compile: method sourceCode in: self class.
 	^ NativizationEnvironment forTesting newExpressionNativizer 
 		  nativize: smethod
 ]

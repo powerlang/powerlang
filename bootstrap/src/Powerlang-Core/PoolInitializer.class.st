@@ -11,8 +11,8 @@ Class {
 PoolInitializer >> evaluate: aMethod [
 	| pools ast stream evaluation source |
 	pools := Dictionary new.
-	ast := [ Compiler parse: aMethod sourceCode in: nil ]
-		on: UndeclaredIdentifierError
+	ast := [ SCompiler parse: aMethod sourceCode in: nil ]
+		on: SUndeclaredIdentifierError
 		do: [ :e | 
 			pools at: e identifier put: PoolDictionary new.
 			e proceed ].

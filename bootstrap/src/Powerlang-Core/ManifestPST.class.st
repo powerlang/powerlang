@@ -29,7 +29,7 @@ ManifestPST class >> ruleRBCollectionProtocolRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBEmptyExceptionHandlerRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SmalltalkParser #methodFragment #false)) #'2019-07-29T21:47:48.456702-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#SSmalltalkParser #methodFragment #false)) #'2019-07-29T21:47:48.456702-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -44,7 +44,7 @@ ManifestPST class >> ruleRBIfTrueReturnsRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBLiteralArrayCharactersRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SmalltalkScanner #isBinary: #false)) #'2019-07-24T02:26:44.802941-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#SSmalltalkScanner #isBinary: #false)) #'2019-07-24T02:26:44.802941-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -59,7 +59,7 @@ ManifestPST class >> ruleRBReturnsIfTrueRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBSearchingLiteralRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#SmalltalkScanner #nextColon #false)) #'2019-07-24T02:24:50.040758-03:00') #(#(#RGClassDefinition #(#SmalltalkScanner)) #'2019-07-24T02:27:27.311656-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#SSmalltalkScanner #nextColon #false)) #'2019-07-24T02:24:50.040758-03:00') #(#(#RGClassDefinition #(#SSmalltalkScanner)) #'2019-07-24T02:27:27.311656-03:00') )
 ]
 
 { #category : #'code-critics' }

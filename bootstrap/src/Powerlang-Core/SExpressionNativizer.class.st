@@ -96,7 +96,7 @@ SExpressionNativizer class >> assemblyForSource: aString [
 { #category : #'instance creation' }
 SExpressionNativizer class >> assemblyForSource: aString in: aSpecies [
 	| method |
-	method := Compiler compile: aString in: aSpecies.
+	method := SCompiler compile: aString in: aSpecies.
 	^self assemblyFor: method
 ]
 
@@ -108,7 +108,7 @@ SExpressionNativizer class >> assemblyForSourceOrig: aString [
 { #category : #'instance creation' }
 SExpressionNativizer class >> assemblyForSourceOrig: aString in: aSpecies [
 	| method |
-	method := Compiler compile: aString in: aSpecies.
+	method := SCompiler compile: aString in: aSpecies.
 	^self assemblyOrigFor: method
 ]
 
@@ -142,7 +142,7 @@ SExpressionNativizer class >> methodForSource: aString [
 { #category : #'instance creation' }
 SExpressionNativizer class >> methodForSource: aString in: aSpecies [
 	| method |
-	method := Compiler compile: aString in: aSpecies.
+	method := SCompiler compile: aString in: aSpecies.
 	^self nativize: method
 ]
 

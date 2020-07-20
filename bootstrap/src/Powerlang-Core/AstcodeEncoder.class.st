@@ -1,6 +1,6 @@
 Class {
 	#name : #AstcodeEncoder,
-	#superclass : #ParseTreeVisitor,
+	#superclass : #SParseTreeVisitor,
 	#instVars : [
 		'method',
 		'stream',
