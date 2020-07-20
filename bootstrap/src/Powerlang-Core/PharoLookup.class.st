@@ -1,6 +1,6 @@
 Class {
 	#name : #PharoLookup,
-	#superclass : #Lookup,
+	#superclass : #MethodLookup,
 	#category : #'Powerlang-Core-Metaphysics'
 }
 

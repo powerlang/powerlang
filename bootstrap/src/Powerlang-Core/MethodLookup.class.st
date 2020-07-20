@@ -1,10 +1,10 @@
 Class {
-	#name : #Lookup,
+	#name : #MethodLookup,
 	#superclass : #Object,
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
 { #category : #'meta accessing' }
-Lookup >> lookup: aSymbol on: aSubject [
+MethodLookup >> lookup: aSymbol on: aSubject [
 	^self subclassResponsibility
 ]

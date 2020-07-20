@@ -1,6 +1,6 @@
 Class {
 	#name : #EmulationLookup,
-	#superclass : #Lookup,
+	#superclass : #MethodLookup,
 	#instVars : [
 		'spec',
 		'globals',
