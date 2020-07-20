@@ -5,7 +5,7 @@ Class {
 		'compiler',
 		'stream'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
 { #category : #private }

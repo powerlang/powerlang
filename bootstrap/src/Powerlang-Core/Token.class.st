@@ -6,7 +6,7 @@ Class {
 		'stretch',
 		'comments'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
 { #category : #printing }

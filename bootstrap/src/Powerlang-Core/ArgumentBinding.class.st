@@ -1,7 +1,7 @@
 Class {
 	#name : #ArgumentBinding,
 	#superclass : #LocalBinding,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #actions }

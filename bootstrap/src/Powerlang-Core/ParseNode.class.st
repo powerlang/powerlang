@@ -1,7 +1,7 @@
 Class {
 	#name : #ParseNode,
 	#superclass : #Token,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
 { #category : #visiting }

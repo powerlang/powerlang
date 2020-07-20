@@ -6,7 +6,7 @@ Class {
 		'name',
 		'info'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
 { #category : #'as yet unclassified' }

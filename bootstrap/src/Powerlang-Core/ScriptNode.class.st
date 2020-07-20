@@ -8,7 +8,7 @@ Class {
 		'children',
 		'scope'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk-Parser'
 }
 
 { #category : #'add/remove' }

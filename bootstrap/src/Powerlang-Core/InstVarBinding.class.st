@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'index'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #actions }

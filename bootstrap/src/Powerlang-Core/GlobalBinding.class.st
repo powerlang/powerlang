@@ -1,7 +1,7 @@
 Class {
 	#name : #GlobalBinding,
 	#superclass : #AssociationBinding,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #private }

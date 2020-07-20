@@ -1,7 +1,7 @@
 Class {
 	#name : #PoolVarBinding,
 	#superclass : #AssociationBinding,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #testing }

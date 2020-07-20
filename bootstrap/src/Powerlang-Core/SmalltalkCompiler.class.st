@@ -11,7 +11,7 @@ Class {
 		'leaf',
 		'activeScript'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Smalltalk'
 }
 
 { #category : #accessing }

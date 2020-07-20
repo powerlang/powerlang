@@ -4,7 +4,7 @@ Class {
 	#classVars : [
 		'Default'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #accessing }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'association'
 	],
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #'instance creation' }
