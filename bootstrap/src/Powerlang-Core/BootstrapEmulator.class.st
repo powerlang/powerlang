@@ -52,7 +52,7 @@ BootstrapEmulator >> classes: aDictionary [
 { #category : #accessing }
 BootstrapEmulator >> compile: anRGMethod [
 	| compiler class |
-	compiler := Compiler namespace: globals.
+	compiler := SCompiler namespace: globals.
 	class := wrappers at: anRGMethod parent.
 	^compiler
 		forClass: class;

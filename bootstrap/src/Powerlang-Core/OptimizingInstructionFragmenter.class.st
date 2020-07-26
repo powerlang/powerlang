@@ -202,7 +202,7 @@ OptimizingInstructionFragmenter >> fragmentSpecialABIArguments [
 	(literals at: 1) == #specialABIBegin
 		ifFalse: [ ^ self ].
 	i := 3.
-	ast := Compiler parse: method source lines first in: nil.
+	ast := SCompiler parse: method source lines first in: nil.
 	names := ast arguments collect: #name.
 	[ (literals at: i) == #specialABIEnd ]
 		whileFalse: [ | name register implicit argument receiver regname |

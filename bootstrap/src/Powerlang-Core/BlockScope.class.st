@@ -100,7 +100,7 @@ BlockScope >> environmentIndexOf: aScriptNode [
 	"
 	temporal compatibility
 	"
-	(aScriptNode isKindOf: ScriptNode)
+	(aScriptNode isKindOf: SScriptNode)
 		ifFalse: [ self ASSERT: false. ^nil ].
 	^self capturedEnvironmentIndexOf: aScriptNode
 ]

@@ -10,7 +10,7 @@ Class {
 { #category : #setup }
 SmalltalkParserTest >> setUp [
 	super setUp.
-	parser := Compiler new smalltalkParser
+	parser := SCompiler new smalltalkParser
 ]
 
 { #category : #other }
@@ -91,7 +91,7 @@ SmalltalkParserTest >> testBinaryHeader [
 	method := parser binarySignature.
 	self
 		assert: method notNil;
-		assert: method class == MethodNode;
+		assert: method class == SMethodNode;
 		assert: method selector keywords size = 1;
 		assert: method selector value == #'+++';
 		assert: method arguments size = 1.
@@ -442,7 +442,7 @@ SmalltalkParserTest >> testEmbeddedDots2 [
 		should: [parser parse: '
 	m
 		#(1 2 3) do: [:funny.arg | funny.arg + 1]']
-		raise: CompilationError.
+		raise: SCompilationError.
 	self
 		should: [parser
 			parse: '
@@ -450,13 +450,13 @@ SmalltalkParserTest >> testEmbeddedDots2 [
 		| funny.local |
 		funny.local := 1.
 		^funny.local']
-		raise: CompilationError.
+		raise: SCompilationError.
 	self
 		should: [parser
 			parse: '
 	m
 		#(1 2 3) do: [:e |  | funny.local | funny.local := e]']
-		raise: CompilationError
+		raise: SCompilationError
 ]
 
 { #category : #literals }
@@ -470,7 +470,7 @@ SmalltalkParserTest >> testExpression [
 	parser on: '(x + 1)'; step.
 	expression := parser primary.
 	self
-		assert: expression class == MessageNode;
+		assert: expression class == SMessageNode;
 		assert: expression selector isBinary;
 		assert: expression source = '(x + 1)'
 ]
@@ -493,7 +493,7 @@ SmalltalkParserTest >> testKeywordHeader [
 	method := parser keywordSignature.
 	self
 		assert: method notNil;
-		assert: method class == MethodNode;
+		assert: method class == SMethodNode;
 		assert: method selector keywords size = 3;
 		assert: method selector value == #x:y:z:;
 		assert: method arguments size = 3.
@@ -514,7 +514,7 @@ SmalltalkParserTest >> testKeywordHeader2 [
 	parser step.
 	method := parser methodSignature.
 	self
-		assert: method class == MethodNode;
+		assert: method class == SMethodNode;
 		assert: method header = 'x: xx y: yy z: zz'.
 	parser on: 'x'.
 	parser step.
@@ -650,7 +650,7 @@ SmalltalkParserTest >> testParseFragment [
 { #category : #temporaries }
 SmalltalkParserTest >> testParseTemporaries [
 	| temporaries |
-	temporaries := Compiler new smalltalkParser
+	temporaries := SCompiler new smalltalkParser
 		parseTemporaries:
 			'm: arg
 	| t1 t2 t3 |
@@ -663,13 +663,13 @@ SmalltalkParserTest >> testPeekForIdentifier [
 	| strm |
 	strm := 'abc.de' readStream.
 	self
-		assert: (Compiler new peekForIdentifier: strm);
+		assert: (SCompiler new peekForIdentifier: strm);
 		assert: strm position = 1.
 	strm position: 3.
-	self assert: (Compiler new peekForIdentifier: strm).
+	self assert: (SCompiler new peekForIdentifier: strm).
 	strm := 'a2.c' readStream.
 	strm position: 2.
-	self deny: (Compiler new peekForIdentifier: strm)
+	self deny: (SCompiler new peekForIdentifier: strm)
 ]
 
 { #category : #literals }
@@ -748,7 +748,7 @@ SmalltalkParserTest >> testUnaryHeader [
 	selector := parser unarySelector.
 	self
 		assert: selector notNil;
-		assert: selector class == SelectorNode;
+		assert: selector class == SSelectorNode;
 		assert: selector keywords size = 1;
 		assert: selector value == #a.
 	parser on: 'a: x'.

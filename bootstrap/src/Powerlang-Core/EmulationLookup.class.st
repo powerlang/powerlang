@@ -1,6 +1,6 @@
 Class {
 	#name : #EmulationLookup,
-	#superclass : #Lookup,
+	#superclass : #MethodLookup,
 	#instVars : [
 		'spec',
 		'globals',
@@ -12,7 +12,7 @@ Class {
 { #category : #accessing }
 EmulationLookup >> compile: anRGMethod [
 	| compiler method |
-	compiler := Compiler namespace: globals.
+	compiler := SCompiler namespace: globals.
 	method := compiler
 		forClass: anRGMethod parent;
 		compile: anRGMethod sourceCode.

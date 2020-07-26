@@ -10,10 +10,23 @@ only load Ring2 on Pharo 7 (we don't care about older Pharos)
   load: 'runtimeSupport';
   load: 'calypso'].
 
+
+"
+Load PetitParser and PetitParser analyzer (for eventual debugging)
+"
 Metacello new
    baseline: 'PetitParser';
    repository: 'github://moosetechnology/PetitParser/src';
-   load.
+   load: 'Core';
+   load: 'Analyzer'.
+
+"
+Load Roassal
+"
+Metacello new
+    baseline: 'Roassal3';
+    repository: 'github://ObjectProfile/Roassal3:v0.9.2';
+    load.
 
 Author useAuthor: 'PowerSmalltalkLoader' during: [
     | repo |

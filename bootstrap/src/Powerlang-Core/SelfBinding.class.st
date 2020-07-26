@@ -1,7 +1,7 @@
 Class {
 	#name : #SelfBinding,
 	#superclass : #Binding,
-	#category : #'Powerlang-Core-SCompiler'
+	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
 { #category : #actions }

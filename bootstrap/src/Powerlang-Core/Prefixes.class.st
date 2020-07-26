@@ -12,7 +12,10 @@ Class {
 		'REPZ',
 		'REX',
 		'REX_R',
-		'REX_W'
+		'REX_W',
+		'xF0',
+		'xF2',
+		'xF3'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
