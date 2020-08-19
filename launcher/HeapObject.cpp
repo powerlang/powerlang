@@ -7,22 +7,22 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "Object.h"
+#include "HeapObject.h"
 
 
 
-Object*
-Object::slot(uint32_t index)
+HeapObject*
+HeapObject::slot(uint32_t index)
 {
     ASSERT(!this->isBytes());
     ASSERT(/*index >= 0 &&*/ index <= this->size());
 
-    Object** slot = (Object**)this + index;
+    HeapObject** slot = (HeapObject**)this + index;
     return *slot;
 }
 
 uint8_t
-Object::byte(uint32_t index)
+HeapObject::byte(uint32_t index)
 {
     ASSERT(this->isBytes());
     ASSERT(index <= this->size());
@@ -31,7 +31,7 @@ Object::byte(uint32_t index)
 }
 
 std::string
-Object::stringVal()
+HeapObject::stringVal()
 {
 	ASSERT(this->isBytes());
 

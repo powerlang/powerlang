@@ -28,8 +28,8 @@ Launcher::main(const int argc, const char** argv)
     auto kernel = ImageSegment::load(&file);
 
     auto retval = launch((Kernel*)kernel->header.module,
-                            Object::smallIntObj(argc),
-                            Object::smallPtrObj(argv));
+                            HeapObject::smallIntObj(argc),
+                            HeapObject::smallPtrObj(argv));
 
     if (retval->isSmallInt()) {
     	return retval->smallIntVal();
@@ -38,8 +38,8 @@ Launcher::main(const int argc, const char** argv)
     }
 }
 
-Object*
-Launcher::launch(Kernel* kernel, Object* argc, Object* argv)
+HeapObject*
+Launcher::launch(Kernel* kernel, HeapObject* argc, HeapObject* argv)
 {
 	ASSERT(kernel != nullptr);
 	ASSERT(argc != nullptr);
@@ -48,14 +48,14 @@ Launcher::launch(Kernel* kernel, Object* argc, Object* argv)
     /*
      * First, validate kernel object
      */
-    ASSERT(kernel->size() >= (sizeof(Kernel) / sizeof(Object*)));
+    ASSERT(kernel->size() >= (sizeof(Kernel) / sizeof(HeapObject*)));
 
 
     /*
      * Finally, setup a call frame and call Smalltalk code.
      */
 
-    Object* retvalObj = Object::smallIntObj(127);
+    HeapObject* retvalObj = HeapObject::smallIntObj(127);
 
 #   ifdef __x86_64__
     asm (

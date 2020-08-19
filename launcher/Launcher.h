@@ -22,7 +22,7 @@ public:
 
 protected:
 
-    Object* launch(Kernel* kernel, Object* argc, Object* argv);
+    HeapObject* launch(Kernel* kernel, HeapObject* argc, HeapObject* argv);
 };
 
 #endif /* LAUNCHER_LAUNCHER_H_ */

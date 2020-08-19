@@ -8,8 +8,8 @@
  */
 
 
-#ifndef OBJECT_H_
-#define OBJECT_H_
+#ifndef _HEAPOBJECT_H_
+#define _HEAPOBJECT_H_
 
 #include <string>
 
@@ -25,13 +25,13 @@ typedef enum
     HasBeenSeen  = 0x20,
     IsSecondGen  = 0x40,
     IsSmall      = 0x80,
-} ObjectFlags;
+} HeapObjectFlags;
 
 /**
  * Class `Object` represent a smalltalk object on an object heap
  * and provides very basic API to query object type and contents.
  */
-struct Object
+struct HeapObject
 {
 #pragma pack (push,1)
     struct SmallHeader
@@ -66,9 +66,9 @@ struct Object
     static const intptr_t SMALLINT_MIN = INTPTR_MIN >> 1;
     static const intptr_t SMALLINT_MAX = INTPTR_MAX >> 1;
 
-    ObjectFlags flags()
+    HeapObjectFlags flags()
     {
-        return (ObjectFlags)(this->smallHeader()->flags);
+        return (HeapObjectFlags)(this->smallHeader()->flags);
     }
 
     /**
@@ -95,7 +95,7 @@ struct Object
      * both named and indexed slots. This MUST be used only
      * with pointer-indexed objects.
      */
-    Object* slot(uint32_t index);
+    HeapObject* slot(uint32_t index);
 
     /**
      * Return a byte of this object at given index. Index
@@ -174,22 +174,22 @@ struct Object
      * Return reference to SmallInteger object with
      * given `intVal`
      */
-    static Object* smallIntObj(intptr_t intVal)
+    static HeapObject* smallIntObj(intptr_t intVal)
     {
     	ASSERT(SMALLINT_MIN <= intVal && intVal <= SMALLINT_MAX);
 
-    	return (Object*)(((uintptr_t)intVal << 1) | 1);
+    	return (HeapObject*)(((uintptr_t)intVal << 1) | 1);
     }
 
     /**
      * Return a reference SmallInteger object holding
      * a given `ptrVal` pointer boxed as "small pointer"
      */
-    static Object* smallPtrObj(void* ptrVal)
+    static HeapObject* smallPtrObj(void* ptrVal)
     {
     	ASSERT(!((uintptr_t)ptrVal & 1));
 
-    	return (Object*)((uintptr_t)ptrVal | 1);
+    	return (HeapObject*)((uintptr_t)ptrVal | 1);
     }
 
     class InvalidAccess
@@ -212,7 +212,7 @@ struct Object
 // Here we just need to make sure the struct Object is empty.
 // However, in C++, size of an empty struct / class is 1 byte,
 // hence the `... == 1`
-static_assert(sizeof(Object) == 1);
+static_assert(sizeof(HeapObject) == 1);
 
 
-#endif /* OBJECT_H_ */
+#endif /* _HEAPOBJECT_H_ */
