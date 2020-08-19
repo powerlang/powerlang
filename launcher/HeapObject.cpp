@@ -11,14 +11,14 @@
 
 
 
-HeapObject*
+Object*
 HeapObject::slot(uint32_t index)
 {
     ASSERT(!this->isBytes());
     ASSERT(/*index >= 0 &&*/ index <= this->size());
 
-    HeapObject** slot = (HeapObject**)this + index;
-    return *slot;
+    Object* slot = (Object*)this + index;
+    return slot;
 }
 
 uint8_t

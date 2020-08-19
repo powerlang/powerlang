@@ -36,12 +36,24 @@ typedef enum
 struct HeapObject
 {
 #pragma pack (push,1)
+
     struct SmallHeader
     {
     	uint16_t hash;
     	uint8_t size;
     	uint8_t flags;
     	uint32_t behavior;
+
+      /**
+       * Casts buffer into a SmallHeader
+       **/
+      static SmallHeader* from(void* buffer) { return (SmallHeader*)buffer; }
+
+      /**
+       * Returns a reference to the HeapObject that corresponds to this header
+       **/
+      HeapObject* object() { return (HeapObject*)(((uintptr_t)this) + sizeof(SmallHeader)); }
+
     };
 
     struct LargeHeader
@@ -49,7 +61,48 @@ struct HeapObject
     	uint32_t size;
     	uint32_t padding;
     	SmallHeader smallHeader;
+
+      /**
+       * Casts buffer into a LargeHeader
+       **/
+      static LargeHeader* from(void* buffer) { return (LargeHeader*)buffer; }
+
+      /**
+       * Returns a reference to the HeapObject that corresponds to this header
+       **/
+      HeapObject* object() { return smallHeader.object(); }
     };
+
+    /**
+     * struct `ObjectHeader` is an opaque handle to a header, in a similar
+     * sense as Object: it represents the start of a header, and you have
+     * to use its helpers to access the actual headers.
+     **/
+    struct ObjectHeader {
+
+      /**
+       * Casts buffer into an ObjectHeader
+       **/
+      static ObjectHeader* from(void* buffer) { return (ObjectHeader*)buffer; }
+
+       /**
+       * Determines whether this corresponds to a small or large header and returns the
+       * SmallHeader part.
+       **/
+      SmallHeader* smallHeader() {
+        auto small = (SmallHeader*)(void*)this;
+        return (small->flags & IsSmall) ? small : &((LargeHeader*)(this))->smallHeader;
+      }
+
+      /**
+       * Returns a reference to the HeapObject that corresponds to this header.
+       * I check whether the header is large or small to add the corresponding
+       * offset.
+       **/
+      HeapObject* object() { return this->smallHeader()->object(); }
+
+    };
+
 #pragma pack (pop)
   protected:
 
@@ -89,7 +142,7 @@ struct HeapObject
      * both named and indexed slots. This MUST be used only
      * with pointer-indexed objects.
      */
-    HeapObject* slot(uint32_t index);
+    Object* slot(uint32_t index);
 
     /**
      * Return a byte of this object at given index. Index
@@ -132,14 +185,35 @@ struct HeapObject
     }
 
     /**
-     * Return aligned size of an object in bytes, *excluding* header.
-     *
+     * Returns the size of an object in bytes, including any padding needed and
+     * *excluding* header.
      */
-    size_t sizeInBytesAligned()
+    size_t alignedSizeInBytes()
     {
     	return align(this->sizeInBytes(), sizeof(void*));
     }
 
+    /**
+     * Returns a reference to the header of the object immediately after the
+     * receiver.
+     * It is of an abstract type, as we don't know beforehand if it is small
+     * or large.
+     **/
+    ObjectHeader* nextHeader()
+    {
+      uintptr_t nextHeader = (uintptr_t)this + this->alignedSizeInBytes();
+
+      return (ObjectHeader*)nextHeader;
+    }
+
+    /**
+     * Returns a reference to the object immediately after the receiver in the
+     * heap.
+     **/
+    HeapObject* nextObject()
+    {
+      return this->nextHeader()->object();
+    }
 
     class InvalidAccess
     {
