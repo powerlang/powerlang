@@ -13,7 +13,9 @@
 
 #include <string>
 
-#include "Util.h"
+#include <Object.h>
+#include <SmallInteger.h>
+#include <Util.h>
 
 typedef enum
 {
@@ -28,19 +30,19 @@ typedef enum
 } HeapObjectFlags;
 
 /**
- * Class `Object` represent a smalltalk object on an object heap
+ * Class `HeapObject` represents a Smalltalk object on an object heap
  * and provides very basic API to query object type and contents.
  */
 struct HeapObject
 {
 #pragma pack (push,1)
     struct SmallHeader
-	{
+    {
     	uint16_t hash;
     	uint8_t size;
     	uint8_t flags;
     	uint32_t behavior;
-	};
+    };
 
     struct LargeHeader
     {
@@ -63,8 +65,6 @@ struct HeapObject
 
 
   public:
-    static const intptr_t SMALLINT_MIN = INTPTR_MIN >> 1;
-    static const intptr_t SMALLINT_MAX = INTPTR_MAX >> 1;
 
     HeapObjectFlags flags()
     {
@@ -72,22 +72,16 @@ struct HeapObject
     }
 
     /**
-     * Return `true` if this object is a SmallInteger instance,
-     * `false` otherwise.
-     */
-    bool isSmallInt() { return (uintptr_t)this & 1 ? true : false; }
-
-    /**
      * Return `true` if this object is byte-indexed, `false`
      * otherwise.
      */
-    bool isBytes() { return !isSmallInt() && (flags() & IsBytes); }
+    bool isBytes() { return flags() & IsBytes; }
 
     /**
      * Return `true` if this object is pointer-indexed, `false`
      * otherwise.
      */
-    bool isPointers() { return !isSmallInt() && !isBytes(); }
+    bool isPointers() { return !isBytes(); }
 
     /**
      * Return a slot (pointer) of this object at given
@@ -147,51 +141,6 @@ struct HeapObject
     }
 
 
-    /**
-     * Assuming `this` represents a SmallInteger, return its
-     * (signed) integer value
-     */
-    intptr_t smallIntVal()
-    {
-        ASSERT(isSmallInt());
-
-        return (intptr_t)this >> 1;
-    }
-
-    /**
-     * Assuming `this` represents a "small pointer"
-     * return the value as pointer
-     */
-    template <typename T = void*>
-    T smallPtrVal()
-    {
-        ASSERT(isSmallInt());
-
-        return (T)((intptr_t)this & (intptr_t)~1);
-    }
-
-    /**
-     * Return reference to SmallInteger object with
-     * given `intVal`
-     */
-    static HeapObject* smallIntObj(intptr_t intVal)
-    {
-    	ASSERT(SMALLINT_MIN <= intVal && intVal <= SMALLINT_MAX);
-
-    	return (HeapObject*)(((uintptr_t)intVal << 1) | 1);
-    }
-
-    /**
-     * Return a reference SmallInteger object holding
-     * a given `ptrVal` pointer boxed as "small pointer"
-     */
-    static HeapObject* smallPtrObj(void* ptrVal)
-    {
-    	ASSERT(!((uintptr_t)ptrVal & 1));
-
-    	return (HeapObject*)((uintptr_t)ptrVal | 1);
-    }
-
     class InvalidAccess
     {
       protected:
@@ -213,6 +162,5 @@ struct HeapObject
 // However, in C++, size of an empty struct / class is 1 byte,
 // hence the `... == 1`
 static_assert(sizeof(HeapObject) == 1);
-
 
 #endif /* _HEAPOBJECT_H_ */
