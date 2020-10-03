@@ -29,6 +29,11 @@ X64ABI >> regFP [
 ]
 
 { #category : #private }
+X64ABI >> regG [
+	^r15
+]
+
+{ #category : #private }
 X64ABI >> regR [
 	^rax
 ]

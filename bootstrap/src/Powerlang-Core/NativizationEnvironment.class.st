@@ -26,6 +26,18 @@ NativizationEnvironment class >> forTesting: anRGEnvironment [
 	^ self new spec: anRGEnvironment
 ]
 
+{ #category : #accessing }
+NativizationEnvironment class >> globalNames [
+	^#(Lookup LookupSuper WriteBarrier Safepoint SmallIntegerBehavior LookupDebuggable LookupSuperDebuggable)
+]
+
+{ #category : #accessing }
+NativizationEnvironment class >> indexOfGlobal: aSymbol [
+	^self globalNames
+		indexOf: aSymbol
+		ifAbsent: [self error: 'global not found']
+]
+
 { #category : #initialization }
 NativizationEnvironment >> abi [
 	^ abi 

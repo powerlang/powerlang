@@ -690,6 +690,18 @@ JITAssembler64 >> loadFPwithSP [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadGwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadGwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadGwithMindex: index [
+	self assemble: 'mov' withReg: self regG withReg: self regM index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadLargeX0withRindirect [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'movq' with: xmm0 with: pointer
@@ -745,6 +757,18 @@ JITAssembler64 >> loadMwithFPindex: index [
 		withReg: self regM
 		withReg: self regFP
 		index: index
+]
+
+{ #category : #private }
+JITAssembler64 >> loadMwithGindex: index [
+	self assemble: 'mov' withReg: self regM withReg: self regG index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadMwithGindex: index
 ]
 
 { #category : #loading }
@@ -1048,6 +1072,18 @@ JITAssembler64 >> loadSwithFPindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regFP index: index
 ]
 
+{ #category : #private }
+JITAssembler64 >> loadSwithGindex: index [
+	self assemble: 'mov' withReg: self regS withReg: self regG index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadSwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadSwithGindex: index
+]
+
 { #category : #loading }
 JITAssembler64 >> loadSwithImmediate: imm [
 	#imm32.
@@ -1289,6 +1325,11 @@ JITAssembler64 >> popFP [
 	self assemble: 'pop' with: self regFP
 ]
 
+{ #category : #private }
+JITAssembler64 >> popG [
+	self assemble: 'pop' with: self regG
+]
+
 { #category : #'push/pop' }
 JITAssembler64 >> popR [
 	self assemble: 'pop' with: self regR
@@ -1361,6 +1402,11 @@ JITAssembler64 >> pushFP [
 { #category : #'push/pop' }
 JITAssembler64 >> pushFPindex: index [
 	self assemble: 'push' withReg: self regFP index: index
+]
+
+{ #category : #private }
+JITAssembler64 >> pushG [
+	self assemble: 'push' with: self regG
 ]
 
 { #category : #'push/pop' }
@@ -1524,6 +1570,11 @@ JITAssembler64 >> regFP [
 { #category : #private }
 JITAssembler64 >> regFalse [
 	^ r14
+]
+
+{ #category : #private }
+JITAssembler64 >> regG [
+	^r15
 ]
 
 { #category : #private }
