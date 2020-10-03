@@ -642,6 +642,7 @@ InlineMessageLinker >> assembleRestoreAndTransferControlWithContext [
 		popR;
 		loadEwithR;
 		restoreCallerSelf;
+		restoreCallerM;
 		loadRwithS;
 		return: 0
 ]
@@ -671,7 +672,8 @@ InlineMessageLinker >> assembleSaveCurrentEnvironment [
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleSetTIBValue [
-	#_setThreadInformationBlockValue:. assembler
+	#_setThreadInformationBlockValue:.
+	assembler
 		convertRtoNativeInteger;
 		storeTIBwithAatIndexR
 ]

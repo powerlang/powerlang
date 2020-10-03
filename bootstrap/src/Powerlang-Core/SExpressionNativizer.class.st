@@ -259,6 +259,24 @@ SExpressionNativizer >> emitCallbackEpilogue [
 ]
 
 { #category : #services }
+SExpressionNativizer >> emitCallbackPrologue [
+	assembler saveCallerFrame.
+	assembler wordSize = 8
+		ifTrue: [ assembler storeArgumentsInStack ].
+	assembler
+		pushS;
+		pushE;
+		pushB;
+		loadRwithArgPointer;
+		convertRtoSmallInteger;
+		pushR;
+		pushSmallInteger: 0;
+		xorFPwithFP;
+		loadEwithNil;
+		loadRwithM
+]
+
+{ #category : #services }
 SExpressionNativizer >> emitEpilogue [
 	method hasBlocks ifTrue: [assembler restoreCallerEnvironment].
 	method isFrameless not
@@ -271,13 +289,14 @@ SExpressionNativizer >> emitEpilogue [
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueCommon [
-	assembler restoreCallerFrame; restoreCallerM; restoreCallerSelf; return
+	assembler restoreCallerFrame; restoreCallerSelf; restoreCallerM; return
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueNoFrame [
 	assembler
 		restoreCallerSelf;
+		restoreCallerM;
 		return
 ]
 
@@ -290,6 +309,7 @@ SExpressionNativizer >> emitFFICall [
 	assembler
 		restoreCallerFrame;
 		restoreCallerSelf;
+		restoreCallerM;
 		return
 ]
 
@@ -301,7 +321,7 @@ SExpressionNativizer >> emitFallbacks [
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
 	method isCallback
-		ifTrue: [ self prepareCallbackFrame ].
+		ifTrue: [ self emitCallbackPrologue ].
 	assembler
 		saveCallerFrame;
 		pushR;
@@ -555,24 +575,6 @@ SExpressionNativizer >> nilLiteral [
 SExpressionNativizer >> popR [
 	assembler popR.
 	stackCount := stackCount - 1
-]
-
-{ #category : #services }
-SExpressionNativizer >> prepareCallbackFrame [
-	assembler saveCallerFrame.
-	assembler wordSize = 8
-		ifTrue: [ assembler storeArgumentsInStack ].
-	assembler
-		pushS;
-		pushE;
-		pushB;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR;
-		pushSmallInteger: 0;
-		xorFPwithFP;
-		loadEwithNil;
-		loadRwithM
 ]
 
 { #category : #services }
