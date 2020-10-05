@@ -782,6 +782,19 @@ OptimizingCodeEmitter >> labelBlocks [
 		jumpDestinations at: block put: label]
 ]
 
+{ #category : #visiting }
+OptimizingCodeEmitter >> loadMifNeeded [
+				method selector == #_dispatchOn:
+			ifTrue: [^assembler loadMwithGlobal: #Lookup].
+		method selector == #_dispatchOn:startingAt:
+			ifTrue: [^assembler loadMwithGlobal: #LookupSuper].
+		method selector == #_dispatchDebuggableOn:
+			ifTrue: [^assembler loadMwithGlobal: #LookupDebuggable].
+		method selector == #_dispatchDebuggableOn:startingAt:
+			ifTrue: [^assembler loadMwithGlobal: #LookupSuperDebuggable].
+
+]
+
 { #category : #unclassified }
 OptimizingCodeEmitter >> messageLinker: aMessageLinker [
 	messageLinker := aMessageLinker
@@ -862,18 +875,19 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 	| frame |
 	instruction name == #activationRecord
-		ifTrue: [ ^ assembler buildFrame ].
+		ifTrue: [ assembler buildFrame. ^self loadMifNeeded ].
 	instruction name == #self
 		ifFalse: [ ^ self ].
 	frame := instruction prev.
-	frame hasFrame ifFalse: [ ^self ].
+	frame hasFrame
+		ifFalse: [ ^ self ].
 	assembler
-				reserveStackSlots: frame temporaries + 2;
-				store: assembler regR in: assembler regFP index: 0;
-				loadTwithMindex: (NativeCode indexOfSlot: 'compiledCode');
-				store: assembler regM in: assembler regFP index: -1.
-			self savesPreviousSelf
-				ifTrue: [ assembler push: assembler regS ] 
+		reserveStackSlots: frame temporaries + 2;
+		store: assembler regR in: assembler regFP index: 0;
+		loadTwithMindex: (NativeCode indexOfSlot: 'compiledCode');
+		store: assembler regM in: assembler regFP index: -1.
+	self savesPreviousSelf
+		ifTrue: [ assembler push: assembler regS ]
 ]
 
 { #category : #unclassified }

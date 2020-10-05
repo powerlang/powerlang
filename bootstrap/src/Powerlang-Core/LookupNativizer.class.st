@@ -49,6 +49,11 @@ LookupNativizer >> methodFor: selector [
 ]
 
 { #category : #accessing }
+LookupNativizer >> methods [
+	^methods
+]
+
+{ #category : #accessing }
 LookupNativizer >> nativizeMethods [
 	| environment | 
 	methods := self closureMethods collect: [:m | bootstrapper compile: m ].
@@ -64,7 +69,7 @@ LookupNativizer >> newNativizationEnvironment [
 		methods: invoked;
 		invoker: bootstrapper invoke.
 	ignored := HaltingSend new
-		filter: #(= > <= + - * // bitAnd: bitOr: bitXor:).
+		filter: #(< <= = > + - * // bitAnd: bitOr: bitXor:).
 	sent := LazyLinker new
 		filter:
 			#(debuggableCopy acquireReferences nativize refreshBlocks doesNotUnderstandSelector: mustBeBoolean class allocateMoreCaches).
@@ -74,7 +79,7 @@ LookupNativizer >> newNativizationEnvironment [
 		add: ignored;
 		add: sent;
 		yourself.
-	^bootstrapper nativizer copy
+	^ bootstrapper nativizer copy
 		messageLinker: composite;
 		completeInitialization
 ]
@@ -82,18 +87,16 @@ LookupNativizer >> newNativizationEnvironment [
 { #category : #'as yet unclassified' }
 LookupNativizer >> otherLookupMethods [
 	^ OrderedCollection new
-		add: (self >> #ProtoObject) >> #objectAtValid:put:;
-		add: (self >> #ProtoObject) >> #behavior;
-		add: (self >> #CompiledMethod) >> #prepareForExecution;
-		add: (self >> #CompiledMethod) >> #isNativized;
-		add: (self >> #CompiledMethod) >> #validNativeCodeAddress;
-		add: (self >> #CompiledMethod) >> #nativeCode;
-		add: (self >> #CompiledMethod) >> #selector;
-		add: (self >> #NativeCode) >> #code;
-		add: (self >> #NativeCode) >> #isFresh;
-		add: (self >> #NativeCode) >> #refresh;
-		add: (self >> #Species) >> #instanceBehavior;
-		add: (self >> #Process) >> #wantsToStepInto;
+		add: self >> #ProtoObject >> #objectAtValid:put:;
+		add: self >> #ProtoObject >> #behavior;
+		add: self >> #CompiledMethod >> #prepareForExecution;
+		add: self >> #CompiledMethod >> #isNativized;
+		add: self >> #CompiledMethod >> #validNativeCodeAddress;
+		add: self >> #CompiledMethod >> #nativeCode;
+		add: self >> #CompiledMethod >> #selector;
+		add: self >> #NativeCode >> #code;
+		add: self >> #Species >> #instanceBehavior;
+		add: self >> #Process >> #wantsToStepInto;
 		yourself
 ]
 
@@ -110,6 +113,6 @@ LookupNativizer >> selectorLookupMethods [
 LookupNativizer >> sendSiteMethods [
 	| sendsite |
 	sendsite := self >> #SendSite.
-	^ #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt: sentSelector #when:use: #beInvoke:using: bePolymorphic isStaticSend #monomorphicMap:to: #polymorphicMap:to: maxSize reset monomorphicStub polymorphicStub takeNextFreeMIC takeNextFreePIC)
+	^ #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt: sentSelector #when:use: #beInvoke:using: bePolymorphic isStaticSend #monomorphicMap:to: #polymorphicMap:to: maxSize reset takeNextFreeMIC takeNextFreePIC)
 		collect: [ :s | sendsite >> s ]
 ]

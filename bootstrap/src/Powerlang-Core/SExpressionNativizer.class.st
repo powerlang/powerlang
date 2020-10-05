@@ -210,7 +210,9 @@ SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 	literal := self methodLiteralAt: anInteger.
 	assembler
 		loadAwithLiteral: literal;
-		storeRinAindex: 2
+		storeRinAindex: 2;
+		pushA.
+	self emitWriteBarrier 
 ]
 
 { #category : #services }
@@ -247,15 +249,26 @@ SExpressionNativizer >> emitBlockPrologue: anSBlock [
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackEpilogue [
+	assembler restoreCallerFrame.
+	environment abi
+		restoreContextUsing: assembler popping: method argumentCount
+]
+
+{ #category : #services }
+SExpressionNativizer >> emitCallbackPrologue [
+	environment abi saveContextUsing: assembler.
 	assembler
-		restoreCallerFrame;
-		popA;
-		popA;
-		popB;
-		popE;
-		popS;
-		popFP;
-		returnFromCallback: method callbackArgumentCount
+		pushSmallInteger: 0;
+		xorFPwithFP;
+		loadMwithImmediate: assembler dummyPointer;
+		addLiteral: assembler lastEmittedPointer;
+		loadGwithLiteral: environment globals;
+		loadNilWithLiteral: nil;
+		loadTrueWithLiteral: true;
+		loadFalseWithLiteral: false;
+		loadEwithNil;
+		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
+		loadRwithRindex: (SCallbackMethod indexOfSlot: 'receiver')
 ]
 
 { #category : #services }
@@ -271,13 +284,14 @@ SExpressionNativizer >> emitEpilogue [
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueCommon [
-	assembler restoreCallerFrame; restoreCallerM; restoreCallerSelf; return
+	assembler restoreCallerFrame; restoreCallerSelf; restoreCallerM; return
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogueNoFrame [
 	assembler
 		restoreCallerSelf;
+		restoreCallerM;
 		return
 ]
 
@@ -290,6 +304,7 @@ SExpressionNativizer >> emitFFICall [
 	assembler
 		restoreCallerFrame;
 		restoreCallerSelf;
+		restoreCallerM;
 		return
 ]
 
@@ -301,7 +316,7 @@ SExpressionNativizer >> emitFallbacks [
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
 	method isCallback
-		ifTrue: [ self prepareCallbackFrame ].
+		ifTrue: [ self emitCallbackPrologue ].
 	assembler
 		saveCallerFrame;
 		pushR;
@@ -340,6 +355,14 @@ SExpressionNativizer >> emitSend: selector [
 	method isDebuggable
 		ifTrue: [ linker emitSendDebuggable: selector using: assembler ]
 		ifFalse: [ linker emitSend: selector using: assembler ]
+]
+
+{ #category : #services }
+SExpressionNativizer >> emitWriteBarrier [
+	assembler
+		loadMwithGlobal: #WriteBarrier;
+		callIndirectM;
+		discardArguments: 1
 ]
 
 { #category : #accessing }
@@ -398,7 +421,8 @@ SExpressionNativizer >> instanceVarAt: index [
 
 { #category : #services }
 SExpressionNativizer >> instanceVarAt: index put: value [
-	assembler storeRinSindex: index
+	assembler storeRinSindex: index; pushS.
+	self emitWriteBarrier
 ]
 
 { #category : #services }
@@ -558,24 +582,6 @@ SExpressionNativizer >> popR [
 ]
 
 { #category : #services }
-SExpressionNativizer >> prepareCallbackFrame [
-	assembler saveCallerFrame.
-	assembler wordSize = 8
-		ifTrue: [ assembler storeArgumentsInStack ].
-	assembler
-		pushS;
-		pushE;
-		pushB;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR;
-		pushSmallInteger: 0;
-		xorFPwithFP;
-		loadEwithNil;
-		loadRwithM
-]
-
-{ #category : #services }
 SExpressionNativizer >> pushCompiledBlock [
 	assembler loadAwithRindex: 1; pushA
 ]
@@ -701,7 +707,7 @@ SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
 				loadTwithEindex: envIndex;
 				storeRinTindex: index;
 				pushT ].
-	self emitSend: #holdRefererIfNeeded:
+	self emitWriteBarrier
 ]
 
 { #category : #services }

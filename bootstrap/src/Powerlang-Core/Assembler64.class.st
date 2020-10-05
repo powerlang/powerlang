@@ -445,6 +445,13 @@ Assembler64 >> jumpToReg: reg [
 ]
 
 { #category : #integers }
+Assembler64 >> lastEmittedPointer [
+	| patch |
+	patch := self currentAddress.
+	^patch - wordSize
+]
+
+{ #category : #integers }
 Assembler64 >> leadingRzeroCount [
 	"
 	lzcnt is a special x64 extension: it puts the REX

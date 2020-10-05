@@ -136,6 +136,12 @@ JITAssembler64 >> callIndirectA [
 	self assemble: 'call' with: pointer
 ]
 
+{ #category : #loading }
+JITAssembler64 >> callIndirectM [
+	pointer reset; length: self addressLength; base: self regM.
+	self assemble: 'call' with: pointer
+]
+
 { #category : #private }
 JITAssembler64 >> callR [
 	self assemble: 'call' with: self regR
@@ -444,6 +450,12 @@ JITAssembler64 >> incC [
 ]
 
 { #category : #private }
+JITAssembler64 >> initialize [
+	super initialize.
+	literals := OrderedCollection new
+]
+
+{ #category : #private }
 JITAssembler64 >> initializeS [
 	self assemble: 'mov' with: self regS with: self regR
 ]
@@ -457,6 +469,11 @@ JITAssembler64 >> jumpIndirectA [
 { #category : #comparing }
 JITAssembler64 >> jumpToA [
 	self assemble: 'jmp' with: self regA
+]
+
+{ #category : #loading }
+JITAssembler64 >> jumpToMindex: index [
+	self assemble: 'jmp' withReg: self regM index: index
 ]
 
 { #category : #comparing }
@@ -690,6 +707,30 @@ JITAssembler64 >> loadFPwithSP [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadFalseWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadFalseWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadFalseWithMindex: index [
+	self assemble: 'mov' withReg: self regFalse withReg: self regM index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadGwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadGwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadGwithMindex: index [
+	self assemble: 'mov' withReg: self regG withReg: self regM index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadLargeX0withRindirect [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'movq' with: xmm0 with: pointer
@@ -747,6 +788,24 @@ JITAssembler64 >> loadMwithFPindex: index [
 		index: index
 ]
 
+{ #category : #private }
+JITAssembler64 >> loadMwithGindex: index [
+	self assemble: 'mov' withReg: self regM withReg: self regG index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadMwithGindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithImmediate: imm [
+	#imm32.
+	self assemble: 'mov' with: self regM withImm: imm
+]
+
 { #category : #loading }
 JITAssembler64 >> loadMwithLiteral: anObject [
 	| index |
@@ -772,6 +831,23 @@ JITAssembler64 >> loadMwithRIPoffset: imm [
 		displacement: imm.
 
 	self assemble: 'lea' with: self regM with: pointer
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithTindex: index [
+	self assemble: 'mov' withReg: self regM withReg: self regT index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadNilWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadNilWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadNilWithMindex: index [
+	self assemble: 'mov' withReg: self regNil withReg: self regM index: index
 ]
 
 { #category : #loading }
@@ -1048,6 +1124,18 @@ JITAssembler64 >> loadSwithFPindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regFP index: index
 ]
 
+{ #category : #private }
+JITAssembler64 >> loadSwithGindex: index [
+	self assemble: 'mov' withReg: self regS withReg: self regG index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadSwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadSwithGindex: index
+]
+
 { #category : #loading }
 JITAssembler64 >> loadSwithImmediate: imm [
 	#imm32.
@@ -1067,6 +1155,18 @@ JITAssembler64 >> loadSwithRindex: index [
 { #category : #loading }
 JITAssembler64 >> loadSwithT [
 	self assemble: 'mov' with: self regS with: self regT
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadTrueWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadTrueWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadTrueWithMindex: index [
+	self assemble: 'mov' withReg: self regTrue withReg: self regM index: index
 ]
 
 { #category : #loading }
@@ -1290,6 +1390,21 @@ JITAssembler64 >> popFP [
 ]
 
 { #category : #'push/pop' }
+JITAssembler64 >> popFalse [
+	self assemble: 'pop' with: self regFalse
+]
+
+{ #category : #private }
+JITAssembler64 >> popG [
+	self assemble: 'pop' with: self regG
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> popNil [
+	self assemble: 'pop' with: self regNil
+]
+
+{ #category : #'push/pop' }
 JITAssembler64 >> popR [
 	self assemble: 'pop' with: self regR
 ]
@@ -1313,6 +1428,11 @@ JITAssembler64 >> popSPindirect [
 { #category : #'push/pop' }
 JITAssembler64 >> popT [
 	self assemble: 'pop' with: self regT
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> popTrue [
+	self assemble: 'pop' with: self regTrue
 ]
 
 { #category : #'push/pop' }
@@ -1361,6 +1481,16 @@ JITAssembler64 >> pushFP [
 { #category : #'push/pop' }
 JITAssembler64 >> pushFPindex: index [
 	self assemble: 'push' withReg: self regFP index: index
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> pushFalse [
+	self assemble: 'push' with: self regFalse
+]
+
+{ #category : #private }
+JITAssembler64 >> pushG [
+	self assemble: 'push' with: self regG
 ]
 
 { #category : #'push/pop' }
@@ -1481,6 +1611,11 @@ JITAssembler64 >> pushTindex: index [
 ]
 
 { #category : #'push/pop' }
+JITAssembler64 >> pushTrue [
+	self assemble: 'push' with: self regTrue
+]
+
+{ #category : #'push/pop' }
 JITAssembler64 >> pushVindex: index [
 	self assemble: 'push' withReg: self regV index: index
 ]
@@ -1524,6 +1659,11 @@ JITAssembler64 >> regFP [
 { #category : #private }
 JITAssembler64 >> regFalse [
 	^ r14
+]
+
+{ #category : #private }
+JITAssembler64 >> regG [
+	^r15
 ]
 
 { #category : #private }

@@ -106,7 +106,7 @@ SExpressionTest >> nativize: aSymbol [
 	| method smethod |
 	method := self class >> aSymbol.
 	smethod := SCompiler compile: method sourceCode in: self class.
-	^ NativizationEnvironment forTesting newExpressionNativizer 
+	^ NativizationEnvironment new newExpressionNativizer 
 		  nativize: smethod
 ]
 
