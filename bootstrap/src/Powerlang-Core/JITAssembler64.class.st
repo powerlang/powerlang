@@ -136,6 +136,12 @@ JITAssembler64 >> callIndirectA [
 	self assemble: 'call' with: pointer
 ]
 
+{ #category : #loading }
+JITAssembler64 >> callIndirectM [
+	pointer reset; length: self addressLength; base: self regM.
+	self assemble: 'call' with: pointer
+]
+
 { #category : #private }
 JITAssembler64 >> callR [
 	self assemble: 'call' with: self regR
@@ -444,6 +450,12 @@ JITAssembler64 >> incC [
 ]
 
 { #category : #private }
+JITAssembler64 >> initialize [
+	super initialize.
+	literals := OrderedCollection new
+]
+
+{ #category : #private }
 JITAssembler64 >> initializeS [
 	self assemble: 'mov' with: self regS with: self regR
 ]
@@ -457,6 +469,11 @@ JITAssembler64 >> jumpIndirectA [
 { #category : #comparing }
 JITAssembler64 >> jumpToA [
 	self assemble: 'jmp' with: self regA
+]
+
+{ #category : #loading }
+JITAssembler64 >> jumpToMindex: index [
+	self assemble: 'jmp' withReg: self regM index: index
 ]
 
 { #category : #comparing }
@@ -690,6 +707,18 @@ JITAssembler64 >> loadFPwithSP [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadFalseWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadFalseWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadFalseWithMindex: index [
+	self assemble: 'mov' withReg: self regFalse withReg: self regM index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadGwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
@@ -772,6 +801,12 @@ JITAssembler64 >> loadMwithGlobal: aSymbol [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadMwithImmediate: imm [
+	#imm32.
+	self assemble: 'mov' with: self regM withImm: imm
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadMwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
@@ -796,6 +831,23 @@ JITAssembler64 >> loadMwithRIPoffset: imm [
 		displacement: imm.
 
 	self assemble: 'lea' with: self regM with: pointer
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithTindex: index [
+	self assemble: 'mov' withReg: self regM withReg: self regT index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadNilWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadNilWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadNilWithMindex: index [
+	self assemble: 'mov' withReg: self regNil withReg: self regM index: index
 ]
 
 { #category : #loading }
@@ -1106,6 +1158,18 @@ JITAssembler64 >> loadSwithT [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadTrueWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadTrueWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadTrueWithMindex: index [
+	self assemble: 'mov' withReg: self regTrue withReg: self regM index: index
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadTwithA [
 	self assemble: 'mov' with: self regT with: self regA
 ]
@@ -1325,9 +1389,19 @@ JITAssembler64 >> popFP [
 	self assemble: 'pop' with: self regFP
 ]
 
+{ #category : #'push/pop' }
+JITAssembler64 >> popFalse [
+	self assemble: 'pop' with: self regFalse
+]
+
 { #category : #private }
 JITAssembler64 >> popG [
 	self assemble: 'pop' with: self regG
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> popNil [
+	self assemble: 'pop' with: self regNil
 ]
 
 { #category : #'push/pop' }
@@ -1354,6 +1428,11 @@ JITAssembler64 >> popSPindirect [
 { #category : #'push/pop' }
 JITAssembler64 >> popT [
 	self assemble: 'pop' with: self regT
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> popTrue [
+	self assemble: 'pop' with: self regTrue
 ]
 
 { #category : #'push/pop' }
@@ -1402,6 +1481,11 @@ JITAssembler64 >> pushFP [
 { #category : #'push/pop' }
 JITAssembler64 >> pushFPindex: index [
 	self assemble: 'push' withReg: self regFP index: index
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> pushFalse [
+	self assemble: 'push' with: self regFalse
 ]
 
 { #category : #private }
@@ -1524,6 +1608,11 @@ JITAssembler64 >> pushT [
 { #category : #'push/pop' }
 JITAssembler64 >> pushTindex: index [
 	self assemble: 'push' withReg: self regT index: index
+]
+
+{ #category : #'push/pop' }
+JITAssembler64 >> pushTrue [
+	self assemble: 'push' with: self regTrue
 ]
 
 { #category : #'push/pop' }
