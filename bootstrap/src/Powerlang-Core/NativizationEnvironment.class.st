@@ -2,7 +2,6 @@ Class {
 	#name : #NativizationEnvironment,
 	#superclass : #Object,
 	#instVars : [
-		'spec',
 		'optimizedMethods',
 		'invokedMethods',
 		'inlinedMethods',
@@ -59,19 +58,6 @@ NativizationEnvironment >> be64bits [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> compileSpecialMethodsWith: compiler [
-	| smethod |
-	inlinedMethods
-		withIndexDo: [ :method :i | 
-			smethod := compiler compile: method.
-			inlinedMethods at: i put: smethod ].
-	invokedMethods
-		withIndexDo: [ :method :i | 
-			smethod := compiler compile: method.
-			invokedMethods at: i put: smethod ]
-]
-
-{ #category : #initialization }
 NativizationEnvironment >> completeInitialization [
 	cachedNativizer := self newExpressionNativizer 
 ]
@@ -101,6 +87,11 @@ NativizationEnvironment >> invokedMethods [
 	^invokedMethods
 ]
 
+{ #category : #initialization }
+NativizationEnvironment >> invokedMethods: aCollection [
+	invokedMethods := aCollection asOrderedCollection 
+]
+
 { #category : #accessing }
 NativizationEnvironment >> messageLinker [
 	^ messageLinker
@@ -116,13 +107,28 @@ NativizationEnvironment >> methodNativizer [
 	^ cachedNativizer 
 ]
 
-{ #category : #initialization }
-NativizationEnvironment >> methodSubset: aDictionary [
-	| all species m |
-	all := aDictionary flatCollect: [ :assoc | 
-		species := spec at: assoc key.
-		assoc value collect: [:sel | m := species >> sel. self ASSERT: m notNil. m ] ].
-	^all asOrderedCollection
+{ #category : #services }
+NativizationEnvironment >> monomorphicCache [
+	| asm lookup next |
+	asm := TemplateAssembler64 on: #[] writeStream.
+	asm wordSize: abi wordSize.
+	lookup := asm newLabel.
+	asm
+		loadTwithAindex: 3;
+		loadSwithGlobal: #SmallIntegerBehavior.
+	next := asm labeledNonIntegerBitTestOfR.
+	asm
+		loadLongSwithRindex: 0;
+		@ next;
+		compareSwithTindex: 1;
+		shortJumpIfNotEqualTo: lookup;
+		loadMwithTindex: 2;
+		jumpToMindex: 1;
+		@ lookup;
+		loadMwithGlobal: #Lookup;
+		jumpToMindex: 1;
+		applyFixups.
+	^ asm nativeCode code
 ]
 
 { #category : #services }
@@ -167,77 +173,79 @@ NativizationEnvironment >> newExpressionNativizer [
 ]
 
 { #category : #initialization }
+NativizationEnvironment >> optimizedMethods: aCollection [
+	optimizedMethods := aCollection
+]
+
+{ #category : #initialization }
 NativizationEnvironment >> optimizingNativizer [
 	^OptimizingNativizer new environment: self
+]
+
+{ #category : #services }
+NativizationEnvironment >> polymorphicCache [
+	| asm smi case2 case3 case4 case5 case6 case7 lookup |
+	asm := TemplateAssembler64 on: #[] writeStream.
+	asm wordSize: abi wordSize.
+	smi := asm newLabel.
+	case2 := asm newLabel.
+	case3 := asm newLabel.
+	case4 := asm newLabel.
+	case5 := asm newLabel.
+	case6 := asm newLabel.
+	case7 := asm newLabel.
+	lookup := asm newLabel.
+	asm loadTwithAindex: 3.
+	smi := asm labeledNonIntegerBitTestOfR.
+	asm
+		loadLongSwithRindex: 0;
+		compareSwithTindex: 1;
+		shortJumpIfNotEqualTo: case2;
+		loadMwithTindex: 2;
+		jumpToMindex: 1;
+		@ case2;
+		compareSwithTindex: 3;
+		shortJumpIfNotEqualTo: case3;
+		loadMwithTindex: 4;
+		jumpToMindex: 1;
+		@ case3;
+		compareSwithTindex: 5;
+		shortJumpIfNotEqualTo: case4;
+		loadMwithTindex: 6;
+		jumpToMindex: 1;
+		@ case4;
+		compareSwithTindex: 7;
+		shortJumpIfNotEqualTo: case5;
+		loadMwithTindex: 8;
+		jumpToMindex: 1;
+		@ case5;
+		compareSwithTindex: 9;
+		shortJumpIfNotEqualTo: case6;
+		loadMwithTindex: 10;
+		jumpToMindex: 1;
+		@ case6;
+		compareSwithTindex: 11;
+		shortJumpIfNotEqualTo: case7;
+		loadMwithTindex: 12;
+		jumpToMindex: 1;
+		@ case7;
+		compareSwithTindex: 13;
+		shortJumpIfNotEqualTo: lookup;
+		loadMwithTindex: 14;
+		jumpToMindex: 1;
+		@ lookup;
+		loadMwithGlobal: #Lookup;
+		jumpToMindex: 1;
+		@ smi;
+		loadMwithTindex: 15;
+		jumpToMindex: 1;
+		applyFixups.
+	^ asm nativeCode code
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> safepointCheck: anObject [
 	safepointCheck := anObject 
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> setupInlinedMethods [
-	| map methods |
-	map := {(#ProtoObject
-		->
-			#(#objectAtValid: #objectAtValid:put: #behavior #class #primitiveAt: #_cachedLookup: #_cachedLookup:in:)).
-	(#Object
-		->
-			#(#byteAtValid: #byteAtValid:put: #basicObjectIndexOf: #at:put:)).
-	(#Species
-		->
-			#(#instSize #_instancesAreArrayed #_instancesHavePointers #memory #instanceBehavior #primitiveNew #primitiveNew:)).
-	(#CompiledMethod
-		->
-			#(#prepareForExecution #isNativized #nativeCode #blockCount #literalIndexFrom:)).
-	(#CompiledBlock -> #(#argumentCount #blockNumber #blockCode #method)).
-	(#NativeCode -> #(#code #isFresh)).
-	(#GCSpace -> #(#commitedLimit #nextFree #nextFree:)).
-	(#CharacterArray -> #(#characterAtValid:))}.
-	methods := self methodSubset: map.
-	inlinedMethods
-		addAll: self undermethods;
-		addAll: methods
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> setupInvokedMethods [
-	| map methods |
-	map := { 
-		#ProtoObject -> #( behavior class primitiveAt: #initializeExtended:contentSize: ).
-		#Object -> #( #_replaceFrom:to:with: ).
-		#Species -> #( #allocate:size: instanceBehavior _instancesAreArrayed
-			           _instancesHavePointers #nil:slotsOf: memory primitiveNewBytes:
-			           primitiveNewPointers: #zero:bytesOf: )}.
-	methods := self methodSubset: map.
-	invokedMethods
-		addAll: self undermethods;
-		addAll: methods
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> setupOptimizedMethods [
-	| map methods |
-	map := {
-			#ProtoObject -> #(behavior class primitiveAt: #primitiveAt:put: initializeExtended:contentSize:).
-			#Object -> #(at: #at:put: basicByteAt: #basicByteAt:put: byteAtValid:
-		    #byteAtValid:put: basicObjectAt: #basicObjectAt:put:
-		    #replaceBytesForwardFrom:to:with:startingAt:).
-			#SendSite -> #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn:
-		    #_dispatchDebuggableOn:startingAt: ).
-			#Species -> #( #allocate:size: primitiveNew primitiveNew: instSize primitiveNewBytes:
-		    primitiveNewPointers: ).
-			#'Float class' -> #( new ).
-			#CompiledBlock -> #( argumentCount arity blockCode method ).
-			#Closure -> #( value value: #value:value: ).
-			#CompiledMethod -> #( blockCount isNativized ).
-			#String -> #( at: #at:put: byteAt: #byteAt:put: ).
-			#GCSpace -> #( lockedAllocateIfPossible: lockedAllocateUnsafe: shallowCopy: ).
-			#Memory -> #( shallowCopy: ) 
-	}.
-	methods := self methodSubset: map.
-	optimizedMethods addAll: self undermethods; addAll: methods
 ]
 
 { #category : #initialization }
@@ -261,21 +269,7 @@ NativizationEnvironment >> shouldOptimize: method [
 	| selector classname |
 	selector := method selector.
 	classname := method classBinding name.
-	^ optimizedMethods anySatisfy: [:m | m selector = selector and: [ m parent name = classname ]  ]
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> spec: anRGEnvironment [
-	spec := anRGEnvironment.
-	self
-		setupOptimizedMethods;
-		setupInlinedMethods;
-		setupInvokedMethods
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> undermethods [
-	^(spec at: #ProtoObject) methods select: [:m | m category = 'header access'].	
+	^ optimizedMethods anySatisfy: [:m | m selector = selector and: [ m classBinding name = classname ]  ]
 ]
 
 { #category : #initialization }
