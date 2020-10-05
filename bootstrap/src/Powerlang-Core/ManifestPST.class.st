@@ -14,7 +14,7 @@ ManifestPST class >> ruleAssertEqualSignIntoAssertEqualsV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBBadMessageRuleV1FalsePositive [
-	^ #(#(#(#RGMethodDefinition #(#MethodEvaluator #dispatchUndermessage: #false)) #'2020-05-12T15:13:15.538824-03:00') )
+	^ #(#(#(#RGMethodDefinition #(#MethodEvaluator #dispatchUndermessage: #false)) #'2020-05-12T15:13:15.538824-03:00') #(#(#RGMethodDefinition #(#SmalltalkBootstrapper #transferLiteralDeep: #false)) #'2020-10-04T08:00:19.2385-03:00') )
 ]
 
 { #category : #'code-critics' }
@@ -33,8 +33,13 @@ ManifestPST class >> ruleRBEmptyExceptionHandlerRuleV1FalsePositive [
 ]
 
 { #category : #'code-critics' }
+ManifestPST class >> ruleRBEqualNilRuleV1FalsePositive [
+	^ #(#(#(#RGMethodDefinition #(#SmalltalkBootstrapper #transferLiteralDeep: #false)) #'2020-10-04T07:59:52.234713-03:00') )
+]
+
+{ #category : #'code-critics' }
 ManifestPST class >> ruleRBEqualsTrueRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#OptimizingCodeEmitter)) #'2020-07-04T00:11:03.866483-03:00') )
+	^ #(#(#(#RGClassDefinition #(#OptimizingCodeEmitter)) #'2020-07-04T00:11:03.866483-03:00') #(#(#RGMethodDefinition #(#SmalltalkBootstrapper #transferLiteralDeep: #false)) #'2020-10-04T08:00:00.17354-03:00') )
 ]
 
 { #category : #'code-critics' }
