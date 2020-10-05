@@ -58,6 +58,11 @@ SCompiledBlock >> environmentCount: anInteger [
 ]
 
 { #category : #constants }
+SCompiledBlock >> format [
+	^ format
+]
+
+{ #category : #constants }
 SCompiledBlock >> id [
 	^format bitsAt: Id
 ]

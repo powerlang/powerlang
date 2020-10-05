@@ -469,6 +469,15 @@ InlineMessageLinker >> assembleHigh32 [
 ]
 
 { #category : #'private - assemble' }
+InlineMessageLinker >> assembleHoldRefererIfNeeded [
+	#_holdRefererIfNeeded:.
+	assembler pushA;
+	loadMwithGlobal: #WriteBarrier;
+		callIndirectM;
+		discardArguments: 1
+]
+
+{ #category : #'private - assemble' }
 InlineMessageLinker >> assembleIntegerMultiplyByInto [
 	#_integerMultiplyBy:into:.
 	assembler

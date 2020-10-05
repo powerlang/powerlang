@@ -210,7 +210,9 @@ SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 	literal := self methodLiteralAt: anInteger.
 	assembler
 		loadAwithLiteral: literal;
-		storeRinAindex: 2
+		storeRinAindex: 2;
+		pushA.
+	self emitWriteBarrier 
 ]
 
 { #category : #services }
@@ -247,33 +249,26 @@ SExpressionNativizer >> emitBlockPrologue: anSBlock [
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackEpilogue [
-	assembler
-		restoreCallerFrame;
-		popA;
-		popA;
-		popB;
-		popE;
-		popS;
-		popFP;
-		returnFromCallback: method callbackArgumentCount
+	assembler restoreCallerFrame.
+	environment abi
+		restoreContextUsing: assembler popping: method argumentCount
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackPrologue [
-	assembler saveCallerFrame.
-	assembler wordSize = 8
-		ifTrue: [ assembler storeArgumentsInStack ].
+	environment abi saveContextUsing: assembler.
 	assembler
-		pushS;
-		pushE;
-		pushB;
-		loadRwithArgPointer;
-		convertRtoSmallInteger;
-		pushR;
 		pushSmallInteger: 0;
 		xorFPwithFP;
+		loadMwithImmediate: assembler dummyPointer;
+		addLiteral: assembler lastEmittedPointer;
+		loadGwithLiteral: environment globals;
+		loadNilWithLiteral: nil;
+		loadTrueWithLiteral: true;
+		loadFalseWithLiteral: false;
 		loadEwithNil;
-		loadRwithM
+		loadRwithMindex: (NativeCode indexOfSlot: 'compiledCode');
+		loadRwithRindex: (SCallbackMethod indexOfSlot: 'receiver')
 ]
 
 { #category : #services }
@@ -362,6 +357,14 @@ SExpressionNativizer >> emitSend: selector [
 		ifFalse: [ linker emitSend: selector using: assembler ]
 ]
 
+{ #category : #services }
+SExpressionNativizer >> emitWriteBarrier [
+	assembler
+		loadMwithGlobal: #WriteBarrier;
+		callIndirectM;
+		discardArguments: 1
+]
+
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
@@ -418,7 +421,8 @@ SExpressionNativizer >> instanceVarAt: index [
 
 { #category : #services }
 SExpressionNativizer >> instanceVarAt: index put: value [
-	assembler storeRinSindex: index
+	assembler storeRinSindex: index; pushS.
+	self emitWriteBarrier
 ]
 
 { #category : #services }
@@ -703,7 +707,7 @@ SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
 				loadTwithEindex: envIndex;
 				storeRinTindex: index;
 				pushT ].
-	self emitSend: #holdRefererIfNeeded:
+	self emitWriteBarrier
 ]
 
 { #category : #services }

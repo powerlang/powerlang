@@ -71,6 +71,11 @@ BootstrapClass >> localPools [
 ]
 
 { #category : #accessing }
+BootstrapClass >> map [
+	^map
+]
+
+{ #category : #accessing }
 BootstrapClass >> map: anObjectMap [
 	map := anObjectMap
 ]
