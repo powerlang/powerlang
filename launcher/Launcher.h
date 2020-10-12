@@ -22,7 +22,8 @@ public:
 
 protected:
 
-    Object* launch(Kernel* kernel, SmallInteger* argc, SmallInteger* argv);
+    int launch(ImageSegment *kernel, const int argc, const char **argv);
 };
 
 #endif /* LAUNCHER_LAUNCHER_H_ */
+

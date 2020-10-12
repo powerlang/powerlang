@@ -65,4 +65,4 @@ struct Object
 
 };
 
-#endif /* _HEAPOBJECT_H_ */
+#endif /* _OBJECT_H_ */
