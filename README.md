@@ -46,3 +46,20 @@ cd bootstrap
 
 You will find everything in Powerlang-* packages
 
+You will need to build a launcher when you have an image segment file ready *(to-do:  document how)*.
+For building the launcher, do this:
+
+```
+cd launcher
+cmake . -B build
+cd build && make
+```
+
+There you will find `bee-dmr` executable, just use it:
+
+```
+./bee-dmr kernel.ims
+```
+
+
+
