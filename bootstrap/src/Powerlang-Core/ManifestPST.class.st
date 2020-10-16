@@ -99,5 +99,5 @@ ManifestPST class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
 
 { #category : #'code-critics' }
 ManifestPST class >> ruleRBUsesAddRuleV1FalsePositive [
-	^ #(#(#(#RGClassDefinition #(#SmalltalkBootstrapper)) #'2020-02-26T01:42:53.799604-03:00') )
+	^ #(#(#(#RGClassDefinition #(#SmalltalkBootstrapper)) #'2020-02-26T01:42:53.799604-03:00') #(#(#RGMethodDefinition #(#NativizationEnvironment #initialize #false)) #'2020-10-15T21:52:21.669111-03:00') )
 ]

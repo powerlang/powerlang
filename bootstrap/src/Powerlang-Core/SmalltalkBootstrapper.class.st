@@ -277,15 +277,21 @@ SmalltalkBootstrapper >> createMethodDictionary: species sized: anInteger [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> createModule [
-	| entrypoint transferred |
+	| runtime smethod transferred exports |
 	module := self new: #Kernel.
-	entrypoint := methods at: self => #Kernel >> #entry:argv:.
-	transferred := identityMap at: entrypoint.
+	runtime := {(self => #Kernel >> #entry:argv:)}
+		collect: [ :def | 
+			smethod := methods at: def.
+			transferred := identityMap at: smethod.
+			transferred nativeCode machineCode ].
+	exports := self newArray: classes values.
 	module
-		classes: (self newArray: classes values);
+		name: (self newString: 'Kernel');
+		version: (self newString: '0.1.0');
+		exports: exports;
+		hash: nilObj;
 		loadAction: self createLoadAction;
-		entrypointReceiver: module;
-		entrypointCode: transferred nativeCode
+		runtime: (self newArray: runtime)
 ]
 
 { #category : #initialization }
@@ -464,7 +470,7 @@ SmalltalkBootstrapper >> initializeInlineCaches [
 	self
 		emulateSend: class
 			selector: #initializeCachesWith:
-			with: {transferred nativeCode compiledCode};
+			with: {transferred machineCode};
 		emulateSend: class selector: #monomorphicCache: with:  {mic};
 		emulateSend: class selector: #polymorphicCache: with: {pic}
 ]
@@ -506,6 +512,39 @@ SmalltalkBootstrapper >> initializeMetaclass: definition [
 		organization: nilObj.
 	cvars := cvarMap at: definition.
 	emulator wrap: meta using: metadef cvars: cvars
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> initializeNativizer [
+	nativizer := NativizationEnvironment new.
+	self
+		initializeNativizerGlobals;
+		initializeInlinedMethods;
+		initializeInvokedMethods;
+		initializeOptimizedMethods;
+		nativizeInvoke;
+		nativizeWriteBarrier;
+		nativizeLookup;
+		setupMessageLinkers
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> initializeNativizerGlobals [
+	| smi items |
+	smi := self classNamed: #SmallInteger.
+	nativizer globalNamed: #SmallIntegerBehavior put: smi behavior.
+	items := {(#Lookup -> (NativeCode new code: 'Lookup Placeholder')).
+	(#LookupSuper -> (NativeCode new code: 'LookupSuper Placeholder')).
+	(#DebuggableLookup
+		-> (NativeCode new code: 'DebuggableLookup placeholder')).
+	(#DebuggableLookupSuper
+		-> (NativeCode new code: 'DebuggableLookupSuper placeholder')).
+	(#Invoke -> (NativeCode new code: 'Invoke placeholder')).
+	(#Safepoint -> (NativeCode new code: 'SafepointCheck placeholder')).
+	(#WriteBarrier -> (NativeCode new code: 'Write Barrier placeholder'))} asDictionary.
+	items
+		keysAndValuesDo:
+			[ :key :placeholder | nativizer globalNamed: key put: placeholder ]
 ]
 
 { #category : #initialization }
@@ -611,6 +650,17 @@ SmalltalkBootstrapper >> log: aString [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> mapNativizerGlobal: name to: transferred [
+	| placeholder |
+	placeholder := nativizer globalNamed: name.
+	identityMap
+		at: placeholder put: transferred;
+		at: placeholder code put: transferred machineCode.
+		
+	globals at: name put: transferred.
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> methodSubset: aDictionary [
 	| all species m |
 	all := aDictionary
@@ -631,43 +681,21 @@ SmalltalkBootstrapper >> nameOf: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativize [
-	| sends dispatch |
-	self
-		initializeInlinedMethods;
-		initializeInvokedMethods;
-		initializeOptimizedMethods.
-	sends := self nativizeWriteBarrier.
-	self
-		nativizeInvoke;
-		nativizeLookup;
-		setupMessageLinkers.
-	sends
-		do: [ :send | 
-			dispatch := send isSuperSend
-				ifTrue: [ lookupSuper ]
-				ifFalse: [ lookup ].
-			send instructions: dispatch nativeCode code ].
-	self
+	self initializeNativizer;
 		initializeInlineCaches;
 		nativizeRemainingMethods
 ]
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeInvoke [
-	| proto transferred |
-	invoke := emulator compile: self => #SendSite >> #_invokeOn:.
-	OptimizingNativizer new
-		environment: nativizer;
-		method: invoke;
-		nativize.
-	proto := self classNamed: #ProtoObject.
-	transferred := self transferMethod: invoke in: proto.
-	identityMap at: invoke put: transferred
+	invoke := self compile: self => #SendSite >> #_invokeOn:.
+	nativizer nativizeOptimizing: invoke.
+	self transfer: invoke in: #ProtoObject asNativizerGlobal: #Invoke
 ]
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeLookup [
-	| n transferred species |
+	| n transferred species  |
 	n := LookupNativizer new
 		bootstrapper: self;
 		nativizeMethods.
@@ -681,10 +709,10 @@ SmalltalkBootstrapper >> nativizeLookup [
 		do: [ :m | 
 			transferred := identityMap at: m.
 			self transferNativeCode: m nativeCode of: transferred ].
-	transferred := identityMap at: lookup.
-	globals at: #Lookup put: transferred.
-	transferred := identityMap at: lookupSuper.
-	globals at: #LookupSuper put: transferred
+	transferred := (identityMap at: lookup) nativeCode.
+	self mapNativizerGlobal: #Lookup to: transferred.
+	transferred := (identityMap at: lookupSuper) nativeCode.
+	self mapNativizerGlobal: #LookupSuper to: transferred
 ]
 
 { #category : #initialization }
@@ -709,7 +737,7 @@ SmalltalkBootstrapper >> nativizeRemainingMethodsIn: species [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeWriteBarrier [
-	| inlined lazy map env |
+	| map inlined dispatcher |
 	map := {('Memory class' -> #(current)).
 	(#Memory -> #(isYoung: isYoungSafe: remember:)).
 	(#CriticalArray -> #(unsafeAdd: #unsafeAt:put:)).
@@ -719,16 +747,15 @@ SmalltalkBootstrapper >> nativizeWriteBarrier [
 	inlined := inlined collect: [ :m | self compile: m ].
 	writeBarrier := emulator
 		compile: self => #ProtoObject >> #holdRefererIfNeeded:.
-	lazy := LazyLinker new.
-	env := nativizer copy
+	dispatcher := LookupLinker new initializeFrom: nativizer.
+	nativizer copy
 		inlinedMethods: inlined;
-		messageLinker: lazy.
-	OptimizingNativizer new
-		environment: env;
-		method: writeBarrier;
-		nativize.
-	nativizer writeBarrier: writeBarrier.
-	^ lazy sends
+		messageLinker: dispatcher;
+		nativizeOptimizing: writeBarrier.
+	self
+		transfer: writeBarrier
+		in: #ProtoObject
+		asNativizerGlobal: #WriteBarrier
 ]
 
 { #category : #initialization }
@@ -968,12 +995,15 @@ SmalltalkBootstrapper >> optimizedMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> setupMessageLinkers [
-	| inl inv look composite |
-	inl := InlineMessageLinker new.
-	inv := InvokeLinker new methods: nativizer invokedMethods.
-	look := LookupLinker new lookup: lookup; lookupSuper: lookupSuper.
-	composite := CompositeMessageLinker new add: inl; add: inv; add: look; yourself.
-	nativizer messageLinker: composite
+	| invoker dispatcher |
+	invoker := InvokeLinker new
+		invoker: nativizer invokeStub;
+		addMethods: nativizer invokedMethods.
+	dispatcher := LookupLinker new initializeFrom: nativizer.
+	nativizer
+		addLinker: invoker;
+		addLinker: dispatcher;
+		completeInitialization
 ]
 
 { #category : #initialization }
@@ -983,10 +1013,10 @@ SmalltalkBootstrapper >> spec [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> spec: anRGEnvironment [
+
 	environment := anRGEnvironment.
 	emulator spec: anRGEnvironment.
-	nativizer := NativizationEnvironment new.
-	nativizer completeInitialization
+
 ]
 
 { #category : #initialization }
@@ -1004,6 +1034,17 @@ SmalltalkBootstrapper >> testMethodAstcodes [
 	"m instVar1 := true
 	#(MethodId #(AssignmentId #(IdentifierId InstVarId 1) #(IdentifierId TrueId)))"
 	^#(1 #(8 #(3 8 1) #(3 2)))
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transfer: anSMethod in: classname asNativizerGlobal: name [
+	| species transferred |
+	species := self classNamed: classname.
+	transferred := self transferMethod: anSMethod in: species.
+	transferred := self
+		transferNativeCode: anSMethod nativeCode
+		of: transferred.
+	self mapNativizerGlobal: name to: transferred
 ]
 
 { #category : #initialization }
@@ -1072,6 +1113,7 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ falseObj ].
 	anObject == true
 		ifTrue: [ ^ trueObj ].
+	identityMap at: anObject ifPresent: [ :existing | ^existing].
 	(class inheritsFrom: Symbol)
 		ifTrue: [ ^ self newSymbol: anObject ].
 	(class inheritsFrom: String)
@@ -1084,8 +1126,6 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ anObject ].
 	class == SCompiledBlock
 		ifTrue: [ ^ self transferBlock: anObject ].
-	class == SCompiledMethod
-		ifTrue: [ ^ identityMap at: anObject ].
 	size := class isVariable
 		ifTrue: [ anObject size ]
 		ifFalse: [ 0 ].

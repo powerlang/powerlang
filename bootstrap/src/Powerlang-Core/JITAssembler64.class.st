@@ -993,6 +993,11 @@ JITAssembler64 >> loadRwithS [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadRwithSP [
+	self assemble: 'mov' with: self regR with: self regSP
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadRwithSPindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regSP index: index
 ]
@@ -1400,6 +1405,11 @@ JITAssembler64 >> popG [
 ]
 
 { #category : #'push/pop' }
+JITAssembler64 >> popM [
+	self assemble: 'pop' with: self regM
+]
+
+{ #category : #'push/pop' }
 JITAssembler64 >> popNil [
 	self assemble: 'pop' with: self regNil
 ]
@@ -1733,7 +1743,8 @@ JITAssembler64 >> restoreCallerFrame [
 JITAssembler64 >> restoreCallerM [
 	| index |
 	index := SCompiledMethod indexOfSlot: 'nativeCode'.
-	self loadMwithFPindex: -1; loadMwithMindex: index
+	self
+		loadMwithFPindex: -1
 ]
 
 { #category : #epilogue }

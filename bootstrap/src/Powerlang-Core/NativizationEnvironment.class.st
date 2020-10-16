@@ -6,6 +6,7 @@ Class {
 		'invokedMethods',
 		'inlinedMethods',
 		'messageLinker',
+		'globals',
 		'writeBarrier',
 		'abi',
 		'safepointCheck',
@@ -27,7 +28,7 @@ NativizationEnvironment class >> forTesting: anRGEnvironment [
 
 { #category : #accessing }
 NativizationEnvironment class >> globalNames [
-	^#(Lookup LookupSuper WriteBarrier Safepoint SmallIntegerBehavior LookupDebuggable LookupSuperDebuggable)
+	^ #(Lookup LookupSuper WriteBarrier Safepoint SmallIntegerBehavior Invoke DebuggableLookup DebuggableLookupSuper)
 ]
 
 { #category : #accessing }
@@ -48,13 +49,13 @@ NativizationEnvironment >> abi: anAbi [
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> be32bits [
-	abi := X86ABI new 
+NativizationEnvironment >> addLinker: aLinker [
+	messageLinker add: aLinker
 ]
 
 { #category : #initialization }
-NativizationEnvironment >> be64bits [
-	abi := X64ABI new 
+NativizationEnvironment >> be32bits [
+	abi := X86ABI new 
 ]
 
 { #category : #initialization }
@@ -63,13 +64,40 @@ NativizationEnvironment >> completeInitialization [
 ]
 
 { #category : #initialization }
+NativizationEnvironment >> globalNamed: aSymbol [
+	| index |
+	index := self class indexOfGlobal: aSymbol.
+	^globals at: index
+]
+
+{ #category : #initialization }
+NativizationEnvironment >> globalNamed: aSymbol put: anObject [
+	| index |
+	index := self class indexOfGlobal: aSymbol.
+	globals at: index put: anObject
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> globals [
+	^globals
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> globals: anArray [
+	globals := anArray
+]
+
+{ #category : #initialization }
 NativizationEnvironment >> initialize [
 	busy := false.
-	abi := ABI forIntel: 8.
-	messageLinker := HaltingSend new.
+	abi := ABI forCurrent.
 	optimizedMethods := OrderedCollection new.
 	invokedMethods := OrderedCollection new.
-	inlinedMethods := OrderedCollection new
+	inlinedMethods := OrderedCollection new.
+	messageLinker := CompositeMessageLinker new
+		add: InlineMessageLinker new.
+	globals := Array new: self class globalNames size.
+
 ]
 
 { #category : #initialization }
@@ -82,6 +110,13 @@ NativizationEnvironment >> inlinedMethods: aCollection [
 	inlinedMethods := aCollection
 ]
 
+{ #category : #accessing }
+NativizationEnvironment >> invokeStub [
+	| index |
+	index := self class indexOfGlobal: #Invoke.
+	^(globals at: index) code
+]
+
 { #category : #initialization }
 NativizationEnvironment >> invokedMethods [
 	^invokedMethods
@@ -90,6 +125,48 @@ NativizationEnvironment >> invokedMethods [
 { #category : #initialization }
 NativizationEnvironment >> invokedMethods: aCollection [
 	invokedMethods := aCollection asOrderedCollection 
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookup [
+	| index |
+	index := self class indexOfGlobal: #Lookup.
+	^globals at: index
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookupDebuggableStub [
+	| index |
+	index := self class indexOfGlobal: #DebuggableLookup.
+	^(globals at: index) code
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookupStub [
+	| index |
+	index := self class indexOfGlobal: #Lookup.
+	^(globals at: index) code
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookupSuper [
+	| index |
+	index := self class indexOfGlobal: #LookupSuper.
+	^ globals at: index
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookupSuperDebuggableStub [
+	| index |
+	index := self class indexOfGlobal: #DebuggableLookupSuper.
+	^(globals at: index) code
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> lookupSuperStub [
+	| index |
+	index := self class indexOfGlobal: #LookupSuper.
+	^(globals at: index) code
 ]
 
 { #category : #accessing }
@@ -241,6 +318,13 @@ NativizationEnvironment >> polymorphicCache [
 		jumpToMindex: 1;
 		applyFixups.
 	^ asm nativeCode code
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> safepoint [
+	| index |
+	index := self class indexOfGlobal: #Safepoint.
+	^(globals at: index) code
 ]
 
 { #category : #initialization }
