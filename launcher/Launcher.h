@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include "ImageSegment.h"
-#include "Kernel.h"
 
 class Launcher
 {
