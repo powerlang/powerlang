@@ -28,6 +28,7 @@ SMethodNode >> buildMethod [
 		selector: self selector;
 		source: compiler sourceCode;
 		classBinding: scope classBinding.
+	cm pragma: pragma.
 	cm blocks do: [ :block | block method: cm ].
 	encoder := AstcodeEncoder new method: cm.
 	astcodes := self acceptVisitor: encoder.
@@ -100,7 +101,13 @@ SMethodNode >> literals [
 
 { #category : #parsing }
 SMethodNode >> methodClass [
-	^SCompiledMethod
+	| type |
+	type := pragma type.
+	type = #callback
+		ifTrue: [ ^ SCallbackMethod ].
+	type = #callout
+		ifTrue: [ ^ SCalloutMethod ].
+	^ SCompiledMethod
 ]
 
 { #category : #testing }

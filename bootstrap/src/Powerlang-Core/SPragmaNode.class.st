@@ -17,6 +17,25 @@ SPragmaNode >> acceptVisitor: aVisitor [
 ]
 
 { #category : #'as yet unclassified' }
+SPragmaNode >> ffi: cc name: aString with: anFFIDescriptor [
+	type := cc.
+	name := aString.
+	info := anFFIDescriptor
+]
+
+{ #category : #'as yet unclassified' }
+SPragmaNode >> ffi: aString with: anFFIDescriptor [
+	type := #ffi.
+	name := aString.
+	info := anFFIDescriptor
+]
+
+{ #category : #'as yet unclassified' }
+SPragmaNode >> info [
+	^info
+]
+
+{ #category : #'as yet unclassified' }
 SPragmaNode >> isUsed [
 	^type notNil
 ]
@@ -31,4 +50,9 @@ SPragmaNode >> primitive: anInteger name: aString [
 	type := #primitive.
 	name := aString.
 	info := anInteger
+]
+
+{ #category : #'as yet unclassified' }
+SPragmaNode >> type [
+	^type
 ]

@@ -343,6 +343,42 @@ SSmalltalkParser >> expression [
 ]
 
 { #category : #private }
+SSmalltalkParser >> ffiArguments [
+	| args type |
+	args := OrderedCollection new.
+	self step.
+	token value != $(
+		ifTrue: [ self error: 'expected "("' ].
+	self peek value = $)
+		ifTrue: [ self step.
+			^ args ].
+	[ type := self ffiType.
+	args add: type.
+	self step.
+	token value = #, ] whileTrue.
+	token value != $)
+		ifTrue: [ self error: 'expected ")"' ].
+	^ args
+]
+
+{ #category : #private }
+SSmalltalkParser >> ffiCall: aBoolean method: aMethodNode [
+	| cc return name args descriptor |
+	cc := token value.
+	return := self ffiType.
+	aBoolean
+		ifTrue: [ self step.
+			name := token value ifNil: [ self error: 'invalid function name' ] ].
+	args := self ffiArguments.
+	args size = aMethodNode selector arity
+		ifFalse:
+			[ ^ self error: 'method arity does not match with function arguments' ].
+	self step.
+	descriptor := SFFIDescriptor ret: return args: args cc: cc.
+	^ compiler pragmaNode ffi: cc name: name with: descriptor
+]
+
+{ #category : #private }
 SSmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	| tag |
 	tag := token value asLowercase.
@@ -350,7 +386,21 @@ SSmalltalkParser >> ffiOrPrimitive: aMethodNode [
 	tag := tag allButLast.
 	token value: tag.
 	tag = 'primitive' ifTrue: [^self primitive].
+	tag = 'callback' ifTrue: [ ^self ffiCall: false method: aMethodNode ].
+	tag = 'callout' ifTrue: [ ^self ffiCall: true method: aMethodNode ].	
 	self invalidPragma
+]
+
+{ #category : #private }
+SSmalltalkParser >> ffiType [
+	| type |
+	self step.
+	token isNameToken ifFalse: [self error: 'expected type name'].
+	type := token value.
+	type = 'struct' ifFalse: [ ^type].
+	self step.
+	token isNameToken ifFalse: [self error: 'expected type name'].	
+	^token value
 ]
 
 { #category : #binary }

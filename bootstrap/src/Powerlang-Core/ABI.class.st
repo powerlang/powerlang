@@ -12,10 +12,17 @@ Class {
 }
 
 { #category : #unclassified }
-ABI class >> forIntel: wordSize [
-	| class |
-	class := wordSize = 4 ifTrue: [X86ABI] ifFalse: [X64ABI].
-	^class new
+ABI class >> currentClass [
+	| platform |
+	platform := OSPlatform current.
+	platform isWin64 ifTrue: [ ^WinX64ABI ].
+	platform isUnix64 ifTrue: [ ^SysVX64ABI ].
+	self ASSERT: false.
+]
+
+{ #category : #unclassified }
+ABI class >> forCurrent [
+	^self currentClass new
 ]
 
 { #category : #unclassified }

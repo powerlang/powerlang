@@ -167,13 +167,13 @@ SCompiledMethod >> isCallback [
 ]
 
 { #category : #constants }
-SCompiledMethod >> isDebuggable [
-	^ format anyMask: Debuggable
+SCompiledMethod >> isCalloutMethod [
+	^ false
 ]
 
 { #category : #constants }
-SCompiledMethod >> isFFIMethod [
-	^ false
+SCompiledMethod >> isDebuggable [
+	^ format anyMask: Debuggable
 ]
 
 { #category : #constants }
@@ -194,6 +194,11 @@ SCompiledMethod >> nativeCode [
 { #category : #accessing }
 SCompiledMethod >> nativeCode: aNativeCode [ 
 	nativeCode := aNativeCode 
+]
+
+{ #category : #constants }
+SCompiledMethod >> pragma: aPragmaNode [
+
 ]
 
 { #category : #printing }
