@@ -17,8 +17,7 @@ HeapObject::slot(uint32_t index)
     ASSERT(!this->isBytes());
     ASSERT(/*index >= 0 &&*/ index <= this->size());
 
-    Object* slot = (Object*)this + index;
-    return slot;
+    return ((Object**)this)[index];
 }
 
 uint8_t
