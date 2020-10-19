@@ -17,18 +17,19 @@ for documentation and [our blog](https://powerlang.github.io) for the latest new
 [![Actions Status](https://github.com/powerlang/powerlang/workflows/CI/badge.svg)](https://github.com/powerlang/powerlang/actions)
 [![Documentation Status](https://readthedocs.org/projects/powerlang/badge/?version=latest)](https://powerlang.readthedocs.io/en/latest/?badge=latest)
 
-# Quick setup
+# Building
+
+**Note**: *following is tested on Linux, for Windows, please refer to section
+"Building launcher for Windows" at the end.*
 
 After cloning the repo, run make to create a pharo bootstrap image. This image
-will contain all the tools you need to generate your new language. 
+will contain all the tools you need to generate your new language.
 
 ```
 git clone git@github.com:powerlang/powerlang.git
-cd powerlang
-make -C bootstrap
 ```
 
-Additionaly, you will need the sources of your language, that have to be placed
+Also you will need the sources of your language, that have to be placed
 in `bootstrap/specs/<your lang>`. Lets say you want to bootstrap Bee Smalltalk:
 
 ```
@@ -36,30 +37,38 @@ git clone git@github.com:powerlang/bee-dmr.git bootstrap/specs/bee-dmr
 echo "bee-dmr" >bootstrap/specs/current
 ```
 
-You are ready, you can start working with your language now. To open the
-development environment just do:
+Now, just do `make`:
+
+```
+make
+```
+
+This compiles launcher executable (`bee-dmr`) and kernel image (`bee-dmr.bsl`) in
+`build/<arch>-<os>` (so if you're running Linux on x86_64, it's `build/x86_64-linux`).
+
+# Running
+
+Assuming you have built everything as descibed above, you may run it by:
+
+```
+cd build/x86_64-linux # or other <arch>-<os> directory
+./bee-dmr bee-dmr.bsd
+```
+
+Not that it can do much at the moment, which bring us to:
+
+# Development
+
+To open Powerlang Pharo development image:
 
 ```
 cd bootstrap
 ./pharo-ui bootstrap.image
 ```
 
-You will find everything in Powerlang-* packages
+All Powerlang code is in packages named `Powerlang-*`. Have fun!
 
-# Launching
-
-First you have to build the image launcher. For that make sure you have a working
-C++ compiler and CMake. Everything shall be prepared to allow for either compiling
-for the current platform or for cross-compiling to others.
-
-For linux from linux do:
-
-```
-cd launcher
-cmake -B build
-cd build
-make
-```
+# Building launcher for Windows
 
 For windows from linux (using mingw64) do:
 

@@ -24,13 +24,20 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-      
+
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
-    
-    # Runs a single command using the runners shell
-    - name: Run tests in bootstrap image
-      run: make -C bootstrap bee-dmr test
+
+    - name: Compile
+      if: matrix.os == 'ubuntu-latest'
+      run: make
+
+    - name: Compile - bootstrap only
+      if: matrix.os != 'ubuntu-latest'
+      run: make -C bootstrap
+
+    - name: Run tests
+      run: make test
 
     - name: XUnit Viewer
       if: matrix.os == 'ubuntu-latest'
