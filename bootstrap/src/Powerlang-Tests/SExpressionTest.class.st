@@ -103,11 +103,15 @@ SExpressionTest >> libraryPath [
 
 { #category : #private }
 SExpressionTest >> nativize: aSymbol [
-	| method smethod |
+	| method smethod environment linker |
 	method := self class >> aSymbol.
 	smethod := SCompiler compile: method sourceCode in: self class.
-	^ NativizationEnvironment new newExpressionNativizer 
-		  nativize: smethod
+	environment := NativizationEnvironment new.
+	environment globalNamed: #Lookup put: (NativeCode new);
+	globalNamed: #LookupSuper put: (NativeCode new).
+	linker := LookupLinker new initializeFrom: environment.
+	environment addLinker: linker.
+	^ environment newExpressionNativizer nativize: smethod
 ]
 
 { #category : #support }
