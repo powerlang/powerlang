@@ -84,3 +84,10 @@ cd build
 make
 ```
 
+There you will find `bee-dmr` executable, just use it:
+
+```
+./bee-dmr /tmp/kernel.ims
+```
+
+
