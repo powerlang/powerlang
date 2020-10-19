@@ -12,7 +12,7 @@ Class {
 
 { #category : #accessing }
 BootstrapTest class >> defaultTimeLimit [
-	^ 30 seconds
+	^ 60 seconds
 ]
 
 { #category : #running }
