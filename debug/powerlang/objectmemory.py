@@ -12,6 +12,7 @@ model image objects (i.e., Smalltalk objects)
 
 import gdb
 
+from powerlang.symbols import SymbolTable
 
 def align(value, alignment):
     return ((int(value) + (alignment - 1)) & ~(alignment - 1))
@@ -354,6 +355,26 @@ class ImageSegment(object):
         lo = int(self._ptr) + self._ptr['header'].type.sizeof + Types.small_header_t.sizeof
         hi = lo + self._ptr['header']['size'] - self._ptr['header'].type.sizeof
         return ObjectIterator(lo, hi)
+
+    @property
+    def symtab(self):
+        if hasattr(self, '_symtab'):
+            self._symtab = SymbolTable(self)
+        return self._symtab
+
+    def find_instances_of(self, oopish_or_classname):
+        """
+        Return an iterator over all instances of given class.
+        """
+        clazz = None
+        if isinstance(oopish_or_classname, str):
+            clazz = self.find_class(oopish_or_classname)
+            if clazz == None:
+                return []
+        else:
+            clazz = obj(oopish_or_classname)
+
+        return (obj for obj in iter(self) if obj.clazz == clazz)
 
     def find_class(self, name):
         for obj in iter(self):
