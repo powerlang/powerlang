@@ -272,6 +272,16 @@ class Object(__ObjectABC):
         offset = index - 1
         return int((self._oop + offset).cast(Types.char.pointer()).dereference())
 
+    def __getattr__(self, name):
+        if name[0] == '_':
+            return super().__getattr__(name)
+        else:
+            names = self.slotNames();
+            if name in names:
+                return self.slotAt(names.index(name) + 1)
+            else:
+                raise AttributeError("Instance of class %s has no slot named '%s'" % ( self.clazzName() , name ))
+
     def chars(self):
         assert self.isBytes()
         char = self._oop.cast(Types.char.pointer())
