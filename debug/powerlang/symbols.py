@@ -20,7 +20,7 @@ class MethodSymbol(object):
 	@property
 	def name(self):
 		clazz = getattr(self.method, 'class')
-		clazzName = clazz.slotAt(6).chars() if clazz.size() > 6 else clazz.slotAt(6).slotAt(6).chars()
+		clazzName = clazz.slotAt(6).chars() if clazz.size() > 6 else clazz.slotAt(6).slotAt(6).chars() + ' class'
 
 		selector = self.method.selector.chars()
 		return '%s >> #%s' % ( clazzName , selector)

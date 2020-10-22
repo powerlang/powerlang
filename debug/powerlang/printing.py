@@ -22,7 +22,7 @@ def PRIxPTR(value):
 
 def _ObjectPrintString(obj):
     if obj.isSmallInteger(): 
-        return (FMTxPTR + " ( SmallInteger: %d " + FMTxPTR + ")") % (obj._oop, int(obj), int(obj))
+        return (FMTxPTR + " ( SmallInteger, %d " + FMTxPTR + ")") % (obj._oop, int(obj), int(obj))
     elif obj.isNil():
         return (FMTxPTR + " ( nil )") % (obj._oop)
     else:
@@ -45,21 +45,31 @@ def _ObjectPrintString(obj):
             return "%s ( %s class )" % ( PRIxPTR(obj) , obj.slotAt(6).slotAt(6).chars())
         elif clazzName == 'Symbol':
             return "%s ( #%s )" % ( PRIxPTR(obj) , obj.chars())
-        elif clazzName == 'String':
-            chars = obj.chars()
-            if len(chars) > 10:
-                chars = '"' + chars[:8] + '...'
+        
+        detail = None
+        if clazzName == 'String':
+            detail = obj.chars()
+            if len(detail) > 10:
+                detail = '"' + detail[:8] + '...'
             else:
-                chars = '"' + chars + '"'
-            return "%s ( String: %s )" % ( PRIxPTR(obj) , chars)
+                detail = '"' + detail + '"'            
+        elif clazzName == 'CompiledMethod':
+            mclazz = getattr(obj, 'class')
+            mclazz = mclazz.slotAt(6).chars() if mclazz.size() > 6 else mclazz.slotAt(6).slotAt(6).chars() + ' class'
+            selector = obj.selector.chars()
+            codeAddr = int(obj.nativeCode.machineCode)
+            codeSize = obj.nativeCode.machineCode.size()
+            detail = "%s >> #%s code %s size %d" % ( mclazz , selector, PRIxPTR(codeAddr), codeSize)
         elif obj.isArrayed():
             if obj.isBytes():
+                details = str(obj.size()) + ' bytes'
+            else:        
+                details = str(obj.size()) + ' slots'
 
-                return "%s ( a %s, %d bytes )" % ( PRIxPTR(obj) , clazzName, obj.size())
-            else:
-                return "%s ( a %s, %d slots )" % ( PRIxPTR(obj) , clazzName, obj.size())
-        else:
+        if detail == None:            
             return "%s ( a %s )" % ( PRIxPTR(obj) , clazzName )
+        else:
+            return "%s ( a %s, %s )" % ( PRIxPTR(obj) , clazzName, detail )
 
 def _ObjectChildren(obj):
     """
