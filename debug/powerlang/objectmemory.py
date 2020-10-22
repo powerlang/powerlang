@@ -358,7 +358,7 @@ class ImageSegment(object):
 
     @property
     def symtab(self):
-        if hasattr(self, '_symtab'):
+        if not hasattr(self, '_symtab'):
             self._symtab = SymbolTable(self)
         return self._symtab
 
@@ -384,3 +384,15 @@ class ImageSegment(object):
             except:
                 pass
         return None
+
+
+# A list of all known segments. The main module should intercept
+# segment loading (especially loading kernel segment) and register
+# it here.
+segments = []
+
+# Flush known segments when inferior exits:
+def __on_exit(event):
+    segments = []
+
+gdb.events.exited.connect(__on_exit)

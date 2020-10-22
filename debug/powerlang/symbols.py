@@ -5,25 +5,24 @@
 #
 # SPDX-License-Identifier: MIT
 
-
 class MethodSymbol(object):
 	def __init__(self, method, symtab):
-		self._method = method
+		self.method = method
 
 	@property
 	def address(self):
-		return int(self._method.nativeCode.machineCode)
+		return int(self.method.nativeCode.machineCode)
 
 	@property
 	def size(self):
-		return self._method.nativeCode.machineCode.size()
+		return self.method.nativeCode.machineCode.size()
 
 	@property
 	def name(self):
-		clazz = getattr(self._method, 'class')
+		clazz = getattr(self.method, 'class')
 		clazzName = clazz.slotAt(6).chars() if clazz.size() > 6 else clazz.slotAt(6).slotAt(6).chars()
 
-		selector = self._method.selector.chars()
+		selector = self.method.selector.chars()
 		return '%s >> #%s' % ( clazzName , selector)
 
 	def __str__(self):
