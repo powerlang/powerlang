@@ -13,7 +13,6 @@
 #include <fstream>
 
 #include "ImageSegment.h"
-#include "Kernel.h"
 
 class Launcher
 {
@@ -22,7 +21,8 @@ public:
 
 protected:
 
-    Object* launch(Kernel* kernel, Object* argc, Object* argv);
+    int launch(ImageSegment *kernel, const int argc, const char **argv);
 };
 
 #endif /* LAUNCHER_LAUNCHER_H_ */
+

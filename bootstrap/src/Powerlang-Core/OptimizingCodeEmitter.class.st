@@ -789,9 +789,9 @@ OptimizingCodeEmitter >> loadMifNeeded [
 		method selector == #_dispatchOn:startingAt:
 			ifTrue: [^assembler loadMwithGlobal: #LookupSuper].
 		method selector == #_dispatchDebuggableOn:
-			ifTrue: [^assembler loadMwithGlobal: #LookupDebuggable].
+			ifTrue: [^assembler loadMwithGlobal: #DebuggableLookup].
 		method selector == #_dispatchDebuggableOn:startingAt:
-			ifTrue: [^assembler loadMwithGlobal: #LookupSuperDebuggable].
+			ifTrue: [^assembler loadMwithGlobal: #DebuggableLookupSuper].
 
 ]
 

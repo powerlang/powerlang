@@ -256,9 +256,11 @@ SExpressionNativizer >> emitCallbackEpilogue [
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackPrologue [
-	environment abi saveContextUsing: assembler.
+	| retaddr |
+	environment abi emitEntrypoint: method descriptor with: assembler.
+	retaddr := assembler dummyPointer.
 	assembler
-		pushSmallInteger: 0;
+		pushSmallInteger: retaddr;
 		xorFPwithFP;
 		loadMwithImmediate: assembler dummyPointer;
 		addLiteral: assembler lastEmittedPointer;
@@ -273,13 +275,13 @@ SExpressionNativizer >> emitCallbackPrologue [
 
 { #category : #services }
 SExpressionNativizer >> emitEpilogue [
-	method hasBlocks ifTrue: [assembler restoreCallerEnvironment].
-	method isFrameless not
-		ifTrue: [
-			method isCallback
-				ifTrue: [self emitCallbackEpilogue]
-				ifFalse: [self emitEpilogueCommon]]
-		ifFalse: [self emitEpilogueNoFrame]
+	method hasBlocks
+		ifTrue: [ assembler restoreCallerEnvironment ].
+	method isCallback
+				ifTrue: [ ^self emitCallbackEpilogue ].
+	method isFrameless
+		ifTrue: [ self emitEpilogueNoFrame ]
+		ifFalse: [ self emitEpilogueCommon ]
 ]
 
 { #category : #services }
@@ -315,13 +317,11 @@ SExpressionNativizer >> emitFallbacks [
 
 { #category : #services }
 SExpressionNativizer >> emitFramedMethodPrologue [
-	method isCallback
-		ifTrue: [ self emitCallbackPrologue ].
 	assembler
 		saveCallerFrame;
 		pushR;
 		initializeS.
-	method isFFIMethod
+	method isCalloutMethod
 		ifTrue: [ self emitFFICall ]
 		ifFalse: [ self
 				pushCompiledMethod;
@@ -338,9 +338,13 @@ SExpressionNativizer >> emitFramelessMethodPrologue [
 
 { #category : #services }
 SExpressionNativizer >> emitMethodPrologue [
+	method isCallback
+		ifTrue: [ ^self
+				emitCallbackPrologue;
+				emitFramedMethodPrologue ].
 	method isFrameless
-		ifTrue: [self emitFramelessMethodPrologue]
-		ifFalse: [self emitFramedMethodPrologue]
+		ifTrue: [ self emitFramelessMethodPrologue ]
+		ifFalse: [ self emitFramedMethodPrologue ]
 ]
 
 { #category : #services }

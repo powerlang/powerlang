@@ -14,7 +14,7 @@
 #include <iostream>
 #include <iterator>
 
-#include <Object.h>
+#include <HeapObject.h>
 
 typedef struct _ImageSegmentHeader
 {
@@ -37,7 +37,7 @@ typedef struct _ImageSegmentHeader
     /**
      * A reference to Module instance describing this image segment
      */
-    Object* module;
+    HeapObject* module;
 
 } ImageSegmentHeader;
 

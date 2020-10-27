@@ -33,6 +33,13 @@ LookupLinker >> emitSendSuper: aSymbol from: aClass using: anAssembler [
 ]
 
 { #category : #accessing }
+LookupLinker >> initializeFrom: aNativizationEnvironment [
+	lookup := aNativizationEnvironment lookupStub.
+	lookupSuper := aNativizationEnvironment lookupSuperStub.
+
+]
+
+{ #category : #accessing }
 LookupLinker >> lookup: aByteArray [
 	lookup := aByteArray
 ]

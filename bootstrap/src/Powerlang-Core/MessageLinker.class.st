@@ -16,5 +16,6 @@ MessageLinker >> canInline: aSymbol [
 
 { #category : #testing }
 MessageLinker >> filter: anObject [
-	filter := anObject
+	filter := anObject.
+	filter isCollection ifTrue: [filter := filter asIdentitySet]
 ]

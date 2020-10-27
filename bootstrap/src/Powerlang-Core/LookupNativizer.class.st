@@ -61,26 +61,23 @@ LookupNativizer >> nativizeMethods [
 	methods do: [:m | environment nativize: m]
 ]
 
-{ #category : #initialization }
+{ #category : #'instance creation' }
 LookupNativizer >> newNativizationEnvironment [
-	| invoked ignored sent composite |
-	invoked := methods copyWith: bootstrapper writeBarrier.
-	invoked := InvokeLinker new
-		methods: invoked;
-		invoker: bootstrapper invoke.
+	| environment ignored lookup invoke |
+	environment := bootstrapper nativizer copy.
 	ignored := HaltingSend new
 		filter: #(< <= = > + - * // bitAnd: bitOr: bitXor:).
-	sent := LazyLinker new
+	lookup := LookupLinker new initializeFrom: environment.
+	lookup
 		filter:
 			#(debuggableCopy acquireReferences nativize refreshBlocks doesNotUnderstandSelector: mustBeBoolean class allocateMoreCaches).
-	composite := CompositeMessageLinker new
-		add: InlineMessageLinker new;
-		add: invoked;
-		add: ignored;
-		add: sent;
-		yourself.
-	^ bootstrapper nativizer copy
-		messageLinker: composite;
+	invoke := InvokeLinker new
+		invoker: environment invokeStub;
+		addMethods: methods.
+	^ environment
+		addLinker: invoke;
+		addLinker: ignored;
+		addLinker: lookup;
 		completeInitialization
 ]
 

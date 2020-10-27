@@ -46,20 +46,41 @@ cd bootstrap
 
 You will find everything in Powerlang-* packages
 
-You will need to build a launcher when you have an image segment file ready *(to-do:  document how)*.
-For building the launcher, do this:
+# Launching
+
+First you have to build the image launcher. For that make sure you have a working
+C++ compiler and CMake. Everything shall be prepared to allow for either compiling
+for the current platform or for cross-compiling to others.
+
+For linux from linux do:
 
 ```
 cd launcher
-cmake . -B build
-cd build && make
+cmake -B build
+cd build
+make
 ```
 
-There you will find `bee-dmr` executable, just use it:
+For windows from linux (using mingw64) do:
 
 ```
-./bee-dmr kernel.ims
+cd launcher
+$ cmake -B build -DCMAKE_TOOLCHAIN_FILE=toolchain-mingw64.cmake
+cd build
+make
 ```
 
+For Windows from Windows, you will need a C++ compiler. Instructions here are for
+mingw-64 (clang should also be possible). To install mingw64, follow the instructions
+[here](https://code.visualstudio.com/docs/cpp/config-mingw). Make sure to install it
+in a path without spaces (like C:/mingw-w64) or you may face errors. Add it to path,
+in my case it was `C:\mingw-w64\x86_64-8.1.0-posix-seh-rt_v6-rev0\mingw64\bin`.
+Install CMake and be sure to have its path added too. Then do:
 
+```
+cd launcher
+$ cmake -B build -G "MinGW Makefiles"
+cd build
+make
+```
 
