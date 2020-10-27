@@ -500,7 +500,7 @@ SmalltalkBootstrapper >> initializeMetaclass: definition [
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
 	supermeta := superclass == nilObj
-		ifTrue: [ self classNamed: #ProtoObject ]
+		ifTrue: [ self classNamed: #Class ]
 		ifFalse: [ superclass behavior slotNamed: #class ].
 	ivars := self newStringArray: metadef instVarNames.
 	flags := self formatOfClass: metadef.
