@@ -16,7 +16,7 @@ import powerlang.cli
 from powerlang.objectmemory import obj
 from powerlang.cli import do, lm
 
-# Intercept Launcher::launch() method a register
+# Intercept Launcher::launch() method and register
 # a kernel segment
 class __LaunchBreakpoint(gdb.Breakpoint):
     def stop(self):

@@ -14,7 +14,9 @@ import gdb
 
 from itertools import chain
 from gdb.printing import PrettyPrinter, SubPrettyPrinter, register_pretty_printer
+
 from powerlang.objectmemory import Object, SmallInteger, obj
+from powerlang.constants import CompiledMethodFlags
 
 FMTxPTR = "0x%016x"
 def PRIxPTR(value):
@@ -57,9 +59,11 @@ def _ObjectPrintString(obj):
             mclazz = getattr(obj, 'class')
             mclazz = mclazz.slotAt(6).chars() if mclazz.size() > 6 else mclazz.slotAt(6).slotAt(6).chars() + ' class'
             selector = obj.selector.chars()
+            nA = obj.format.bits(CompiledMethodFlags.ArgCount)
+            nT = obj.format.bits(CompiledMethodFlags.TempCount)
             codeAddr = int(obj.nativeCode.machineCode)
             codeSize = obj.nativeCode.machineCode.size()
-            detail = "%s >> #%s code %s size %d" % ( mclazz , selector, PRIxPTR(codeAddr), codeSize)
+            detail = "%s >> #%s nA %d nT %d code %s size %d" % ( mclazz , selector, nA, nT, PRIxPTR(codeAddr), codeSize)
         elif obj.isArrayed():
             if obj.isBytes():
                 details = str(obj.size()) + ' bytes'

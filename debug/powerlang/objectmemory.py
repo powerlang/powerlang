@@ -112,6 +112,17 @@ class SmallInteger(__ObjectABC):
     def isSmallInteger(self):
         return True
 
+    def bits(self, bits):
+        if isinstance(bits, int):
+            return 1 if (int(self) & (1 << bits-1)) > 0 else 0
+        elif isinstance(bits, range):
+            mask = (-1 << bits.stop) ^ (-1 << (bits.start - 1))
+            shift = bits.start - 1
+            return (int(self) & mask) >> shift
+        else:
+            raise ArgumentError("Invalid bits specifier - must be either int or range")
+
+
 class Object(__ObjectABC):
     def __init__(self, val):        
         super().__init__(val)
