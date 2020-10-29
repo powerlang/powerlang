@@ -388,19 +388,52 @@ class ImageSegment(object):
         return (obj for obj in iter(self) if obj.clazz == clazz)
 
     def find_class(self, name):
-        for obj in iter(self):
+        for o in iter(self):
             try:
-                if obj.clazzName() == (name + ' class'):
-                    return obj
+                if o.clazzName() == (name + ' class'):
+                    return o
             except:
                 pass
         return None
+
+    def find_object_at(self, addrish):
+        """
+        Return an object at given addish or None if no object
+        contains that address
+        """
+        addr = int(addrish)
+        for o in iter(self):
+            lo = int(o)
+            hi = lo + o.sizeInBytes()
+            if lo <= addr and addr < hi:
+                return o
+        return None
+
+    def find_references_to(self, oopish):
+        """
+        Return an iterator over all object referencing
+        given oopish.
+        """
+        o = obj(oopish)
+        return (r for r in iter(self) if r.references(o))
+
 
 
 # A list of all known segments. The main module should intercept
 # segment loading (especially loading kernel segment) and register
 # it here.
-segments = []
+# Here we use try: except NameError: idiom to support module reloading
+try:
+    segments
+    # If we arrive here it means the code has been reloaded
+    # in running GDB, so try to update class to a new version
+    # as a courtesy to the user...
+    for segment in segments:
+        segment.__class__ = ImageSegment
+except NameError:
+    segments = []
+
+
 
 # Flush known segments when inferior exits:
 def __on_exit(event):

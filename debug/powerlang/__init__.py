@@ -7,14 +7,16 @@
 
 import gdb
 
+import powerlang.objectmemory
 import powerlang.printing
 import powerlang.symbols
 import powerlang.cli
 
 # Import following this namespace for convenience
 # (when one uses Python interactively)
+import powerlang.objectmemory as om
 from powerlang.objectmemory import obj
-from powerlang.cli import do, lm
+from powerlang.cli import do, lm, am
 
 # Intercept Launcher::launch() method and register
 # a kernel segment
@@ -25,3 +27,30 @@ class __LaunchBreakpoint(gdb.Breakpoint):
         powerlang.objectmemory.segments.append(kernel)
         return False # continue
 __LaunchBreakpoint('Launcher::launch(ImageSegment*, int, char const**)', internal=True)
+
+
+class __PythonReload(gdb.Command):
+    """
+    Reload Python code
+    Usage: pr
+
+    Reload Python code, making best-effort to update all
+    code and cached objects to reflect new version. However,
+    this is not perfect due to limitations of Python's
+    importlib.reload().
+    """
+    def invoke (self, args, from_tty):
+        self()
+
+    def __call__(self):
+        try:
+            from importlib import reload
+        except:
+            from imp import reload
+
+        powerlang.objectmemory = reload(powerlang.objectmemory)
+        powerlang.symbols = reload(powerlang.symbols)
+        powerlang.printing = reload(powerlang.printing)
+        powerlang.cli = reload(powerlang.cli)
+
+pr = __PythonReload('pr', gdb.COMMAND_MAINTENANCE)
