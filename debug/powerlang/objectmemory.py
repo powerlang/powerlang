@@ -12,7 +12,11 @@ model image objects (i.e., Smalltalk objects)
 
 import gdb
 
+from itertools import chain
+
 from powerlang.symbols import SymbolTable
+
+flatten = chain.from_iterable
 
 def align(value, alignment):
     return ((int(value) + (alignment - 1)) & ~(alignment - 1))
@@ -58,7 +62,7 @@ class ObjectIndices:
     Class_sharedPools           = 9
 
     Metaclass_class             = 6
- 
+
 def _as_gdb_value(valueish, typ):
     if isinstance(valueish, gdb.Value):
         assert valueish.type == typ, "Passed valueish is a gdb.Value of a different type"
@@ -80,7 +84,7 @@ def _as_oop_value(valueish):
 
 class __ObjectABC(object):
     """
-    Base abstract superclass for both a full object 
+    Base abstract superclass for both a full object
     and (immediate) small integers.
     """
 
@@ -122,9 +126,16 @@ class SmallInteger(__ObjectABC):
         else:
             raise ArgumentError("Invalid bits specifier - must be either int or range")
 
+    def references(self, oopish):
+        """
+        Return True if self references given object,
+        False otherwise
+        """
+        return False
+
 
 class Object(__ObjectABC):
-    def __init__(self, val):        
+    def __init__(self, val):
         super().__init__(val)
         self._small_header = None
         self._large_header = None
@@ -201,7 +212,7 @@ class Object(__ObjectABC):
         else:
             return int(self.large_header['size'])
 
-    def sizeInBytes(self): 
+    def sizeInBytes(self):
         """
         Return size of an object in bytes, *excluding* header
         and excluding eventual alignment (for byte objects)
@@ -272,6 +283,15 @@ class Object(__ObjectABC):
         ptr = (self._oop.cast(Types.char.pointer()) + offset).cast(Types.oop.pointer())
         return obj(ptr.dereference())
 
+    def slots(self):
+        """
+        Return a list of slot values (references to other objects)
+        """
+        if self.isBytes():
+            return []
+        else:
+            return [ self.slotAt(i) for i in range(1, self.size() + 1) ]
+
     def byteAt(self, index):
         """
         Return byte at given index. Indexing starts at 1 as in Smalltalk.
@@ -306,7 +326,15 @@ class Object(__ObjectABC):
         while string[-1] == '\0':
             string = string[0:-1]
         return string
-    
+
+    def references(self, oopish):
+        if not self.isBytes():
+            refd_obj = obj(oopish)
+            for slot_obj in self.slots():
+                if slot_obj == refd_obj:
+                    return True
+        return False
+
     def value(self):
         """
         Return gdb.Value representing self.
@@ -351,10 +379,10 @@ class ObjectIterator(object):
             return o
         else:
             raise StopIteration  # signals "the end"
-    
+
 class ImageSegment(object):
     """
-    A represenation of an image segment as produced by 
+    A represenation of an image segment as produced by
     bootstrapper.
     """
 
@@ -416,6 +444,25 @@ class ImageSegment(object):
         """
         o = obj(oopish)
         return (r for r in iter(self) if r.references(o))
+
+def find_object_at(addrish):
+    """
+    Return an object at given addish or None if no object
+    contains that address
+    """
+    for segment in segments:
+        o = segment.find_object_at(addrish)
+        if o != None:
+            return o
+    return None
+
+def find_references_to(oopish):
+    """
+    Return an iterator over all object referencing
+    given oopish.
+    """
+    return flatten( segment.find_references_to(oopish) for segment in segments )
+
 
 
 
