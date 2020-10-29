@@ -525,6 +525,7 @@ SmalltalkBootstrapper >> initializeNativizer [
 		nativizeInvoke;
 		nativizeWriteBarrier;
 		nativizeLookup;
+		transferNativizerGlobals;
 		setupMessageLinkers
 ]
 
@@ -1199,6 +1200,12 @@ SmalltalkBootstrapper >> transferNativeCode: aNativeCode of: compiledCode [
 			slot := self transferLiteralDeep: elem.
 			transferred at: i put: slot ].
 	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferNativizerGlobals [
+	self transferLiteralDeep: nativizer globals
+
 ]
 
 { #category : #initialization }
