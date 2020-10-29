@@ -264,7 +264,6 @@ SExpressionNativizer >> emitCallbackPrologue [
 		xorFPwithFP;
 		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
 		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
-		addLiteral: assembler lastEmittedPointer;
 		loadGwithLiteral: environment globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
