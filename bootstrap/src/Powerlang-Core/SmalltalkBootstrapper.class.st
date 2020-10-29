@@ -819,6 +819,22 @@ SmalltalkBootstrapper >> newBytesFrom: aByteObject [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> newCallback: aNativeCode bytesFrom: aByteArray [
+	| code original behavior class |
+	code := self newBytesFrom: aByteArray.
+	original := code behavior.
+	behavior := self newSlots: 'CallbackBehavior'.
+	class := original slotNamed: 'class'.
+	behavior
+		slotNamed: 'class' put: class;
+		methods: original methods;
+		next: nilObj;
+		nativeCode: aNativeCode.
+	code behavior: behavior.
+	^ code
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> newClassVarDictionary: anArray [
 	| dict |
 	dict := self newDictionary.
@@ -1144,10 +1160,13 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
-	| size transferred astcodes selector format |
-	identityMap at: anSCompiledMethod ifPresent: [ :m | self ASSERT: false ].
+	| size classname transferred astcodes selector format |
+	identityMap
+		at: anSCompiledMethod
+		ifPresent: [ :m | self ASSERT: false ].
 	size := anSCompiledMethod size.
-	transferred := self newSlots: 'CompiledMethod' sized: size.
+	classname := anSCompiledMethod isCallback ifTrue: ['CallbackMethod'] ifFalse: [ 'CompiledMethod' ].
+	transferred := self newSlots: classname sized: size.
 	identityMap at: anSCompiledMethod put: transferred.
 	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
 	selector := self newSymbol: anSCompiledMethod selector.
@@ -1164,10 +1183,13 @@ SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferNativeCode: aNativeCode of: compiledCode [
-	| size transferred code slot |
+	| size transferred code slot callback |
 	size := aNativeCode size.
 	transferred := self newSlots: 'NativeCode' sized: size.
-	code := self newBytesFrom: aNativeCode code.
+	callback := compiledCode classname = #CallbackMethod.
+	code := callback
+		ifTrue: [ self newCallback: transferred bytesFrom: aNativeCode code ]
+		ifFalse: [ self newBytesFrom: aNativeCode code ].
 	transferred
 		machineCode: code;
 		compiledCode: compiledCode.

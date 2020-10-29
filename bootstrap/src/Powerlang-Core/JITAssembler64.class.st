@@ -743,6 +743,19 @@ JITAssembler64 >> loadLargeX1withAindirect [
 ]
 
 { #category : #loading }
+JITAssembler64 >> loadLongMwithIPoffset: anInteger [
+	| instsize |
+	#dontOptimize.
+	instsize := 6.
+	pointer
+		reset;
+		length: 32;
+		base: self regIP;
+		displacement: anInteger - instsize.
+	self assemble: 'mov' with: self regM e with: pointer
+]
+
+{ #category : #loading }
 JITAssembler64 >> loadLongRWithRAtOffsetA [
 	pointer
 		reset;
@@ -1674,6 +1687,11 @@ JITAssembler64 >> regFalse [
 { #category : #private }
 JITAssembler64 >> regG [
 	^r15
+]
+
+{ #category : #private }
+JITAssembler64 >> regIP [
+	^ rip
 ]
 
 { #category : #private }

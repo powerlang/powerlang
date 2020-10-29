@@ -16,6 +16,15 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #accessing }
+ImageSegmentWriter class >> behaviorOffset [
+	"
+		The offset at which the behavior is from the oop (negated)
+	"
+
+	^ -4
+]
+
 { #category : #'class initialization' }
 ImageSegmentWriter class >> initialize [
 	WordSize := 8
