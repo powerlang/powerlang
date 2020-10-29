@@ -37,11 +37,13 @@ JITAssembler64 >> addDoubleX1toX0 [
 
 { #category : #loading }
 JITAssembler64 >> addLiteral: anObject [
-	^literals
+	| index | 
+	index := literals
 		indexOf: anObject
 		ifAbsent: [ literals
 				add: anObject;
 				size ].
+	^ index + 2
 ]
 
 { #category : #arithmetic }
