@@ -9,6 +9,15 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #'as yet unclassified' }
+SCallbackMethod class >> behaviorNativeCodeSlot [
+	"callback methods have a special machine code. Its bytes are of
+	class ByteArray, but the behavior of this ByteArray is special:
+	it has an extra slot that allows to find the native code object
+	corresponding to this callback"
+	^4
+]
+
 { #category : #accessing }
 SCallbackMethod >> descriptor [
 	^descriptor

@@ -251,18 +251,19 @@ SExpressionNativizer >> emitBlockPrologue: anSBlock [
 SExpressionNativizer >> emitCallbackEpilogue [
 	assembler restoreCallerFrame.
 	environment abi
-		restoreContextUsing: assembler popping: method argumentCount
+		restoreContext: method descriptor with: assembler
 ]
 
 { #category : #services }
 SExpressionNativizer >> emitCallbackPrologue [
 	| retaddr |
 	environment abi emitEntrypoint: method descriptor with: assembler.
-	retaddr := assembler dummyPointer.
+	retaddr := 0.
 	assembler
-		pushSmallInteger: retaddr;
+		pushImmediate: retaddr;
 		xorFPwithFP;
-		loadMwithImmediate: assembler dummyPointer;
+		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
+		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
 		addLiteral: assembler lastEmittedPointer;
 		loadGwithLiteral: environment globals;
 		loadNilWithLiteral: nil;
