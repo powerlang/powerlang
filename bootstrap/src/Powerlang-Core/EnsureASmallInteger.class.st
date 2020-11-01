@@ -8,5 +8,5 @@ Class {
 EnsureASmallInteger >> nativizeUsing: anAssembler for: messageNativizer [
 	anAssembler
 		testIntegerBitOf: anAssembler regA8;
-		shortJumpIfZeroTo: messageNativizer failLabel
+		jumpIfZeroTo: messageNativizer failLabel
 ]
