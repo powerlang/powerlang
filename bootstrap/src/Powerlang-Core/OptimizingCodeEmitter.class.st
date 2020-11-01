@@ -518,7 +518,7 @@ OptimizingCodeEmitter >> assembleJumpTrue: blockJumpTrue orJumpFalse: blockJumpF
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleLoadConstant: value to: register [
-	| constant index |
+	| constant |
 	value isSmallInteger
 		ifTrue: [ constant := value * 2 + 1.
 			^ assembler load: register withImmediate: constant ].
