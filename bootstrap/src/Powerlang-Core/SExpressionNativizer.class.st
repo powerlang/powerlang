@@ -863,9 +863,9 @@ SExpressionNativizer >> visitOptimizedMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitReturn: anSReturn [
-	anSReturn expression acceptVisitor: self.
-	anSReturn local ifTrue: [
-	"self emitEpilogue"] ifFalse: [
-		assembler pushR; loadRwithE.
-		self emitSend: #_return:]
+  anSReturn expression acceptVisitor: self.
+  anSReturn local ifTrue: [ self emitEpilogue ] ifFalse: [ assembler
+           pushR;
+           loadRwithE.
+        self emitSend: #_return: ] 
 ]
