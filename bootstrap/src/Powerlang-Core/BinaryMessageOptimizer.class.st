@@ -22,7 +22,7 @@ BinaryMessageOptimizer class >> on: aMessageNode using: anAstcodeEmitter [
 
 { #category : #'as yet unclassified' }
 BinaryMessageOptimizer class >> optimizesMessage: selector [
-	^ #(== = < <= >= > + - * / // \\ | & bitOr: bitAnd: bitXor:)
+	^ #(== = < <= >= > + - * // \\ | & bitOr: bitAnd: bitXor:)
 		includes: selector
 ]
 
