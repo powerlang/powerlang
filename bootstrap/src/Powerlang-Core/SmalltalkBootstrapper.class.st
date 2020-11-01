@@ -433,10 +433,14 @@ SmalltalkBootstrapper >> initializeBehavior: anObjectMap [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeClass: definition [
-	| class supername superclass name flag ivars poolnames pools subclasses format cvars |
+	| class supername superclass name flag ivars poolnames pools subclasses format cvars superbehavior |
 	class := classes at: definition.
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
+	superbehavior := superclass == nilObj
+		ifTrue: [ nilObj ]
+		ifFalse: [ superclass instanceBehavior ].
+	class instanceBehavior next: superbehavior.
 	subclasses := definition subclasses
 		collect: [ :def | self classNamed: def name ].
 	subclasses := self newArray: subclasses.
@@ -493,7 +497,7 @@ SmalltalkBootstrapper >> initializeInvokedMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeMetaclass: definition [
-	| class meta metadef supername superclass ivars supermeta flags format cvars |
+	| class meta metadef supername superclass ivars supermeta flags format cvars superbehavior |
 	class := classes at: definition.
 	meta := class behavior slotNamed: #class.
 	metadef := definition metaclass.
@@ -502,6 +506,11 @@ SmalltalkBootstrapper >> initializeMetaclass: definition [
 	supermeta := superclass == nilObj
 		ifTrue: [ self classNamed: #Class ]
 		ifFalse: [ superclass behavior slotNamed: #class ].
+	superbehavior := supermeta == nilObj
+		ifTrue: [ nilObj ]
+		ifFalse: [ supermeta instanceBehavior ].
+	meta instanceBehavior next: superbehavior.
+
 	ivars := self newStringArray: metadef instVarNames.
 	flags := self formatOfClass: metadef.
 	format := self newSmallInteger: flags.
