@@ -37,11 +37,13 @@ JITAssembler64 >> addDoubleX1toX0 [
 
 { #category : #loading }
 JITAssembler64 >> addLiteral: anObject [
-	^literals
+	| index | 
+	index := literals
 		indexOf: anObject
 		ifAbsent: [ literals
 				add: anObject;
 				size ].
+	^ index + 2
 ]
 
 { #category : #arithmetic }
@@ -586,6 +588,22 @@ JITAssembler64 >> loadAwithFalse [
 	self assemble: 'mov' with: self regA with: self regFalse
 ]
 
+{ #category : #private }
+JITAssembler64 >> loadAwithGindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regA
+		withReg: self regG
+		index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadAwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadAwithGindex: index
+]
+
 { #category : #loading }
 JITAssembler64 >> loadAwithImmediate: imm [
 	#imm32.
@@ -792,6 +810,11 @@ JITAssembler64 >> loadMXCSRfromA [
 	self assemble: 'ldmxcsr' with: pointer
 ]
 
+{ #category : #'push/pop' }
+JITAssembler64 >> loadMwithA [
+	self assemble: 'mov' with: self regM with: self regA
+]
+
 { #category : #loading }
 JITAssembler64 >> loadMwithFPindex: index [
 	self
@@ -844,6 +867,15 @@ JITAssembler64 >> loadMwithRIPoffset: imm [
 		displacement: imm.
 
 	self assemble: 'lea' with: self regM with: pointer
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithRindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regM
+		withReg: self regR
+		index: index
 ]
 
 { #category : #loading }
@@ -1730,6 +1762,11 @@ JITAssembler64 >> regT [
 ]
 
 { #category : #private }
+JITAssembler64 >> regT8 [
+	^ cl
+]
+
+{ #category : #private }
 JITAssembler64 >> regTrue [
 	^ r13
 ]
@@ -1837,6 +1874,11 @@ JITAssembler64 >> shiftTleft: count [
 JITAssembler64 >> shiftTright: count [
 	self ASSERT: count < 32.
 	self assemble: 'sar' with: self regT with: count
+]
+
+{ #category : #comparing }
+JITAssembler64 >> smallInteger: anInteger [
+	^(anInteger bitShift: 1) + 1
 ]
 
 { #category : #arithmetic }
@@ -2104,6 +2146,11 @@ JITAssembler64 >> subDoubleX1fromX0 [
 { #category : #arithmetic }
 JITAssembler64 >> subFromRconstant: imm [
 	self assemble: 'sub' with: self regR withImm: imm
+]
+
+{ #category : #arithmetic }
+JITAssembler64 >> subTfromR [
+	self assemble: 'sub' with: self regR with: self regT
 ]
 
 { #category : #arithmetic }

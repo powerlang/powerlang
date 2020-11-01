@@ -85,6 +85,7 @@ BinaryMessageNativizer >> inlineBitXor [
 	nativizer saveContextSwitchPoint.
 	assembler
 		xorRwithA;
+		ensureRintegerBit;
 		@ done.
 	nativizer
 		addFallback: [ assembler
@@ -100,9 +101,13 @@ BinaryMessageNativizer >> inlineEquals [
 	failed := assembler newLabel.
 	self loadOperands.
 	nativizer saveContextSwitchPoint.
-	assembler loadTwithR; loadRwithTrue;
+	assembler
+		loadTwithR;
+		loadRwithTrue;
 		compareTwithA;
-		jumpIfNotEqualTo: done; loadRwithFalse; @ done.
+		jumpIfEqualTo: done;
+		loadRwithFalse;
+		@ done.
 	nativizer
 		addFallback: [ assembler
 				@ failed;
@@ -159,7 +164,7 @@ BinaryMessageNativizer >> inlineIdentityEquals [
 	self loadOperands.
 	assembler loadTwithR; loadRwithTrue;
 		compareTwithA;
-		jumpIfNotEqualTo: done; loadRwithFalse; @ done
+		jumpIfEqualTo: done; loadRwithFalse; @ done
 ]
 
 { #category : #private }
@@ -208,28 +213,45 @@ BinaryMessageNativizer >> inlineLessThan [
 BinaryMessageNativizer >> inlineMessage [
 	| selector s |
 	s := message selector.
-	selector := s isSymbol ifTrue: [s] ifFalse: [nativizer method at: s].
-	selector = #'==' ifTrue: [^self inlineIdentityEquals].
-	selector = #'=' ifTrue: [^self inlineEquals].
-	selector = #'+' ifTrue: [^self inlinePlus].
-	selector = #'<' ifTrue: [^self inlineLessThan].
-	selector = #'<=' ifTrue: [^self inlineLessEqualThan].
-	selector = #'>=' ifTrue: [^self inlineGreaterEqualThan].
-	selector = #'>' ifTrue: [^self inlineGreaterThan].
-	selector = #'-' ifTrue: [^self inlineMinus].
-	selector = #'*' ifTrue: [^self inlineMultiply].
-	selector = #'//' ifTrue: [^self inlineMultiply].
-	selector = #'/' ifTrue: [^self inlineMultiply].
-	selector = #'\\' ifTrue: [^self inlineMultiply].
-	selector = #'|' ifTrue: [^self inlineBitOr: #|].
-	selector = #'&' ifTrue: [^self inlineBitAnd: #&].
-"	selector = #'>>' ifTrue: [^self inlineBitShiftLeft: #>>].
+	selector := s isSymbol
+		ifTrue: [ s ]
+		ifFalse: [ nativizer method at: s ].
+	selector = #==
+		ifTrue: [ ^ self inlineIdentityEquals ].
+	selector = #=
+		ifTrue: [ ^ self inlineEquals ].
+	selector = #+
+		ifTrue: [ ^ self inlinePlus ].
+	selector = #<
+		ifTrue: [ ^ self inlineLessThan ].
+	selector = #<=
+		ifTrue: [ ^ self inlineLessEqualThan ].
+	selector = #>=
+		ifTrue: [ ^ self inlineGreaterEqualThan ].
+	selector = #>
+		ifTrue: [ ^ self inlineGreaterThan ].
+	selector = #-
+		ifTrue: [ ^ self inlineMinus ].
+	selector = #*
+		ifTrue: [ ^ self inlineMultiply ].
+	selector = #//
+		ifTrue: [ ^ self inlineQuotient ].
+	selector = #\\
+		ifTrue: [ ^ self inlineRemainder ].
+	selector = #|
+		ifTrue: [ ^ self inlineBitOr: #| ].
+	selector = #&
+		ifTrue: [ ^ self inlineBitAnd: #& ].
+	"	selector = #'>>' ifTrue: [^self inlineBitShiftLeft: #>>].
 	selector = #'<<' ifTrue: [^self inlineBitShiftRight: #<<]."
-	selector = #bitOr: ifTrue: [^self inlineBitOr: #bitOr:].
-	selector = #bitAnd: ifTrue: [^self inlineBitAnd: #bitAnd:].
-	selector = #bitXor: ifTrue: [^self inlineBitXor].
-"	selector = #bitShift: ifTrue: [^self inlineBitShift]."
-	self ASSERT: false 
+	selector = #bitOr:
+		ifTrue: [ ^ self inlineBitOr: #bitOr: ].
+	selector = #bitAnd:
+		ifTrue: [ ^ self inlineBitAnd: #bitAnd: ].
+	selector = #bitXor:
+		ifTrue: [ ^ self inlineBitXor ].
+	"	selector = #bitShift: ifTrue: [^self inlineBitShift]."
+	self ASSERT: false
 ]
 
 { #category : #private }
@@ -261,24 +283,27 @@ BinaryMessageNativizer >> inlineMultiply [
 	done := assembler newLabel.
 	failed := assembler newLabel.
 	overflow := assembler newLabel.
-	self loadOperands.	
+	self loadOperands.
 	nativizer saveContextSwitchPoint.
 	assembler
+		pushA;
 		loadTwithR;
 		clearRintegerBit;
 		multiplyRbyA;
+		popA;
 		jumpIfOverflowTo: overflow;
 		ensureRintegerBit;
+
 		@ done.
 	nativizer
 		addFallback: [ assembler
 				@ overflow;
-			loadRwithT;
+				loadRwithT;
+			
 				@ failed;
 				pushA.
 			nativizer emitSend: #*.
 			assembler jumpTo: done ]
-
 ]
 
 { #category : #private }
@@ -303,6 +328,56 @@ BinaryMessageNativizer >> inlinePlus [
 			pushA.
 		nativizer emitSend: #'+'.
 		assembler jumpTo: done] 
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> inlineQuotient [
+	| |
+	done := assembler newLabel.
+	failed := assembler newLabel.
+	self loadOperands.
+	assembler
+		compareRwithSmallInteger: 0;
+		jumpIfLessOrEqualSignedTo: failed.
+	nativizer saveContextSwitchPoint.
+	assembler
+		convertRtoNativeInteger;
+		convertAtoNativeInteger;
+		loadTwithA;
+		divideRbyT;
+		convertRtoSmallInteger;
+		@ done.
+	nativizer
+		addFallback: [ assembler
+				@ failed;
+				pushA.
+			nativizer emitSend: #//.
+			assembler jumpTo: done ]
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> inlineRemainder [
+	done := assembler newLabel.
+	failed := assembler newLabel.
+	self loadOperands.
+	assembler
+		compareRwithSmallInteger: 0;
+		jumpIfLessOrEqualSignedTo: failed.
+	nativizer saveContextSwitchPoint.
+	assembler
+		convertRtoNativeInteger;
+		convertAtoNativeInteger;
+		loadTwithA;
+		divideRbyT;
+		loadRwithA;
+		convertRtoSmallInteger;
+		@ done.
+	nativizer
+		addFallback: [ assembler
+				@ failed;
+				pushA.
+			nativizer emitSend: #//.
+			assembler jumpTo: done ]
 ]
 
 { #category : #private }

@@ -433,10 +433,14 @@ SmalltalkBootstrapper >> initializeBehavior: anObjectMap [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeClass: definition [
-	| class supername superclass name flag ivars poolnames pools subclasses format cvars |
+	| class supername superclass name flag ivars poolnames pools subclasses format cvars superbehavior |
 	class := classes at: definition.
 	supername := definition superclass ifNotNil: [ :s | s name ].
 	superclass := self classNamedOrNil: supername.
+	superbehavior := superclass == nilObj
+		ifTrue: [ nilObj ]
+		ifFalse: [ superclass instanceBehavior ].
+	class instanceBehavior next: superbehavior.
 	subclasses := definition subclasses
 		collect: [ :def | self classNamed: def name ].
 	subclasses := self newArray: subclasses.
@@ -462,15 +466,19 @@ SmalltalkBootstrapper >> initializeClass: definition [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeInlineCaches [
-	| class transferred mic pic |
+	| class lkup invk mic pic |
 	class := self classNamed: #SendSite.
-	transferred := globals at: #Lookup.
+	lkup := globals at: #Lookup.
+	invk := globals at: #Invoke.
 	mic := self newBytesFrom: nativizer monomorphicCache.
 	pic := self newBytesFrom: nativizer polymorphicCache.
 	self
 		emulateSend: class
-			selector: #initializeCachesWith:
-			with: {transferred machineCode};
+			selector: #allocateInitialCachesUsing:
+			with: {lkup};
+		emulateSend: class
+			selector: #initializeInvoke:
+			with: {invk};
 		emulateSend: class selector: #monomorphicCache: with:  {mic};
 		emulateSend: class selector: #polymorphicCache: with: {pic}
 ]
@@ -493,7 +501,7 @@ SmalltalkBootstrapper >> initializeInvokedMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeMetaclass: definition [
-	| class meta metadef supername superclass ivars supermeta flags format cvars |
+	| class meta metadef supername superclass ivars supermeta flags format cvars superbehavior |
 	class := classes at: definition.
 	meta := class behavior slotNamed: #class.
 	metadef := definition metaclass.
@@ -502,6 +510,11 @@ SmalltalkBootstrapper >> initializeMetaclass: definition [
 	supermeta := superclass == nilObj
 		ifTrue: [ self classNamed: #Class ]
 		ifFalse: [ superclass behavior slotNamed: #class ].
+	superbehavior := supermeta == nilObj
+		ifTrue: [ nilObj ]
+		ifFalse: [ supermeta instanceBehavior ].
+	meta instanceBehavior next: superbehavior.
+
 	ivars := self newStringArray: metadef instVarNames.
 	flags := self formatOfClass: metadef.
 	format := self newSmallInteger: flags.
@@ -525,6 +538,7 @@ SmalltalkBootstrapper >> initializeNativizer [
 		nativizeInvoke;
 		nativizeWriteBarrier;
 		nativizeLookup;
+		transferNativizerGlobals;
 		setupMessageLinkers
 ]
 
@@ -727,12 +741,12 @@ SmalltalkBootstrapper >> nativizeRemainingMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeRemainingMethodsIn: species [
-	| transferred |
-	methods do: [ :smethod |
-		transferred := identityMap at: smethod.
+	methods
+		do: [ :smethod | 
 			smethod nativeCode
-				ifNil: [ nativizer nativize: smethod.
-					self transferNativeCode: smethod nativeCode of: transferred ]]
+				ifNil: [
+					nativizer nativize: smethod.
+					self transferNativeCodeOfMethod: smethod ] ]
 ]
 
 { #category : #initialization }
@@ -1090,19 +1104,16 @@ SmalltalkBootstrapper >> transferAstcodesFrom: anArray [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferBlock: anSCompiledBlock [
-	| transferred code method format |
-	identityMap at: anSCompiledBlock ifPresent: [ :b | ^b ].
+	| transferred method format |
+	identityMap at: anSCompiledBlock ifPresent: [ :b | ^ b ].
 	transferred := self newSlots: #CompiledBlock.
 	identityMap at: anSCompiledBlock put: transferred.
 	method := identityMap at: anSCompiledBlock method.
-	code := self
-		transferNativeCode: anSCompiledBlock nativeCode
-		of: transferred.
 	format := self newInteger: anSCompiledBlock format.
 	transferred
 		method: method;
 		format: format;
-		nativeCode: code.
+		nativeCode: nilObj.
 	^ transferred
 ]
 
@@ -1160,12 +1171,14 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
-	| size classname transferred astcodes selector format |
+	| size classname transferred astcodes selector format literal tliteral |
 	identityMap
 		at: anSCompiledMethod
 		ifPresent: [ :m | self ASSERT: false ].
 	size := anSCompiledMethod size.
-	classname := anSCompiledMethod isCallback ifTrue: ['CallbackMethod'] ifFalse: [ 'CompiledMethod' ].
+	classname := anSCompiledMethod isCallback
+		ifTrue: [ 'CallbackMethod' ]
+		ifFalse: [ 'CompiledMethod' ].
 	transferred := self newSlots: classname sized: size.
 	identityMap at: anSCompiledMethod put: transferred.
 	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
@@ -1177,7 +1190,10 @@ SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
 		selector: selector;
 		format: format;
 		source: self nilObject.
-	1 to: size do: [ :i | self transferLiteralAt: i in: transferred ].
+	1 to: size do: [ :i | 
+		literal := anSCompiledMethod at: i.
+		tliteral  := self transferLiteralDeep: literal.
+		transferred at: i put: tliteral ].
 	^ transferred
 ]
 
@@ -1199,6 +1215,29 @@ SmalltalkBootstrapper >> transferNativeCode: aNativeCode of: compiledCode [
 			slot := self transferLiteralDeep: elem.
 			transferred at: i put: slot ].
 	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferNativeCodeOfMethod: anSCompiledMethod [
+	| transferred remaining literal block position |
+	transferred := identityMap at: anSCompiledMethod.
+	self transferNativeCode: anSCompiledMethod nativeCode of: transferred.
+	remaining := anSCompiledMethod blockCount.
+	position := 1.
+	[ remaining > 0 ]
+		whileTrue: [ literal := anSCompiledMethod at: position.
+			literal isBlock
+				ifTrue: [ block := transferred at: position.
+					self transferNativeCode: literal nativeCode of: block.
+					remaining := remaining - 1 ].
+			position := position + 1 ].
+	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferNativizerGlobals [
+	self transferLiteralDeep: nativizer globals
+
 ]
 
 { #category : #initialization }

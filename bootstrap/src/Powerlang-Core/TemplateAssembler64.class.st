@@ -662,6 +662,11 @@ TemplateAssembler64 >> loadMXCSRfromA [
 	
 ]
 
+{ #category : #'push/pop' }
+TemplateAssembler64 >> loadMwithA [
+	self assembleBytes: #[16r48 16r89 16rD3]
+]
+
 { #category : #loading }
 TemplateAssembler64 >> loadRConvertingDoubleRindirect [
 	self assembleBytes: #[16rF2 16r48 16rF 16r2C 16r0].

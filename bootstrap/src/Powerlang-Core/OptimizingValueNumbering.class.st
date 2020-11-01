@@ -10,7 +10,8 @@ Class {
 		'currentBlock',
 		'names',
 		'hashes',
-		'hashesOut'
+		'hashesOut',
+		'constHashes'
 	],
 	#category : #'Powerlang-Core-OCompiler'
 }
@@ -22,7 +23,13 @@ OptimizingValueNumbering >> addNewName: instruction [
 
 { #category : #unclassified }
 OptimizingValueNumbering >> hashOfLoadConstant: instruction [
-	^[instruction value printString] on: Error do: [^nil]
+	| value |
+	value := instruction value.
+	value isInteger
+		ifTrue: [ ^ value printString ].
+	^ constHashes
+		at: value
+		ifAbsentPut: [ 'value ' , constHashes size printString ]
 ]
 
 { #category : #unclassified }
@@ -256,15 +263,16 @@ OptimizingValueNumbering >> workFrom: aBasicBlock [
 	| count |
 	hashes := Dictionary new.
 	hashesOut := Dictionary new.
+	constHashes := IdentityDictionary new.
 	names := Dictionary new.
 	firstBlock := aBasicBlock.
 	count := 0.
-	aBasicBlock instructionsWithSuccessorsDo: [:inst | 
-		names at: inst put: '{v' , count printString , '}'.
-		count := count + 1].
+	aBasicBlock
+		instructionsWithSuccessorsDo: [ :inst | 
+			names at: inst put: '{v' , count printString , '}'.
+			count := count + 1 ].
 	aBasicBlock withSuccessorsPostOrder
-		reverseDo: [:block | self workOn: block].
-
+		reverseDo: [ :block | self workOn: block ]
 ]
 
 { #category : #unclassified }

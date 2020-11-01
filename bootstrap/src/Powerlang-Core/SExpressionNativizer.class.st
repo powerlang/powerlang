@@ -216,6 +216,20 @@ SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 ]
 
 { #category : #services }
+SExpressionNativizer >> captureClosure: anSBlock [
+	| slot variables block |
+	self instantiateClosure: anSBlock.
+	slot := 3.
+	variables := anSBlock capturedVariables readStream.
+	[ variables atEnd ]
+		whileFalse: [ self captureVariable: variables index: slot.
+			slot := slot + 1 ].
+	block := anSBlock compiledCode.
+	block capturesHome
+		ifTrue: [ self saveReturnFrame ]
+]
+
+{ #category : #services }
 SExpressionNativizer >> captureVariable: stream index: anInteger [
 	| type pos |
 	type := stream next.
@@ -242,7 +256,8 @@ SExpressionNativizer >> emitBlockPrologue: anSBlock [
 	assembler saveCallerFrame.
 	self
 		loadBlockSelf: anSBlock compiledCode;
-		pushCompiledBlock;
+		loadBlockNativeCode;
+		pushNativeCode;
 		pushEnvironments;
 		initializeTemporaries: anSBlock tempCount
 ]
@@ -264,7 +279,6 @@ SExpressionNativizer >> emitCallbackPrologue [
 		xorFPwithFP;
 		loadLongMwithIPoffset: 0 - assembler currentAddress + ImageSegmentWriter behaviorOffset;
 		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;
-		addLiteral: assembler lastEmittedPointer;
 		loadGwithLiteral: environment globals;
 		loadNilWithLiteral: nil;
 		loadTrueWithLiteral: true;
@@ -279,19 +293,9 @@ SExpressionNativizer >> emitEpilogue [
 	method hasBlocks
 		ifTrue: [ assembler restoreCallerEnvironment ].
 	method isCallback
-				ifTrue: [ ^self emitCallbackEpilogue ].
+		ifTrue: [ ^ self emitCallbackEpilogue ].
 	method isFrameless
-		ifTrue: [ self emitEpilogueNoFrame ]
-		ifFalse: [ self emitEpilogueCommon ]
-]
-
-{ #category : #services }
-SExpressionNativizer >> emitEpilogueCommon [
-	assembler restoreCallerFrame; restoreCallerSelf; restoreCallerM; return
-]
-
-{ #category : #services }
-SExpressionNativizer >> emitEpilogueNoFrame [
+		ifFalse: [ assembler restoreCallerFrame ].
 	assembler
 		restoreCallerSelf;
 		restoreCallerM;
@@ -300,9 +304,8 @@ SExpressionNativizer >> emitEpilogueNoFrame [
 
 { #category : #services }
 SExpressionNativizer >> emitFFICall [
-	assembler loadRwithM;
-		pushR;
-		pushS.
+	self loadObject: method.
+	assembler pushR; pushS.
 	self emitSend: #_ffiCall:.
 	assembler
 		restoreCallerFrame;
@@ -325,7 +328,7 @@ SExpressionNativizer >> emitFramedMethodPrologue [
 	method isCalloutMethod
 		ifTrue: [ self emitFFICall ]
 		ifFalse: [ self
-				pushCompiledMethod;
+				pushNativeCode;
 				initializeMethodEnvironment;
 				initializeMethodTemporaries;
 				emitSafepointCheck ]
@@ -365,8 +368,8 @@ SExpressionNativizer >> emitSend: selector [
 { #category : #services }
 SExpressionNativizer >> emitWriteBarrier [
 	assembler
-		loadMwithGlobal: #WriteBarrier;
-		callIndirectM;
+		loadAwithGlobal: #WriteBarrier;
+		callIndirectA;
 		discardArguments: 1
 ]
 
@@ -381,11 +384,10 @@ SExpressionNativizer >> falseLiteral [
 	assembler loadRwithFalse
 ]
 
-{ #category : #services }
+{ #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	assembler := TemplateAssembler64 on: #[  ] writeStream.
-
+	assembler := TemplateAssembler64 new
 ]
 
 { #category : #services }
@@ -501,6 +503,19 @@ SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 ]
 
 { #category : #services }
+SExpressionNativizer >> loadBlockNativeCode [
+	"
+	index := CompiledBlock indexOfSlot: 'nativeCode'
+	"
+
+	| index |
+	index := 3. 
+	assembler
+		loadMwithRindex: 1;
+		loadMwithMindex: index
+]
+
+{ #category : #services }
 SExpressionNativizer >> loadBlockSelf: aCompiledBlock [
 	| offset | 
 	aCompiledBlock capturesSelf
@@ -520,8 +535,18 @@ SExpressionNativizer >> loadLiteralAt: anInteger [
 ]
 
 { #category : #services }
+SExpressionNativizer >> loadObject: anObject [
+	assembler 	 loadRwithLiteral:  anObject
+]
+
+{ #category : #services }
 SExpressionNativizer >> loadRwithStack: anInteger [
 	assembler loadRwithFPindex: 1 - anInteger
+]
+
+{ #category : #services }
+SExpressionNativizer >> loadTwithStack: anInteger [
+	assembler loadTwithFPindex: 1 - anInteger
 ]
 
 { #category : #accessing }
@@ -587,21 +612,13 @@ SExpressionNativizer >> popR [
 ]
 
 { #category : #services }
-SExpressionNativizer >> pushCompiledBlock [
-	assembler loadAwithRindex: 1; pushA
-]
-
-{ #category : #services }
-SExpressionNativizer >> pushCompiledMethod [
-	| offset |
-	offset := (NativeCode indexOfSlot: 'compiledCode').
-	assembler loadTwithMindex: offset;
-		pushT
-]
-
-{ #category : #services }
 SExpressionNativizer >> pushEnvironments [
 	assembler pushE; loadEwithR; pushE
+]
+
+{ #category : #services }
+SExpressionNativizer >> pushNativeCode [
+	assembler pushM
 ]
 
 { #category : #services }
@@ -749,19 +766,10 @@ SExpressionNativizer >> visitAssignment: anSAssignment [
 
 { #category : #services }
 SExpressionNativizer >> visitBlock: anSBlock [
-	| block slot variables |
 	anSBlock isInlined
-		ifTrue: [ ^anSBlock statements do: [ :s | s acceptVisitor: self ] ].
+		ifTrue: [ ^ anSBlock statements do: [ :s | s acceptVisitor: self ] ].
 	remainingBlocks add: anSBlock.
-	self instantiateClosure: anSBlock.
-	slot := 3.
-	variables := anSBlock capturedVariables readStream.
-	[ variables atEnd ]
-		whileFalse: [ self captureVariable: variables index: slot.
-			slot := slot + 1 ].
-	block := anSBlock compiledCode.
-	block capturesHome
-		ifTrue: [ self saveReturnFrame ]
+	self captureClosure: anSBlock 
 ]
 
 { #category : #services }
@@ -828,14 +836,19 @@ SExpressionNativizer >> visitMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitMethod: anSMethod [
-	| statements |
+	| statements returned |
 	activeScript := anSMethod.
 	self emitMethodPrologue.
 	statements := anSMethod statements.
-	statements do: [:s | s acceptVisitor: self].
-	(statements notEmpty andNot: [statements last isReturn])
-		ifTrue: [assembler loadRwithS].
-	self emitEpilogue; emitFallbacks; saveMethodCode
+	statements do: [ :s | s acceptVisitor: self ].
+	(statements notEmpty andNot: [ statements last isReturn ])
+		ifTrue: [ assembler loadRwithS ].
+	returned := statements notEmpty and: [ 	
+	statements last isReturn].
+	returned ifFalse: [ self emitEpilogue ].
+	self
+		emitFallbacks;
+		saveMethodCode
 ]
 
 { #category : #services }
@@ -850,9 +863,9 @@ SExpressionNativizer >> visitOptimizedMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitReturn: anSReturn [
-	anSReturn expression acceptVisitor: self.
-	anSReturn local ifTrue: [
-	"self emitEpilogue"] ifFalse: [
-		assembler pushR; loadRwithE.
-		self emitSend: #_return:]
+  anSReturn expression acceptVisitor: self.
+  anSReturn local ifTrue: [ self emitEpilogue ] ifFalse: [ assembler
+           pushR;
+           loadRwithE.
+        self emitSend: #_return: ] 
 ]

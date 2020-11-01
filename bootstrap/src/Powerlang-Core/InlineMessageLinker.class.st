@@ -471,10 +471,11 @@ InlineMessageLinker >> assembleHigh32 [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleHoldRefererIfNeeded [
 	#_holdRefererIfNeeded:.
-	assembler pushA;
-	loadMwithGlobal: #WriteBarrier;
-		callIndirectM;
-		discardArguments: 1
+	assembler
+		pushA;
+		loadAwithGlobal: #WriteBarrier;
+		callIndirectA;
+		popA
 ]
 
 { #category : #'private - assemble' }
@@ -490,23 +491,11 @@ InlineMessageLinker >> assembleIntegerMultiplyByInto [
 ]
 
 { #category : #'private - assemble' }
-InlineMessageLinker >> assembleInvokeWithDroppingTwoFramesAndAdjusting [
-	#_invokeWith:droppingTwoFramesAndAdjusting:.
+InlineMessageLinker >> assembleInvoke [
+	#_invoke:.
 	assembler
-		restoreCallerFrame;
-		restoreCallerFrame;
-		convertTtoNativeInteger;
-		shiftTleft: assembler wordSizeShift;
-		addSPtoT;
-		pushR;
-		pushR;
-		loadRwithSPindex: 3;
-		storeRinTindex: 1;
-		storeAinTindex: 2;
-		popA;
-		loadSPwithT;
-		loadRwithS;
-		jumpToA
+		loadMwithA;
+		callIndirectM
 ]
 
 { #category : #'private - assemble' }
@@ -755,16 +744,14 @@ InlineMessageLinker >> assembleTransferControlDiscardingLastArgTo [
 	assembler
 		restoreCallerFrame;
 		popSPindirect;
-		jumpToA
+		loadMwithA;
+		jumpToMindex: 1
 ]
 
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleTransferControlTo [
 	#_transferControlTo:.
-	assembler
-		restoreCallerFrame;
-		loadSwithA;
-		jumpToA
+	assembler restoreCallerFrame; loadMwithA; jumpToMindex: 1
 ]
 
 { #category : #'private - assemble' }

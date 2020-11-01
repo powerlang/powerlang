@@ -13,16 +13,6 @@ Class {
 	#category : #'Powerlang-Core-Assembler-JIT'
 }
 
-{ #category : #'instance creation' }
-RelocatableBuffer class >> new [
-	^super new initialize
-]
-
-{ #category : #'instance creation' }
-RelocatableBuffer class >> on: aStream [
-	^self new on: aStream
-]
-
 { #category : #fixups }
 RelocatableBuffer >> addAbsoluteFixup: label [
 	| fixup |
@@ -67,7 +57,8 @@ RelocatableBuffer >> currentAddress [
 RelocatableBuffer >> initialize [
 	super initialize.
 	fixups := OrderedCollection new.
-	address := 0
+	address := 0.
+	stream := #[] writeStream
 ]
 
 { #category : #writing }
@@ -100,11 +91,6 @@ RelocatableBuffer >> nextULargePut: long [
 { #category : #writing }
 RelocatableBuffer >> nextULongPut: long [
 	stream nextULongPut: long
-]
-
-{ #category : #private }
-RelocatableBuffer >> on: aStream [
-	stream := aStream
 ]
 
 { #category : #accessing }
@@ -155,6 +141,11 @@ RelocatableBuffer >> skip: anInteger [
 { #category : #writing }
 RelocatableBuffer >> stream [
 	^stream
+]
+
+{ #category : #private }
+RelocatableBuffer >> stream: aStream [
+	stream := aStream
 ]
 
 { #category : #writing }

@@ -85,6 +85,7 @@ SMessageNode >> needsStrictEvaluationOrder [
 		and: [arguments conform: [:arg | arg isImmediate or: [arg isBlockNode]]])
 		ifTrue: [^false].
 	receiver hasAssign ifTrue: [^true].
+	receiver isMessageNode ifTrue: [ ^true ]. 
 	^self hasVolatileArguments
 ]
 

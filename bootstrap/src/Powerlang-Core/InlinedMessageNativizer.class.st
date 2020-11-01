@@ -210,7 +210,7 @@ InlinedMessageNativizer >> inlineMessage [
 	selector = #to:do:
 		ifTrue: [ ^ self inlineToDo ].
 	selector = #to:by:do:
-		ifTrue: [ ^ self ].
+		ifTrue: [ ^ self inlineToByDo].
 	selector = #timesRepeat:
 		ifTrue: [ ^ self inlineTimesRepeat ].
 	(selector beginsWith: #or:)
@@ -311,10 +311,8 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 	assembler
 		alignTo: 16;
 		@ head;
-		testIntegerBitOf: assembler regA8;
-		jumpIfZeroTo: nonInteger.
-	nativizer loadRwithStack: current.
-	assembler
+		testIntegerBitOf: assembler regR8;
+		jumpIfZeroTo: nonInteger;
 		compareRwithSmallInteger: 0;
 		jumpIfLessOrEqualSignedTo: continue;
 		@ block.
@@ -322,7 +320,7 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer loadRwithStack: current.
 	assembler
-		testIntegerBitOf: assembler regA8;
+		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonDecrementable;
 		subFromRconstant: 2.
 	nativizer storeRInStack: current.
@@ -348,9 +346,8 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 ]
 
 { #category : #nativizing }
-InlinedMessageNativizer >> inlineToDo [
-	| head block continue nonInteger nonIncrementable overflow current limit |
-
+InlinedMessageNativizer >> inlineToByDo [
+	| head block continue nonInteger nonIncrementable overflow current limit by increment |
 	head := assembler newLabel.
 	block := assembler newLabel.
 	continue := assembler newLabel.
@@ -358,30 +355,98 @@ InlinedMessageNativizer >> inlineToDo [
 	nonIncrementable := assembler newLabel.
 	overflow := assembler newLabel.
 	message receiver acceptVisitor: nativizer.
-	current := nativizer pushR.
+	current := message arguments third inlinedArgs first.
+	nativizer temporaryInStackAtPut: current.
 	message arguments first acceptVisitor: nativizer.
 	limit := nativizer pushR.
 	assembler loadAwithR.
-	nativizer loadRwithStack: current.
+	nativizer temporaryInStackAt: current.
 	assembler
 		alignTo: 16;
 		@ head;
 		testIntegerBitOf: assembler regA8;
-		jumpIfZeroTo: nonInteger.
-	nativizer loadAwithStack: limit.
+		jumpIfZeroTo: nonInteger;
+		testIntegerBitOf: assembler regR8;
+		jumpIfZeroTo: nonInteger;
+		compareRwithA.
+	by := message arguments second value.
+	by > 0
+		ifTrue: [ assembler jumpIfGreaterOrEqualSignedTo: continue ]
+		ifFalse: [ assembler jumpIfLessOrEqualSignedTo: continue ].
+	increment := (assembler smallInteger: by) - 1.
+	assembler @ block.
+	message arguments third statements
+		do: [ :s | s acceptVisitor: nativizer ].
+	nativizer temporaryInStackAt: current.
 	assembler
+		testIntegerBitOf: assembler regR8;
+		jumpIfZeroTo: nonIncrementable;
+		addRconstant: increment;
+		jumpIfOverflowTo: overflow.
+	nativizer
+		temporaryInStackAtPut: current;
+		loadAwithStack: limit.
+	assembler
+		jumpTo: head;
+		@ continue.
+	nativizer
+		addFallback: [ assembler
+				@ overflow;
+				subFromRconstant: increment;
+				@ nonIncrementable;
+				pushSmallInteger: 1.
+			nativizer
+				emitSend: #+;
+				temporaryInStackAtPut: current;
+				loadAwithStack: limit.
+			assembler jumpTo: head ];
+		addFallback: [ assembler
+				@ nonInteger;
+				pushA.
+			nativizer emitSend: #<=.
+			assembler
+				compareRwithTrue;
+				jumpIfEqualTo: block;
+				jumpTo: continue ]
+]
+
+{ #category : #nativizing }
+InlinedMessageNativizer >> inlineToDo [
+	| head block continue nonInteger nonIncrementable overflow current limit |
+	head := assembler newLabel.
+	block := assembler newLabel.
+	continue := assembler newLabel.
+	nonInteger := assembler newLabel.
+	nonIncrementable := assembler newLabel.
+	overflow := assembler newLabel.
+	message receiver acceptVisitor: nativizer.
+	current := message arguments second inlinedArgs first.
+	nativizer temporaryInStackAtPut: current.
+	message arguments first acceptVisitor: nativizer.
+	limit := nativizer pushR.
+	assembler loadAwithR.
+	nativizer temporaryInStackAt: current.
+	assembler
+		alignTo: 16;
+		@ head;
+		testIntegerBitOf: assembler regA8;
+		jumpIfZeroTo: nonInteger;
+		testIntegerBitOf: assembler regR8;
+		jumpIfZeroTo: nonInteger;
 		compareRwithA;
-		jumpIfEqualTo: continue;
+		jumpIfGreaterOrEqualSignedTo: continue;
 		@ block.
 	message arguments second statements
 		do: [ :s | s acceptVisitor: nativizer ].
-	nativizer loadRwithStack: current.
+	nativizer temporaryInStackAt: current.
 	assembler
 		testIntegerBitOf: assembler regA8;
 		jumpIfZeroTo: nonIncrementable;
 		addRconstant: 2;
 		jumpIfOverflowTo: overflow.
-	nativizer storeRInStack: current.
+	nativizer
+		temporaryInStackAtPut: current;
+		loadAwithStack: limit.
 	assembler
 		jumpTo: head;
 		@ continue.
@@ -393,7 +458,8 @@ InlinedMessageNativizer >> inlineToDo [
 				pushSmallInteger: 1.
 			nativizer
 				emitSend: #+;
-				storeRInStack: current.
+				temporaryInStackAtPut: current;
+				loadAwithStack: limit.
 			assembler jumpTo: head ];
 		addFallback: [ assembler
 				@ nonInteger;
