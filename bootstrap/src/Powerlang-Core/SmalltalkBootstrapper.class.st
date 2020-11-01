@@ -737,12 +737,12 @@ SmalltalkBootstrapper >> nativizeRemainingMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> nativizeRemainingMethodsIn: species [
-	| transferred |
-	methods do: [ :smethod |
-		transferred := identityMap at: smethod.
+	methods
+		do: [ :smethod | 
 			smethod nativeCode
-				ifNil: [ nativizer nativize: smethod.
-					self transferNativeCode: smethod nativeCode of: transferred ]]
+				ifNil: [
+					nativizer nativize: smethod.
+					self transferNativeCodeOfMethod: smethod ] ]
 ]
 
 { #category : #initialization }
@@ -1100,19 +1100,16 @@ SmalltalkBootstrapper >> transferAstcodesFrom: anArray [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferBlock: anSCompiledBlock [
-	| transferred code method format |
-	identityMap at: anSCompiledBlock ifPresent: [ :b | ^b ].
+	| transferred method format |
+	identityMap at: anSCompiledBlock ifPresent: [ :b | ^ b ].
 	transferred := self newSlots: #CompiledBlock.
 	identityMap at: anSCompiledBlock put: transferred.
 	method := identityMap at: anSCompiledBlock method.
-	code := self
-		transferNativeCode: anSCompiledBlock nativeCode
-		of: transferred.
 	format := self newInteger: anSCompiledBlock format.
 	transferred
 		method: method;
 		format: format;
-		nativeCode: code.
+		nativeCode: nilObj.
 	^ transferred
 ]
 
@@ -1170,12 +1167,14 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
-	| size classname transferred astcodes selector format |
+	| size classname transferred astcodes selector format literal tliteral |
 	identityMap
 		at: anSCompiledMethod
 		ifPresent: [ :m | self ASSERT: false ].
 	size := anSCompiledMethod size.
-	classname := anSCompiledMethod isCallback ifTrue: ['CallbackMethod'] ifFalse: [ 'CompiledMethod' ].
+	classname := anSCompiledMethod isCallback
+		ifTrue: [ 'CallbackMethod' ]
+		ifFalse: [ 'CompiledMethod' ].
 	transferred := self newSlots: classname sized: size.
 	identityMap at: anSCompiledMethod put: transferred.
 	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
@@ -1187,7 +1186,10 @@ SmalltalkBootstrapper >> transferMethod: anSCompiledMethod in: species [
 		selector: selector;
 		format: format;
 		source: self nilObject.
-	1 to: size do: [ :i | self transferLiteralAt: i in: transferred ].
+	1 to: size do: [ :i | 
+		literal := anSCompiledMethod at: i.
+		tliteral  := self transferLiteralDeep: literal.
+		transferred at: i put: tliteral ].
 	^ transferred
 ]
 
@@ -1208,6 +1210,23 @@ SmalltalkBootstrapper >> transferNativeCode: aNativeCode of: compiledCode [
 		withIndexDo: [ :elem :i | 
 			slot := self transferLiteralDeep: elem.
 			transferred at: i put: slot ].
+	^ transferred
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> transferNativeCodeOfMethod: anSCompiledMethod [
+	| transferred remaining literal block |
+	transferred := identityMap at: anSCompiledMethod.
+	self transferNativeCode: anSCompiledMethod nativeCode of: transferred.
+	remaining := anSCompiledMethod blockCount.
+	index := 1.
+	[ remaining > 0 ]
+		whileTrue: [ literal := anSCompiledMethod at: index.
+			literal isBlock
+				ifTrue: [ block := transferred at: index.
+					self transferNativeCode: literal nativeCode of: block.
+					remaining := remaining - 1 ].
+			index := index + 1 ].
 	^ transferred
 ]
 
