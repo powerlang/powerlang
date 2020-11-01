@@ -1219,18 +1219,18 @@ SmalltalkBootstrapper >> transferNativeCode: aNativeCode of: compiledCode [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> transferNativeCodeOfMethod: anSCompiledMethod [
-	| transferred remaining literal block |
+	| transferred remaining literal block position |
 	transferred := identityMap at: anSCompiledMethod.
 	self transferNativeCode: anSCompiledMethod nativeCode of: transferred.
 	remaining := anSCompiledMethod blockCount.
-	index := 1.
+	position := 1.
 	[ remaining > 0 ]
-		whileTrue: [ literal := anSCompiledMethod at: index.
+		whileTrue: [ literal := anSCompiledMethod at: position.
 			literal isBlock
-				ifTrue: [ block := transferred at: index.
+				ifTrue: [ block := transferred at: position.
 					self transferNativeCode: literal nativeCode of: block.
 					remaining := remaining - 1 ].
-			index := index + 1 ].
+			position := position + 1 ].
 	^ transferred
 ]
 
