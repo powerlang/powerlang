@@ -753,9 +753,9 @@ OptimizingCodeEmitter >> initializeAssemblers [
 		yourself
 ]
 
-{ #category : #unclassified }
+{ #category : #initialization }
 OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := TemplateAssembler64 on: #[] writeStream
+	assembler := TemplateAssembler64 new
 ]
 
 { #category : #unclassified }

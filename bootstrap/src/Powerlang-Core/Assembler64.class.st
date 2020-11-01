@@ -51,11 +51,6 @@ Assembler64 class >> new [
 	^super new initialize
 ]
 
-{ #category : #'instance creation' }
-Assembler64 class >> on: aStream [
-	^self new on: aStream
-]
-
 { #category : #labels }
 Assembler64 >> @ label [
 	self addLabel: label
@@ -344,6 +339,7 @@ Assembler64 >> initialize [
 	pointer := MemoryOperand new.
 	encoder := instruction encoder.
 	labels := Dictionary new: 100.
+	memory := RelocatableBuffer new
 ]
 
 { #category : #'private - jumps' }
@@ -616,11 +612,6 @@ Assembler64 >> nop: count [
 { #category : #calls }
 Assembler64 >> offsetOfIndex: index [
 	^index - 1 * wordSize
-]
-
-{ #category : #initialization }
-Assembler64 >> on: aStream [
-	memory := RelocatableBuffer on: aStream
 ]
 
 { #category : #services }

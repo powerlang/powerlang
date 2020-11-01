@@ -380,11 +380,10 @@ SExpressionNativizer >> falseLiteral [
 	assembler loadRwithFalse
 ]
 
-{ #category : #services }
+{ #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	assembler := TemplateAssembler64 on: #[  ] writeStream.
-
+	assembler := TemplateAssembler64 new
 ]
 
 { #category : #services }
