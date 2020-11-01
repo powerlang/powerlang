@@ -836,14 +836,19 @@ SExpressionNativizer >> visitMessage: anSMessage [
 
 { #category : #services }
 SExpressionNativizer >> visitMethod: anSMethod [
-	| statements |
+	| statements returned |
 	activeScript := anSMethod.
 	self emitMethodPrologue.
 	statements := anSMethod statements.
-	statements do: [:s | s acceptVisitor: self].
-	(statements notEmpty andNot: [statements last isReturn])
-		ifTrue: [assembler loadRwithS].
-	self emitEpilogue; emitFallbacks; saveMethodCode
+	statements do: [ :s | s acceptVisitor: self ].
+	(statements notEmpty andNot: [ statements last isReturn ])
+		ifTrue: [ assembler loadRwithS ].
+	returned := statements notEmpty and: [ 	
+	statements last isReturn].
+	returned ifFalse: [ self emitEpilogue ].
+	self
+		emitFallbacks;
+		saveMethodCode
 ]
 
 { #category : #services }
