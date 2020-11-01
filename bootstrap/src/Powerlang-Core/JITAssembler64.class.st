@@ -1762,6 +1762,11 @@ JITAssembler64 >> regT [
 ]
 
 { #category : #private }
+JITAssembler64 >> regT8 [
+	^ cl
+]
+
+{ #category : #private }
 JITAssembler64 >> regTrue [
 	^ r13
 ]
@@ -1869,6 +1874,11 @@ JITAssembler64 >> shiftTleft: count [
 JITAssembler64 >> shiftTright: count [
 	self ASSERT: count < 32.
 	self assemble: 'sar' with: self regT with: count
+]
+
+{ #category : #comparing }
+JITAssembler64 >> smallInteger: anInteger [
+	^(anInteger bitShift: 1) + 1
 ]
 
 { #category : #arithmetic }
@@ -2136,6 +2146,11 @@ JITAssembler64 >> subDoubleX1fromX0 [
 { #category : #arithmetic }
 JITAssembler64 >> subFromRconstant: imm [
 	self assemble: 'sub' with: self regR withImm: imm
+]
+
+{ #category : #arithmetic }
+JITAssembler64 >> subTfromR [
+	self assemble: 'sub' with: self regR with: self regT
 ]
 
 { #category : #arithmetic }
