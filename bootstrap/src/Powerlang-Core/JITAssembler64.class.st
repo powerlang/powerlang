@@ -588,6 +588,22 @@ JITAssembler64 >> loadAwithFalse [
 	self assemble: 'mov' with: self regA with: self regFalse
 ]
 
+{ #category : #private }
+JITAssembler64 >> loadAwithGindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regA
+		withReg: self regG
+		index: index
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadAwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadAwithGindex: index
+]
+
 { #category : #loading }
 JITAssembler64 >> loadAwithImmediate: imm [
 	#imm32.
@@ -794,6 +810,11 @@ JITAssembler64 >> loadMXCSRfromA [
 	self assemble: 'ldmxcsr' with: pointer
 ]
 
+{ #category : #'push/pop' }
+JITAssembler64 >> loadMwithA [
+	self assemble: 'mov' with: self regM with: self regA
+]
+
 { #category : #loading }
 JITAssembler64 >> loadMwithFPindex: index [
 	self
@@ -846,6 +867,15 @@ JITAssembler64 >> loadMwithRIPoffset: imm [
 		displacement: imm.
 
 	self assemble: 'lea' with: self regM with: pointer
+]
+
+{ #category : #loading }
+JITAssembler64 >> loadMwithRindex: index [
+	self
+		assemble: 'mov'
+		withReg: self regM
+		withReg: self regR
+		index: index
 ]
 
 { #category : #loading }

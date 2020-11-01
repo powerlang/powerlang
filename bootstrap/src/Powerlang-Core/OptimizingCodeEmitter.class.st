@@ -668,22 +668,21 @@ OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleTransferControlTo: instruction [
-	| code receiver |
+	| code receiver activation |
 	receiver := allocation at: instruction left.
 	code := allocation at: instruction right.
-	receiver == assembler regA ifTrue: [
-		code == assembler regT
-			ifTrue: [
-				assembler move: assembler regA to: assembler regR.
-				receiver := assembler regR]
-			ifFalse: [
-				assembler move: assembler regA to: assembler regT.
-				receiver := assembler regT]].
-	self assembleCopyIfNeeded: code to: assembler regA.
+	receiver == assembler regA
+		ifTrue: [ code == assembler regT
+				ifTrue: [ assembler move: assembler regA to: assembler regR.
+					receiver := assembler regR ]
+				ifFalse: [ assembler move: assembler regA to: assembler regT.
+					receiver := assembler regT ] ].
+	self assembleCopyIfNeeded: code to: assembler regM.
 	self assembleCopyIfNeeded: receiver to: assembler regR.
-	self activationRecord savesPreviousSelf
-		ifTrue: [assembler pop: assembler regS].
-	assembler restoreCallerFrame; jumpToReg: assembler regA
+	activation := self activationRecord.
+	(activation savesPreviousSelf and: [activation hasFrame])
+		ifTrue: [assembler popS].
+	assembler restoreCallerFrame; jumpToMindex: 1
 ]
 
 { #category : #unclassified }
@@ -875,7 +874,8 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 	| frame |
 	instruction name == #activationRecord
-		ifTrue: [ assembler buildFrame. ^self loadMifNeeded ].
+		ifTrue: [ assembler buildFrame.
+			^ self loadMifNeeded ].
 	instruction name == #self
 		ifFalse: [ ^ self ].
 	frame := instruction prev.
@@ -884,10 +884,9 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 	assembler
 		reserveStackSlots: frame temporaries + 2;
 		store: assembler regR in: assembler regFP index: 0;
-		loadTwithMindex: (NativeCode indexOfSlot: 'compiledCode');
 		store: assembler regM in: assembler regFP index: -1.
 	self savesPreviousSelf
-		ifTrue: [ assembler push: assembler regS ]
+		ifTrue: [ assembler pushS; pushM; loadMwithA ]
 ]
 
 { #category : #unclassified }
@@ -914,11 +913,11 @@ OptimizingCodeEmitter >> visitReturn: aReturnInstruction [
 	source := allocation at: aReturnInstruction source.
 	self assembleCopyIfNeeded: source to: assembler regR.
 	self savesPreviousSelf
-		ifTrue: [assembler pop: assembler regS; restoreCallerFrame]
-		ifFalse: [
-			assembler
+		ifTrue: [ assembler
+				popM; popS; restoreCallerFrame ]
+		ifFalse: [ assembler
 				restoreCallerFrame;
-				load: assembler regS from: assembler regFP atIndex: 0].
+				load: assembler regS from: assembler regFP atIndex: 0; restoreCallerM ].
 	assembler return
 ]
 
