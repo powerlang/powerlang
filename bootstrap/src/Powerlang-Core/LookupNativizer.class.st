@@ -92,6 +92,7 @@ LookupNativizer >> otherLookupMethods [
 		add: self >> #CompiledMethod >> #nativeCode;
 		add: self >> #CompiledMethod >> #selector;
 		add: self >> #NativeCode >> #code;
+		add: self >> #NativeCode >> #compiledCode;
 		add: self >> #Species >> #instanceBehavior;
 		add: self >> #Process >> #wantsToStepInto;
 		yourself
@@ -110,6 +111,6 @@ LookupNativizer >> selectorLookupMethods [
 LookupNativizer >> sendSiteMethods [
 	| sendsite |
 	sendsite := self >> #SendSite.
-	^ #(_dispatchOn: #_dispatchOn:startingAt: _dispatchDebuggableOn: #_dispatchDebuggableOn:startingAt: sentSelector #when:use: #beInvoke:using: bePolymorphic isStaticSend #monomorphicMap:to: #polymorphicMap:to: maxSize reset takeNextFreeMIC takeNextFreePIC)
+	^ #(_dispatchOn: _dispatchOn:startingAt: _dispatchDebuggableOn: _dispatchDebuggableOn:startingAt: sentSelector when:use: beInvoke:using: bePolymorphic isStaticSend monomorphicMap:to: polymorphicMap:to: maxSize reset takeNextFreeMIC takeNextFreePIC)
 		collect: [ :s | sendsite >> s ]
 ]
