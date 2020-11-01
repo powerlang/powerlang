@@ -407,11 +407,13 @@ OptimizingCodeEmitter >> assembleEqualsConstant: instruction [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
-	| base dst |
+	| base dst index |
 	base := allocation at: extendedSizeSend receiver.
 	dst := allocation at: extendedSizeSend.
+	index := LargeSizeOffset // 4 + 1.
 	assembler
-		load: dst e from: base atIndex: LargeSizeOffset;
+	
+		load: dst e from: base atIndex: index;
 		convertToSmallInteger: dst
 ]
 
