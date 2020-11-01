@@ -216,6 +216,20 @@ SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 ]
 
 { #category : #services }
+SExpressionNativizer >> captureClosure: anSBlock [
+	| slot variables block |
+	self instantiateClosure: anSBlock.
+	slot := 3.
+	variables := anSBlock capturedVariables readStream.
+	[ variables atEnd ]
+		whileFalse: [ self captureVariable: variables index: slot.
+			slot := slot + 1 ].
+	block := anSBlock compiledCode.
+	block capturesHome
+		ifTrue: [ self saveReturnFrame ]
+]
+
+{ #category : #services }
 SExpressionNativizer >> captureVariable: stream index: anInteger [
 	| type pos |
 	type := stream next.
@@ -752,19 +766,10 @@ SExpressionNativizer >> visitAssignment: anSAssignment [
 
 { #category : #services }
 SExpressionNativizer >> visitBlock: anSBlock [
-	| block slot variables |
 	anSBlock isInlined
-		ifTrue: [ ^anSBlock statements do: [ :s | s acceptVisitor: self ] ].
+		ifTrue: [ ^ anSBlock statements do: [ :s | s acceptVisitor: self ] ].
 	remainingBlocks add: anSBlock.
-	self instantiateClosure: anSBlock.
-	slot := 3.
-	variables := anSBlock capturedVariables readStream.
-	[ variables atEnd ]
-		whileFalse: [ self captureVariable: variables index: slot.
-			slot := slot + 1 ].
-	block := anSBlock compiledCode.
-	block capturesHome
-		ifTrue: [ self saveReturnFrame ]
+	self captureClosure: anSBlock 
 ]
 
 { #category : #services }
