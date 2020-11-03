@@ -466,25 +466,6 @@ SmalltalkBootstrapper >> initializeClass: definition [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> initializeInlineCaches [
-	| class lkup invk mic pic |
-	class := self classNamed: #SendSite.
-	lkup := globals at: #Lookup.
-	invk := globals at: #Invoke.
-	mic := self newBytesFrom: nativizer monomorphicCache.
-	pic := self newBytesFrom: nativizer polymorphicCache.
-	self
-		emulateSend: class
-			selector: #allocateInitialCachesUsing:
-			with: {lkup};
-		emulateSend: class
-			selector: #initializeInvoke:
-			with: {invk};
-		emulateSend: class selector: #monomorphicCache: with:  {mic};
-		emulateSend: class selector: #polymorphicCache: with: {pic}
-]
-
-{ #category : #initialization }
 SmalltalkBootstrapper >> initializeInlinedMethods [
 	| compiled |
 	compiled := self inlinedMethods
@@ -568,6 +549,23 @@ SmalltalkBootstrapper >> initializeOptimizedMethods [
 	compiled := self optimizedMethods
 		collect: [ :method | methods at: method ].
 	nativizer optimizedMethods: compiled
+]
+
+{ #category : #initialization }
+SmalltalkBootstrapper >> initializeSendSite [
+	| class lkup invk mic pic |
+	class := self classNamed: #SendSite.
+	lkup := globals at: #Lookup.
+	invk := globals at: #Invoke.
+	mic := self newBytesFrom: nativizer monomorphicCache.
+	pic := self newBytesFrom: nativizer polymorphicCache.
+	self
+		emulateSend: class
+			selector: #allocateInitialCachesUsing:
+			with: {lkup};
+		emulateSend: class selector: #initializeInvoke: with: {invk};
+		emulateSend: class selector: #monomorphicCache: with: {mic};
+		emulateSend: class selector: #polymorphicCache: with: {pic}
 ]
 
 { #category : #initialization }
@@ -696,7 +694,7 @@ SmalltalkBootstrapper >> nameOf: anObject [
 { #category : #initialization }
 SmalltalkBootstrapper >> nativize [
 	self initializeNativizer;
-		initializeInlineCaches;
+		initializeSendSite;
 		nativizeRemainingMethods
 ]
 
