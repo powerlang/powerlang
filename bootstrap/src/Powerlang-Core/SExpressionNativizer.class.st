@@ -184,10 +184,14 @@ SExpressionNativizer >> argumentInEnvironmentAt: index [
 
 { #category : #services }
 SExpressionNativizer >> argumentInStackAt: index [
-	| end |
-	end := 3 + self argumentCount.
-	assembler loadRwithFPindex: end - index
-
+	| args end |
+	args := self argumentCount.
+	method hasFrame ifTrue: [ 
+		end := 3 + args.
+	assembler loadRwithFPindex: end - index ] ifFalse: [ 
+		end := 2 + args.
+		assembler  loadRwithSPindex: end - index
+	 ]
 ]
 
 { #category : #services }
