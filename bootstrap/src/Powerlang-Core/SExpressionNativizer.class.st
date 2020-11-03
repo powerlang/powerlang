@@ -366,6 +366,16 @@ SExpressionNativizer >> emitSend: selector [
 ]
 
 { #category : #services }
+SExpressionNativizer >> emitSend: selector super: aBoolean [
+	| linker |
+	linker := environment messageLinker.
+	
+	method isDebuggable
+		ifTrue: [ aBoolean ifTrue: [linker emitSendSuperDebuggable: selector from: method classBinding using: assembler] ifFalse: [linker emitSendDebuggable: selector using: assembler ]]
+		ifFalse: [ aBoolean ifTrue: [linker emitSendSuper: selector from: method classBinding using: assembler ] ifFalse: [linker emitSend: selector using: assembler ]]
+]
+
+{ #category : #services }
 SExpressionNativizer >> emitWriteBarrier [
 	assembler
 		loadAwithGlobal: #WriteBarrier;
@@ -774,21 +784,26 @@ SExpressionNativizer >> visitBlock: anSBlock [
 
 { #category : #services }
 SExpressionNativizer >> visitCascade: anSCascade [
-	| index |
-	anSCascade receiver acceptVisitor: self.
+	| receiver index |
+	receiver := anSCascade receiver.
+	receiver acceptVisitor: self.
 	index := self pushR.
-	anSCascade messages do: [:m | self visitCascadeMessage: m receiver: index].
+	anSCascade messages
+		do: [ :m | self visitCascadeMessage: m receiver: index super: receiver isSuper ].
 	self dropTos
 ]
 
 { #category : #services }
-SExpressionNativizer >> visitCascadeMessage: anSCascadeMessage receiver: index [
+SExpressionNativizer >> visitCascadeMessage: anSCascadeMessage receiver: index super: aBoolean [
 	| arguments |
 	arguments := anSCascadeMessage arguments.
-	arguments do: [:node | 
-		node acceptVisitor: self.
-		self pushR].
-	self loadRwithStack: index; emitSend: anSCascadeMessage selector.
+	arguments
+		do: [ :node | 
+			node acceptVisitor: self.
+			self pushR ].
+	self
+		loadRwithStack: index;
+		emitSend: anSCascadeMessage selector super: aBoolean.
 	stackCount := stackCount - arguments size
 ]
 
@@ -819,19 +834,23 @@ SExpressionNativizer >> visitLiteral: anSLiteral [
 { #category : #services }
 SExpressionNativizer >> visitMessage: anSMessage [
 	| arguments index |
-	anSMessage isInlined ifTrue: [^self visitInlinedMessage: anSMessage].
-	anSMessage isOptimized ifTrue: [^self visitOptimizedMessage: anSMessage].
+	anSMessage isInlined
+		ifTrue: [ ^ self visitInlinedMessage: anSMessage ].
+	anSMessage isOptimized
+		ifTrue: [ ^ self visitOptimizedMessage: anSMessage ].
 	anSMessage receiver acceptVisitor: self.
 	arguments := anSMessage arguments.
-	arguments isEmpty ifFalse: [
-		index := self pushR.
-		arguments do: [:node | 
-			node acceptVisitor: self.
-			self pushR].
-		self loadRwithStack: index].
-	self emitSend: anSMessage selector.
+	arguments isEmpty
+		ifFalse: [ index := self pushR.
+			arguments
+				do: [ :node | 
+					node acceptVisitor: self.
+					self pushR ].
+			self loadRwithStack: index ].
+	self emitSend: anSMessage selector super: anSMessage receiver isSuper.
 	stackCount := stackCount - arguments size.
-	arguments isEmpty ifFalse: [self dropTos]
+	arguments isEmpty
+		ifFalse: [ self dropTos ]
 ]
 
 { #category : #services }
