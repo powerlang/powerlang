@@ -24,7 +24,8 @@ Class {
 		'wordSize',
 		'maxSMI',
 		'minSMI',
-		'module'
+		'module',
+		'smalltalk'
 	],
 	#classVars : [
 		'Spec'
@@ -762,9 +763,11 @@ SmalltalkBootstrapper >> nativizeWriteBarrier [
 	writeBarrier := emulator
 		compile: self => #ProtoObject >> #holdRefererIfNeeded:.
 	dispatcher := LookupLinker new initializeFrom: nativizer.
-	nativizer copy
+	NativizationEnvironment new
+		globals: nativizer globals;
 		inlinedMethods: inlined;
 		messageLinker: dispatcher;
+		completeInitialization;
 		nativizeOptimizing: writeBarrier.
 	self
 		transfer: writeBarrier

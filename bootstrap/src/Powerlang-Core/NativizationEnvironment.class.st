@@ -250,6 +250,11 @@ NativizationEnvironment >> newExpressionNativizer [
 ]
 
 { #category : #initialization }
+NativizationEnvironment >> optimizedMethods [
+	^optimizedMethods
+]
+
+{ #category : #initialization }
 NativizationEnvironment >> optimizedMethods: aCollection [
 	optimizedMethods := aCollection
 ]

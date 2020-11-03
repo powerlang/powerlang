@@ -64,7 +64,9 @@ LookupNativizer >> nativizeMethods [
 { #category : #'instance creation' }
 LookupNativizer >> newNativizationEnvironment [
 	| environment ignored lookup invoke |
-	environment := bootstrapper nativizer copy.
+	environment := NativizationEnvironment new
+		globals: bootstrapper nativizer globals;
+		optimizedMethods: bootstrapper nativizer optimizedMethods.
 	ignored := HaltingSend new
 		filter: #(< <= = > + - * // bitAnd: bitOr: bitXor:).
 	lookup := LookupLinker new initializeFrom: environment.
