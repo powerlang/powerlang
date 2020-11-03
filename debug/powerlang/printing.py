@@ -23,7 +23,7 @@ def PRIxPTR(value):
     return FMTxPTR % int(value)
 
 def _ObjectPrintString(obj):
-    if obj.isSmallInteger(): 
+    if obj.isSmallInteger():
         return (FMTxPTR + " ( SmallInteger, %d " + FMTxPTR + ")") % (obj._oop, int(obj), int(obj))
     elif obj.isNil():
         return (FMTxPTR + " ( nil )") % (obj._oop)
@@ -47,15 +47,15 @@ def _ObjectPrintString(obj):
             return "%s ( %s class )" % ( PRIxPTR(obj) , obj.slotAt(6).slotAt(6).chars())
         elif clazzName == 'Symbol':
             return "%s ( #%s )" % ( PRIxPTR(obj) , obj.chars())
-        
+
         detail = None
         if clazzName == 'String':
             detail = obj.chars()
             if len(detail) > 10:
                 detail = '"' + detail[:8] + '...'
             else:
-                detail = '"' + detail + '"'            
-        elif clazzName == 'CompiledMethod':
+                detail = '"' + detail + '"'
+        elif clazzName == 'CompiledMethod' or clazzName == 'CallbackMethod':
             mclazz = getattr(obj, 'class')
             mclazz = mclazz.slotAt(6).chars() if mclazz.size() > 6 else mclazz.slotAt(6).slotAt(6).chars() + ' class'
             selector = obj.selector.chars()
@@ -67,10 +67,10 @@ def _ObjectPrintString(obj):
         elif obj.isArrayed():
             if obj.isBytes():
                 details = str(obj.size()) + ' bytes'
-            else:        
+            else:
                 details = str(obj.size()) + ' slots'
 
-        if detail == None:            
+        if detail == None:
             return "%s ( a %s )" % ( PRIxPTR(obj) , clazzName )
         else:
             return "%s ( a %s, %s )" % ( PRIxPTR(obj) , clazzName, detail )
@@ -96,7 +96,7 @@ def _ObjectChildren(obj):
             else:
                 name = '%s%d' % (prefix, index + 1)
             return (name, obj.slotAt(index + 1)._oop)
-        return chain(header, map(lambda i : mk_slot(i), range(0, obj.size())))    
+        return chain(header, map(lambda i : mk_slot(i), range(0, obj.size())))
 
 SmallInteger.to_string = _ObjectPrintString
 SmallInteger.__str__ = _ObjectPrintString
@@ -113,7 +113,7 @@ class oop(object):
     def __init__(self, val):
         if isinstance(val, gdb.Value):
             # Not used yet, but will once we resurrect C++ magic
-            # 
+            #
             # if (val.type.code != gdb.TYPE_CODE_PTR) and val.type.name.startswith('BAST::OOP'):
             #    val = val['ptr']
             self._oop = val

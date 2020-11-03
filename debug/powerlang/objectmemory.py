@@ -397,23 +397,22 @@ class ImageSegment(object):
 
     @property
     def symtab(self):
-        if not hasattr(self, '_symtab'):
-            self._symtab = SymbolTable(self)
-        return self._symtab
+        return SymbolTable(self)
 
-    def find_instances_of(self, oopish_or_classname):
+    def find_instances_of(self, *oopishes_or_classnames):
         """
-        Return an iterator over all instances of given class.
+        Return an iterator over all instances of given class(es).
         """
-        clazz = None
-        if isinstance(oopish_or_classname, str):
-            clazz = self.find_class(oopish_or_classname)
-            if clazz == None:
-                return []
-        else:
-            clazz = obj(oopish_or_classname)
+        clazzes = []
+        for oopish_or_classname in oopishes_or_classnames:
+            if isinstance(oopish_or_classname, str):
+                clazz = self.find_class(oopish_or_classname)
+            else:
+                clazz = obj(oopish_or_classname)
+            if clazz != None:
+                clazzes.append(clazz)
 
-        return (obj for obj in iter(self) if obj.clazz == clazz)
+        return (obj for obj in iter(self) if obj.clazz in clazzes)
 
     def find_class(self, name):
         for o in iter(self):

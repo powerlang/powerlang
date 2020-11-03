@@ -27,7 +27,7 @@ class __DumpObjectCmd(gdb.Command):
     Usage: do EXP [EXP...]
 
     An expression EXP can be either OOP as numerical constant
-    (for example '0x1ff10028') or C/C++ expression which is 
+    (for example '0x1ff10028') or C/C++ expression which is
     evaluated in current frame (for example, 'kernel->header.module')
     """
     def invoke (self, args, from_tty):
@@ -74,7 +74,7 @@ def _lookup_symbol(pc_or_regexp):
 
     symtabs = (segment.symtab for segment in segments)
 
-    if pc != None:    
+    if pc != None:
         for symtab in symtabs:
             sym = symtab.lookup_symbol_by_addr(pc)
             if sym != None:
@@ -89,10 +89,10 @@ class __LookupMethod(gdb.Command):
     Looks up a method containing given PC or matching given REGEXP.
     Usage: lm [PC]
            lm REGEXP
-    
+
     PC can be given as an expression evaluating to an address
-    or omitted in which case value if $pc (PC of currently 
-    selected frame) is used. 
+    or omitted in which case value if $pc (PC of currently
+    selected frame) is used.
 
     If REGEXP is given, all methods whose name matches
     given regexp are looked up and printed.
@@ -102,13 +102,17 @@ class __LookupMethod(gdb.Command):
         if len(argv) > 1:
             raise Exception("lm takes only one argument (%d given)" % len(argv))
         elif len(argv) == 0:
-            argv = ['$pc']    
+            argv = ['$pc']
+        any_found = False
         for method in self(argv[0]):
+            any_found = True
             print(method)
+        if not any_found:
+            print("No method found.")
 
     def __call__(self, pc_or_regexp = '$pc'):
         return (sym.method for sym in _lookup_symbol(pc_or_regexp))
-        
+
 lm = __LookupMethod('lm', gdb.COMMAND_DATA)
 
 class __DisassembleMethod(gdb.Command):
@@ -116,27 +120,27 @@ class __DisassembleMethod(gdb.Command):
     Disassemble a method with given PC or matching given REGEXP.
     Usage: lm [PC]
            lm REGEXP
-    
+
     PC can be given as an expression evaluating to an address
-    or omitted in which case value if $pc (PC of currently 
-    selected frame) is used. 
+    or omitted in which case value if $pc (PC of currently
+    selected frame) is used.
 
     If REGEXP is given then method matching that REGEXP is
     disassembled
     """
-    def invoke(self, args, from_tty):        
+    def invoke(self, args, from_tty):
         argv = gdb.string_to_argv(args)
         if len(argv) > 1:
             raise Exception("lm takes only one argument (%d given)" % len(argv))
         elif len(argv) == 0:
-            argv = ['$pc']    
+            argv = ['$pc']
         self(argv[0])
 
-    def __call__(self, pc_or_regexp = '$pc'):          
-        methodsyms = list(_lookup_symbol(pc_or_regexp))        
+    def __call__(self, pc_or_regexp = '$pc'):
+        methodsyms = list(_lookup_symbol(pc_or_regexp))
         if len(methodsyms) == 0:
             print("No method matching %s" % pc_or_regexp)
-        elif len(methodsyms) > 1: 
+        elif len(methodsyms) > 1:
             print("Multiple methods matching %s:" % pc_or_regexp)
             for methodsym in methodsyms:
                 print(methodsym)
@@ -151,8 +155,8 @@ class __DisassembleMethod(gdb.Command):
         hiPC = loPC + methodsym.size
 
         print(methodsym)
-        for insn in arch.disassemble(loPC, hiPC - 1):            
-            print("  0x%016x: %s" % ( insn['addr'], insn['asm'] ));            
+        for insn in arch.disassemble(loPC, hiPC - 1):
+            print("  0x%016x: %s" % ( insn['addr'], insn['asm'] ));
 
 
 am = __DisassembleMethod('am', gdb.COMMAND_DATA)

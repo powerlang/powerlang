@@ -37,9 +37,9 @@ class MethodSymbol(object):
 class SymbolTable(object):
 	def __init__(self, segment):
 		self._segment = segment
-		
+
 	def __iter__(self):
-		return (MethodSymbol(mthd, self) for mthd in self._segment.find_instances_of('CompiledMethod') )
+		return (MethodSymbol(mthd, self) for mthd in self._segment.find_instances_of('CompiledMethod', 'CallbackMethod'))
 
 	def lookup_symbol_by_name(self, name):
 		for sym in iter(self):
