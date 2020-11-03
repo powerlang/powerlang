@@ -572,12 +572,11 @@ SmalltalkBootstrapper >> initializeOptimizedMethods [
 
 { #category : #initialization }
 SmalltalkBootstrapper >> initializeSmalltalk [
-	| class smalltalk |
+	| class |
 	class := self classNamed: #SmalltalkSystem.
 	smalltalk := self emulateSend: class selector: #new.
 	globals
-		do:
-			[ :assoc | self emulateSend: smalltalk selector: #add: with: {assoc} ].
+		do: [ :assoc | self emulateSend: smalltalk selector: #add: with: {assoc} ].
 	self emulateSend: smalltalk selector: #bootstrapInitialize
 ]
 
@@ -1286,8 +1285,9 @@ SmalltalkBootstrapper >> writeBarrier [
 
 { #category : #validating }
 SmalltalkBootstrapper >> writer [
-	^ImageSegmentWriter new 
-		objects: objects; 
+	^ ImageSegmentWriter new
+		objects: objects;
 		module: module;
-		yourself 
+		space: smalltalk memory edenSpace;
+		yourself
 ]

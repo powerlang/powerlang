@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'stream',
 		'objects',
+		'space',
 		'nextHash',
 		'offsets',
 		'size',
@@ -60,6 +61,20 @@ ImageSegmentWriter >> base: anInteger [
 	 at a different address but then they must relocate.
 	"
 	base := anInteger
+]
+
+{ #category : #accessing }
+ImageSegmentWriter >> configureSpace [
+	| basemap free limit |
+	basemap := SmallintObjectMap new value: base // 2.
+	free := SmallintObjectMap new value: (base + size) // 2.
+	limit := SmallintObjectMap new value: (base + size + 16r20000 // 2).
+	space
+		base: basemap;
+		nextFree: free;
+		softLimit: limit;
+		commitedLimit: limit;
+		reservedLimit: limit
 ]
 
 { #category : #accessing }
@@ -129,6 +144,11 @@ ImageSegmentWriter >> offsetOf: anObjectMap [
 	^ offsets at: anObjectMap
 ]
 
+{ #category : #initialization }
+ImageSegmentWriter >> space: aGCSpace [
+	space := aGCSpace
+]
+
 { #category : #accessing }
 ImageSegmentWriter >> stream: aWriteStream [
 	stream := aWriteStream
@@ -138,6 +158,7 @@ ImageSegmentWriter >> stream: aWriteStream [
 ImageSegmentWriter >> write [
 	self
 		layoutObjects;
+		configureSpace;
 		writeSignature;
 		writeHeader;
 		writeObjects
