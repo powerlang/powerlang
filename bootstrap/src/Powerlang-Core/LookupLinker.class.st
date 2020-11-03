@@ -23,7 +23,7 @@ LookupLinker >> emitSend: aSymbol using: anAssembler [
 LookupLinker >> emitSendSuper: aSymbol from: aClass using: anAssembler [
 	| send behavior |
 	send := SendSite new lookup: aSymbol using: lookupSuper; beSuperSend.
-	behavior := aClass superclass instanceBehavior.
+	behavior := aClass superclass map instanceBehavior.
 	anAssembler
 		loadAwithLiteral: send;
 		loadTwithLiteral: behavior;

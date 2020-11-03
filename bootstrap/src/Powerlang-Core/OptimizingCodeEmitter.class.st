@@ -417,6 +417,18 @@ OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
 		convertToSmallInteger: dst
 ]
 
+{ #category : #private }
+OptimizingCodeEmitter >> assembleExtendedSizePut: extendedSizeSend [
+	| base  index value |
+	base := allocation at: extendedSizeSend left.
+	value := allocation at: extendedSizeSend right.
+	index := LargeSizeOffset // 4 + 1.
+	assembler
+		convertToNativeInteger: value e;
+		store: value e in: base index: index;
+		convertToSmallInteger: value e
+]
+
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleFrom: aBasicBlock [
 	| code |

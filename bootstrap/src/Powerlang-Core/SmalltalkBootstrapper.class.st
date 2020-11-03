@@ -24,7 +24,8 @@ Class {
 		'wordSize',
 		'maxSMI',
 		'minSMI',
-		'module'
+		'module',
+		'smalltalk'
 	],
 	#classVars : [
 		'Spec'
@@ -465,25 +466,6 @@ SmalltalkBootstrapper >> initializeClass: definition [
 ]
 
 { #category : #initialization }
-SmalltalkBootstrapper >> initializeInlineCaches [
-	| class lkup invk mic pic |
-	class := self classNamed: #SendSite.
-	lkup := globals at: #Lookup.
-	invk := globals at: #Invoke.
-	mic := self newBytesFrom: nativizer monomorphicCache.
-	pic := self newBytesFrom: nativizer polymorphicCache.
-	self
-		emulateSend: class
-			selector: #allocateInitialCachesUsing:
-			with: {lkup};
-		emulateSend: class
-			selector: #initializeInvoke:
-			with: {invk};
-		emulateSend: class selector: #monomorphicCache: with:  {mic};
-		emulateSend: class selector: #polymorphicCache: with: {pic}
-]
-
-{ #category : #initialization }
 SmalltalkBootstrapper >> initializeInlinedMethods [
 	| compiled |
 	compiled := self inlinedMethods
@@ -570,13 +552,29 @@ SmalltalkBootstrapper >> initializeOptimizedMethods [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> initializeSendSite [
+	| class lkup invk mic pic |
+	class := self classNamed: #SendSite.
+	lkup := globals at: #Lookup.
+	invk := globals at: #Invoke.
+	mic := self newBytesFrom: nativizer monomorphicCache.
+	pic := self newBytesFrom: nativizer polymorphicCache.
+	self
+		emulateSend: class
+			selector: #allocateInitialCachesUsing:
+			with: {lkup};
+		emulateSend: class selector: #initializeInvoke: with: {invk};
+		emulateSend: class selector: #monomorphicCache: with: {mic};
+		emulateSend: class selector: #polymorphicCache: with: {pic}
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> initializeSmalltalk [
-	| class smalltalk |
+	| class |
 	class := self classNamed: #SmalltalkSystem.
 	smalltalk := self emulateSend: class selector: #new.
 	globals
-		do:
-			[ :assoc | self emulateSend: smalltalk selector: #add: with: {assoc} ].
+		do: [ :assoc | self emulateSend: smalltalk selector: #add: with: {assoc} ].
 	self emulateSend: smalltalk selector: #bootstrapInitialize
 ]
 
@@ -696,7 +694,7 @@ SmalltalkBootstrapper >> nameOf: anObject [
 { #category : #initialization }
 SmalltalkBootstrapper >> nativize [
 	self initializeNativizer;
-		initializeInlineCaches;
+		initializeSendSite;
 		nativizeRemainingMethods
 ]
 
@@ -762,9 +760,11 @@ SmalltalkBootstrapper >> nativizeWriteBarrier [
 	writeBarrier := emulator
 		compile: self => #ProtoObject >> #holdRefererIfNeeded:.
 	dispatcher := LookupLinker new initializeFrom: nativizer.
-	nativizer copy
+	NativizationEnvironment new
+		globals: nativizer globals;
 		inlinedMethods: inlined;
 		messageLinker: dispatcher;
+		completeInitialization;
 		nativizeOptimizing: writeBarrier.
 	self
 		transfer: writeBarrier
@@ -1283,8 +1283,9 @@ SmalltalkBootstrapper >> writeBarrier [
 
 { #category : #validating }
 SmalltalkBootstrapper >> writer [
-	^ImageSegmentWriter new 
-		objects: objects; 
+	^ ImageSegmentWriter new
+		objects: objects;
 		module: module;
-		yourself 
+		space: smalltalk memory edenSpace;
+		yourself
 ]
