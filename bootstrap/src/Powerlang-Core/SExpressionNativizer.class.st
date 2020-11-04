@@ -248,6 +248,13 @@ SExpressionNativizer >> captureVariable: stream index: anInteger [
 ]
 
 { #category : #services }
+SExpressionNativizer >> constPoolValueAt: anInteger [
+	| literal |
+	literal := self methodLiteralAt: anInteger.
+	assembler loadRwithLiteral: literal
+]
+
+{ #category : #services }
 SExpressionNativizer >> dropTos [
 	assembler dropTos: 1.
 	^stackCount := stackCount - 1

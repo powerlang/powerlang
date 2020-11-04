@@ -133,6 +133,11 @@ MethodEvaluator >> closures [
 	^closures
 ]
 
+{ #category : #visiting }
+MethodEvaluator >> constPoolValueAt: anInteger [
+	^ method at: anInteger
+]
+
 { #category : #dispatching }
 MethodEvaluator >> dispatch: aMethod with: aMessage [
 	| interpreter |
