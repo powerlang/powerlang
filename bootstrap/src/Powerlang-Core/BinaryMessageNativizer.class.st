@@ -287,19 +287,18 @@ BinaryMessageNativizer >> inlineMultiply [
 	nativizer saveContextSwitchPoint.
 	assembler
 		pushA;
+		convertAtoNativeInteger;
 		loadTwithR;
 		clearRintegerBit;
 		multiplyRbyA;
 		popA;
 		jumpIfOverflowTo: overflow;
 		ensureRintegerBit;
-
 		@ done.
 	nativizer
 		addFallback: [ assembler
 				@ overflow;
 				loadRwithT;
-			
 				@ failed;
 				pushA.
 			nativizer emitSend: #*.
