@@ -3,9 +3,9 @@ Class {
 	#superclass : #Object,
 	#type : #variable,
 	#instVars : [
-		'method',
 		'format',
-		'nativeCode'
+		'nativeCode',
+		'method'
 	],
 	#pools : [
 		'SCompiledBlockFlags'
