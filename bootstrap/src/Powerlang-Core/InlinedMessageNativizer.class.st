@@ -436,13 +436,13 @@ InlinedMessageNativizer >> inlineToDo [
 		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonInteger;
 		compareRwithA;
-		jumpIfGreaterOrEqualSignedTo: continue;
+		jumpIfGreaterSignedTo: continue;
 		@ block.
 	message arguments second statements
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer temporaryInStackAt: current.
 	assembler
-		testIntegerBitOf: assembler regA8;
+		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonIncrementable;
 		addRconstant: 2;
 		jumpIfOverflowTo: overflow.
