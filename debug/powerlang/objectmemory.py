@@ -13,6 +13,7 @@ model image objects (i.e., Smalltalk objects)
 import gdb
 
 from itertools import chain
+from functools import cached_property
 
 from powerlang.symbols import SymbolTable
 
@@ -395,7 +396,7 @@ class ImageSegment(object):
         hi = lo + self._ptr['header']['size'] - self._ptr['header'].type.sizeof
         return ObjectIterator(lo, hi)
 
-    @property
+    @cached_property
     def symtab(self):
         return SymbolTable(self)
 
