@@ -15,6 +15,11 @@ ConstantPoolBinding >> emitLoadAusing: anAstcodeEncoder [
 ]
 
 { #category : #testing }
+ConstantPoolBinding >> encodeUsing: anAstcodeEmitter [
+	anAstcodeEmitter encodePoolConst: self literal
+]
+
+{ #category : #testing }
 ConstantPoolBinding >> isConstantBinding [
 	^true
 ]

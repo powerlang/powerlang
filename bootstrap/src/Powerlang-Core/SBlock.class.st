@@ -30,6 +30,11 @@ SBlock >> capturedVariables: aCollection [
 ]
 
 { #category : #accessing }
+SBlock >> capturesHome [
+	^compiledCode capturesHome
+]
+
+{ #category : #accessing }
 SBlock >> index [
 	^index
 ]
@@ -57,6 +62,17 @@ SBlock >> inlinedArgs: anArray [
 { #category : #initialization }
 SBlock >> isInlined [
 	^compiledCode isNil
+]
+
+{ #category : #accessing }
+SBlock >> offsetOfCurrentEnvironment [
+	^ 2
+]
+
+{ #category : #accessing }
+SBlock >> offsetOfEnvironment: anInteger [
+	(anInteger = 1 and: [ self capturesHome ]) ifTrue: [ ^ 0 ].
+	^ 2
 ]
 
 { #category : #unclassified }

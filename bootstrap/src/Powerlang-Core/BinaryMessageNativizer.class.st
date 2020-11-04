@@ -287,19 +287,18 @@ BinaryMessageNativizer >> inlineMultiply [
 	nativizer saveContextSwitchPoint.
 	assembler
 		pushA;
+		convertAtoNativeInteger;
 		loadTwithR;
 		clearRintegerBit;
 		multiplyRbyA;
 		popA;
 		jumpIfOverflowTo: overflow;
 		ensureRintegerBit;
-
 		@ done.
 	nativizer
 		addFallback: [ assembler
 				@ overflow;
 				loadRwithT;
-			
 				@ failed;
 				pushA.
 			nativizer emitSend: #*.
@@ -429,4 +428,14 @@ BinaryMessageNativizer >> methodLiteralAt: index [
 { #category : #private }
 BinaryMessageNativizer >> nativizer: anAstcodeNativizer [
 	nativizer := anAstcodeNativizer 
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> popR [
+	^ nativizer popR
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> pushR [
+	^nativizer pushR
 ]

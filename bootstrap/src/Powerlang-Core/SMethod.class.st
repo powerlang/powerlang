@@ -18,6 +18,16 @@ SMethod >> isMethod [
 ]
 
 { #category : #printing }
+SMethod >> offsetOfCurrentEnvironment [
+	^ 0
+]
+
+{ #category : #printing }
+SMethod >> offsetOfEnvironment: anInteger [
+	^0
+]
+
+{ #category : #printing }
 SMethod >> pragma [
 	^pragma
 ]

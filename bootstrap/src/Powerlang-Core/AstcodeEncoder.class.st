@@ -196,6 +196,15 @@ AstcodeEncoder >> encodeOptimizedMessage: aMessageNode [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodePoolConst: association [
+	| index |
+	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: ConstantPoolId;
+		nextPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodePoolVar: association [
 	| index |
 	index := method indexOf: association ifAbsent: [self ASSERT: false].

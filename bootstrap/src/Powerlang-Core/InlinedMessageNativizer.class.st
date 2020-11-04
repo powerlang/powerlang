@@ -102,15 +102,17 @@ InlinedMessageNativizer >> inlineBranchIf: aBoolean [
 	second := aBoolean.
 	assembler
 		@ retry;
-		compareRwithBoolean: first;
+		loadAwithR;
+		loadRwithNil;
+		compareAwithBoolean: first;
 		jumpIfEqualTo: end;
-		compareRwithBoolean: second;
+		compareAwithBoolean: second;
 		jumpIfNotEqualTo: failed.
 	message arguments first statements
 		do: [ :s | s acceptVisitor: nativizer ].
 	assembler @ end.
 	nativizer
-		addFallback: [ assembler @ failed.
+		addFallback: [ assembler @ failed; loadRwithA.
 			nativizer sendMustBeBoolean.
 			assembler jumpTo: retry ]
 ]
@@ -371,8 +373,8 @@ InlinedMessageNativizer >> inlineToByDo [
 		compareRwithA.
 	by := message arguments second value.
 	by > 0
-		ifTrue: [ assembler jumpIfGreaterOrEqualSignedTo: continue ]
-		ifFalse: [ assembler jumpIfLessOrEqualSignedTo: continue ].
+		ifTrue: [ assembler jumpIfGreaterSignedTo: continue ]
+		ifFalse: [ assembler jumpIfLessSignedTo: continue ].
 	increment := (assembler smallInteger: by) - 1.
 	assembler @ block.
 	message arguments third statements
@@ -434,13 +436,13 @@ InlinedMessageNativizer >> inlineToDo [
 		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonInteger;
 		compareRwithA;
-		jumpIfGreaterOrEqualSignedTo: continue;
+		jumpIfGreaterSignedTo: continue;
 		@ block.
 	message arguments second statements
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer temporaryInStackAt: current.
 	assembler
-		testIntegerBitOf: assembler regA8;
+		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonIncrementable;
 		addRconstant: 2;
 		jumpIfOverflowTo: overflow.

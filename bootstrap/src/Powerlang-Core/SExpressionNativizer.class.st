@@ -178,8 +178,7 @@ SExpressionNativizer >> argumentCount [
 
 { #category : #services }
 SExpressionNativizer >> argumentInEnvironmentAt: index [
-	assembler loadRwithEindex: index
-
+	assembler loadRwithEindex: index + SClosure instSize
 ]
 
 { #category : #services }
@@ -221,16 +220,15 @@ SExpressionNativizer >> associationValueAt: anInteger put: dummy [
 
 { #category : #services }
 SExpressionNativizer >> captureClosure: anSBlock [
-	| slot variables block |
+	| slot variables |
 	self instantiateClosure: anSBlock.
 	slot := 3.
 	variables := anSBlock capturedVariables readStream.
 	[ variables atEnd ]
 		whileFalse: [ self captureVariable: variables index: slot.
 			slot := slot + 1 ].
-	block := anSBlock compiledCode.
-	block capturesHome
-		ifTrue: [ self saveReturnFrame ]
+	anSBlock capturesHome
+		ifTrue: [ self emitSend: #saveHomeFrame ]
 ]
 
 { #category : #services }
@@ -247,6 +245,13 @@ SExpressionNativizer >> captureVariable: stream index: anInteger [
 			storeTinRindex: anInteger].
 	type = EnvironmentValue
 		ifTrue: [assembler loadTwithEindex: pos; storeTinRindex: anInteger]
+]
+
+{ #category : #services }
+SExpressionNativizer >> constPoolValueAt: anInteger [
+	| literal |
+	literal := self methodLiteralAt: anInteger.
+	assembler loadRwithLiteral: literal
 ]
 
 { #category : #services }
@@ -461,9 +466,13 @@ SExpressionNativizer >> loadAwithArgument: index in: envIndex [
 
 { #category : #services }
 SExpressionNativizer >> loadAwithArgumentInEnvironment: envIndex at: index [
-	envIndex = 0 ifTrue: [ assembler loadAwithEindex: index ]
-	ifFalse: [ assembler loadAwithEindex: envIndex; loadAwithAindex: index ]
-
+	| offset |
+	envIndex = 0
+		ifTrue: [ assembler loadAwithEindex: index + SClosure instSize ]
+		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
+			assembler
+				loadAwithEindex: envIndex + SClosure instSize;
+				loadAwithAindex: index + offset ]
 ]
 
 { #category : #services }
@@ -496,14 +505,13 @@ SExpressionNativizer >> loadAwithTemporary: index in: envIndex [
 
 { #category : #services }
 SExpressionNativizer >> loadAwithTemporaryInEnvironment: envIndex at: index [
-		envIndex = 0
-		ifTrue: [ assembler loadAwithEindex: index ]
-		ifFalse: [ 
+	| offset |
+	envIndex = 0
+		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. assembler loadAwithEindex: index + offset ]
+		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadAwithEindex: envIndex;
-				loadAwithAindex: index ]
-	
-	
+				loadAwithEindex: envIndex + SClosure instSize;
+				loadAwithAindex: index + offset ]
 ]
 
 { #category : #services }
@@ -518,15 +526,12 @@ SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 
 { #category : #services }
 SExpressionNativizer >> loadBlockNativeCode [
-	"
-	index := CompiledBlock indexOfSlot: 'nativeCode'
-	"
-
-	| index |
-	index := 3. 
+	| block nativeCode |
+	block := SClosure indexOfSlot: 'block'.
+	nativeCode := SCompiledBlock indexOfSlot: 'nativeCode'.
 	assembler
-		loadMwithRindex: 1;
-		loadMwithMindex: index
+		loadMwithRindex: block;
+		loadMwithMindex: nativeCode
 ]
 
 { #category : #services }
@@ -690,16 +695,6 @@ SExpressionNativizer >> saveMethodCode [
 		            nativeCode
 ]
 
-{ #category : #services }
-SExpressionNativizer >> saveReturnFrame [
-	assembler pushR; loadRwithM.
-	self emitSend: #topFrameCursor.
-	assembler
-		loadAwithR;
-		popR;
-		storeAinRindex: 2
-]
-
 { #category : #templates }
 SExpressionNativizer >> sendMustBeBoolean [
 	self emitSend: #mustBeBoolean
@@ -724,24 +719,28 @@ SExpressionNativizer >> temporaryAt: index in: envIndex put: dummy [
 
 { #category : #services }
 SExpressionNativizer >> temporaryInEnvironment: envIndex at: index [
+	| offset |
 	envIndex = 0
-		ifTrue: [ assembler loadRwithEindex: index ]
-		ifFalse: [ assembler
-		loadRwithEindex: envIndex;
-		loadRwithRindex: index]
+		ifTrue: [offset := activeScript offsetOfCurrentEnvironment. assembler loadRwithEindex: index + offset ]
+		ifFalse: [ 
+			offset := activeScript offsetOfEnvironment: envIndex.
+			assembler
+				loadRwithEindex: envIndex + SClosure instSize ;
+				loadRwithRindex: index + offset]
 ]
 
 { #category : #services }
 SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
+	| offset |
 	envIndex = 0
-		ifTrue: [ 
+		ifTrue: [ offset := activeScript offsetOfCurrentEnvironment.
 			assembler
-				storeRinEindex: index;
+				storeRinEindex: index + offset;
 				pushE ]
-		ifFalse: [ 
+		ifFalse: [ offset := activeScript offsetOfEnvironment: envIndex.
 			assembler
-				loadTwithEindex: envIndex;
-				storeRinTindex: index;
+				loadTwithEindex: envIndex + SClosure instSize ;
+				storeRinTindex: index + offset;
 				pushT ].
 	self emitWriteBarrier
 ]

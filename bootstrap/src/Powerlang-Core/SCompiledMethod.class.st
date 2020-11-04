@@ -3,11 +3,11 @@ Class {
 	#superclass : #Array,
 	#type : #variable,
 	#instVars : [
+		'format',
 		'nativeCode',
 		'astcodes',
 		'class',
 		'selector',
-		'format',
 		'source'
 	],
 	#pools : [

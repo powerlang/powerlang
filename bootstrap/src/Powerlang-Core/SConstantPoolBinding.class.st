@@ -13,3 +13,8 @@ SConstantPoolBinding class >> decodeUsing: anAstcodeDecoder [
 SConstantPoolBinding >> value [
 	^association
 ]
+
+{ #category : #evaluating }
+SConstantPoolBinding >> valueWithin: evaluator [
+	^ evaluator constPoolValueAt: index
+]
