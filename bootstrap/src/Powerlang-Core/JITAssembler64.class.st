@@ -1813,10 +1813,7 @@ JITAssembler64 >> restoreCallerFrame [
 
 { #category : #epilogue }
 JITAssembler64 >> restoreCallerM [
-	| index |
-	index := SCompiledMethod indexOfSlot: 'nativeCode'.
-	self
-		loadMwithFPindex: -1
+	self loadMwithFPindex: -1
 ]
 
 { #category : #epilogue }
