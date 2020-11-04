@@ -102,15 +102,17 @@ InlinedMessageNativizer >> inlineBranchIf: aBoolean [
 	second := aBoolean.
 	assembler
 		@ retry;
-		compareRwithBoolean: first;
+		loadAwithR;
+		loadRwithNil;
+		compareAwithBoolean: first;
 		jumpIfEqualTo: end;
-		compareRwithBoolean: second;
+		compareAwithBoolean: second;
 		jumpIfNotEqualTo: failed.
 	message arguments first statements
 		do: [ :s | s acceptVisitor: nativizer ].
 	assembler @ end.
 	nativizer
-		addFallback: [ assembler @ failed.
+		addFallback: [ assembler @ failed; loadRwithA.
 			nativizer sendMustBeBoolean.
 			assembler jumpTo: retry ]
 ]

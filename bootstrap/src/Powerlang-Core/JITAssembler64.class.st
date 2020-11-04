@@ -194,6 +194,18 @@ JITAssembler64 >> compare: register withLiteral: anObject [
 ]
 
 { #category : #comparing }
+JITAssembler64 >> compareAwithBoolean: aBoolean [
+	aBoolean
+		ifTrue: [ self compareAwithTrue ]
+		ifFalse: [ self compareAwithFalse ]
+]
+
+{ #category : #comparing }
+JITAssembler64 >> compareAwithFalse [
+	self assemble: 'cmp' with: self regA with: self regFalse
+]
+
+{ #category : #comparing }
 JITAssembler64 >> compareAwithImmediate: imm [
 	#imm8.
 	#imm32.
@@ -203,6 +215,11 @@ JITAssembler64 >> compareAwithImmediate: imm [
 { #category : #comparing }
 JITAssembler64 >> compareAwithSmallInteger: anInteger [
 	self compareAwithImmediate: (anInteger bitShift: 1) + 1
+]
+
+{ #category : #comparing }
+JITAssembler64 >> compareAwithTrue [
+	self assemble: 'cmp' with: self regA with: self regTrue
 ]
 
 { #category : #loading }
