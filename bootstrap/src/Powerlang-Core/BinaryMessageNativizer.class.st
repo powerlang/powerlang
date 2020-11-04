@@ -429,3 +429,13 @@ BinaryMessageNativizer >> methodLiteralAt: index [
 BinaryMessageNativizer >> nativizer: anAstcodeNativizer [
 	nativizer := anAstcodeNativizer 
 ]
+
+{ #category : #private }
+BinaryMessageNativizer >> popR [
+	^ nativizer popR
+]
+
+{ #category : #private }
+BinaryMessageNativizer >> pushR [
+	^nativizer pushR
+]

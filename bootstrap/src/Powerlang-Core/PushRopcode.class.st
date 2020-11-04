@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #accessing }
-PushRopcode >> nativizeUsing: anAssembler [
-	anAssembler pushR
+PushRopcode >> nativizeUsing: anAssembler for: messageNativizer [
+	messageNativizer pushR
 ]

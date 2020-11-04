@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #accessing }
-PopRopcode >> nativizeUsing: anAssembler [
-	anAssembler popR
+PopRopcode >> nativizeUsing: anAssembler for: messageNativizer [
+	messageNativizer popR
 ]
