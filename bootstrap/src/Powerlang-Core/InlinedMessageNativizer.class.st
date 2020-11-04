@@ -373,8 +373,8 @@ InlinedMessageNativizer >> inlineToByDo [
 		compareRwithA.
 	by := message arguments second value.
 	by > 0
-		ifTrue: [ assembler jumpIfGreaterOrEqualSignedTo: continue ]
-		ifFalse: [ assembler jumpIfLessOrEqualSignedTo: continue ].
+		ifTrue: [ assembler jumpIfGreaterSignedTo: continue ]
+		ifFalse: [ assembler jumpIfLessSignedTo: continue ].
 	increment := (assembler smallInteger: by) - 1.
 	assembler @ block.
 	message arguments third statements
