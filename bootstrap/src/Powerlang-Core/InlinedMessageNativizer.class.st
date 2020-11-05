@@ -331,6 +331,7 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 		jumpTo: head;
 		@ continue.
 	nativizer
+		dropTos;
 		addFallback: [ assembler
 				@ nonDecrementable;
 				pushSmallInteger: 1.
@@ -392,7 +393,7 @@ InlinedMessageNativizer >> inlineToByDo [
 	assembler
 		jumpTo: head;
 		@ continue.
-	nativizer
+	nativizer dropTos;
 		addFallback: [ assembler
 				@ overflow;
 				subFromRconstant: increment;
@@ -453,7 +454,7 @@ InlinedMessageNativizer >> inlineToDo [
 	assembler
 		jumpTo: head;
 		@ continue.
-	nativizer
+	nativizer dropTos;
 		addFallback: [ assembler
 				@ overflow;
 				subFromRconstant: 2;
