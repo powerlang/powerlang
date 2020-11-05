@@ -79,6 +79,7 @@ InlinedMessageNativizer >> inlineBinaryWhile: aBoolean [
 		jumpIfEqualTo: block;
 		compareRwithBoolean: aBoolean not;
 		jumpIfNotEqualTo: failed;
+		jumpTo: continue;
 		@ block.
 	message arguments first statements
 		do: [ :s | s acceptVisitor: nativizer ].
