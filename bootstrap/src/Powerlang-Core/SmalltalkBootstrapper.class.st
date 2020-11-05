@@ -887,6 +887,15 @@ SmalltalkBootstrapper >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
+SmalltalkBootstrapper >> newLargeIntegerFrom: aByteObject [
+	| size contents |
+	size := aByteObject size alignedTo: 2.
+	contents := ByteArray new: size.
+	contents replaceFrom: 1 to: aByteObject size with: aByteObject.
+	^ self newBytes: aByteObject class name contents: contents
+]
+
+{ #category : #initialization }
 SmalltalkBootstrapper >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
@@ -1140,13 +1149,15 @@ SmalltalkBootstrapper >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ falseObj ].
 	anObject == true
 		ifTrue: [ ^ trueObj ].
-	identityMap at: anObject ifPresent: [ :existing | ^existing].
+	identityMap at: anObject ifPresent: [ :existing | ^ existing ].
 	(class inheritsFrom: Symbol)
 		ifTrue: [ ^ self newSymbol: anObject ].
 	(class inheritsFrom: String)
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
+	(class inheritsFrom: LargeInteger)
+		ifTrue: [ ^ self newLargeIntegerFrom: anObject ].
 	(class inheritsFrom: Float)
 		ifTrue: [ ^ self newFloatFrom: anObject ].
 	(class inheritsFrom: ObjectMap)
