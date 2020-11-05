@@ -674,18 +674,19 @@ SExpressionNativizer >> resetForBlock: anSBlock [
 	assembler reset
 ]
 
-{ #category : #accessing }
+{ #category : #services }
 SExpressionNativizer >> saveContextSwitchPoint [
-	method isDebuggable ifTrue: [ 
-		assembler
-			pushA;
-			pushT;
-			pushR.
-		self emitSend: #signalStep using: assembler.
-		assembler
-			popR;
-			popT;
-			popA ]
+	method isDebuggable
+		ifFalse: [ ^ self ].
+	assembler
+		pushA;
+		pushT;
+		pushR.
+	environment messageLinker emitSend: #signalStep using: assembler.
+	assembler
+		popR;
+		popT;
+		popA
 ]
 
 { #category : #services }
