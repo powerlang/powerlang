@@ -7,6 +7,7 @@
 
 import gdb
 
+import powerlang.utils
 import powerlang.objectmemory
 import powerlang.printing
 import powerlang.symbols
@@ -48,6 +49,7 @@ class __PythonReload(gdb.Command):
         except:
             from imp import reload
 
+        powerlang.utils = reload(powerlang.utils)
         powerlang.objectmemory = reload(powerlang.objectmemory)
         powerlang.symbols = reload(powerlang.symbols)
         powerlang.printing = reload(powerlang.printing)

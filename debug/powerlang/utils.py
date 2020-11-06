@@ -11,6 +11,7 @@ for general use.
 """
 
 from itertools import chain
+from functools import lru_cache as cache
 
 class cached_generator(object):
     """

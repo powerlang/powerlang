@@ -240,6 +240,7 @@ def _build_pretty_printer():
     pp.add_printer("HeapObject::SmallHeader", '^HeapObject::SmallHeader', None)
     pp.add_printer("HeapObject::LargeHeader", '^HeapObject::LargeHeader', None)
     pp.add_printer("HeapObject", "^HeapObject", oop)
+    pp.add_printer("Object", "^Object", oop)
     return pp
 
 register_pretty_printer(gdb, _build_pretty_printer(), replace = True)

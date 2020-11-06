@@ -13,8 +13,8 @@ model image objects (i.e., Smalltalk objects)
 import gdb
 
 from itertools import chain
-from functools import cached_property
 
+from powerlang.utils import cache
 from powerlang.symbols import SymbolTable
 
 flatten = chain.from_iterable
@@ -66,8 +66,8 @@ class ObjectIndices:
 
 def _as_gdb_value(valueish, typ):
     if isinstance(valueish, gdb.Value):
-        assert valueish.type == typ, "Passed valueish is a gdb.Value of a different type"
-        return valueish
+        assert valueish.type.code == typ.code
+        return valueish.cast(typ)
     elif isinstance(valueish, int):
         return gdb.Value(valueish).cast(typ)
     elif isinstance(valueish, str):
@@ -138,8 +138,6 @@ class SmallInteger(__ObjectABC):
 class Object(__ObjectABC):
     def __init__(self, val):
         super().__init__(val)
-        self._small_header = None
-        self._large_header = None
 
     def isNil(self):
         try:
@@ -156,16 +154,16 @@ class Object(__ObjectABC):
         return int(self._oop)
 
     @property
+    @cache
     def small_header(self):
         """
         Return this object's small (base) header as an instance
         of `gdb.Value` of type `small_header_t`
         """
-        if self._small_header == None:
-            self._small_header = (self._oop.cast(Types.char.pointer()) - Types.small_header_t.sizeof).cast(Types.small_header_t.pointer())
-        return self._small_header
+        return (self._oop.cast(Types.char.pointer()) - Types.small_header_t.sizeof).cast(Types.small_header_t.pointer())
 
     @property
+    @cache
     def large_header(self):
         """
         Return this object's large (extended) header as an instance
@@ -175,9 +173,7 @@ class Object(__ObjectABC):
         if self.isSmall():
             return None
         else:
-            if self._large_header == None:
-                self._large_header = (self._oop.cast(Types.char.pointer()) - Types.large_header_t.sizeof).cast(Types.large_header_t.pointer())
-        return self._large_header
+            return (self._oop.cast(Types.char.pointer()) - Types.large_header_t.sizeof).cast(Types.large_header_t.pointer())
 
     def flags(self):
         return self.small_header['flags']
@@ -227,28 +223,29 @@ class Object(__ObjectABC):
         return align(self.sizeInBytes(), Types.oop.sizeof);
 
     @property
+    @cache
     def behavior(self):
         """
         Return this object's behavior as an (sub)instance
         of `_Object`.
         """
-        if not hasattr(self, '_behavior'):
-            self._behavior = self.__class__(self.small_header['behavior'].cast(Types.oop))
-        return self._behavior
+        return self.__class__(self.small_header['behavior'].cast(Types.oop))
 
     @property
+    @cache
     def clazz(self):
-        if not hasattr(self, '_clazz'):
-            self._clazz = self.behavior.slotAt(ObjectIndices.Behavior_class)
-            assert self._clazz.size() >= 6
-        return self._clazz
+        clazz = self.behavior.slotAt(ObjectIndices.Behavior_class)
+        assert clazz.size() >= 6
+        return clazz
 
+    @cache
     def clazzName(self):
         if self.clazz.size() == 6:
             return "%s class" % self.clazz.slotAt(ObjectIndices.Metaclass_class).slotAt(ObjectIndices.Class_name).chars()
         else:
             return self.clazz.slotAt(ObjectIndices.Class_name).chars()
 
+    @cache
     def slotNames(self):
         """
         Return a list of instance variable names fot this object
@@ -270,6 +267,7 @@ class Object(__ObjectABC):
             current = current.slotAt(ObjectIndices.Species_superclass)
         return list(reversed(slotNames))
 
+    @cache
     def slotAt(self, index):
         """
         Return object given index as an instance of `Object`. Indexing
@@ -396,7 +394,8 @@ class ImageSegment(object):
         hi = lo + self._ptr['header']['size'] - self._ptr['header'].type.sizeof
         return ObjectIterator(lo, hi)
 
-    @cached_property
+    @property
+    @cache
     def symtab(self):
         return SymbolTable(self)
 
@@ -473,10 +472,9 @@ def find_references_to(oopish):
 try:
     segments
     # If we arrive here it means the code has been reloaded
-    # in running GDB, so try to update class to a new version
-    # as a courtesy to the user...
-    for segment in segments:
-        segment.__class__ = ImageSegment
+    # in running GDB, so we re-instantiate segments to make sure
+    # new code has been loaded and used.
+    segments = [ImageSegment(segment._ptr) for segment in segments]
 except NameError:
     segments = []
 
