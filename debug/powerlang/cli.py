@@ -60,35 +60,11 @@ class __DumpObjectCmd(gdb.Command):
 
 do = __DumpObjectCmd('do', gdb.COMMAND_DATA)
 
-def _lookup_symbol(pc_or_regexp):
-    pc = None
-    regexp = None
-    try:
-        pc = None
-        if isinstance(pc_or_regexp, int):
-            pc = pc_or_regexp
-        else:
-            pc = gdb.parse_and_eval(pc_or_regexp)
-    except:
-        regexp = re.compile(pc_or_regexp)
-
-    symtabs = (segment.symtab for segment in segments)
-
-    if pc != None:
-        for symtab in symtabs:
-            sym = symtab.lookup_symbol_by_addr(pc)
-            if sym != None:
-                return [sym]
-        return []
-    if regexp != None:
-        return (sym for sym in flatten(symtabs) if regexp.search(sym.name))
-
-
-class __LookupMethod(gdb.Command):
+class __LookupSymbol(gdb.Command):
     """
     Looks up a method containing given PC or matching given REGEXP.
-    Usage: lm [PC]
-           lm REGEXP
+    Usage: ls [PC]
+           ls REGEXP
 
     PC can be given as an expression evaluating to an address
     or omitted in which case value if $pc (PC of currently
@@ -104,22 +80,42 @@ class __LookupMethod(gdb.Command):
         elif len(argv) == 0:
             argv = ['$pc']
         any_found = False
-        for method in self(argv[0]):
+        for symbol in self(argv[0]):
             any_found = True
-            print(method)
+            print(symbol)
         if not any_found:
-            print("No method found.")
+            print("No symbol found.")
 
     def __call__(self, pc_or_regexp = '$pc'):
-        return (sym.method for sym in _lookup_symbol(pc_or_regexp))
+        pc = None
+        regexp = None
+        try:
+            pc = None
+            if isinstance(pc_or_regexp, int):
+                pc = pc_or_regexp
+            else:
+                pc = gdb.parse_and_eval(pc_or_regexp)
+        except:
+            regexp = re.compile(pc_or_regexp)
 
-lm = __LookupMethod('lm', gdb.COMMAND_DATA)
+        symtabs = [ segment.symtab for segment in segments ]
 
-class __DisassembleMethod(gdb.Command):
+        if pc != None:
+            for symtab in symtabs:
+                sym = symtab.lookup_symbol_by_addr(pc)
+                if sym != None:
+                    return [sym]
+            return []
+        if regexp != None:
+            return (sym for sym in flatten(symtabs) if regexp.search(sym.name))
+
+ls = __LookupSymbol('ls', gdb.COMMAND_DATA)
+
+class __DisassembleSymbol(gdb.Command):
     """
-    Disassemble a method with given PC or matching given REGEXP.
-    Usage: lm [PC]
-           lm REGEXP
+    Disassemble a symbol with given PC or matching given REGEXP.
+    Usage: ls [PC]
+           ls REGEXP
 
     PC can be given as an expression evaluating to an address
     or omitted in which case value if $pc (PC of currently
@@ -131,32 +127,32 @@ class __DisassembleMethod(gdb.Command):
     def invoke(self, args, from_tty):
         argv = gdb.string_to_argv(args)
         if len(argv) > 1:
-            raise Exception("lm takes only one argument (%d given)" % len(argv))
+            raise Exception("as takes only one argument (%d given)" % len(argv))
         elif len(argv) == 0:
             argv = ['$pc']
         self(argv[0])
 
     def __call__(self, pc_or_regexp = '$pc'):
-        methodsyms = list(_lookup_symbol(pc_or_regexp))
-        if len(methodsyms) == 0:
-            print("No method matching %s" % pc_or_regexp)
-        elif len(methodsyms) > 1:
-            print("Multiple methods matching %s:" % pc_or_regexp)
-            for methodsym in methodsyms:
+        syms = list(ls(pc_or_regexp))
+        if len(syms) == 0:
+            print("No symbol matching %s" % pc_or_regexp)
+        elif len(syms) > 1:
+            print("Multiple symbols matching %s:" % pc_or_regexp)
+            for methodsym in syms:
                 print(methodsym)
             print("Please disambiguate")
         else:
-            self.disassemble(methodsyms[0])
+            self.disassemble(syms[0])
 
 
-    def disassemble(self, methodsym):
+    def disassemble(self, sym):
         arch = gdb.selected_inferior().architecture()
-        loPC = methodsym.address
-        hiPC = loPC + methodsym.size
+        loPC = sym.address
+        hiPC = loPC + sym.size
 
-        print(methodsym)
+        print(sym)
         for insn in arch.disassemble(loPC, hiPC - 1):
             print("  0x%016x: %s" % ( insn['addr'], insn['asm'] ));
 
 
-am = __DisassembleMethod('am', gdb.COMMAND_DATA)
+ds = __DisassembleSymbol('ds', gdb.COMMAND_DATA)

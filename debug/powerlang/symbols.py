@@ -5,23 +5,25 @@
 #
 # SPDX-License-Identifier: MIT
 
-from functools import cached_property
-
-from powerlang.utils import cached_generator
+from powerlang.utils import cached_generator, cache
+from powerlang.constants import CompiledMethodFlags
 
 class MethodSymbol(object):
     def __init__(self, method, symtab):
         self.method = method
 
-    @cached_property
+    @property
+    @cache
     def address(self):
         return int(self.method.nativeCode.machineCode)
 
-    @cached_property
+    @property
+    @cache
     def size(self):
         return self.method.nativeCode.machineCode.size()
 
-    @cached_property
+    @property
+    @cache
     def name(self):
         clazz = getattr(self.method, 'class')
         clazzName = clazz.slotAt(6).chars() if clazz.size() > 6 else clazz.slotAt(6).slotAt(6).chars() + ' class'
@@ -29,20 +31,33 @@ class MethodSymbol(object):
         selector = self.method.selector.chars()
         return '%s >> #%s' % ( clazzName , selector)
 
+    def numArgs(self):
+        return self.method.format.bits(CompiledMethodFlags.ArgCount)
+
+    def numTmps(self):
+        return self.method.format.bits(CompiledMethodFlags.TempCount)
+
+    def isFrameLess(self):
+        return self.method.format.bits(CompiledMethodFlags.HasFrame) == 0
+
+    def isCallback(self):
+        return self.method.clazzName() == 'CallbackMethod'
+
     def __str__(self):
-        return self.name
+        return ("M-sym: nA: %-2d nT: %-2d code: 0x%016x size: %-4d method: 0x%016x %s" % ( self.numArgs(), self.numTmps(), self.address, self.size, int(self.method), self.name ) )
 
     def __int__(self):
         return self.address
 
     def __repr__(self):
-        return "<MethodSymbol: 0x%016x, %4d, %s>" % ( self.address, self.size, self.name )
+        return str(self)
 
 class SymbolTable(object):
     def __init__(self, segment):
         self._segment = segment
 
-    @cached_property
+    @property
+    @cache
     def symbols(self):
         return cached_generator( (MethodSymbol(mthd, self) for mthd in self._segment.find_instances_of('CompiledMethod', 'CallbackMethod')) )
 

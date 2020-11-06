@@ -17,7 +17,7 @@ import powerlang.cli
 # (when one uses Python interactively)
 import powerlang.objectmemory as om
 from powerlang.objectmemory import obj
-from powerlang.cli import do, lm, am
+from powerlang.cli import do, ls, ds
 
 # Intercept Launcher::launch() method and register
 # a kernel segment
