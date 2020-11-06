@@ -26,8 +26,11 @@ class __LaunchBreakpoint(gdb.Breakpoint):
         kernel = powerlang.objectmemory.ImageSegment('kernel')
         powerlang.objectmemory.segments.clear()
         powerlang.objectmemory.segments.append(kernel)
+        print("Loading symbols from image segment, please wait...")
+        kernel.symtab.load()
+        print("...done!")
         return False # continue
-__LaunchBreakpoint('Launcher::launch(ImageSegment*, int, char const**)', internal=True)
+__LaunchBreakpoint('Launcher::launch(ImageSegment*, int, char const**)', internal=True, temporary=True)
 
 
 class __PythonReload(gdb.Command):

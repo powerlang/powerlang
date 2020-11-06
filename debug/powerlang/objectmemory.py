@@ -475,6 +475,8 @@ try:
     # in running GDB, so we re-instantiate segments to make sure
     # new code has been loaded and used.
     segments = [ImageSegment(segment._ptr) for segment in segments]
+    for segment in segments:
+        segment.symtab.load()
 except NameError:
     segments = []
 

@@ -56,13 +56,28 @@ class SymbolTable(object):
     def __init__(self, segment):
         self._segment = segment
 
-    @property
-    @cache
-    def symbols(self):
-        return cached_generator( (MethodSymbol(mthd, self) for mthd in self._segment.find_instances_of('CompiledMethod', 'CallbackMethod')) )
-
     def __iter__(self):
-        return iter(self.symbols)
+        if not hasattr(self, '_symbols'):
+            raise Exception("Symbols not loaded (use SymbolTable.load() to load them)")
+        return iter(self._symbols)
+
+
+    def load(self):
+        """
+        Loads all symbols from segment. This has to be called before any symbol can
+        be looked up. Loading symbols may take time.
+        """
+        symbols = [ MethodSymbol(mthd, self) for mthd in self._segment.find_instances_of('CompiledMethod', 'CallbackMethod') ]
+        symbols.sort(key = lambda sym: sym.address)
+
+        # A sanity check, make sure they're ordered so we can use binary search when looking up
+        # by an address, will wanish
+        for i in range(0, len(symbols) - 1):
+            sym1 = symbols[i]
+            sym2 = symbols[i+1]
+            assert (sym1.address + sym1.size) <= sym2.address
+
+        self._symbols = symbols
 
     def lookup_symbol_by_name(self, name):
         for sym in iter(self):
@@ -71,9 +86,30 @@ class SymbolTable(object):
         return None
 
     def lookup_symbol_by_addr(self, addr):
-        for sym in iter(self):
-            if sym.address <= int(addr) and int(addr) <= (sym.address + sym.size):
-                return sym;
+        if not hasattr(self, '_symbols'):
+            raise Exception("Symbols not loaded (use SymbolTable.load() to load them)")
+
+        # Simple but slow code...
+        #
+        # for sym in iter(self):
+        #     if sym.address <= int(addr) and int(addr) <= (sym.address + sym.size):
+        #         return sym;
+        # return None
+
+        # ...so we better use binary search instead:
+
+        lo_index = 0
+        hi_index = len(self._symbols)-1
+        while( lo_index<=hi_index):
+            mid = (lo_index + hi_index) // 2
+            sym = self._symbols[mid]
+
+            if   int(addr) < sym.address:
+                hi_index = mid - 1
+            elif int(addr) >= (sym.address + sym.size):
+                lo_index = mid + 1
+            else:
+                return sym
         return None
 
 
