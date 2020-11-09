@@ -11,11 +11,14 @@ import powerlang.utils
 import powerlang.objectmemory
 import powerlang.printing
 import powerlang.symbols
+import powerlang.unwind
 import powerlang.cli
+
 
 # Import following this namespace for convenience
 # (when one uses Python interactively)
 import powerlang.objectmemory as om
+import powerlang.unwind as uw
 from powerlang.objectmemory import obj
 from powerlang.cli import do, ls, ds
 
@@ -55,7 +58,15 @@ class __PythonReload(gdb.Command):
         powerlang.utils = reload(powerlang.utils)
         powerlang.objectmemory = reload(powerlang.objectmemory)
         powerlang.symbols = reload(powerlang.symbols)
+        powerlang.unwind = reload(powerlang.unwind)
         powerlang.printing = reload(powerlang.printing)
         powerlang.cli = reload(powerlang.cli)
+        reload(powerlang)
+
+        global om
+        om = powerlang.objectmemory
+
+        global uw
+        uw = powerlang.unwind
 
 pr = __PythonReload('pr', gdb.COMMAND_MAINTENANCE)

@@ -6,17 +6,27 @@
 # SPDX-License-Identifier: MIT
 
 """
-This module contain pretty-printers for GDB
+This module contain pretty-printers and frame decorators for Powerlang / Bee
 """
 
 import re
 import gdb
+import gdb.FrameDecorator
 
 from itertools import chain
 from gdb.printing import PrettyPrinter, SubPrettyPrinter, register_pretty_printer
+from gdb.FrameDecorator import SymValueWrapper
 
-from powerlang.objectmemory import Object, SmallInteger, obj
+from powerlang.utils import cache
+from powerlang.objectmemory import Object, SmallInteger, obj, segments
 from powerlang.constants import CompiledMethodFlags
+
+def _lookup_symbol_by_addr(addr):
+    for segment in segments:
+        sym = segment.symtab.lookup_symbol_by_addr(int(addr))
+        if sym != None:
+            return sym
+    return None
 
 FMTxPTR = "0x%016x"
 def PRIxPTR(value):
@@ -244,3 +254,44 @@ def _build_pretty_printer():
     return pp
 
 register_pretty_printer(gdb, _build_pretty_printer(), replace = True)
+
+
+#
+# Frame Decorators
+#
+class FrameDecorator(gdb.FrameDecorator.FrameDecorator):
+    def __init__(self, base_frame, symbol):
+        super().__init__(base_frame)
+        self.symbol = symbol
+
+    def function(self):
+        return self.symbol.name
+
+
+
+class FrameFilter(object):
+    def __init__(self):
+        self.name = "Powerlang-BeeDMR"
+        self.priority = 100
+        self.enabled = True
+
+    def filter(self, frames):
+        return map(self.decorate, frames)
+
+    def decorate(self, frame):
+        """
+        Decorate a single `frame`.
+        """
+
+        # Note, that `frame` may be either an instance of `gdb.Frame` or
+        # another decorator, so make sure it is a decorator
+        if isinstance(frame, gdb.Frame):
+            frame = gdb.FrameDecorator.FrameDecorator(frame)
+
+        symbol = _lookup_symbol_by_addr(frame.inferior_frame().pc())
+        if symbol != None:
+            frame = FrameDecorator(frame, symbol)
+        return frame
+
+__ff = FrameFilter()
+gdb.frame_filters[__ff.name] = __ff

@@ -93,8 +93,12 @@ class __LookupSymbol(gdb.Command):
             pc = None
             if isinstance(pc_or_regexp, int):
                 pc = pc_or_regexp
-            else:
+            elif isinstance(pc_or_regexp, gdb.Value):
+                pc = int(pc)
+            elif isinstance(pc_or_regexp, str):
                 pc = gdb.parse_and_eval(pc_or_regexp)
+            else:
+                raise InvalidArgument("pc_or_regexp must be an int, str, or gdb.Value")
         except:
             regexp = re.compile(pc_or_regexp)
 
