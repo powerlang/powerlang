@@ -35,14 +35,18 @@ typedef struct _ImageSegmentHeader
      */
     uint64_t size;
     /**
+     * Amount of memory to be reserved when loading the segment
+     */
+    uint64_t reservedSize;
+    /**
      * A reference to Module instance describing this image segment
      */
     HeapObject* module;
 
 } ImageSegmentHeader;
 
-static_assert(sizeof(ImageSegmentHeader) == 32 /*bytes*/,
-              "segment_header size not 32bytes");
+static_assert(sizeof(ImageSegmentHeader) == 40 /*bytes*/,
+              "segment_header size not 40 bytes");
 
 class ImageSegment
 {
