@@ -42,7 +42,7 @@ ImageSegmentWriter class >> objectsOffset [
 		The offset at which header terminates and objects are stored.
 		See ImageSegment.h for structure of a segment header
 	"
-	^32
+	^40
 ]
 
 { #category : #accessing }
