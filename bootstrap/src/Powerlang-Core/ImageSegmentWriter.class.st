@@ -42,7 +42,7 @@ ImageSegmentWriter class >> objectsOffset [
 		The offset at which header terminates and objects are stored.
 		See ImageSegment.h for structure of a segment header
 	"
-	^32
+	^40
 ]
 
 { #category : #accessing }
@@ -164,10 +164,12 @@ ImageSegmentWriter >> write [
 		writeObjects
 ]
 
-{ #category : #accessing }
+{ #category : #'own services' }
 ImageSegmentWriter >> writeHeader [
 	"See ImageSegment.h for structure of a segment header"
-	stream uint64le: base; uint64le: size.
+	| reserved |
+	reserved := (space reservedLimit value - space base value) * 2.
+	stream uint64le: base; uint64le: size; uint64le: reserved.
 	self writeReferenceTo: module
 ]
 

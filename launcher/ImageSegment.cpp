@@ -34,7 +34,7 @@ ImageSegment::load(std::istream* data)
 
     data->read(reinterpret_cast<char*>(&header), sizeof(header));
 
-    ImageSegment* segment = ImageSegment::alloc(header.baseAddress, header.size);
+    ImageSegment* segment = ImageSegment::alloc(header.baseAddress, header.reservedSize);
 
     data->seekg(0, data->beg);
     data->read(reinterpret_cast<char*>(segment), header.size);
