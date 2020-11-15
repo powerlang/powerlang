@@ -11,7 +11,13 @@ for general use.
 """
 
 from itertools import chain
-from functools import lru_cache as cache
+from functools import lru_cache
+
+def cache(user_function):
+    """
+    Simple lightweight unbounded function cache. Sometimes called “memoize”.
+    """
+    return lru_cache(maxsize=None, typed=False)(user_function)
 
 class cached_generator(object):
     """
