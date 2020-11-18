@@ -10,7 +10,8 @@ Class {
 		'maxSMI',
 		'classes',
 		'metaclasses',
-		'kernel'
+		'kernel',
+		'identityMap'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -74,13 +75,6 @@ VirtualSmalltalkImage >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: kernel sized: size
 ]
 
-{ #category : #accessing }
-VirtualSmalltalkImage >> booleanFrom: anObject [
-anObject == falseObj ifTrue: [ ^false ].
-	anObject == trueObj ifTrue: [ ^true ].	
-	self error: 'not a boolean'
-]
-
 { #category : #'own services' }
 VirtualSmalltalkImage >> buildSpecies: spec [
 	| sspec sclass sbehavior metasuper  |
@@ -105,6 +99,11 @@ VirtualSmalltalkImage >> classFor: anRGBehavior [
 { #category : #building }
 VirtualSmalltalkImage >> classNamed: aString [
 	^self classFor: self => aString
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> classes [
+	^ classes
 ]
 
 { #category : #accessing }
@@ -176,7 +175,8 @@ VirtualSmalltalkImage >> genesis [
 { #category : #accessing }
 VirtualSmalltalkImage >> initialize [
 	classes := OrderedDictionary new.
-	metaclasses := OrderedDictionary new
+	metaclasses := OrderedDictionary new.
+		identityMap := IdentityDictionary new
 ]
 
 { #category : #initialization }
@@ -230,8 +230,13 @@ VirtualSmalltalkImage >> initializeMetaclass: definition superclass: superclass 
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> kernel: anRGBehavior [
-	kernel := anRGBehavior
+VirtualSmalltalkImage >> kernel [
+	^kernel
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> kernel: anRGEnvironment [
+	kernel := anRGEnvironment 
 ]
 
 { #category : #accessing }
@@ -248,6 +253,17 @@ VirtualSmalltalkImage >> newArray: anArray [
 ]
 
 { #category : #initialization }
+VirtualSmalltalkImage >> newAssociation: anAssociation [
+	| assoc key value |
+	assoc := self newSlots: 'Association'.
+	key := self transferLiteralDeep: anAssociation key.
+	value := self transferLiteralDeep: anAssociation value.
+	^ assoc
+		key: key;
+		value: value; yourself
+]
+
+{ #category : #initialization }
 VirtualSmalltalkImage >> newBytes: classname contents: aByteObject [
 	| obj |
 	obj := self basicNewBytes: classname contents: aByteObject.
@@ -258,6 +274,11 @@ VirtualSmalltalkImage >> newBytes: classname contents: aByteObject [
 { #category : #initialization }
 VirtualSmalltalkImage >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> newFloatFrom: aFloat [
+	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
 { #category : #initialization }
@@ -295,6 +316,11 @@ VirtualSmalltalkImage >> newLargePositiveInteger: anInteger [
 ]
 
 { #category : #initialization }
+VirtualSmalltalkImage >> newSlots: classname [
+	^self newSlots: classname sized: 0
+]
+
+{ #category : #initialization }
 VirtualSmalltalkImage >> newSlots: classname sized: size [
 	| obj |
 	obj := self basicNewSlots: classname sized: size.
@@ -329,8 +355,96 @@ VirtualSmalltalkImage >> newStringArray: strings [
 ]
 
 { #category : #accessing }
+VirtualSmalltalkImage >> newSymbol: aSymbol [
+	| new bytes |
+	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
+	bytes := aSymbol copyWith: Character null.
+	new := self newBytes: 'Symbol' contents: bytes.
+	^ identityMap at: aSymbol put: new
+]
+
+{ #category : #accessing }
 VirtualSmalltalkImage >> nil [
 	^ nilObj
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> transferBlock: anSCompiledBlock [
+	| transferred method format |
+	identityMap at: anSCompiledBlock
+		ifPresent: [ :b | ^ b ].
+	transferred := self newSlots: #CompiledBlock.
+	identityMap at: anSCompiledBlock put: transferred.
+	method := identityMap at: anSCompiledBlock method.
+	format := self newInteger: anSCompiledBlock format.
+	transferred
+		method: method;
+		format: format;
+		nativeCode: nilObj.
+	^ transferred
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> transferLiteral: anObject [
+	| class transferred slot |
+	class := anObject class.
+	(class inheritsFrom: ObjectMap)
+		ifTrue: [ ^ anObject ].
+	(class inheritsFrom: Integer)
+		ifTrue: [ ^ self newInteger: anObject ].
+	(class inheritsFrom: Symbol)
+		ifTrue: [ ^ self newSymbol: anObject ].
+	(class inheritsFrom: String)
+		ifTrue: [ ^ self newString: anObject ].
+	class = ByteArray
+		ifTrue: [ ^ self newBytesFrom: anObject ].
+	transferred := self newNamed: anObject class name size: anObject size.
+	anObject
+		withIndexDo: [ :elem :i | 
+			slot := self transferLiteralDeep: elem.
+			transferred at: i put: slot ].
+	^ transferred
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> transferLiteralDeep: anObject [
+	| class transferred slot size ivar |
+	class := anObject class.
+	anObject isInteger
+		ifTrue: [ ^ self newInteger: anObject ].
+	anObject == nil
+		ifTrue: [ ^ nilObj ].
+	anObject == false
+		ifTrue: [ ^ falseObj ].
+	anObject == true
+		ifTrue: [ ^ trueObj ].
+	identityMap at: anObject ifPresent: [:existing | ^ existing ].
+	(class inheritsFrom: Symbol)
+		ifTrue: [ ^ self newSymbol: anObject ].
+	(class inheritsFrom: String)
+		ifTrue: [ ^ self newString: anObject ].
+	class = ByteArray
+		ifTrue: [ ^ self newBytesFrom: anObject ].
+	(class inheritsFrom: Float)
+		ifTrue: [ ^ self newFloatFrom: anObject ].
+	(class inheritsFrom: BootstrapObject)
+		ifTrue: [ ^ anObject ].
+	class == SCompiledBlock
+		ifTrue: [ ^ self transferBlock: anObject ].
+	size := class isVariable
+		ifTrue: [ anObject size ]
+		ifFalse: [ 0 ].
+	transferred := self newSlots: class name sized: size.
+	1 to: class instSize do: [ :i | 
+		ivar := anObject instVarAt: i.
+		slot := self transferLiteralDeep: ivar.
+		transferred slotAt: i put: slot ].
+	size > 0
+		ifTrue: [ anObject
+				withIndexDo: [ :elem :i | 
+					slot := self transferLiteralDeep: elem.
+					transferred at: i put: slot ] ].
+	^ transferred
 ]
 
 { #category : #accessing }

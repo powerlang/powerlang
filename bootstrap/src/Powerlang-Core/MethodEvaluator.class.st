@@ -33,11 +33,6 @@ MethodEvaluator class >> initialize [
 	Undermessages := #(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: _uShortAtOffset:put:)
 ]
 
-{ #category : #'instance creation' }
-MethodEvaluator class >> new [
-	^self basicNew initialize
-]
-
 { #category : #visiting }
 MethodEvaluator >> argumentAt: index in: anInteger [
 	| env |
@@ -94,21 +89,26 @@ MethodEvaluator >> blockAstcodesOf: anSCompiledBlock [
 
 { #category : #visiting }
 MethodEvaluator >> blockOf: anObjectMap [
-	closures at: anObjectMap ifPresent: [:block | ^block ].
-	parent blockOf: anObjectMap
+	^closures at: anObjectMap
+
 ]
 
 { #category : #visiting }
 MethodEvaluator >> booleanFor: aBoolean [
 	^ aBoolean
-		ifTrue: [ system trueObject ] ifFalse: [system falseObject]
-
+		ifTrue: [ system true ]
+		ifFalse: [ system false ]
 ]
 
 { #category : #visiting }
-MethodEvaluator >> captureClosure: anSBlock from: block [
+MethodEvaluator >> built: closure [
+	^closures includesKey: closure
+]
+
+{ #category : #visiting }
+MethodEvaluator >> captureClosure: anSBlock with: block [
 	| closure s i type env arg |
-	closure := system newNamed: #Closure size: block environmentCount.
+	closure := system newClosure: block environmentCount.
 	closures at: closure put: block.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
@@ -136,18 +136,6 @@ MethodEvaluator >> closures [
 { #category : #visiting }
 MethodEvaluator >> constPoolValueAt: anInteger [
 	^ method at: anInteger
-]
-
-{ #category : #dispatching }
-MethodEvaluator >> dispatch: aMethod with: aMessage [
-	| interpreter |
-	interpreter := self class new
-		receiver: aMessage receiver;
-		arguments: aMessage arguments;
-		method: aMethod;
-		runtime: system;
-		parent: self.
-	^ interpreter evaluate: aMethod
 ]
 
 { #category : #visiting }
@@ -203,6 +191,11 @@ MethodEvaluator >> dispatchUndermessage: message [
 ]
 
 { #category : #visiting }
+MethodEvaluator >> environment: anObjectMap [
+	environment := anObjectMap
+]
+
+{ #category : #visiting }
 MethodEvaluator >> environmentFor: anInteger [
 	"
 	-1: inlined argument.
@@ -217,8 +210,9 @@ MethodEvaluator >> environmentFor: anInteger [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluate: sexpressions [
-	^ self visitMethod: sexpressions
+MethodEvaluator >> evaluate [
+	system pushFrame: self.
+	^ self visitMethod: method sexpressions
 ]
 
 { #category : #visiting }
@@ -262,11 +256,11 @@ MethodEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject
 
 { #category : #visiting }
 MethodEvaluator >> evaluateClosure: closure withArgs: anArray [
-	| home block sblock evaluator |
-	home := self homeOf: closure.
-	block := home blockOf: closure.
-	sblock := home blockAstcodesOf: block.
-	evaluator := home copy parent: self; beBlock.
+	| frame block sblock evaluator |
+	frame := system builderOf: closure.
+	block := frame blockOf: closure.
+	sblock := frame blockAstcodesOf: block.
+	evaluator := frame copy beBlock.
 	^ sblock isInlined
 		ifTrue: [ evaluator evaluateBlock: sblock args: anArray ]
 		ifFalse: [ evaluator evaluateBlock: sblock args: anArray closure: closure ]
@@ -362,10 +356,10 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 
 { #category : #visiting }
 MethodEvaluator >> evaluatePrimitiveClosureArgumentCount [
-	| interpreter block |
-	interpreter := self homeOf: receiver.
-	block := interpreter blockOf: receiver.
-	^self integerFor: block argumentCount
+	| frame block |
+	frame := system builderOf: receiver. 
+	block := frame blockOf: receiver.
+	^ self integerFor: block argumentCount
 ]
 
 { #category : #visiting }
@@ -420,17 +414,7 @@ MethodEvaluator >> evaluatePrimitivePrimeFor [
 
 { #category : #visiting }
 MethodEvaluator >> falseLiteral [
-	^ system falseObject
-]
-
-{ #category : #visiting }
-MethodEvaluator >> homeOf: closure [
-	| interpreter |
-	interpreter := self.
-	[ interpreter closures includesKey: receiver ]
-		whileFalse: [ interpreter := interpreter parent ].
-	^interpreter
-
+	^ system false
 ]
 
 { #category : #visiting }
@@ -484,7 +468,7 @@ MethodEvaluator >> method: anSCompiledMethod [
 
 { #category : #visiting }
 MethodEvaluator >> nilLiteral [
-	^ system nilObject
+	^ system nil
 ]
 
 { #category : #visiting }
@@ -525,6 +509,55 @@ MethodEvaluator >> returning: anObject [
 ]
 
 { #category : #visiting }
+MethodEvaluator >> staticSend: selector to: recv with: args [
+	| result |
+	selector == #_isSmallInteger
+		ifTrue: [ ^ self booleanFor: recv isImmediate ].
+	selector == #_isLarge
+		ifTrue: [ ^ self booleanFor: recv isSmall not ].
+	selector == #_smallSize
+		ifTrue: [ ^ self
+				integerFor:
+					(recv isSmall
+						ifTrue: [ recv size ]
+						ifFalse: [ self error ]) ].
+	selector == #_largeSize
+		ifTrue: [ ^ self
+				integerFor:
+					(recv isSmall
+						ifTrue: [ self error ]
+						ifFalse: [ recv size ]) ].
+	selector == #_basicFlags
+		ifTrue: [ ^ self integerFor: recv headerFlags ].
+	selector == #_basicAt:
+		ifTrue: [ ^ recv slots at: args first value ].
+	selector == #_byteAt:
+		ifTrue: [ result := recv bytes at: args first value.
+			^ self integerFor: result ].
+	selector == #_basicHash
+		ifTrue: [ ^ self integerFor: recv headerHash ].
+	selector == #_basicHash:
+		ifTrue: [ recv headerHash: args first value.
+			^ recv ].
+	selector == #_smallIntegerByteAt:
+		ifTrue: [ result := recv value byteAt: args first value.
+			^ self integerFor: result ].
+	selector == #_bitShiftLeft:
+		ifTrue: [ result := recv value bitShift: args first value.
+			(result isKindOf: LargeInteger)
+				ifTrue: [ self halt ].
+			^ self integerFor: result ].
+	selector == #_uShortAtOffset:
+		ifTrue: [ ^ result := self
+				integerFor: (recv bytes unsignedShortAt: args first value + 1) ].
+	selector == #_uShortAtOffset:put:
+		ifTrue: [ result := args second.
+			recv bytes unsignedShortAt: args first value + 1 put: result value.
+			^ result ].
+	self ASSERT: false
+]
+
+{ #category : #visiting }
 MethodEvaluator >> system: anEmulator [
 	system := anEmulator
 ]
@@ -547,14 +580,7 @@ MethodEvaluator >> temporaryAt: index in: anInteger put: aValue [
 
 { #category : #visiting }
 MethodEvaluator >> trueLiteral [
-	^system trueObject
-]
-
-{ #category : #visiting }
-MethodEvaluator >> unwindTo: env returning: value [
-	| evaluator |
-	evaluator := self.
-	[ evaluator returning: value. evaluator isHomeOf: env ] whileFalse: [ evaluator := evaluator parent ]
+	^system true
 ]
 
 { #category : #visiting }
@@ -577,26 +603,25 @@ MethodEvaluator >> visitBlock: anSBlock [
 	block := anSBlock isInlined
 		ifTrue: [ SCompiledBlock new ]
 		ifFalse: [ anSBlock compiledCode ].
-	closure := self captureClosure: anSBlock from: block.
+	closure := self captureClosure: anSBlock with: block.
 	blockAstcodes at: block put: anSBlock.
 	^ closure
 ]
 
 { #category : #visiting }
 MethodEvaluator >> visitCascade: anSCascade [
-	| recv args selector message last |
+	| recv args selector last |
 	recv := anSCascade receiver acceptVisitor: self.
-	anSCascade messages do: [ :msg | args := msg arguments
-		collect: [ :code | code acceptVisitor: self ].
-	selector := system symbolFrom: msg selector.
-	message := MessageSend
-		receiver: recv
-		selector: selector
-		arguments: args.
-	(self isUndermessage: selector)
-		ifTrue: [ ^ self dispatchUndermessage: message ].
-	last :=  system send: message super: anSCascade receiver isSuper from: self].
-	^last
+	anSCascade messages
+		do: [ :msg | 
+			args := msg arguments collect: [ :code | code acceptVisitor: self ].
+			selector := system symbolFrom: msg selector.
+			last := system
+				send: selector
+				to: recv
+				with: args
+				super: anSCascade receiver isSuper ].
+	^ last
 ]
 
 { #category : #visiting }
@@ -618,23 +643,16 @@ MethodEvaluator >> visitMessage: anSMessage [
 		collect: [ :code | code acceptVisitor: self ].
 	selector := system symbolFrom: anSMessage selector.
 	self ASSERT: selector !== #error:.
-	message := MessageSend
-		receiver: recv
-		selector: selector
-		arguments: args.
-	(self isUndermessage: selector)
-		ifTrue: [ ^ self dispatchUndermessage: message ].
-	^ system send: message super: anSMessage receiver isSuper from: self
+	^ system send: selector to: recv with: args super: anSMessage receiver isSuper
 ]
 
 { #category : #visiting }
 MethodEvaluator >> visitMethod: anSMethod [
 	| primitive |
 	primitive := anSMethod primitive.
-	primitive
-		ifNotNil: [ ^self evaluatePrimitive: primitive].
-	environment := system newNamed: #Array size: method environmentCount.
+	primitive ifNotNil: [ ^ self evaluatePrimitive: primitive ].
 	self visitScript: anSMethod.
+	system popFrame.
 	^ returning
 		ifTrue: [ returnValue ]
 		ifFalse: [ receiver ]
@@ -653,7 +671,7 @@ MethodEvaluator >> visitReturn: anSReturn [
 	home := anSReturn local
 		ifTrue: [ environment ]
 		ifFalse: [ environment at: 1 ].
-	self unwindTo: home returning: value
+	system unwindUpTo: home returning: value
 ]
 
 { #category : #visiting }
