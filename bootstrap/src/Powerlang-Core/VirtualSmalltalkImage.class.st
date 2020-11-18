@@ -49,8 +49,12 @@ VirtualSmalltalkImage >> => aSymbol [
 
 { #category : #services }
 VirtualSmalltalkImage >> basicNewBytes: classname contents: aByteObject [
-	^ByteObjectMap new: self => classname valued: aByteObject.
+	^ self basicNewBytesOf: self => classname contents: aByteObject
+]
 
+{ #category : #services }
+VirtualSmalltalkImage >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
+	^ ByteObjectMap new: anRGBehavior valued: aByteObject
 ]
 
 { #category : #accessing }
@@ -67,12 +71,17 @@ VirtualSmalltalkImage >> basicNewSlots: classname in: spec [
 VirtualSmalltalkImage >> basicNewSlots: classname in: spec sized: size [
 	| species |
 	species := spec at: classname.
-	^ SlotObjectMap new: species size: size withAll: nilObj
+	^self basicNewSlotsOf: species sized: size
 ]
 
 { #category : #accessing }
 VirtualSmalltalkImage >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: kernel sized: size
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> basicNewSlotsOf: anRGBehavior sized: size [
+	^ SlotObjectMap new: anRGBehavior size: size withAll: nilObj
 ]
 
 { #category : #'own services' }
@@ -276,6 +285,21 @@ VirtualSmalltalkImage >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
+{ #category : #initialization }
+VirtualSmalltalkImage >> newBytesOf: anRGBehavior contents: aByteObject [
+	| obj |
+	obj := self basicNewBytesOf: anRGBehavior contents: aByteObject.
+	self initializeBehavior: obj.
+	^ obj
+]
+
+{ #category : #initialization }
+VirtualSmalltalkImage >> newBytesOf: anRGBehavior sized: anInteger [
+	| contents |
+	contents := ByteArray new: anInteger.
+	^ self newBytesOf: anRGBehavior contents: contents
+]
+
 { #category : #accessing }
 VirtualSmalltalkImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
@@ -322,8 +346,28 @@ VirtualSmalltalkImage >> newSlots: classname [
 
 { #category : #initialization }
 VirtualSmalltalkImage >> newSlots: classname sized: size [
+"
+	Allocate an object of pointer type (as SlotObjectMap).
+	It is niled-out, and 	`size` is the size of indexed part (i.e.,
+	shall not include named slots)
+	"
+
 	| obj |
 	obj := self basicNewSlots: classname sized: size.
+	self initializeBehavior: obj.
+	^ obj
+]
+
+{ #category : #initialization }
+VirtualSmalltalkImage >> newSlotsOf: anRGBehavior sized: size [
+	"
+	Allocate an object of pointer type (as SlotObjectMap).
+	It is niled-out, and 	`size` is the size of indexed part (i.e.,
+	shall not include named slots)
+	"
+
+	| obj |
+	obj := self basicNewSlotsOf: anRGBehavior sized: size.
 	self initializeBehavior: obj.
 	^ obj
 ]
@@ -398,7 +442,7 @@ VirtualSmalltalkImage >> transferLiteral: anObject [
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
-	transferred := self newNamed: anObject class name size: anObject size.
+	transferred := self newSlots: anObject class name sized: anObject size.
 	anObject
 		withIndexDo: [ :elem :i | 
 			slot := self transferLiteralDeep: elem.
@@ -450,6 +494,11 @@ VirtualSmalltalkImage >> transferLiteralDeep: anObject [
 { #category : #accessing }
 VirtualSmalltalkImage >> true [
 	^ trueObj
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> wordSize [
+	^ wordSize
 ]
 
 { #category : #accessing }

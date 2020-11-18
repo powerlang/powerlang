@@ -12,6 +12,13 @@ SmallintObjectMap class >> new: anRGBehavior valued: anInteger [
 	^self new initializeAs: anRGBehavior valued: anInteger
 ]
 
+{ #category : #comparing }
+SmallintObjectMap >> = anObject [
+	anObject class == self class
+		ifFalse: [ ^ false ].
+	^value == anObject value
+]
+
 { #category : #accessing }
 SmallintObjectMap >> at: index [
 	self errorNotIndexable
@@ -20,6 +27,11 @@ SmallintObjectMap >> at: index [
 { #category : #accessing }
 SmallintObjectMap >> at: index put: anObject [
 	self errorNotIndexable
+]
+
+{ #category : #comparing }
+SmallintObjectMap >> hash [
+	^ value hash
 ]
 
 { #category : #initialization }

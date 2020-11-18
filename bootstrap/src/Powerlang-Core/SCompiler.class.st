@@ -89,10 +89,9 @@ SCompiler >> forClass: aClass [
 
 { #category : #initialization }
 SCompiler >> initialize: aDictionary [
-	super initialize.
 	namespace := aDictionary.
 	class := aDictionary at: #UndefinedObject ifAbsent: nil.
-	pools := OrderedCollection new.
+	pools := OrderedCollection new
 ]
 
 { #category : #initialization }

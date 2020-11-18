@@ -128,6 +128,11 @@ MethodEvaluator >> captureClosure: anSBlock with: block [
 	^ closure
 ]
 
+{ #category : #services }
+MethodEvaluator >> classBinding [
+	^method classBinding
+]
+
 { #category : #visiting }
 MethodEvaluator >> closures [
 	^closures
@@ -287,13 +292,13 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 		ifTrue: [ index := arguments first value.
 			^ receiver at: index put: arguments second ].
 	primitive = #New
-		ifTrue: [ ^ system new: receiver spec ].
+		ifTrue: [ ^ system newSlotsOf: receiver spec instanceSide sized: 0].
 	primitive = #NewSized
 		ifTrue: [ size := arguments first value.
-			^ system new: receiver spec size: size ].
+			^ system newSlotsOf: receiver spec instanceSide sized: size ].
 	primitive = #NewBytes
 		ifTrue: [ size := arguments first value.
-			^ system newBytes: receiver spec size: size ].
+			^ system newBytesOf: receiver spec instanceSide sized: size ].
 	primitive = #Equal
 		ifTrue: [ argument := arguments first.
 			^ self
@@ -348,7 +353,7 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 				startingAt: arguments fourth value.
 			^ receiver ].
 	primitive = #FloatNew
-		ifTrue: [ ^ system new: receiver spec size: 8 ].
+		ifTrue: [ ^ system newBytesOf: receiver spec instanceSide sized: 8 ].
 	primitive = #PrimeFor
 		ifTrue: [ ^ self evaluatePrimitivePrimeFor ].
 	self ASSERT: false

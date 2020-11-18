@@ -101,10 +101,25 @@ VirtualSmalltalkRuntimeTest >> test132sendIfTrueToTrue [
 
 { #category : #tests }
 VirtualSmalltalkRuntimeTest >> test150compute20dividedBy5 [
-	| twenty five four result |
-	twenty := image newInteger: 20.
-	five := image newInteger: 5.
-	four := image newInteger: 4.
-	result := runtime send: #/ to: twenty with: {five}.
-	self assert: result equals: four
+	| result |
+	result := runtime send: #/ to: self ==> 20 with: {(self ==> 5)}.
+	self assert: result equals: self ==> 4
+]
+
+{ #category : #tests }
+VirtualSmalltalkRuntimeTest >> test200createDictionary [
+	| class d |
+	class := image classNamed: #Dictionary.
+	d := runtime send: #new to: class with: {}.
+	self assert: d spec name equals: 'Dictionary'
+]
+
+{ #category : #tests }
+VirtualSmalltalkRuntimeTest >> test210addAssociationToDictionary [
+	| class d assoc |
+	class := image classNamed: #Dictionary.
+	assoc := image newAssociation: #foo -> nil.
+	d := runtime send: #new to: class with: {}.
+	runtime send: #add: to: d with: {assoc}.
+	self assert: d spec name equals: 'Dictionary'
 ]
