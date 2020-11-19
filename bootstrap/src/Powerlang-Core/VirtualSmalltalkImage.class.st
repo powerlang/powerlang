@@ -478,7 +478,7 @@ VirtualSmalltalkImage >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ falseObj ].
 	anObject == true
 		ifTrue: [ ^ trueObj ].
-	identityMap at: anObject ifPresent: [:existing | ^ existing ].
+	identityMap at: anObject ifPresent: [ :existing | ^ existing ].
 	(class inheritsFrom: Symbol)
 		ifTrue: [ ^ self newSymbol: anObject ].
 	(class inheritsFrom: String)
@@ -487,7 +487,7 @@ VirtualSmalltalkImage >> transferLiteralDeep: anObject [
 		ifTrue: [ ^ self newBytesFrom: anObject ].
 	(class inheritsFrom: Float)
 		ifTrue: [ ^ self newFloatFrom: anObject ].
-	(class inheritsFrom: BootstrapObject)
+	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].
 	class == SCompiledBlock
 		ifTrue: [ ^ self transferBlock: anObject ].
