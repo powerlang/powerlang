@@ -266,6 +266,7 @@ MethodEvaluator >> evaluateClosure: closure withArgs: anArray [
 	block := frame blockOf: closure.
 	sblock := frame blockAstcodesOf: block.
 	evaluator := frame copy beBlock.
+	system pushFrame: evaluator.
 	^ sblock isInlined
 		ifTrue: [ evaluator evaluateBlock: sblock args: anArray ]
 		ifFalse: [ evaluator evaluateBlock: sblock args: anArray closure: closure ]
@@ -295,7 +296,7 @@ MethodEvaluator >> evaluatePrimitive: primitive [
 		ifTrue: [ ^ system newSlotsOf: receiver spec instanceSide sized: 0].
 	primitive = #NewSized
 		ifTrue: [ size := arguments first value.
-			^ system newSlotsOf: receiver spec instanceSide sized: size ].
+			^ system newOf: receiver spec instanceSide sized: size ].
 	primitive = #NewBytes
 		ifTrue: [ size := arguments first value.
 			^ system newBytesOf: receiver spec instanceSide sized: size ].
@@ -486,6 +487,15 @@ MethodEvaluator >> parent: anInterpreter [
 	parent := anInterpreter
 ]
 
+{ #category : #visiting }
+MethodEvaluator >> primitive: primitive [
+	| result |
+	result := self evaluatePrimitive: primitive.
+	returning ifTrue: [ ^self ].
+	system popFrame.
+			self returning: result
+]
+
 { #category : #printing }
 MethodEvaluator >> printOn: aStream [
  self backtrace
@@ -655,12 +665,11 @@ MethodEvaluator >> visitMessage: anSMessage [
 MethodEvaluator >> visitMethod: anSMethod [
 	| primitive |
 	primitive := anSMethod primitive.
-	primitive ifNotNil: [ ^ self evaluatePrimitive: primitive ].
-	self visitScript: anSMethod.
-	system popFrame.
+	primitive ifNil: [	self visitScript: anSMethod] ifNotNil: [ self primitive: primitive ].
 	^ returning
 		ifTrue: [ returnValue ]
-		ifFalse: [ receiver ]
+		ifFalse: [ system popFrame.
+			receiver ]
 ]
 
 { #category : #visiting }
