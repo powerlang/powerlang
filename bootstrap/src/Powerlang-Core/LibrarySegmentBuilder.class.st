@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'kernelBuilder',
 		'requiredSpecs',
-		'imports'
+		'imports',
+		'spec'
 	],
 	#classVars : [
 		'KernelSpec'
