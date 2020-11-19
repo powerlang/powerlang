@@ -10,8 +10,7 @@ Class {
 { #category : #running }
 ObjectMapTest >> setUp [
 	super setUp.
-	kernel := SmalltalkBootstrapper spec
-
+	kernel := VirtualSmalltalkImage kernelSpec
 ]
 
 { #category : #running }

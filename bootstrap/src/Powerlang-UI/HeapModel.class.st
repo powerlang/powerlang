@@ -22,8 +22,8 @@ HeapModel class >> defaultSpec [
 HeapModel class >> forSimulatedPst [
 	<example>
 	| kernel builder writer runtime labels |
-	kernel := SmalltalkBootstrapper spec.
-	builder := SmalltalkBootstrapper fromSpec build.
+	kernel := VirtualSmalltalkImage kernelSpec.
+	builder := KernelSegmentBuilder fromSpec build.
 	writer := builder writer write.
 	runtime := Runtime forSimulating: kernel memory: writer image.
 	labels := Dictionary new.

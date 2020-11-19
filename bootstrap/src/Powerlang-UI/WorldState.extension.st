@@ -2,7 +2,7 @@ Extension { #name : #WorldState }
 
 { #category : #'*Powerlang-UI' }
 WorldState class >> pstClassBrowser [
-	SmalltalkBootstrapper spec browse
+	VirtualSmalltalkImage kernelSpec browse
 ]
 
 { #category : #'*Powerlang-UI' }

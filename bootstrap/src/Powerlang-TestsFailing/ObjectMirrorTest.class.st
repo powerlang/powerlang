@@ -10,9 +10,11 @@ Class {
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
 	| builder writer |
-	builder := SmalltalkBootstrapper fromSpec build.
+	builder := KernelSegmentBuilder fromSpec64bits build.
 	writer := builder writer write.
-	^ Runtime forSimulating: SmalltalkBootstrapper spec memory: writer image
+	^ Runtime
+		forSimulating: VirtualSmalltalkImage kernelSpec
+		memory: writer image
 ]
 
 { #category : #private }

@@ -33,10 +33,10 @@ AstcodeTest >> encode: source [
 { #category : #private }
 AstcodeTest >> encode: source in: aSpecies [
 	| ring compiler |
-	ring := SmalltalkBootstrapper spec bindingOf: aSpecies name.
+	ring := VirtualSmalltalkImage kernelSpec bindingOf: aSpecies name.
 	compiler := SCompiler forClass: ring value.
 	method := compiler compile: source.
-	^method astcodes
+	^ method astcodes
 ]
 
 { #category : #private }
