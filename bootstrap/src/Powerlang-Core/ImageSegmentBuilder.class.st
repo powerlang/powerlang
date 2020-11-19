@@ -24,9 +24,9 @@ ImageSegmentBuilder >> => aSymbol [
 
 { #category : #services }
 ImageSegmentBuilder >> addObjectDeep: anObject [
-	self ASSERT: (anObject isKindOf: BootstrapObject).
+	self ASSERT: (anObject isKindOf: ObjectMap).
 	anObject isImport
-		ifTrue: [ ^ self addImport: anObject].
+		ifTrue: [ ^ self addImport: anObject ].
 	anObject isImmediate
 		ifTrue: [ ^ self ].
 	(objects includes: anObject)
@@ -305,7 +305,8 @@ ImageSegmentBuilder >> transferSimpleLiterals: method [
 	1 to: method size do: [ :i | 
 		literal := method at: i.
 		class := literal class.
-		((class inheritsFrom: BootstrapObject) or: [ class = SCompiledBlock ])
+		((class inheritsFrom: ObjectMap)
+			or: [ class = SCompiledBlock ])
 			ifFalse: [ method at: i put: (self transferLiteralDeep: literal) ] ].
 	^ method
 ]
