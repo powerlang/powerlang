@@ -36,7 +36,7 @@ Launcher::launch(ImageSegment *kernel, const int argc, const char **argv)
 {
 	ASSERT(kernel != nullptr);
 
-    auto runtime = (Runtime*)(void*)kernel->header.module->slot(5);
+    auto runtime = (Runtime*)(void*)kernel->header.module->slot(6);
     return runtime->init(argc, argv);
 }
 
