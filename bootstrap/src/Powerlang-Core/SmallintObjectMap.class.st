@@ -42,9 +42,9 @@ SmallintObjectMap >> initializeAs: anRGBehavior sized: size [
 { #category : #initialization }
 SmallintObjectMap >> initializeAs: anRGBehavior valued: anInteger [
 	self assert: anRGBehavior name == #SmallInteger.
-	self assert: anInteger isSmallInteger.
+	self assert: anInteger isInteger.
 	spec := anRGBehavior.
-	value := anInteger.
+	value := anInteger
 ]
 
 { #category : #testing }
