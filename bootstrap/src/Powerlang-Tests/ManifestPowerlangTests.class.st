@@ -21,3 +21,8 @@ ManifestPowerlangTests class >> ruleRBConsistencyCheckRuleV1FalsePositive [
 ManifestPowerlangTests class >> ruleRBSentNotImplementedRuleV1FalsePositive [
 	^ #(#(#(#RGPackage #(#'Powerlang-Tests')) #'2020-02-26T15:19:33.083731-03:00') )
 ]
+
+{ #category : #'code-critics' }
+ManifestPowerlangTests class >> ruleRBUncommonMessageSendRuleV1FalsePositive [
+	^ #(#(#(#RGPackageDefinition #(#'Powerlang-Tests')) #'2020-11-17T16:21:46.297523-03:00') )
+]
