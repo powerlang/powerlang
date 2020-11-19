@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'spec',
-		'superclass'
+		'superclass',
+		'map'
 	],
 	#category : #'Powerlang-Core-Emulation'
 }
@@ -17,6 +18,16 @@ VirtualSpecies >> allSharedPoolsUsing: globals [
 		whileFalse: [ pools addAll: (class sharedPoolsUsing: globals).
 			class := class superclass ].
 	^ pools
+]
+
+{ #category : #accessing }
+VirtualSpecies >> map [
+	^map
+]
+
+{ #category : #accessing }
+VirtualSpecies >> map: anObjectMap [ 
+	map := anObjectMap 
 ]
 
 { #category : #accessing }
