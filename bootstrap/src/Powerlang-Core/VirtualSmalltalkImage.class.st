@@ -182,6 +182,11 @@ VirtualSmalltalkImage >> genesis [
 ]
 
 { #category : #accessing }
+VirtualSmalltalkImage >> includes: anObject [
+	^identityMap includesKey: anObject
+]
+
+{ #category : #accessing }
 VirtualSmalltalkImage >> initialize [
 	classes := OrderedDictionary new.
 	metaclasses := OrderedDictionary new.
@@ -246,6 +251,11 @@ VirtualSmalltalkImage >> kernel [
 { #category : #accessing }
 VirtualSmalltalkImage >> kernel: anRGEnvironment [
 	kernel := anRGEnvironment 
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> map: anObject to: anObjectMap [
+	identityMap at: anObject put: anObjectMap
 ]
 
 { #category : #accessing }
@@ -324,9 +334,7 @@ VirtualSmalltalkImage >> newLargeNegativeInteger: anInteger [
 		byte > 0
 			ifTrue: [ byte := 256 - byte ].
 		bytes at: i put: byte ].
-	^ ByteObjectMap
-		new: self => #LargeNegativeInteger
-		valued: bytes
+	^ self newBytes: #LargeNegativeInteger contents: bytes
 ]
 
 { #category : #initialization }
@@ -334,9 +342,7 @@ VirtualSmalltalkImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
-	^ ByteObjectMap
-		new: self => #LargePositiveInteger
-		valued: bytes
+	^ self newBytes: #LargePositiveInteger contents: bytes reversed
 ]
 
 { #category : #initialization }
@@ -410,6 +416,16 @@ VirtualSmalltalkImage >> newSymbol: aSymbol [
 { #category : #accessing }
 VirtualSmalltalkImage >> nil [
 	^ nilObj
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> speciesFor: anRGBehavior [
+	^classes at: anRGBehavior ifAbsent: [ metaclasses at: anRGBehavior]
+]
+
+{ #category : #testing }
+VirtualSmalltalkImage >> surrogateFor: anObject [
+	^ identityMap at: anObject ifAbsent: nil
 ]
 
 { #category : #accessing }

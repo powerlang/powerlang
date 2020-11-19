@@ -38,6 +38,15 @@ VirtualSmalltalkRuntime >> booleanFrom: anObject [
 	self error: 'not a boolean'
 ]
 
+{ #category : #initialization }
+VirtualSmalltalkRuntime >> bootstrap [
+	| transferred class smalltalk |
+	transferred := self newInteger: image wordSize.
+	class := image classNamed: #SmalltalkSystem.
+	smalltalk := self send: #new to: class.
+	self send: #bootstrap: to: smalltalk with: {transferred}
+]
+
 { #category : #testing }
 VirtualSmalltalkRuntime >> builderOf: closure [
 	frames
@@ -56,6 +65,16 @@ VirtualSmalltalkRuntime >> compile: anRGMethod [
 	^ compiler
 		forClass: class;
 		compile: anRGMethod sourceCode
+]
+
+{ #category : #'own services' }
+VirtualSmalltalkRuntime >> declareGlobals: anObjectMap [
+	| assocs |
+	assocs := anObjectMap
+		slots collect: [ :symbol | 
+			image newAssociation: symbol -> nil].
+	assocs do: [:assoc | 	globals add: assoc ].
+		^assocs
 ]
 
 { #category : #accessing }
@@ -79,6 +98,16 @@ VirtualSmalltalkRuntime >> false [
 ]
 
 { #category : #accessing }
+VirtualSmalltalkRuntime >> frames [
+	^ frames
+]
+
+{ #category : #accessing }
+VirtualSmalltalkRuntime >> globals [
+	^ globals
+]
+
+{ #category : #accessing }
 VirtualSmalltalkRuntime >> image: aVirtualSmalltalkImage [
 	image := aVirtualSmalltalkImage.
 	smallintBehavior := (image classNamed: #SmallInteger) instanceBehavior.
@@ -95,6 +124,19 @@ VirtualSmalltalkRuntime >> initialize [
 	overrides := Dictionary new.
 	virtualSpecies := OrderedDictionary new.
 	globals := VirtualDictionary new
+]
+
+{ #category : #'own services' }
+VirtualSmalltalkRuntime >> initializeClassPools [
+	| dictionary virtual cvars |
+	dictionary := image classNamed: #Dictionary.
+	image classes
+		keysAndValuesDo: [ :spec :map | 
+			virtual := self virtualSpeciesFor: spec.
+			cvars := self send: #new to: dictionary.
+			virtual classPool
+				associations do: [ :assoc | self send: #add: to: cvars with: {assoc} ].
+			map classVariables: cvars ]
 ]
 
 { #category : #accessing }
@@ -156,7 +198,7 @@ VirtualSmalltalkRuntime >> initializeEmulationOverrides [
 		override: #Closure -> #value:
 			with: 'value: a1 <primitive: ClosureValueWithArgs>';
 		override: #Closure -> #value:value:
-			with: 'value: a1 value: 2 <primitive: ClosureValueWithArgs>';
+			with: 'value: a1 value: a2 <primitive: ClosureValueWithArgs>';
 		override: #Closure -> #value:value:value:
 			with: 'value: a1 value: a2 value: a3 <primitive: ClosureValueWithArgs>';
 		override: #Closure -> #evaluateWith:
@@ -176,13 +218,22 @@ VirtualSmalltalkRuntime >> initializeEmulationOverrides [
 			with: 'primeFor: anInteger <primitive: PrimeFor>'
 ]
 
-{ #category : #accessing }
+{ #category : #'own services' }
 VirtualSmalltalkRuntime >> initializeGlobals [
-	|  assoc |
-	 image classes
+	| assoc |
+	assoc := image newAssociation: #WordSize -> image wordSize.
+	globals add: assoc.
+	assoc := image newAssociation: #LastHash ->1.
+	globals add: assoc.
+					
+	image classes
 		keysAndValuesDo: [ :spec :map | 
 			assoc := image newAssociation: spec name asSymbol -> map.
-			globals add: assoc ]
+			globals add: assoc.
+			spec
+				sharedPoolsDo: [ :pool | 
+					assoc := image newAssociation: pool name asSymbol -> nil.
+					globals add: assoc ] ]
 ]
 
 { #category : #testing }
@@ -212,13 +263,42 @@ VirtualSmalltalkRuntime >> methodFor: aSymbol in: anRGBehavior [
 ]
 
 { #category : #accessing }
+VirtualSmalltalkRuntime >> newBytesOf: anRGBehavior  sized: anInteger [
+	^ image newBytesOf: anRGBehavior  sized: anInteger
+]
+
+{ #category : #accessing }
 VirtualSmalltalkRuntime >> newClosure: anInteger [
 	^image newSlots: #Closure sized: anInteger
+]
+
+{ #category : #initialization }
+VirtualSmalltalkRuntime >> newDictionary [
+	| factory |
+	factory := image classNamed: #Dictionary.
+	^ self send: #new to: factory
 ]
 
 { #category : #services }
 VirtualSmalltalkRuntime >> newInteger: anInteger [ 
 	^image newInteger: anInteger 
+]
+
+{ #category : #accessing }
+VirtualSmalltalkRuntime >> newOf: anRGBehavior [ 
+	^ image newSlotsOf: anRGBehavior sized: 0
+]
+
+{ #category : #accessing }
+VirtualSmalltalkRuntime >> newOf: anRGBehavior sized: anInteger [
+	^ anRGBehavior isBytes
+		ifTrue: [ image newBytesOf: anRGBehavior sized: anInteger ]
+		ifFalse: [ image newSlotsOf: anRGBehavior sized: anInteger ]
+]
+
+{ #category : #accessing }
+VirtualSmalltalkRuntime >> newSlotsOf: anRGBehavior sized: anInteger [
+	^ image newSlotsOf: anRGBehavior sized: anInteger
 ]
 
 { #category : #accessing }
@@ -316,33 +396,36 @@ VirtualSmalltalkRuntime >> unwindUpTo: environment returning: value [
 		frame := frames at: i.
 		frame returning: value.
 		(frame isHomeOf: environment)
-			ifTrue: [ ^ frames removeLast: frames size - i ]
-	 ].
+			ifTrue: [ ^ frames removeLast: frames size - i +1 ] ].
 	self error: 'frame not found'
 ]
 
 { #category : #accessing }
 VirtualSmalltalkRuntime >> virtualClassFor: spec [
-	| superclass supervirtual  virtual |
+	| superclass supervirtual virtual map |
 	superclass := spec superclass.
+	map := image classFor: spec.
 	supervirtual := superclass
 		ifNotNil: [ self virtualSpeciesFor: superclass ].
 	virtual := VirtualClass new
 		spec: spec;
-		superclass: supervirtual.
+		superclass: supervirtual;
+		map: map.
 	virtual createClassAssociationsWith: image.
 	^ virtualSpecies at: spec put: virtual
 ]
 
 { #category : #accessing }
 VirtualSmalltalkRuntime >> virtualMetaclassFor: spec [
-	| superclass supervirtual class virtual |
+	| superclass supervirtual class virtual map |
 	class := self virtualSpeciesFor: spec instanceSide.
+	map := 	image speciesFor: spec.
 	superclass := spec superclass ifNil: image => #Class.
 	supervirtual := self virtualSpeciesFor: superclass.
 	virtual := VirtualMetaclass new
 		spec: spec;
 		superclass: supervirtual;
+		map: map;
 		class: class.
 	^ virtualSpecies at: spec put: virtual
 ]
