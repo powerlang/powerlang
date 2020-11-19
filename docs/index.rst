@@ -67,6 +67,24 @@ The system can be debugged remotely through a vdb/gdb connection, which
 allows both local and remote debugging.
 
 
+How to improve this documentation
+*********************************
+
+This documentation was written in rst format and html output was generated
+by sphinx. You will find these same contents
+in `/docs` directory. To be able to compile them, you will need to install
+sphinx in your system::
+
+    pip3 install sphinx sphinx-autobuild
+
+then just from root powerlang dir do::
+
+    sphinx-autobuild docs docs/_build/html
+
+which will open a local http server at http://127.0.0.1:8000 that recompiles
+automatically when files are changed and that lets you browser the docs as
+you change them. When you have any change, just open a PR in
+`github.com/powerlang <https://github.com/powerlang>`_
 
 Indices and tables
 ==================
@@ -75,6 +93,7 @@ Indices and tables
    :maxdepth: 2
    :includehidden:
    
+   bootstrap/index
    dmr/dmr
 ..   :caption: Contents:
 
