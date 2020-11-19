@@ -11,9 +11,6 @@ Class {
 		'module',
 		'objects'
 	],
-	#classVars : [
-		'Spec'
-	],
 	#category : #'Powerlang-Core-Building'
 }
 
