@@ -9,10 +9,10 @@ Class {
 		'offsets',
 		'size',
 		'base',
-		'module'
-	],
-	#classVars : [
-		'WordSize'
+		'module',
+		'wordSize',
+		'roots',
+		'index'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -24,11 +24,6 @@ ImageSegmentWriter class >> behaviorOffset [
 	"
 
 	^ -4
-]
-
-{ #category : #'class initialization' }
-ImageSegmentWriter class >> initialize [
-	WordSize := 8
 ]
 
 { #category : #accessing }
@@ -43,6 +38,24 @@ ImageSegmentWriter class >> objectsOffset [
 		See ImageSegment.h for structure of a segment header
 	"
 	^40
+]
+
+{ #category : #initialization }
+ImageSegmentWriter >> addClosure [
+	| remaining obj b |
+	remaining := OrderedCollection withAll: roots.
+	remaining do: [ :s | offsets at: s put: nil ].
+	[ remaining isEmpty ]
+		whileFalse: [ obj := remaining removeFirst.
+			objects add: obj.
+			b := obj behavior.
+			(offsets includesKey: b)
+				ifFalse: [ offsets at: b put: nil. remaining add: b ].
+			obj
+				slotsDo: [ :s | 
+					(s isImmediate or: [ offsets includesKey: s ])
+						ifFalse: [ offsets at: s put: nil.
+							remaining add: s ] ] ]
 ]
 
 { #category : #accessing }
@@ -94,9 +107,10 @@ ImageSegmentWriter >> image [
 { #category : #accessing }
 ImageSegmentWriter >> initialize [
 	offsets := IdentityDictionary new.
+	objects := OrderedCollection new.
 	stream := #[] writeStream.
 	nextHash := 1.
-	base := 0.
+	base := 0
 ]
 
 { #category : #accessing }
@@ -108,7 +122,7 @@ ImageSegmentWriter >> layoutObjects [
 			oop := offset + obj headerSizeInBytes.
 			offsets at: obj put: oop.
 			offset := oop + obj bodySizeInBytes ].
-	size := offset.
+	size := offset
 ]
 
 { #category : #initialization }
@@ -129,11 +143,6 @@ ImageSegmentWriter >> objects [
 	^ objects
 ]
 
-{ #category : #initialization }
-ImageSegmentWriter >> objects: aCollection [
-	objects := aCollection
-]
-
 { #category : #accessing }
 ImageSegmentWriter >> objectsOffset [
 	^self class objectsOffset
@@ -142,6 +151,11 @@ ImageSegmentWriter >> objectsOffset [
 { #category : #accessing }
 ImageSegmentWriter >> offsetOf: anObjectMap [
 	^ offsets at: anObjectMap
+]
+
+{ #category : #initialization }
+ImageSegmentWriter >> roots: aCollection [
+	roots := aCollection
 ]
 
 { #category : #initialization }
@@ -155,8 +169,14 @@ ImageSegmentWriter >> stream: aWriteStream [
 ]
 
 { #category : #accessing }
+ImageSegmentWriter >> wordSize: anInteger [
+	wordSize := anInteger
+]
+
+{ #category : #accessing }
 ImageSegmentWriter >> write [
 	self
+		addClosure;
 		layoutObjects;
 		configureSpace;
 		writeSignature;
@@ -185,7 +205,7 @@ ImageSegmentWriter >> writeObjectBytes: obj [
 	| current aligned |
 	stream nextBytesPutAll: obj bytes.
 	current := stream position.
-	aligned := current alignedTo: WordSize.
+	aligned := current alignedTo: wordSize.
 	aligned - current timesRepeat: [ stream nextPut: 0 ]
 ]
 
@@ -198,7 +218,7 @@ ImageSegmentWriter >> writeObjectHeader: obj [
 				uint32le: 0 ].
 	behavior := self encodedReferenceTo: obj behavior.
 	stream
-		uint16le: self nextHash;
+		uint16le: obj headerHash;
 		nextPut: obj headerSmallSize;
 		nextPut: obj headerFlags;
 		uint32le: behavior.
@@ -225,8 +245,8 @@ ImageSegmentWriter >> writeObjects [
 ImageSegmentWriter >> writeReferenceTo: slot [
 	| encoded |
 	encoded := self encodedReferenceTo: slot.
-	WordSize = 8
-		ifFalse: [ self assert: false].
+	wordSize = 8
+		ifFalse: [ self assert: false ].
 	stream uint64le: encoded
 ]
 
