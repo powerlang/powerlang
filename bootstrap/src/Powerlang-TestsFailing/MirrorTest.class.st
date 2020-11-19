@@ -33,10 +33,10 @@ MirrorTest >> mirrorForObject [
 { #category : #tests }
 MirrorTest >> setUp [
 	super setUp.
-	builder := SmalltalkBootstrapper fromSpec build.
+	builder := VirtualSmalltalkImage kernelSpec build.
 	writer := builder writer write.
 	runtime := Runtime
-		forSimulating: SmalltalkBootstrapper spec
+		forSimulating: VirtualSmalltalkImage kernelSpec
 		memory: writer image
 ]
 

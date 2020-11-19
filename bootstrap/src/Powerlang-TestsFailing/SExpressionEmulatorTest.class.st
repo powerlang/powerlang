@@ -48,7 +48,7 @@ SExpressionEmulatorTest >> invoke: method with: object [
 { #category : #running }
 SExpressionEmulatorTest >> setUp [
 	super setUp.
-	builder := SmalltalkBootstrapper fromSpec build
+	builder := VirtualSmalltalkImage kernelSpec build
 ]
 
 { #category : #tests }
@@ -65,6 +65,6 @@ SExpressionEmulatorTest >> test100yourself [
 SExpressionEmulatorTest >> write [
 	writer := builder writer write.
 	runtime := Runtime
-		forSimulating: SmalltalkBootstrapper spec
+		forSimulating: VirtualSmalltalkImage kernelSpec
 		memory: writer image
 ]
