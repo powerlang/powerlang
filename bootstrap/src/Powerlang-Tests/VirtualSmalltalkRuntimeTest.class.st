@@ -159,6 +159,17 @@ VirtualSmalltalkRuntimeTest >> test160evaluateClosure [
 ]
 
 { #category : #tests }
+VirtualSmalltalkRuntimeTest >> test160evaluateClosureFrames [
+	| result |
+	self
+		compile: 'foo [5] value'
+		in: #ProtoObject
+		during: [ result := runtime send: #foo to: image true.
+			self assert: result equals: image true ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
 VirtualSmalltalkRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
