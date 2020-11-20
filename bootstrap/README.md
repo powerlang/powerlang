@@ -4,7 +4,7 @@
 Load current kernel smalltalk code and browse it.
 "
 
-    SmalltalkBootstrapper newSpec browse.
+    VirtualSmalltalkImage kernelSpec browse.
 
 "
 
