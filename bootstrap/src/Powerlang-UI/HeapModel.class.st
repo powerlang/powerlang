@@ -21,11 +21,15 @@ HeapModel class >> defaultSpec [
 { #category : #specs }
 HeapModel class >> forSimulatedPst [
 	<example>
-	| kernel builder writer runtime labels |
-	kernel := VirtualSmalltalkImage kernelSpec.
-	builder := KernelSegmentBuilder fromSpec build.
+	| builder writer labels |
+	builder := KernelSegmentBuilder new
+		initialize64BitImage;
+		generateModule;
+		bootstrapModule;
+		fillClasses;
+		nativizeForDMR;
+		addGenesisObjects.
 	writer := builder writer write.
-	runtime := Runtime forSimulating: kernel memory: writer image.
 	labels := Dictionary new.
 	builder classes
 		do: [ :class | 
