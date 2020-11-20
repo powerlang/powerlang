@@ -261,15 +261,17 @@ MethodEvaluator >> evaluateClosure: aPClosure with: anObject with: anotherObject
 
 { #category : #visiting }
 MethodEvaluator >> evaluateClosure: closure withArgs: anArray [
-	| frame block sblock evaluator |
+	| frame block sblock evaluator result |
 	frame := system builderOf: closure.
 	block := frame blockOf: closure.
 	sblock := frame blockAstcodesOf: block.
 	evaluator := frame copy beBlock.
 	system pushFrame: evaluator.
-	^ sblock isInlined
+	result := sblock isInlined
 		ifTrue: [ evaluator evaluateBlock: sblock args: anArray ]
-		ifFalse: [ evaluator evaluateBlock: sblock args: anArray closure: closure ]
+		ifFalse: [ evaluator evaluateBlock: sblock args: anArray closure: closure ].
+	returning ifFalse: [ system popFrame ].
+	^result
 ]
 
 { #category : #visiting }
