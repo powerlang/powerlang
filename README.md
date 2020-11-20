@@ -1,8 +1,8 @@
 # Powerlang
 
-This is Powerlang, a research vehicle to explore about implementation of programming
-laguages. While focused on Smalltalk, it aims to be a generic language creation
-toolkit, something you can use to either evolve Smalltalk, or either build
+This is Powerlang, a research vehicle to explore implementations of programming
+languages. While focused on Smalltalk, it aims to be a generic language creation
+toolkit, something you can use to either evolve Smalltalk, or otherwise build
 a new language implementation of choice.
 We provide tools for coding, bootstrapping, compiling, jitting and debugging the
 implementation.
@@ -29,7 +29,7 @@ make -C bootstrap
 ```
 
 Additionaly, you will need the sources of your language, that have to be placed
-in `bootstrap/specs/<your lang>`. Lets say you want to boostrap Bee Smalltalk:
+in `bootstrap/specs/<your lang>`. Lets say you want to bootstrap Bee Smalltalk:
 
 ```
 git clone git@github.com:powerlang/bee-dmr.git bootstrap/specs/bee-dmr
