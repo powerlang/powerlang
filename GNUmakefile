@@ -18,7 +18,7 @@ all: $(KERNEL) $(LAUNCHER)
 
 $(KERNEL): bootstrap/bootstrap.image bootstrap/pharo bootstrap/specs/$(shell cat bootstrap/specs/current)/Kernel/* | $(BUILD)
 	cd bootstrap && ./pharo bootstrap.image eval \
-		"SmalltalkBootstrapper fromSpec build writer base: $(BASEADDR); writeToFile:'$(shell pwd)/$@'"
+		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'$(shell pwd)/$@'"
 
 $(LAUNCHER):
 	$(MAKE) HOST=$(HOST) BUILD=$(shell realpath $(BUILD)) -C launcher
