@@ -11,7 +11,7 @@ BaselineOfPowerlang >> baseline: spec [
 		spec baseline: 'PetitParser' with: [
 			spec loads: 'Core'. 
 			spec loads: 'Analyzer'. 
-			spec repository: 'github://moosetechnology/PetitParser' 
+			spec repository: 'github://shingarov/PetitParser:ULD'
 		].
 		
 		spec baseline: 'Roassal3' with: [
