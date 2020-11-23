@@ -16,7 +16,7 @@ NativeCode >> code [
 
 { #category : #'as yet unclassified' }
 NativeCode >> code: bytes [
-self shouldBeImplemented.
+	machineCode := bytes
 ]
 
 { #category : #'as yet unclassified' }

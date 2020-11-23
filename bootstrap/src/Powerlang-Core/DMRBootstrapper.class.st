@@ -53,14 +53,7 @@ DMRBootstrapper >> initializeNativizer [
 	nativizer := NativizationEnvironment new.
 	self
 		initializeNativizerGlobals;
-		initializeInlinedMethods;
-		initializeInvokedMethods;
-		initializeOptimizedMethods;
-		nativizeInvoke;
-		nativizeWriteBarrier;
-		nativizeLookup;
-		transferNativizerGlobals;
-		setupMessageLinkers
+		transferNativizerGlobals
 ]
 
 { #category : #initialization }

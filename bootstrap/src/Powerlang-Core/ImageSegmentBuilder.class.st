@@ -158,6 +158,14 @@ ImageSegmentBuilder >> initialize64BitImage [
 ]
 
 { #category : #initialization }
+ImageSegmentBuilder >> initializeNativizer [
+	^DMRBootstrapper new
+		image: image;
+		builder: self;
+		initializeNativizer
+]
+
+{ #category : #initialization }
 ImageSegmentBuilder >> log: aString [
 	Transcript
 		show: aString;

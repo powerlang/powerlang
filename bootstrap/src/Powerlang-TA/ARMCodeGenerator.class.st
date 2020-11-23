@@ -22,7 +22,7 @@ ARMCodeGenerator >> load: r withImmediate: imm [
 ]
 
 { #category : #'as yet unclassified' }
-ARMCodeGenerator >> spit: bv [ 
+ARMCodeGenerator >> spit: bv [
 	codeStream nextPutAll: bv asLEByteArray
 ]
 

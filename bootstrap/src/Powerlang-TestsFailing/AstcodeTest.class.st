@@ -20,9 +20,7 @@ AstcodeTest >> compile: source in: aSpecies [
 
 { #category : #private }
 AstcodeTest >> connectGdb [
-	gdb := RemoteGDBSession 
-		host: '192.168.75.2'
-		port: 7000
+	gdb := RemoteGDBSession host: '192.168.1.64' port: 7000
 ]
 
 { #category : #private }
@@ -52,6 +50,17 @@ AstcodeTest >> encode: source in: aSpecies [
 	compiler := SCompiler forClass: ring value.
 	method := compiler compile: source.
 	^ method astcodes
+]
+
+{ #category : #private }
+AstcodeTest >> newNativizer [
+	| bootstrapper |
+	bootstrapper := KernelSegmentBuilder new
+		initialize64BitImage;
+		generateModule;
+		bootstrapModule;
+		initializeNativizer.
+	^ bootstrapper nativizer completeInitialization
 ]
 
 { #category : #private }
@@ -350,32 +359,32 @@ AstcodeTest >> test050instVarAssignment [
 AstcodeTest >> test100nativizeReturn42 [
 	| astcodes root nativizer |
 	astcodes := self encode: 'm ^42'.
-	nativizer := NativizationEnvironment forTesting: SmalltalkBootstrapper spec.
-	nativizer completeInitialization.
-	nativizer nativeCodeFor: method 
+	nativizer := self newNativizer halt.
+
+	nativizer nativize: method
 ]
 
 { #category : #private }
 AstcodeTest >> test200runReturn42 [
 	| astcodes nativizer nc wherePC |
-	
-self connectGdb; createRAM. 
-		
+	self
+		connectGdb;
+		createRAM.
 	astcodes := self encode: 'm ^42'.
-	nativizer := NativizationEnvironment forTesting: SmalltalkBootstrapper spec.
-	nativizer completeInitialization.
-	nc := nativizer nativeCodeFor: method.
-
+	nativizer := self newNativizer.
+	nc := (nativizer nativize: method) nativeCode.
 	self halt.
 	gdb c.
-	wherePC := (gdb getRegister: 'rip')+1. "advance past the int3"
-	gdb setRegister: 'rip' to: wherePC.
+	wherePC := (gdb getRegister: 'pc') + 4.	"advance past the int3"
+	gdb setRegister: 'pc' to: wherePC.
 	memory writeBytes: nc code toAddr: wherePC.
 	"step through the mov rax,0x55"
-	gdb s. self assert: (gdb getRegister: 'rax') equals: 42<<1+1.
+	gdb s.
+	self assert: (gdb getRegister: 'r1') equals: (42 << 1) + 1.
 	"step through the mov rsi,QWORD PTR [rbp-0x8]"
-	gdb s. self assert: (gdb getRegister: 'rsi') equals: 16r5555555555555555.
+	gdb s.
+	self assert: (gdb getRegister: 'rsi') equals: 16r5555555555555555.
 	"step through the mov rbx,QWORD PTR [rbp-0x10]"
-	gdb s. self assert: (gdb getRegister: 'rbx') equals: 16r6666666666666666.
-
+	gdb s.
+	self assert: (gdb getRegister: 'rbx') equals: 16r6666666666666666
 ]

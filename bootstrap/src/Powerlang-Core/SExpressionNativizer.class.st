@@ -406,7 +406,7 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	assembler := #TemplateAssembler64XXXX new
+	assembler := ARMCodeGenerator new
 ]
 
 { #category : #services }
