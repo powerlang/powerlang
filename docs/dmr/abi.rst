@@ -26,6 +26,7 @@ the target processor ISA:
    "SP", "RSP", "callee-saved", Stack Pointer"
    "FP", "RBP", "callee-saved", "Stack Frame Pointer"
    "R", "RAX", "volatile", "Receiver and Return value pointer"
+   "M", "RBX", "callee-saved", "Method/Block native context"
    "S", "RSI", "callee-saved", "Self"
    "E", "RDI", "callee-saved", "Environment"
    "A", "RDX", "volatile", "Argument"
@@ -34,19 +35,24 @@ the target processor ISA:
    "nil", "R12", "fixed", "nil"
    "true", "R13", "fixed", "true"
    "false", "R14", "fixed", "false"
+   "G", "R15", "fixed", "commonly used global objects"
   
 IP, SP, and FP are self describing. R register contains the receiver at the instant at
 which a message is going to be sent, and contains the return value at the moment when
 a method is about to exit. When entering a method, R register (which is volatile) is
 stored into S, which is callee-saved. This allows to have a pointer to self permanently
 in a register while executing a method. Previous S is restored by the callee at exit,
-loading it from the stack frame of the caller.
+loading it from the stack frame of the caller. M provides access to a method's (or block)
+native code and literals. NativeCode objects (the ones pointed by M) know the CompiledMethod
+or CompiledBlock that generated them, and the literals used within native code. They also
+point to the byte array that holds the machine instructions to be used by the processor.
+M is restored when returning in the same way than S. 
 A, T and V register names are just denotational.
 This means they were named like that because of their main uses, but they can be used
 for different things. They are usually free, ready for usage. We describe the way they
 work first and give some examples later.
 A is used whenever a register is needed for fast/inline arguments,
-like with binary integer operations. It is not used for passing real
+like with inlined binary integer operations. It is not used for passing real
 arguments in message sends. 
 T is used to store temporary values during operations that require a free register.
 V is used to load constants. It is needed because typical ISAs do not let use full
