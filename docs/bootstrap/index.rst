@@ -49,7 +49,7 @@ virtual image that reads Bee `Kernel` module definition, and then builds
 the objects required for the classes, metaclasses and behaviors.
 Objects generated during the genesis are of type :code:`ObjectMap`.
 This hierarchy of types allows to represent the contents of the
-newly created object slots, and their correspoinding spec type and
+newly created object slots, and their corresponding spec type and
 associated behavior and hash. The objects created by this virtual image
 are the minimum needed to do any kind of Smalltalk execution. However,
 it doesn't contain any method, as compiling methods is a more complex
@@ -76,7 +76,7 @@ the association #Array -> Array, that belongs to the bootstrapped world.
 
 There is a constant sense of duality while compiling and executing virtually:
 objects need to be passed back and forth from the local image to the bootstrapped
-image and viceversa many the times.  To deal with this, the method compiler is
+image and vice-versa many times.  To deal with this, the method compiler is
 passed `VirtualClasses`, which account for both the Ring specs and the `ObjectMap`
 that represents the class in the bootstrapped system. To allow usage of globals and
 pools or class vars, the compiler the compiler uses `VirtualDictionaries`, which know
