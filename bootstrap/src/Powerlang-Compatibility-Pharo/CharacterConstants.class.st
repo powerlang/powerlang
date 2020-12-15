@@ -7,7 +7,7 @@ Class {
 		'Space',
 		'Tab'
 	],
-	#category : #'Powerlang-Core-Compatibility'
+	#category : #'Powerlang-Compatibility-Pharo'
 }
 
 { #category : #'class initialization' }

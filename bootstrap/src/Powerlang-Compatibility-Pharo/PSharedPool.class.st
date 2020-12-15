@@ -1,7 +1,7 @@
 Class {
 	#name : #PSharedPool,
 	#superclass : #SharedPool,
-	#category : #'Powerlang-Core-Compatibility'
+	#category : #'Powerlang-Compatibility-Pharo'
 }
 
 { #category : #accessing }

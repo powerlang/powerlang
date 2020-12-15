@@ -18,7 +18,10 @@ BaselineOfPowerlang >> baseline: spec [
 			spec repository: 'github://ObjectProfile/Roassal3:v0.9.2' 
 		].
 			
+		spec package: 'Powerlang-Compatibility-Pharo'.
+			
 		spec package: 'Powerlang-Core' with:[
+			spec requires: 'Powerlang-Compatibility-Pharo'.
 			spec requires: 'PetitParser'
 		].
 		spec package: 'Powerlang-Tests'.

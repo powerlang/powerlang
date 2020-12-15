@@ -5,7 +5,7 @@ Class {
 		'start',
 		'end'
 	],
-	#category : #'Powerlang-Core-Compatibility'
+	#category : #'Powerlang-Compatibility-Pharo'
 }
 
 { #category : #'instance creation' }

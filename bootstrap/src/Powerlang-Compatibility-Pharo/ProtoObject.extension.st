@@ -1,6 +1,6 @@
 Extension { #name : #ProtoObject }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 ProtoObject >> !== anObject [
 	^self ~~ anObject
 ]

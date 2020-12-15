@@ -1,23 +1,23 @@
 Extension { #name : #WriteStream }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 WriteStream >> nextBytePut: aCollection [
 	^ self nextPut: aCollection
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 WriteStream >> nextBytesPut: aCollection [
 	^self nextBytesPutAll: aCollection
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 WriteStream >> nextLongPut: anInteger [
 	| unsigned |
 	unsigned := anInteger < 0 ifTrue: [ anInteger + (1 << 32) ] ifFalse: [ anInteger  ]
 .self nextULongPut: unsigned.
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 WriteStream >> nextULongPut: anInteger [
 	1 to: 4 do: [ :i | 
 		| bi |
@@ -26,7 +26,7 @@ WriteStream >> nextULongPut: anInteger [
 
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 WriteStream >> peek [
 	^self atEnd ifFalse: [collection at: position + 1]
 ]

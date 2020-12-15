@@ -1,6 +1,6 @@
 Extension { #name : #Boolean }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 Boolean >> isBoolean [ 
 	^ true
 ]

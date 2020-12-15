@@ -1,6 +1,6 @@
 Extension { #name : #PositionableStream }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> peekForAll: aCollection [
 	| n |
 	n := aCollection size.
@@ -9,14 +9,14 @@ PositionableStream >> peekForAll: aCollection [
 		yourself
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint16le [
 	"Answer the next unsigned, 16-bit integer from this (binary) stream."
 
 	^ self next + (self next bitShift: 8)
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint16le: anInteger [
 	"Store the given unsigned, 32-bit integer as little endian 
 	 on this (binary) stream."
@@ -27,7 +27,7 @@ PositionableStream >> uint16le: anInteger [
 	self nextPut: (anInteger byteAt: 2)
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint32le [
 	"Answer the next unsigned, 32-bit integer from this (binary) stream."
 
@@ -35,7 +35,7 @@ PositionableStream >> uint32le [
 	
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint32le: anInteger [
 	"Store the given unsigned, 32-bit integer as little endian 
 	 on this (binary) stream."
@@ -48,7 +48,7 @@ PositionableStream >> uint32le: anInteger [
 	self nextPut: (anInteger byteAt: 4)
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint64le [
 	"Answer the next unsigned, 64-bit integer from this (binary) stream."
 
@@ -58,7 +58,7 @@ PositionableStream >> uint64le [
 		+ (self next bitShift: 56)
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> uint64le: anInteger [
 	"Store the given unsigned, 64-bit integer as little endian 
 	 on this (binary) stream."

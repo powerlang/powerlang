@@ -1,6 +1,6 @@
 Extension { #name : #OrderedDictionary }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 OrderedDictionary >> withIndexDo: aBlock [
 	| i |
 	i := 1.
