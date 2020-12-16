@@ -97,7 +97,7 @@ InstructionSpec class >> fromString: aString [
 { #category : #initialization }
 InstructionSpec class >> initialize [
 	OperandEncoding initializeEncodings.
-	InstructionPrefix initializePrefixes.
+	Prefixes initialize.
 	VEXPrefix initializeSignatures.
 	self initializeSpecs.
 	Smalltalk at: #Decoder64 ifPresent: [ :d | d initializeSpecs ]
