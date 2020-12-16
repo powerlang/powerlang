@@ -6,8 +6,8 @@ pharo pharo-ui Pharo.image:
 
 bootstrap.image: pharo Pharo.image src
 	./pharo Pharo.image save bootstrap
-	./pharo $@ metacello install tonel://./src BaselineOfPowerlang
 	./pharo $@ eval --save "(IceRepositoryCreator new location: '..' asFileReference; createRepository) register"
+	./pharo $@ metacello install tonel://./src BaselineOfPowerlang
 	./pharo $@ eval --save "SystemWindow closeTopWindow. GTPlayground openContents: 'README.md' asFileReference contents withSqueakLineEndings"
 	@echo ""
 	@echo "To open Pharo bootstrap image run:"
