@@ -122,6 +122,7 @@ Register class >> initializeRegisters [
 		initialize16BitRegisters;
 		initialize32BitRegisters;
 		initialize64BitRegisters;
+		initializeRIPRegister;
 		initializeMMXRegisters;
 		initializeSSERegisters;
 		initializeSegmentRegisters
