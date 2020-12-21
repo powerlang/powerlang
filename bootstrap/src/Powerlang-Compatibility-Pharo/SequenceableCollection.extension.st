@@ -1,11 +1,11 @@
 Extension { #name : #SequenceableCollection }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 SequenceableCollection >> beeCopyFrom: start [
 	^self beeCopyFrom: start to: self size
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 SequenceableCollection >> beeCopyFrom: start to: stop [
 	| size copy |
 	size := stop - start + 1 max: 0.

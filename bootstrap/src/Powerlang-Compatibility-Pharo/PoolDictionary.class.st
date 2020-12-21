@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'constant'
 	],
-	#category : #'Powerlang-Core-Compatibility'
+	#category : #'Powerlang-Compatibility-Pharo'
 }
 
 { #category : #'instance creation' }

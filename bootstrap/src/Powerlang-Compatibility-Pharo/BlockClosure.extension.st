@@ -1,6 +1,6 @@
 Extension { #name : #BlockClosure }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 BlockClosure >> evaluateWith: anArg [
 	"Activate the receiver, creating a closure activation (MethodContext)
 	 whose closure is the receiver and whose caller is the sender of this message.

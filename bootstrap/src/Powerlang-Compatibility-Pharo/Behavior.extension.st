@@ -1,11 +1,11 @@
 Extension { #name : #Behavior }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 Behavior >> configureCompiler: aCompiler [
 	
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 Behavior >> isSpecies [
 	^true
 ]

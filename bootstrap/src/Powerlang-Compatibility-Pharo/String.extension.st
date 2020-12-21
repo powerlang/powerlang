@@ -1,21 +1,21 @@
 Extension { #name : #String }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> arity [
 	^self numArgs
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> existingSymbol [
 	^Symbol findInterned: self
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> includesString: aString [
 	^ self includesSubstring: aString
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> indexOfString: aString from: start to: stop [
 	| n limit base i |
 	n := aString size.
@@ -34,7 +34,7 @@ String >> indexOfString: aString from: start to: stop [
 
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> indexOfSubcollection: aCollection startingAt: anInteger [
 	| m n i first |
 	m := aCollection size.
@@ -52,12 +52,12 @@ String >> indexOfSubcollection: aCollection startingAt: anInteger [
 	^0
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> reduced [
 	^self
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> replaceAllSubstrings: aString with: anotherString [
 	| string strm index fragment n |
 	string := aString asString.
@@ -77,12 +77,12 @@ String >> replaceAllSubstrings: aString with: anotherString [
 	^strm contents
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> trimBlanks [
 	^self trim
 ]
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 String >> withArticle [
 	| article |
 	article := self first isVowel ifTrue: ['an'] ifFalse: ['a'].

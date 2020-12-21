@@ -6,7 +6,7 @@ Class {
 		'error',
 		'return'
 	],
-	#category : #'Powerlang-Core-Compatibility'
+	#category : #'Powerlang-Compatibility-Pharo'
 }
 
 { #category : #private }
