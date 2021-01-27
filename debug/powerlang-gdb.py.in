@@ -6,7 +6,9 @@
 # SPDX-License-Identifier: MIT
 
 from sys import path
+from os.path import join
 
 path.append("@POWERLANG_GDB_PYDIR@")
+path.append(join("@POWERLANG_GDB_PYDIR@", "jv-vdb" , "python"))
 
 from powerlang import *

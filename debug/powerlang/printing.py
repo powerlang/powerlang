@@ -17,6 +17,8 @@ from itertools import chain
 from gdb.printing import PrettyPrinter, SubPrettyPrinter, register_pretty_printer
 from gdb.FrameDecorator import SymValueWrapper
 
+from  vdb.printing import CxxCollectionPrettyPrinter
+
 from powerlang.utils import cache
 from powerlang.objectmemory import Object, SmallInteger, obj, segments
 from powerlang.constants import CompiledMethodFlags
@@ -158,95 +160,8 @@ class oop(object):
         return obj
 
 
-class CxxPrettyPrinter(PrettyPrinter):
-    """
-    This is specialized pretty printer for printing C++ class
-    types.
-
-    TBW.
-    """
-
-    class CxxSubPrinter(SubPrettyPrinter):
-        def __init__(self, name, regexp, printer):
-            super().__init__(name)
-            self.regexp = regexp
-            self.regexp_c = re.compile(regexp)
-            self.printer = printer
-
-        def matches(self, val_type):
-            """
-            Return True, if this subprinter can print `val`, False otherwise
-            """
-            if val_type.code == gdb.TYPE_CODE_PTR:
-                val_type = val_type.target()
-            try:
-                if val_type.name != None and self.regexp_c.search(val_type.name):
-                    return True
-            except:
-                pass
-            return False
-
-        def __call__(self, val):
-            """
-            Lookup the pretty-printer for the provided value.
-            """
-            if self.matches(val.type):
-                return printer(val)
-            else:
-                return None
-
-    def add_printer(self, name, regexp, printer):
-        """Add a printer to the list.
-
-        Add printer to the list.
-
-        Arguments:
-            name:    name of this pretty printer (for enable/disable)
-            regexp:  the regular expression, as a string.
-            printer: a callable that given a value returns an object to
-                     pretty-print it.
-
-        Returns:
-            Nothing.
-        """
-        if self.subprinters == None:
-            self.subprinters = []
-        for subprinter in self.subprinters:
-            if subprinter.regexp == regexp:
-                subprinter.printer = printer
-                return
-        self.subprinters.append( CxxPrettyPrinter.CxxSubPrinter(name, regexp, printer) );
-
-    def lookup(self, t):
-        def basetypes(t):
-            if t.code != gdb.TYPE_CODE_STRUCT:
-                return None
-            for f in t.fields():
-                if f.is_base_class:
-                    return f.type
-            return None
-
-        if self.subprinters == None:
-            return None , None
-        if t.code == gdb.TYPE_CODE_PTR:
-            t = t.target()
-        while t != None:
-            for subprinter in self.subprinters:
-                if subprinter.enabled and subprinter.matches(t):
-                    return subprinter.printer , subprinter.regexp
-            t = basetypes(t)
-        return None, None
-
-    def __call__(self, val):
-        printer, ignored = self.lookup(val.dynamic_type)
-        if printer != None:
-            return printer(val)
-        return None
-
-
-
 def _build_pretty_printer():
-    pp = CxxPrettyPrinter("Bee-DMR")
+    pp = CxxCollectionPrettyPrinter("Bee-DMR")
     pp.add_printer("HeapObject::SmallHeader", '^HeapObject::SmallHeader', None)
     pp.add_printer("HeapObject::LargeHeader", '^HeapObject::LargeHeader', None)
     pp.add_printer("HeapObject", "^HeapObject", oop)
