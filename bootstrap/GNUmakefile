@@ -15,16 +15,19 @@ bootstrap.image: pharo Pharo.image src
 	@echo "    ./pharo-ui bootstrap.image"
 	@echo ""
 
-test: bootstrap.image pharo
+test: bootstrap.image pharo specs/current
 	./pharo $< test --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
-bee-dmr: specs/bee-dmr
-	echo "bee-dmr" >specs/current
+specs/current: specs/bee-dmr
+	echo "bee-dmr" > specs/current
 
 specs/bee-dmr:
 	git clone git@github.com:powerlang/bee-dmr.git specs/bee-dmr || git clone https://github.com/powerlang/bee-dmr.git specs/bee-dmr
 
 clean:
-	rm -rf Pharo* pharo* bootstrap.image icon-packs
+	rm -f bootstrap.image bootstrap.changes
+
+mrproper: clean
+	rm -rf Pharo* pharo* icon-packs

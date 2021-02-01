@@ -5,11 +5,12 @@ node ( "linux && x86_64" ) { ws {
         writeFile file: 'bootstrap/specs/current', text: 'bee-dmr'
     }
 
-    stage ( "Bootstrap" ) {
-        sh  """
-            make -C bootstrap
-            make -C bootstrap test
-            """
+    stage ( "Compile" ) {
+        sh "make"
+    }
+
+    stage ( "Test" ) {
+        sh "make test"
         junit 'bootstrap/test-reports/*-Test.xml'
     }
 }}
