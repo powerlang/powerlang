@@ -7,6 +7,14 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
+{ #category : #'instance creation' }
+CompositeMessageLinker class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #services }
 CompositeMessageLinker >> add: aMessageLinker [
 	candidates add: aMessageLinker

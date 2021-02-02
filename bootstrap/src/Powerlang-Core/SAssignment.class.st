@@ -13,6 +13,14 @@ SAssignment class >> decodeUsing: anAstcodeDecoder [
 	^anAstcodeDecoder decodeAssignment
 ]
 
+{ #category : #'instance creation' }
+SAssignment class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #visiting }
 SAssignment >> acceptVisitor: visitor [
 	^visitor visitAssignment: self

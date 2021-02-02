@@ -8,6 +8,14 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Tools'
 }
 
+{ #category : #'instance creation' }
+ModRM class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #private }
 ModRM >> beRR [
 	self mod: 2r11

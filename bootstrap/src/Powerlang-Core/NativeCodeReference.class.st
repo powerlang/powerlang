@@ -15,6 +15,14 @@ NativeCodeReference class >> absoluteFor: anObject [
 	^(self new for: anObject) beAbsolute
 ]
 
+{ #category : #'instance creation' }
+NativeCodeReference class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 NativeCodeReference >> beAbsolute [
 	absolute := true

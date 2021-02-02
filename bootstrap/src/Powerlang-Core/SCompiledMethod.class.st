@@ -17,6 +17,14 @@ Class {
 }
 
 { #category : #'instance creation' }
+SCompiledMethod class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
+{ #category : #'instance creation' }
 SCompiledMethod class >> new: anInteger [
 	^ (self basicNew: anInteger) initialize
 ]

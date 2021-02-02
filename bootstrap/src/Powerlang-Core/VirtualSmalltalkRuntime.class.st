@@ -29,6 +29,14 @@ VirtualSmalltalkRuntime class >> initialize [
 	Undermessages := #(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: #_uShortAtOffset:put:)
 ]
 
+{ #category : #'instance creation' }
+VirtualSmalltalkRuntime class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #services }
 VirtualSmalltalkRuntime >> booleanFrom: anObject [
 	anObject == image false

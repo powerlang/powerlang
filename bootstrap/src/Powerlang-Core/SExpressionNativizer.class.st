@@ -158,6 +158,14 @@ SExpressionNativizer class >> nativize: aCompiledMethod [
 		nativize: aCompiledMethod
 ]
 
+{ #category : #'instance creation' }
+SExpressionNativizer class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #services }
 SExpressionNativizer >> addFallback: aBlock [
 	fallbacks add: aBlock

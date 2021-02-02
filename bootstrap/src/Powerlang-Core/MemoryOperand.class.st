@@ -35,6 +35,14 @@ MemoryOperand class >> fromString: aString [
 	^self fromStream: aString readStream
 ]
 
+{ #category : #'instance creation' }
+MemoryOperand class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #comparing }
 MemoryOperand >> = operand [
 	self class == operand class ifFalse: [^false].

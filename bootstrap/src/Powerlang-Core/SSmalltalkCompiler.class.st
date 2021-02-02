@@ -14,6 +14,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler-Smalltalk'
 }
 
+{ #category : #'instance creation' }
+SSmalltalkCompiler class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 SSmalltalkCompiler >> activate: aScriptNode while: aBlock [
 	| current |

@@ -15,6 +15,14 @@ Class {
 	#category : #'Powerlang-Core-OCompiler-IR'
 }
 
+{ #category : #'instance creation' }
+OSimpleLiveRange class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #unclassified }
 OSimpleLiveRange >> addUseFrom: operation at: block [
 	uses add: operation -> block
