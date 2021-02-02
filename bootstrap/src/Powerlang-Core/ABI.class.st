@@ -13,10 +13,18 @@ Class {
 
 { #category : #unclassified }
 ABI class >> currentClass [
-	| platform |
-	platform := OSPlatform current.
-	platform isWin64 ifTrue: [ ^WinX64ABI ].
-	platform isUnix64 ifTrue: [ ^SysVX64ABI ].
+	((Smalltalk respondsTo: #isSmalltalkX) and: [Smalltalk isSmalltalkX]) ifFalse: [
+		| platform |
+
+		platform := #OSPlatform asClass current.
+		platform isWin64 ifTrue: [ ^WinX64ABI ].
+		platform isUnix64 ifTrue: [ ^SysVX64ABI ].
+	] ifTrue: [
+		ExternalAddress pointerSize == 8 ifTrue: [
+			OperatingSystem isMSWINDOWSlike ifTrue: [ ^ WinX64ABI ].
+			OperatingSystem isUNIXlike ifTrue: [ ^ SysVX64ABI ].
+		].
+	].
 	self ASSERT: false.
 ]
 
