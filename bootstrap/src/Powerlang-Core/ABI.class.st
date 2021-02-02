@@ -13,11 +13,14 @@ Class {
 
 { #category : #unclassified }
 ABI class >> currentClass [
-	| platform |
-	platform := OSPlatform current.
-	(platform isWin64 or: [platform isWin32 and: [Smalltalk vm wordSize = 8]]) ifTrue: [ ^WinX64ABI ].
-	(platform isUnix64 or: [platform isMacOSX]) ifTrue: [ ^SysVX64ABI ].
-	self ASSERT: false.
+	| host |
+	
+	host := Smalltalk host.
+	host = 'x86_64-linux-gnu' ifTrue:[ ^SysVX64ABI ].
+	host = 'x86_64-darwin' ifTrue:[ ^SysVX64ABI ].
+	host = 'x86_64-win32' ifTrue:[ ^WinX64ABI ].
+	
+	self error:'Unssuported host: ', host.
 ]
 
 { #category : #unclassified }
