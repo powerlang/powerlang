@@ -127,8 +127,8 @@ AstcodeDecoder >> decodeInlineNodes: anArray [
   result := OrderedCollection new.
   stream := anArray readStream.
   [ stream atEnd ] whileFalse: [ type := self nodeTypeOf: stream next.
-        decoded := type decodeUsing: self.
-        result add: decoded ]. 
+		decoded := type decodeUsing: self.
+		result add: decoded ]. 
   stream := prev.
   ^result
 ]

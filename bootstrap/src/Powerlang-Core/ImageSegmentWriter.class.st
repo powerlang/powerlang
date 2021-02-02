@@ -271,8 +271,8 @@ ImageSegmentWriter >> writeToFile: filename [
 		| bytes |
 		
 		"Bit stupid - we write into internal ByteArray backed stream and
-      then write it to real file. That's because WriteStream and ZnWriteStream
-      are not polymorphic. Sigh"
+	  then write it to real file. That's because WriteStream and ZnWriteStream
+	  are not polymorphic. Sigh"
 		bytes := ByteArray streamContents:[:byteStream | self writeTo: byteStream ].
 		fileStream nextPutAll: bytes.
 	]
