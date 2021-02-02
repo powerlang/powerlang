@@ -99,8 +99,10 @@ InstructionSpec class >> initialize [
 	OperandEncoding initializeEncodings.
 	Prefixes initialize.
 	VEXPrefix initializeSignatures.
+	ISAOperandType initialize.
 	self initializeSpecs.
 	Smalltalk at: #Decoder64 ifPresent: [ :d | d initializeSpecs ]
+
 ]
 
 { #category : #initialization }

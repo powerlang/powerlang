@@ -43,8 +43,9 @@ ISAOperandType class >> immediateTypes [
 
 { #category : #initialization }
 ISAOperandType class >> initialize [
-	self
-		initializeTypes
+	OperandTypeFlags initialize.
+	self initializeTypes
+
 ]
 
 { #category : #initialization }
@@ -290,7 +291,8 @@ ISAOperandType >> hasImmediateFlag [
 
 { #category : #initialization }
 ISAOperandType >> initializeConstantFlag [
-	type anyone isDigit ifTrue: [self addFlag: ConstantType]
+	type anyOne isDigit ifTrue: [self addFlag: ConstantType]
+
 ]
 
 { #category : #initialization }
