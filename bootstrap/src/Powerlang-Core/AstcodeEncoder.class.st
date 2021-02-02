@@ -14,6 +14,14 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
+{ #category : #'instance creation' }
+AstcodeEncoder class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #visiting }
 AstcodeEncoder >> compiledBlockIndexOf: aBlockNode [
 	| index |

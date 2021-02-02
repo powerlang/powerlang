@@ -13,6 +13,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #'instance creation' }
+SCompiledBlock class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #constants }
 SCompiledBlock >> argumentCount [
 	^format bitsAt: ArgCount

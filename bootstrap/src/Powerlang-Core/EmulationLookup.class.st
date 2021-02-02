@@ -9,6 +9,14 @@ Class {
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
+{ #category : #'instance creation' }
+EmulationLookup class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 EmulationLookup >> compile: anRGMethod [
 	| compiler method |

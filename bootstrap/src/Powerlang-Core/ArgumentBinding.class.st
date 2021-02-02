@@ -4,6 +4,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
+{ #category : #'instance creation' }
+ArgumentBinding class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #actions }
 ArgumentBinding >> beInlined [
 	environment := InlinedArgEnvironment new

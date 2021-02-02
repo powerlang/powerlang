@@ -14,6 +14,14 @@ Class {
 	#category : #'Powerlang-Core-Building'
 }
 
+{ #category : #'instance creation' }
+ImageSegmentBuilder class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #initialization }
 ImageSegmentBuilder >> => aSymbol [
 	^ self spec at: aSymbol

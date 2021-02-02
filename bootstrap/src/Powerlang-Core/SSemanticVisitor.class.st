@@ -7,6 +7,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #'instance creation' }
+SSemanticVisitor class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #analizing }
 SSemanticVisitor >> analyzeAssignment: anAssignmentNode [
 	anAssignmentNode assignees

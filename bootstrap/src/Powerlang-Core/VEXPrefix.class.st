@@ -121,6 +121,14 @@ VEXPrefix class >> l [
 	^2r100
 ]
 
+{ #category : #'instance creation' }
+VEXPrefix class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #private }
 VEXPrefix class >> operandSizeOverrideBits [
 	^1

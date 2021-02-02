@@ -14,6 +14,14 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
+{ #category : #'instance creation' }
+SendSite class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 SendSite >> beSuperSend [
 	format := format bitOr: IsSuperSend

@@ -38,6 +38,14 @@ NativizationEnvironment class >> indexOfGlobal: aSymbol [
 		ifAbsent: [self error: 'global not found']
 ]
 
+{ #category : #'instance creation' }
+NativizationEnvironment class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #initialization }
 NativizationEnvironment >> abi [
 	^ abi 

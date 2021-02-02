@@ -12,6 +12,14 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
+{ #category : #'instance creation' }
+InlineMessageLinker class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #private }
 InlineMessageLinker class >> supported [
 	| selectors |

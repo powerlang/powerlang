@@ -32,6 +32,14 @@ VirtualSmalltalkImage class >> kernelSpec [
 	^ KernelSpec ifNil: [ KernelSpec := self newKernelSpec ]
 ]
 
+{ #category : #'instance creation' }
+VirtualSmalltalkImage class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 VirtualSmalltalkImage class >> newKernelSpec [
 	| root current repo spec |

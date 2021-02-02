@@ -15,6 +15,14 @@ SMessage class >> decodeUsing: anAstcodeDecoder [
 	^anAstcodeDecoder decodeMessage
 ]
 
+{ #category : #'instance creation' }
+SMessage class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #printing }
 SMessage >> acceptVisitor: visitor [
 	^visitor visitMessage: self

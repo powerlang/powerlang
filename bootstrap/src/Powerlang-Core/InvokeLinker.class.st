@@ -8,6 +8,14 @@ Class {
 	#category : #'Powerlang-Core-Nativization'
 }
 
+{ #category : #'instance creation' }
+InvokeLinker class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #nativizing }
 InvokeLinker >> addMethod: aCompiledMethod [
 	self addMethod: aCompiledMethod for: aCompiledMethod selector
