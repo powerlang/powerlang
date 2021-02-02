@@ -353,7 +353,7 @@ NativizationEnvironment >> shouldInline: aSymbol [
 	^ inlinedMethods anySatisfy: [ :m | m selector = aSymbol ]
 ]
 
-{ #category : #'*Powerlang-Core-OCompiler' }
+{ #category : #queries }
 NativizationEnvironment >> shouldOptimize: method [
 	| selector classname |
 	selector := method selector.

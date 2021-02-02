@@ -18,7 +18,7 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
-{ #category : #'*Powerlang-Core-Parser' }
+{ #category : #'instance creation' }
 MemoryOperand class >> fromStream: aStream [
 	| memory |
 	memory := AssemblerParser new memory parse: aStream.
