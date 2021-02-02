@@ -185,17 +185,17 @@ OptimizingVariableBinder >> resolve: aReadVariable asArgument: binding [
 OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
   | global read value name load | 
   binding isPoolVar ifTrue: [ load := OLoadConstant valued: binding value.
-        ^aReadVariable dissolveReplacingWith: load ].
+		^aReadVariable dissolveReplacingWith: load ].
   name := binding association key asString asSymbol.
   (name == #WordSize or: [ name == #WordSizeShift ]) ifTrue: [ value := name == #WordSize ifTrue: [ abi wordSize ] ifFalse: [ abi wordSizeShift ].
-        load := OLoadConstant valued: value.
-        ^aReadVariable dissolveReplacingWith: load ].
+		load := OLoadConstant valued: value.
+		^aReadVariable dissolveReplacingWith: load ].
   global := OLoadConstant valued: binding association.
   read := OBinaryConstantOperation left: global right: 2 name: #_basicAt:.
   global addUse: read at: #left.
   aReadVariable
-     beforeInsert: global;
-     dissolveReplacingWith: read
+	 beforeInsert: global;
+	 dissolveReplacingWith: read
 ]
 
 { #category : #unclassified }
