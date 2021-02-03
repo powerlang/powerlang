@@ -135,10 +135,12 @@ SSmalltalkScanner >> nextColon [
 SSmalltalkScanner >> nextComment [
 	| start comment |
 	start := stream position.
-	(stream skipTo: $") ifFalse: [self error: 'unfinished comment' at: start].
+	[ stream atEnd not and:[stream peek ~~ $"] ] whileTrue: [stream next].
+	stream atEnd ifTrue: [self error: 'unfinished comment' at: start].
 	stream position: start.
 	comment := stream upTo: $".
 	^self buildToken: compiler commentNode at: start with: comment
+
 ]
 
 { #category : #scanning }
@@ -251,7 +253,8 @@ SSmalltalkScanner >> scanBinarySymbol [
 
 { #category : #scanning }
 SSmalltalkScanner >> scanChar [
-	^stream skipSeparators atEnd ifFalse: [stream next]
+	^(stream skipSeparators; atEnd) ifFalse: [stream next]
+
 ]
 
 { #category : #scanning }
