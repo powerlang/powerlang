@@ -546,7 +546,6 @@ OptimizingCodeEmitter >> assembleLoadConstant: value to: register [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleLookup: selector [
-	self haltIf: selector = #'&'.
 	messageLinker emitSend: selector using: assembler
 ]
 

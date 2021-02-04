@@ -68,16 +68,14 @@ DMRBootstrapper >> initializeNativizerGlobals [
 	| smi items |
 	smi := image classNamed: #SmallInteger.
 	nativizer globalNamed: #SmallIntegerBehavior put: smi behavior.
-	items := {(#Lookup -> (NativeCode new code: 'Lookup Placeholder')).
-	(#LookupSuper -> (NativeCode new code: 'LookupSuper Placeholder')).
-	(#DebuggableLookup
-		-> (NativeCode new code: 'DebuggableLookup placeholder')).
-	(#DebuggableLookupSuper
-		-> (NativeCode new code: 'DebuggableLookupSuper placeholder')).
-	(#Invoke -> (NativeCode new code: 'Invoke placeholder')).
-	(#Safepoint -> (NativeCode new code: 'SafepointCheck placeholder')).
-	(#WriteBarrier -> (NativeCode new code: 'Write Barrier placeholder'))}
-		asDictionary.
+	items := Dictionary newFromPairs: {
+		#Lookup .           (NativeCode new code: 'Lookup Placeholder').
+		#LookupSuper .      (NativeCode new code: 'LookupSuper Placeholder').
+		#DebuggableLookup . (NativeCode new code: 'DebuggableLookup placeholder').
+		#DebuggableLookupSuper. (NativeCode new code: 'DebuggableLookupSuper placholder').
+		#Invoke .           (NativeCode new code: 'Invoke placeholder').
+		#Safepoint .        (NativeCode new code: 'SafepointCheck placeholder').
+		#WriteBarrier .     (NativeCode new code: 'Write Barrier placeholder')}.
 	items
 		keysAndValuesDo: [ :key :placeholder | nativizer globalNamed: key put: placeholder ]
 ]
