@@ -63,12 +63,22 @@ ISAInstruction >> encoder [
 
 { #category : #encoding }
 ISAInstruction >> encoding32 [
-	^ ByteArray streamContents: [ :strm | self writeEncoding32On: strm ]
+	| s |
+
+	s := ReadWriteStream on: ByteArray new.
+	self writeEncoding32On: s.
+	^ s contents.
+
 ]
 
 { #category : #encoding }
 ISAInstruction >> encoding64 [
-	^ByteArray streamContents: [:strm | self writeEncoding64On: strm]
+	| s |
+
+	s := ReadWriteStream on: ByteArray new.
+	self writeEncoding64On: s.
+	^ s contents.
+
 ]
 
 { #category : #testing }
