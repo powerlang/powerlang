@@ -15,7 +15,7 @@ code written in files. We expect it to let generate images for other languages i
 future.
 
 For now, Powerlang runs on top of Pharo, and consists of a set of packages that
-allow to load code definitions, to compile them, to build image segments and to
+allow for loading code definitions, to compile them, build image segments, and to
 generate native code for methods ahead of time, which is required when targetting
 the DMR runtime.
 
@@ -28,7 +28,7 @@ a separate git repository, which the makefiles automatically clone into
 
 Bee consists of a main `Kernel` module, which is self-hosted. This means that
 the kernel is able to perform basic Smalltalk computation without accessing nor
-requiring other modules. This includes objects like numbers, collections,
+requiring other modules. The Kernel includes objects like numbers, collections,
 classes, methods and modules. If other things are to be used, they are loaded
 in a modular fashion: OS support, JIT compiler, libraries are out by default
 but a dependency tracking system |ss| allows |se| will allow to easily add
@@ -101,7 +101,7 @@ to the module spec being built. The virtual runtime interprets the message send,
 creating more `ObjectMaps`. During that process the compiler
 doesn't yet recognize pool variables, so pool vars can't be used to initialize pool vars
 (it shouldn't be a big limitation though). One extra step is done by the bootstrapper:
-it sends :code:`declareGlobals` to de module, so that any global object name is put
+it sends :code:`declareGlobals` to the module, so that any global object name is put
 into the module namespace.
 
 After this initial pass, arbitrary methods can be compiled, so the bootstrap process

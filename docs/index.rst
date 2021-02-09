@@ -2,7 +2,7 @@
 Welcome to Powerlang's documentation!
 =====================================
 
-Powerlang is a research vehicle to explore about implementation of programming
+Powerlang is a research vehicle to explore the implementation of programming
 laguages. While focused on Smalltalk, it aims to be a generic language creation
 toolkit, something you can use to either evolve Smalltalk, or either build
 a new language implementation of choice.
@@ -25,21 +25,22 @@ should look like, the direction in which we want to go.
 We want a minimal modular Smalltalk, that starts from a little kernel and that
 can load other modules on-the-fly to grow exactly as needed.
 The bootstrap process is done mostly from a specification (source code), using
-different dialects (Pharo et al). This allows freezed-system development which
+different dialects (Pharo et al). This allows sealed-system development which
 is required when doing big or complex changes, specially in design. Of course,
 the live environment development will be supported as usual in Smalltalk-80
 systems.
 Computation is represented using Smalltalk Expressions (or SExpressions), 
-a lower-level representation of asts that is encoded into byte arrays (called
-astcodes).
+a lower-level representation of abstract syntax trees (ASTs) that is
+encoded into byte arrays (called astcodes).
 
 Namespaces are supported from the beginning, and form the base of packages.
-Packages are built into (binary) image segments, that load very quickly.
-A package distribution system shall compute dependencies and fetch
+Packages are built into (binary) image segments that load very quickly.
+A package distribution system computes dependencies and fetches
 prebuilt image segments for quick setup, update and deployment.
 
-The base system can be used to allow create different dynamic languages, and
-we expect Bee Smalltalk to expand in two different axes: on one hand, it can
+The base system can be used to allow creation of
+different dynamic languages.  In particular, 
+we expect Bee Smalltalk to expand on two different axes: on one hand, it can
 grow to become a full, tightly integrated Smalltalk; on the other hand,
 its kernel can be the base system on top of which we support other
 Smalltalks (or other languages). The main candidate for the latter
@@ -71,8 +72,8 @@ used to support languages like Smalltalk.
 
 Smalltalk source code is stored on git, using a tonel-like format. We store 
 just code and definitions in the repo, no artifacts.
-Build artifacts go through Continuous Integration since the very beginning.
-Each OS platform is put in separate namespaces, and built into separate
+Build artifacts go through Continuous Integration from the very beginning.
+Each OS platform is put in a separate namespace and built into separate
 image segments, which are autoloaded according at startup according to the
 running platform.
 The system can be debugged remotely through a vdb/gdb connection, which
