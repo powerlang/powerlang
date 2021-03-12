@@ -52,10 +52,34 @@ Assuming you have built everything as descibed above, you may run it by:
 
 ```
 cd build/x86_64-linux # or other <arch>-<os> directory
-./bee-dmr bee-dmr.bsd
+./bee-dmr bee-dmr.bsl
+echo $?
 ```
+This last should echo "3" as the result of the computation.
 
-Not that it can do much at the moment, which bring us to:
+This is because the code executed is something like
+```smalltalk
+"bee-dmr/Kernel/Kernel.st"
+Kernel >> entry: argc argv: argv [
+	<callback: long (long, pointer)>
+	"^Smalltalk startSession"
+	^Kernel new foo.
+]
+
+Kernel >> foo [
+	| result |
+	result := 42 factorial.
+	^result = 0x3C1581D491B28F523C23ABDF35B689C908000000000 
+		ifTrue: [1] 
+		ifFalse: [0]
+]
+```
+So the unboxed encoding of "1" is returned.
+
+The encoding for smallIntegers is ((smallInt bitShift: 1) + 1), so (1 bitShift: 1) + 1 -> 3.
+
+
+Not that this looks like much at the moment, which bring us to:
 
 # Development
 
