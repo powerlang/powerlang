@@ -52,7 +52,7 @@ Assuming you have built everything as descibed above, you may run it by:
 
 ```
 cd build/x86_64-linux # or other <arch>-<os> directory
-./bee-dmr bee-dmr.bsd
+./bee-dmr bee-dmr.bsl
 echo $?
 ```
 This last should echo "3" as the result of the computation.
