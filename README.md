@@ -55,8 +55,7 @@ cd build/x86_64-linux # or other <arch>-<os> directory
 ./bee-dmr bee-dmr.bsd
 echo $?
 ```
-This last should echo "3" as a return of "1" is an unboxed SmallInteger.  
-The encoding is ((smallInt bitShift: 1) + 1) and (1 bitShift: 1) + 1 -> 3.
+This last should echo "3" as the result of the computation.
 
 This is because the code executed is something like
 ```smalltalk
@@ -70,11 +69,17 @@ Kernel >> entry: argc argv: argv [
 Kernel >> foo [
 	| result |
 	result := 42 factorial.
-	^result = 0x3C1581D491B28F523C23ABDF35B689C908000000000 ifTrue: [1] ifFalse: [0]
+	^result = 0x3C1581D491B28F523C23ABDF35B689C908000000000 
+		ifTrue: [1] 
+		ifFalse: [0]
 ]
 ```
+So the unboxed encoding of "1" is returned.
 
-Not that it looks like much at the moment, which bring us to:
+The encoding for smallIntegers is ((smallInt bitShift: 1) + 1), so (1 bitShift: 1) + 1 -> 3.
+
+
+Not that this looks like much at the moment, which bring us to:
 
 # Development
 
