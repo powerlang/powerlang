@@ -919,7 +919,8 @@ InlineMessageLinker >> emitSendDebuggable: aSymbol using: anAssembler [
 
 { #category : #initialization }
 InlineMessageLinker >> initialize [
-	map := self class supported asDictionary.
+	map := Dictionary new.
+	self class supported do:[:each|map add: each].
 	self filter: map keys asIdentitySet
 ]
 
