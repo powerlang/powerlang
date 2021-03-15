@@ -39,9 +39,10 @@ SExpressionTest class >> templateSelectors [
 	current := self organization.
 	current categories
 		select: [:c | c beginsWith: 'templates']
-		thenDo: [:c | selectors addAll: (organization
+		thenDo: [:c | selectors addAll: (self organization
 			selectorsFor: c)].
 	^selectors sort
+
 ]
 
 { #category : #private }
@@ -83,10 +84,10 @@ SExpressionTest >> generateMinimalLibraryWithEntryPoint: selector [
 	| builder entrypoint |
 	builder := #Librarian forBuilding newLibraryBuilder.
 	entrypoint := builder
-		              filename: self libraryPath asFileReference;
-		              addAll:
-			              (self class supportMethodsUsing: builder environment);
-		              entryPoint: self class >> selector.
+					  filename: self libraryPath asFileReference;
+					  addAll:
+						  (self class supportMethodsUsing: builder environment);
+					  entryPoint: self class >> selector.
 	self class nativize: entrypoint using: builder environment.
 	builder generate
 ]
