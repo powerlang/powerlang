@@ -6,6 +6,21 @@ SmalltalkImage >> associationAt: aSymbol [
 ]
 
 { #category : #'*Powerlang-Compatibility-Pharo' }
+SmalltalkImage >> getPackageDirectoryForPackage: anRPackage [
+	"Return a directory from which given package has been loaded.
+	 
+	 CAVEAT: This only works for packages loaded from GIT repository and
+	 having in registered in Iceberg"
+	
+	| repo |
+	repo := IceRepository registry 
+					detect:[ :each | each loadedPackages contains: [:icep | icep name = anRPackage name ] ]
+					ifNone:[ ^ nil ].
+	^repo codeDirectory / anRPackage name
+
+]
+
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 SmalltalkImage >> host [
 	"Return current host identification string (that is, identification
 	of machine the smalltalk is currently running on). 
