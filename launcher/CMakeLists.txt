@@ -18,7 +18,7 @@ add_custom_command(OUTPUT ${BOOTSTRAP}/bootstrap.image
                    COMMAND make -C ${BOOTSTRAP}
                    WORKING_DIRECTORY ${BOOTSTRAP})
 
-IF(${CMAKE_C_COMPILER} MATCHES "mingw")
+IF(WIN32 OR (${CMAKE_C_COMPILER} MATCHES "mingw"))
     set(PLATFORM Windows)
 ELSE()
     set(PLATFORM Posix)
