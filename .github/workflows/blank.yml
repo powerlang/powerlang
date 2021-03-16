@@ -30,6 +30,8 @@ jobs:
 
     - name: Compile
       run: make
+      env:
+        CMAKE_GENERATOR: Unix Makefiles
 
     - name: Compile - bootstrap only
       run: make -C bootstrap
