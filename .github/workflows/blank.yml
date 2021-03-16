@@ -29,11 +29,9 @@ jobs:
       run: git fetch --unshallow
 
     - name: Compile
-      if: matrix.os == 'ubuntu-latest'
       run: make
 
     - name: Compile - bootstrap only
-      if: matrix.os != 'ubuntu-latest'
       run: make -C bootstrap
 
     - name: Run tests
