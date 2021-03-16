@@ -24,7 +24,7 @@ $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 	make -C $(BUILD)
 
 $(BUILD)/Makefile: launcher/CMakeLists.txt | $(BUILD)
-	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=build/x86_64-linux) -DCMAKE_BUILD_TYPE=Debug
+	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=$(BUILD)) -DCMAKE_BUILD_TYPE=Debug
 
 bootstrap/specs/current:
 	$(MAKE) -C bootstrap specs/current
