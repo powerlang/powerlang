@@ -16,7 +16,7 @@ ABI class >> currentClass [
 	| platform |
 	platform := OSPlatform current.
 	platform isWin64 ifTrue: [ ^WinX64ABI ].
-	platform isUnix64 ifTrue: [ ^SysVX64ABI ].
+	(platform isUnix64 or: platform isMacOSX) ifTrue: [ ^SysVX64ABI ].
 	self ASSERT: false.
 ]
 
