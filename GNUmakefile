@@ -18,7 +18,7 @@ all: $(LAUNCHER) $(KERNEL)
 
 $(KERNEL): bootstrap/specs/current bootstrap/bootstrap.image bootstrap/pharo | $(BUILD)
 	cd bootstrap && ./pharo bootstrap.image eval \
-		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'$(shell pwd)/$@'"
+		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'../$(BUILD)/$@'"
 
 $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 	make -C $(BUILD)
