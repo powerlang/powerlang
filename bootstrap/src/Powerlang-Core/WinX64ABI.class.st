@@ -5,13 +5,34 @@ Class {
 }
 
 { #category : #services }
-WinX64ABI >> restoreContextUsing: anAssembler popping: anInteger [
+WinX64ABI >> emitEntrypoint: anFFIDescriptor with: anAssembler [
+	anAssembler saveCallerFrame;
+		pushG;
+		pushNil;
+		pushTrue;
+		pushFalse;
+		pushM;
+		pushE;
+		pushS.
+	self storeArgumentsInStack: anFFIDescriptor with: anAssembler.
+	
+]
+
+{ #category : #services }
+WinX64ABI >> popRetaddrAndArgs: anFFIDescriptor with: anAssembler [
 	anAssembler
 		popA;
 		popA;
-		popB;
-		popE;
+		popA
+]
+
+{ #category : #services }
+WinX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
+	self popRetaddrAndArgs: anFFIDescriptor with: anAssembler.
+	anAssembler
 		popS;
+		popE;
+		popM;
 		popFalse;
 		popTrue;
 		popNil;
@@ -21,17 +42,8 @@ WinX64ABI >> restoreContextUsing: anAssembler popping: anInteger [
 ]
 
 { #category : #services }
-WinX64ABI >> saveContextUsing: anAssembler [
-	anAssembler
-		saveCallerFrame;
-		storeArgumentsInStack;
-		pushG;
-		pushNil;
-		pushFalse;
-		pushTrue;
-		pushS;
-		pushE;
-		pushB;
+WinX64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
+	anAssembler pushS;
 		loadRwithArgPointer;
 		convertRtoSmallInteger;
 		pushR

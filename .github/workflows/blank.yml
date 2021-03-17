@@ -29,11 +29,11 @@ jobs:
       run: git fetch --unshallow
 
     - name: Compile
-      if: matrix.os == 'ubuntu-latest'
       run: make
+      env:
+        CMAKE_GENERATOR: Unix Makefiles
 
     - name: Compile - bootstrap only
-      if: matrix.os != 'ubuntu-latest'
       run: make -C bootstrap
 
     - name: Run tests

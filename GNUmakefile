@@ -18,13 +18,13 @@ all: $(LAUNCHER) $(KERNEL)
 
 $(KERNEL): bootstrap/specs/current bootstrap/bootstrap.image bootstrap/pharo | $(BUILD)
 	cd bootstrap && ./pharo bootstrap.image eval \
-		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'$(shell pwd)/$@'"
+		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'../$@'"
 
 $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 	make -C $(BUILD)
 
 $(BUILD)/Makefile: launcher/CMakeLists.txt | $(BUILD)
-	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=build/x86_64-linux) -DCMAKE_BUILD_TYPE=Debug
+	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=$(BUILD)) -DCMAKE_BUILD_TYPE=Debug
 
 bootstrap/specs/current:
 	$(MAKE) -C bootstrap specs/current
