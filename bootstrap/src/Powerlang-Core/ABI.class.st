@@ -15,8 +15,8 @@ Class {
 ABI class >> currentClass [
 	| platform |
 	platform := OSPlatform current.
-	platform isWin64 ifTrue: [ ^WinX64ABI ].
-	(platform isUnix64 or: platform isMacOSX) ifTrue: [ ^SysVX64ABI ].
+	(platform isWin64 or: [platform isWin32 and: [Smalltalk vm wordSize = 8]]) ifTrue: [ ^WinX64ABI ].
+	(platform isUnix64 or: [platform isMacOSX]) ifTrue: [ ^SysVX64ABI ].
 	self ASSERT: false.
 ]
 
