@@ -99,8 +99,7 @@ KernelBuilderTest >> test220writeSegmentWithBase [
 			equals: b + offset + 16r10;
 		assert: (writer encodedReferenceTo: falseObj)
 			equals: b + offset + 16r18.
-	FileLocator temp asFileReference / 'kernel.ims'
-		binaryWriteStreamDo: [ :s | s nextPutAll: writer image ]
+	ByteArray streamContents: [ :s | s nextPutAll: writer image ]
 ]
 
 { #category : #tests }
@@ -125,8 +124,7 @@ KernelBuilderTest >> test300completeSegmentWithBase [
 			equals: b + offset + 16r10;
 		assert: (writer encodedReferenceTo: falseObj)
 			equals: b + offset + 16r18.
-	FileLocator temp asFileReference / 'kernel.ims'
-		binaryWriteStreamDo: [ :s | s nextPutAll: writer image ]
+	ByteArray streamContents: [ :s | s nextPutAll: writer image ]
 ]
 
 { #category : #tests }
@@ -154,6 +152,5 @@ KernelBuilderTest >> test400completeNativizedSegmentWithBase [
 			equals: b + offset + 16r10;
 		assert: (writer encodedReferenceTo: falseObj)
 			equals: b + offset + 16r18.
-	FileLocator temp asFileReference / 'kernel.ims'
-		binaryWriteStreamDo: [ :s | s nextPutAll: writer image ]
+	ByteArray streamContents: [ :s | s nextPutAll: writer image ]
 ]
