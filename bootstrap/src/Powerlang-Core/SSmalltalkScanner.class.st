@@ -120,7 +120,7 @@ SSmalltalkScanner >> nextColon [
 	| start char |
 	start := stream position.
 	char := stream peek.
-	((char = $ or: [char = $	]) and: [(stream peek: 2) second = $=]) ifTrue: [
+	((char = Character space or: [char = Character tab]) and: [(stream peek: 2) second = $=]) ifTrue: [
 		stream skip: 1.
 		char := $=].
 	char = $= ifTrue: [
@@ -129,6 +129,7 @@ SSmalltalkScanner >> nextColon [
 	^(self isBinary: stream peek)
 		ifTrue: [self nextBinarySelector]
 		ifFalse: [self nextSpecialCharacter]
+
 ]
 
 { #category : #scanning }
