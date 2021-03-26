@@ -136,7 +136,7 @@ SSmalltalkScanner >> nextColon [
 SSmalltalkScanner >> nextComment [
 	| start comment |
 	start := stream position.
-	[ stream atEnd not and:[stream peek ~~ $"] ] whileTrue: [stream next].
+	[ stream atEnd not and:[stream peek !== $"] ] whileTrue: [stream next].
 	stream atEnd ifTrue: [self error: 'unfinished comment' at: start].
 	stream position: start.
 	comment := stream upTo: $".
