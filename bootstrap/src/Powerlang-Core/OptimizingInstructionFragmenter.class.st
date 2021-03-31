@@ -244,7 +244,7 @@ OptimizingInstructionFragmenter >> fragmentTernary: instruction [
 	left addUse: new at: #left.
 	right addUse: new at: #right.
 	self
-		ASSERT: (#(_basicAt:put: _basicULongAt:put:	_byteAt:put: _objectAtOffset:put:)
+		ASSERT: (#(_basicAt:put: _basicULongAt:put:     _byteAt:put: _objectAtOffset:put:)
 			includes: new name).
 	instruction replaceAllUsesWith: right; dissolveReplacingWith: new
 ]

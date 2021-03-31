@@ -70,8 +70,8 @@ SCompiledMethod >> capturesSelf [
 { #category : #constants }
 SCompiledMethod >> capturesSelf: aBoolean [
 	format := aBoolean
-		          ifTrue: [ format bitOr: CapturesSelf ]
-		          ifFalse: [ format bitClear: CapturesSelf ]
+				  ifTrue: [ format bitOr: CapturesSelf ]
+				  ifFalse: [ format bitClear: CapturesSelf ]
 ]
 
 { #category : #constants }
@@ -139,8 +139,8 @@ SCompiledMethod >> hasEnvironment [
 { #category : #constants }
 SCompiledMethod >> hasEnvironment: aBoolean [
 	format := aBoolean
-		          ifTrue: [ format bitOr: HasEnvironment ]
-		          ifFalse: [ format bitClear: HasEnvironment ]
+				  ifTrue: [ format bitOr: HasEnvironment ]
+				  ifFalse: [ format bitClear: HasEnvironment ]
 ]
 
 { #category : #constants }
@@ -151,8 +151,8 @@ SCompiledMethod >> hasFrame [
 { #category : #constants }
 SCompiledMethod >> hasFrame: aBoolean [
 	format := aBoolean
-		          ifTrue: [ format bitOr: HasFrame ]
-		          ifFalse: [ format bitClear: HasFrame ]
+				  ifTrue: [ format bitOr: HasFrame ]
+				  ifFalse: [ format bitClear: HasFrame ]
 ]
 
 { #category : #constants }

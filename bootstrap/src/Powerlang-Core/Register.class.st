@@ -116,6 +116,12 @@ Register class >> initializeRIPRegister [
 
 { #category : #initialization }
 Register class >> initializeRegisters [
+	
+	"Make sure OperandTypeFlags are initialized since
+	 it is required and order of initialization is not 
+	 defined in Pharo and Smallltalk/X."
+	OperandTypeFlags initialize.
+
 	self
 		initialize8BitRegisters;
 		initialize8BitRexRegisters;

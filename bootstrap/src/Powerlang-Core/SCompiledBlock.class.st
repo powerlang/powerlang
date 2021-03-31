@@ -31,8 +31,8 @@ SCompiledBlock >> capturesHome [
 { #category : #constants }
 SCompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
-		          ifTrue: [ format bitOr: CapturesHome ]
-		          ifFalse: [ format bitClear: CapturesHome ]
+				  ifTrue: [ format bitOr: CapturesHome ]
+				  ifFalse: [ format bitClear: CapturesHome ]
 ]
 
 { #category : #constants }

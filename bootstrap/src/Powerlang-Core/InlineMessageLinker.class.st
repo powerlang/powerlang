@@ -16,9 +16,15 @@ Class {
 InlineMessageLinker class >> supported [
 	| selectors |
 	selectors := self organization selectorsFor: #'private - assemble'.
-	^selectors collect: [:selector | | cm |
+	^selectors collect: [:selector | | cm key |
 		cm := self >> selector.
-		cm literals last -> selector]. 
+		key := cm literals detect: [:each | each isSymbol and:[each first == $_ ]].
+		key -> selector]. 
+
+	"
+	InlineMessageLinker supported
+	"
+
 ]
 
 { #category : #'private - assemble' }
@@ -919,8 +925,14 @@ InlineMessageLinker >> emitSendDebuggable: aSymbol using: anAssembler [
 
 { #category : #initialization }
 InlineMessageLinker >> initialize [
-	map := self class supported asDictionary.
+	map := Dictionary new.
+	self class supported do:[:each|map add: each].
 	self filter: map keys asIdentitySet
+
+	"
+	InlineMessageLinker new
+	"
+
 ]
 
 { #category : #'private - helpers' }

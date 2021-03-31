@@ -479,13 +479,13 @@ VirtualSmalltalkImage >> transferLiteralDeep: anObject [
 	anObject == true
 		ifTrue: [ ^ trueObj ].
 	identityMap at: anObject ifPresent: [ :existing | ^ existing ].
-	(class inheritsFrom: Symbol)
+	(class == Symbol or:[class inheritsFrom: Symbol])
 		ifTrue: [ ^ self newSymbol: anObject ].
-	(class inheritsFrom: String)
+	(anObject isString)
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
-	(class inheritsFrom: Float)
+	(class == Float or:[class inheritsFrom: Float])
 		ifTrue: [ ^ self newFloatFrom: anObject ].
 	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].

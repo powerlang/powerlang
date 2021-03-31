@@ -120,7 +120,7 @@ SSmalltalkScanner >> nextColon [
 	| start char |
 	start := stream position.
 	char := stream peek.
-	((char = $ or: [char = $	]) and: [(stream peek: 2) second = $=]) ifTrue: [
+	((char = Character space or: [char = Character tab]) and: [(stream peek: 2) second = $=]) ifTrue: [
 		stream skip: 1.
 		char := $=].
 	char = $= ifTrue: [
@@ -129,16 +129,19 @@ SSmalltalkScanner >> nextColon [
 	^(self isBinary: stream peek)
 		ifTrue: [self nextBinarySelector]
 		ifFalse: [self nextSpecialCharacter]
+
 ]
 
 { #category : #scanning }
 SSmalltalkScanner >> nextComment [
 	| start comment |
 	start := stream position.
-	(stream skipTo: $") ifFalse: [self error: 'unfinished comment' at: start].
+	[ stream atEnd not and:[stream peek !== $"] ] whileTrue: [stream next].
+	stream atEnd ifTrue: [self error: 'unfinished comment' at: start].
 	stream position: start.
 	comment := stream upTo: $".
 	^self buildToken: compiler commentNode at: start with: comment
+
 ]
 
 { #category : #scanning }
@@ -251,7 +254,8 @@ SSmalltalkScanner >> scanBinarySymbol [
 
 { #category : #scanning }
 SSmalltalkScanner >> scanChar [
-	^stream skipSeparators atEnd ifFalse: [stream next]
+	^(stream skipSeparators; atEnd) ifFalse: [stream next]
+
 ]
 
 { #category : #scanning }

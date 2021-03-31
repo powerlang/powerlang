@@ -518,8 +518,8 @@ SExpressionNativizer >> loadAwithTemporaryInEnvironment: envIndex at: index [
 SExpressionNativizer >> loadAwithTemporaryInStackAt: index [
 			| start |
 	start := self pushesEnvironments
-			         ifTrue: [ -3 ]
-			         ifFalse: [ -1 ].
+					 ifTrue: [ -3 ]
+					 ifFalse: [ -1 ].
 		^ assembler loadAwithFPindex: start - index
 
 ]
@@ -692,8 +692,8 @@ SExpressionNativizer >> saveContextSwitchPoint [
 { #category : #services }
 SExpressionNativizer >> saveMethodCode [
 	mainCode := assembler
-		            applyFixups;
-		            nativeCode
+					applyFixups;
+					nativeCode
 ]
 
 { #category : #templates }
@@ -750,8 +750,8 @@ SExpressionNativizer >> temporaryInEnvironment: envIndex atPut: index [
 SExpressionNativizer >> temporaryInStackAt: index [
 		| start |
 	start := self pushesEnvironments
-			         ifTrue: [ -3 ]
-			         ifFalse: [ -1 ].
+					 ifTrue: [ -3 ]
+					 ifFalse: [ -1 ].
 		^ assembler loadRwithFPindex: start - index .
 
 ]
@@ -760,8 +760,8 @@ SExpressionNativizer >> temporaryInStackAt: index [
 SExpressionNativizer >> temporaryInStackAtPut: index [
 			| start |
 	start := self pushesEnvironments
-				         ifTrue: [ -3 ]
-				         ifFalse: [ -1 ].
+						 ifTrue: [ -3 ]
+						 ifFalse: [ -1 ].
 			assembler storeRinFPindex: start - index
 
 ]
@@ -888,7 +888,7 @@ SExpressionNativizer >> visitOptimizedMessage: anSMessage [
 SExpressionNativizer >> visitReturn: anSReturn [
   anSReturn expression acceptVisitor: self.
   anSReturn local ifTrue: [ self emitEpilogue ] ifFalse: [ assembler
-           pushR;
-           loadRwithE.
-        self emitSend: #_return: ] 
+		   pushR;
+		   loadRwithE.
+		self emitSend: #_return: ] 
 ]
