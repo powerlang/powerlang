@@ -13,6 +13,14 @@ Class {
 	#category : #'Powerlang-Core-Assembler-JIT'
 }
 
+{ #category : #'instance creation' }
+RelocatableBuffer class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #fixups }
 RelocatableBuffer >> addAbsoluteFixup: label [
 	| fixup |

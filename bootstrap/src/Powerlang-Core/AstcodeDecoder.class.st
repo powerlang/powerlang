@@ -14,6 +14,14 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
+{ #category : #'instance creation' }
+AstcodeDecoder class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #public }
 AstcodeDecoder >> bindingTypeOf: id [
 	^bindingTypes at: id

@@ -9,6 +9,14 @@ Class {
 }
 
 { #category : #'instance creation' }
+SlotObjectMap class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
+{ #category : #'instance creation' }
 SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
 	| obj |
 	obj := self new: anRGBehavior size: size.

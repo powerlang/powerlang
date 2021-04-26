@@ -19,6 +19,14 @@ VirtualDictionary class >> fromPool: aSlotObjectMap [
 ]
 
 { #category : #'instance creation' }
+VirtualDictionary class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
+{ #category : #'instance creation' }
 VirtualDictionary class >> withAll: variables [
 	^self withAll: variables constant: false
 ]

@@ -9,6 +9,14 @@ Class {
 }
 
 { #category : #'instance creation' }
+ByteObjectMap class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
+{ #category : #'instance creation' }
 ByteObjectMap class >> new: anRGBehavior size: anInteger [
 
 	^ self new

@@ -4,6 +4,14 @@ Class {
 	#category : #'Powerlang-Core-SCompiler'
 }
 
+{ #category : #'instance creation' }
+StaticBinder class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 StaticBinder >> at: aString [
 	^contents at: aString ifAbsent: nil

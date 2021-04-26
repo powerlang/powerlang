@@ -26,6 +26,14 @@ ImageSegmentWriter class >> behaviorOffset [
 	^ -4
 ]
 
+{ #category : #'instance creation' }
+ImageSegmentWriter class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #accessing }
 ImageSegmentWriter class >> nilOffset [
 	^self objectsOffset + 8

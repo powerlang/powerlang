@@ -8,6 +8,14 @@ Class {
 	#category : #'Powerlang-Core-SExpressions'
 }
 
+{ #category : #'instance creation' }
+SScript class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #printing }
 SScript >> argumentCount [
 	^compiledCode argumentCount

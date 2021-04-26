@@ -83,6 +83,8 @@ Not that this looks like much at the moment, which bring us to:
 
 # Development
 
+## ...in Pharo
+
 To open Powerlang Pharo development image:
 
 ```
@@ -91,6 +93,11 @@ cd bootstrap
 ```
 
 All Powerlang code is in packages named `Powerlang-*`. Have fun!
+
+## ...in Smalltalk/X
+
+Please refer to [README_STX.md](README_STX.md) for instructions
+how to load Powerlang into [Smalltalk/X jv-branch](https://swing.fit.cvut.cz/projects/stx-jv)
 
 # Building launcher for Windows
 
