@@ -5,6 +5,9 @@ the header of an object.
 Class {
 	#name : #DmrObjectFormat,
 	#superclass : #ObjectFormat,
+	#instVars : [
+		'wordSize'
+	],
 	#pools : [
 		'ObjectHeaderMasks',
 		'ObjectHeaderOffsets'
@@ -15,6 +18,15 @@ Class {
 { #category : #services }
 DmrObjectFormat >> behaviorOf: oid [
 	^ storage uint32of: oid atOffset: BehaviorOffset
+]
+
+{ #category : #sizes }
+DmrObjectFormat >> bodySizeInBytesOf: oid [
+	| total |
+	total := self sizeOf: oid.
+	^ (self isBytes: oid)
+		ifTrue: [ total + wordSize - 1 bitAnd: 0 - wordSize ]
+		ifFalse: [ total * wordSize ]
 ]
 
 { #category : #sizes }
@@ -36,6 +48,17 @@ DmrObjectFormat >> classOf: anObjectHandle [
 { #category : #services }
 DmrObjectFormat >> flagsOf: anObject [
 	^ storage uint8of: anObject atOffset: FlagsOffset
+]
+
+{ #category : #sizes }
+DmrObjectFormat >> headerSizeInBytesOf: oid [
+	^(self isSmall: oid) ifTrue: [8] ifFalse: [16]
+
+]
+
+{ #category : #services }
+DmrObjectFormat >> initialize [
+	wordSize := 8
 ]
 
 { #category : #services }
@@ -89,6 +112,15 @@ DmrObjectFormat >> largeSizeOf: oid [
 	^ storage uint32of: oid atOffset: LargeSizeOffset
 ]
 
+{ #category : #services }
+DmrObjectFormat >> nextObjectHandleOf: anObjectHandle [
+	| addr size |
+	addr := anObjectHandle oid.
+	size := self sizeInBytesOf: addr.
+	^anObjectHandle runtime handleOn: addr + size.
+	
+]
+
 { #category : #sizes }
 DmrObjectFormat >> print: oid on: aStream [
 	| size |
@@ -129,6 +161,11 @@ DmrObjectFormat >> printFlagsOf: oid on: aStream [
 	aStream
 		nextPut: char;
 		nextPut: $)
+]
+
+{ #category : #sizes }
+DmrObjectFormat >> sizeInBytesOf: oid [
+	^ (self headerSizeInBytesOf: oid) + (self bodySizeInBytesOf: oid)
 ]
 
 { #category : #sizes }

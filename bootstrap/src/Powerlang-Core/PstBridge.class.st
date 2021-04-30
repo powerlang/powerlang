@@ -54,16 +54,18 @@ PstBridge >> findRootObjects [
 			name := class name asLocalString.
 			self name: class as: name.
 			class := class superclass ].
-	self findRootClasses
-	"; findSmalltalk"
+	self findRootClasses; findSmalltalk
 ]
 
 { #category : #initialization }
 PstBridge >> findSmalltalk [
-	| smalltalk |
-	smalltalk := self halt.
-	self name: smalltalk as: #Smalltalk.
-	^smalltalk
+	| handle |
+	handle := nilObj.
+	[ handle getClass localName != 'SmalltalkSystem' ]
+		whileTrue: [ handle := handle nextObjectHandle ].
+
+	self name: handle mirror as: #Smalltalk.
+
 ]
 
 { #category : #initialization }

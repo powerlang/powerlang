@@ -156,6 +156,11 @@ ObjectHandle >> mirror [
 	^ObjectMirror on: self
 ]
 
+{ #category : #'meta accessing' }
+ObjectHandle >> nextObjectHandle [
+	^ runtime objectFormat nextObjectHandleOf: self
+]
+
 { #category : #private }
 ObjectHandle >> nilObject [
 	^runtime nil
