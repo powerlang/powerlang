@@ -4,17 +4,22 @@ Class {
 	#instVars : [
 		'storage'
 	],
-	#category : #'Powerlang-TestsFailing-Metaphysics'
+	#category : #'Powerlang-Tests-Metaphysics'
 }
 
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
 	| builder writer |
-	builder := KernelSegmentBuilder fromSpec64bits build.
+	builder := KernelSegmentBuilder new
+		initialize64BitImage;
+		generateModule;
+		bootstrapModule;
+		addGenesisObjects.
 	writer := builder writer write.
-	^ Runtime
+	^Runtime
 		forSimulating: VirtualSmalltalkImage kernelSpec
-		memory: writer image
+		memory: writer image.
+
 ]
 
 { #category : #private }
@@ -57,7 +62,7 @@ ObjectMirrorTest >> test040UndefinedObjectMirror [
 { #category : #private }
 ObjectMirrorTest >> test100findSmalltalk [
 	| smalltalk |
-	"smalltalk := self runtime globalNamed: 'Smalltalk'."
+	smalltalk := self runtime globalNamed: 'Smalltalk'.
 	self
 		assert: smalltalk reflectedClass localName
 		equals: 'SmalltalkSystem'

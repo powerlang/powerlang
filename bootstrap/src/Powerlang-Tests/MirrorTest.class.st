@@ -3,10 +3,9 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
-		'builder',
-		'writer'
+		'builder'
 	],
-	#category : #'Powerlang-TestsFailing-Metaphysics'
+	#category : #'Powerlang-Tests-Metaphysics'
 }
 
 { #category : #tests }
@@ -32,12 +31,18 @@ MirrorTest >> mirrorForObject [
 
 { #category : #tests }
 MirrorTest >> setUp [
+	| image |
 	super setUp.
-	builder := VirtualSmalltalkImage kernelSpec build.
-	writer := builder writer write.
+	builder := KernelSegmentBuilder new
+		initialize64BitImage;
+		generateModule;
+		bootstrapModule;
+		addGenesisObjects.
+	image := builder writer write; image.
 	runtime := Runtime
 		forSimulating: VirtualSmalltalkImage kernelSpec
-		memory: writer image
+		memory: image
+
 ]
 
 { #category : #tests }
@@ -95,5 +100,5 @@ MirrorTest >> testObjectMirrorBasics [
 		deny: class reflectsLargeObject;
 		deny: class reflectsNil.
 	definition := builder => 'Class'.
-	self assert: class size equals: definition allInstVarNames size
+	self assert: class slotSize equals: definition allInstVarNames size
 ]
