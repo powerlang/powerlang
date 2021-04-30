@@ -3,9 +3,7 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
-		'builder',
-		'writer',
-		'image'
+		'builder'
 	],
 	#category : #'Powerlang-Tests-Metaphysics'
 }
@@ -33,16 +31,17 @@ MirrorTest >> mirrorForObject [
 
 { #category : #tests }
 MirrorTest >> setUp [
+	| image |
 	super setUp.
 	builder := KernelSegmentBuilder new
 		initialize64BitImage;
 		generateModule;
 		bootstrapModule;
 		addGenesisObjects.
-	writer := builder writer write.
+	image := builder writer write; image.
 	runtime := Runtime
 		forSimulating: VirtualSmalltalkImage kernelSpec
-		memory: writer image
+		memory: image
 
 ]
 
