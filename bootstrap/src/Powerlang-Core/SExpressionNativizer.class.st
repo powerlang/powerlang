@@ -414,7 +414,8 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	ir := TemplateAssemblerAMD64 new
+	ir := JITAssemblerAMD64 new
+
 ]
 
 { #category : #services }
