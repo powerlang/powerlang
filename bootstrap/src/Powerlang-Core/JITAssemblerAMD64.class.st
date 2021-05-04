@@ -27,7 +27,7 @@ JITAssemblerAMD64 class >> initialize [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addAtoR [
-	self assemble: 'add' with: self regR with: self regA
+	backend add: backend regA to: backend regR
 ]
 
 { #category : #arithmetic }
@@ -471,7 +471,8 @@ JITAssemblerAMD64 >> incC [
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.
-	literals := OrderedCollection new
+	literals := OrderedCollection new.
+	backend := self
 ]
 
 { #category : #private }
@@ -2048,7 +2049,7 @@ JITAssemblerAMD64 >> storeRinSbyte: index [
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeRinSindex: index [
-	self store: self regR in: self regS index: index
+	backend store: backend regR in: backend regS index: index
 ]
 
 { #category : #'push/pop' }
