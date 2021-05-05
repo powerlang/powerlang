@@ -385,7 +385,7 @@ InlinedMessageNativizer >> inlineToByDo [
 	assembler
 		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonIncrementable;
-		addRconstant: increment;
+		addRwithImmediate: increment;
 		jumpIfOverflowTo: overflow.
 	nativizer
 		temporaryInStackAtPut: current;
@@ -446,7 +446,7 @@ InlinedMessageNativizer >> inlineToDo [
 	assembler
 		testIntegerBitOf: assembler regR8;
 		jumpIfZeroTo: nonIncrementable;
-		addRconstant: 2;
+		addRwithImmediate: 2;
 		jumpIfOverflowTo: overflow.
 	nativizer
 		temporaryInStackAtPut: current;

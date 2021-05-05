@@ -108,7 +108,7 @@ InlineMessageLinker >> assembleBasicCopyFromToWith [
 		loadEwithAddressOfRatA;
 		loadSwithAddressOfSatA;
 		subAfromT;
-		addToTconstant: 1;
+		addTwithImmediate: 1;
 		moveTslots;
 		popE
 ]
@@ -316,7 +316,7 @@ InlineMessageLinker >> assembleExpandInStackSized [
 		loadTwithA;
 		loopTtimes: [ assembler
 				pushIndirectR;
-				addRconstant: assembler addressSize ]
+				addRwithImmediate: assembler addressSize ]
 ]
 
 { #category : #'private - assemble' }
@@ -341,7 +341,7 @@ InlineMessageLinker >> assembleFloatEquals [
 		loadLargeX0withRindirect;
 		compareEqualLargeX0withAindirect;
 		loadRwithX0;
-		addRconstant: 1;
+		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus
 ]
@@ -364,7 +364,7 @@ InlineMessageLinker >> assembleFloatLessThan [
 		loadLargeX0withRindirect;
 		compareLessThanLargeX0withAindirect;
 		loadRwithX0;
-		addRconstant: 1;
+		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus
 ]
