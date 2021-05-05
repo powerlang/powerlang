@@ -60,6 +60,11 @@ AssemblerAMD64 >> add: op1 to: op2 [
 	self assemble: 'add' with: op2 with: op1
 ]
 
+{ #category : #services }
+AssemblerAMD64 >> addImm: imm to: reg [ 
+	self assemble: 'add' with: reg withImm: imm
+]
+
 { #category : #labels }
 AssemblerAMD64 >> addLabel: aString [
 	self addLabel: aString to: self currentAddress
@@ -89,13 +94,22 @@ AssemblerAMD64 >> alignTo: aNumber [
 ]
 
 { #category : #services }
-AssemblerAMD64 >> and: op1 with: op2 [
-	self assemble: 'and' with: op1 with: op2
+AssemblerAMD64 >> and: source1andDest with: source2 [
+	self assemble: 'and' with: source1andDest with: source2
 ]
 
 { #category : #services }
-AssemblerAMD64 >> and: op1 withImm: op2 [
-	self assemble: 'and' with: op1 withImm: op2
+AssemblerAMD64 >> and: source1andDest withImm: imm [
+	self assemble: 'and' with: source1andDest withImm: imm
+]
+
+{ #category : #services }
+AssemblerAMD64 >> andIndirect: source1andDest withImm: imm [
+	pointer
+		reset;
+		length: self addressLength;
+		base: source1andDest.
+	self assemble: 'and' with: pointer withImm: imm
 ]
 
 { #category : #relocation }
@@ -451,6 +465,21 @@ AssemblerAMD64 >> lastEmittedPointer [
 	| patch |
 	patch := self currentAddress.
 	^patch - wordSize
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> lea: dest
+		base: base
+		index: index
+		scale: scale [
+
+	pointer
+		reset;
+		length: self addressLength;
+		base: base;
+		index: index;
+		scale: scale.
+	self assemble: 'lea' with: dest with: pointer
 ]
 
 { #category : #integers }

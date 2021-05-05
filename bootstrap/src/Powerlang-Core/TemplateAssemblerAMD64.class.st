@@ -83,7 +83,7 @@ TemplateAssemblerAMD64 >> andRwithImmediate: imm [
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> andTosWithImmediate: imm [
+TemplateAssemblerAMD64 >> andSPindirectWithImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r83 16r24 16r24];

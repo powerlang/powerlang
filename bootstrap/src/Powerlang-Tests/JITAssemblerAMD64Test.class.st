@@ -105,51 +105,51 @@ JITAssemblerAMD64Test >> testAddDoubleX1toX0 [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddRconstant__1 [
 	
-	assembler perform: #addRconstant: withArguments: #(1).
+	assembler perform: #addRwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 192 1])
-	
+
 ]
 
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddRconstant__2 [
 	
-	assembler perform: #addRconstant: withArguments: #(2).
+	assembler perform: #addRwithImmediate: withArguments: #(2).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 192 2])
-	
+
 ]
 
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddRconstant__4 [
 	
-	assembler perform: #addRconstant: withArguments: #(4).
+	assembler perform: #addRwithImmediate: withArguments: #(4).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 192 4])
-	
+
 ]
 
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddRconstant__8 [
 	
-	assembler perform: #addRconstant: withArguments: #(8).
+	assembler perform: #addRwithImmediate: withArguments: #(8).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 192 8])
-	
+
 ]
 
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddRconstant__m2 [
 	
-	assembler perform: #addRconstant: withArguments: #(-2).
+	assembler perform: #addRwithImmediate: withArguments: #(-2).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 192 254])
-	
+
 ]
 
 { #category : #'tests - generated' }
@@ -175,11 +175,11 @@ JITAssemblerAMD64Test >> testAddSslotsToSP [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddToTconstant__1 [
 	
-	assembler perform: #addToTconstant: withArguments: #(1).
+	assembler perform: #addTwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 131 193 1])
-	
+
 ]
 
 { #category : #'tests - generated' }

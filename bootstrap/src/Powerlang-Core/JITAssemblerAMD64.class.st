@@ -47,52 +47,43 @@ JITAssemblerAMD64 >> addLiteral: anObject [
 ]
 
 { #category : #arithmetic }
-JITAssemblerAMD64 >> addRconstant: imm [
-	self assemble: 'add' with: self regR withImm: imm
+JITAssemblerAMD64 >> addRwithImmediate: imm [
+	backend addImm: imm to: backend regR 
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addSPtoT [
-	self assemble: 'add' with: self regT with: self regSP
+	backend add: backend regSP to: backend regT
 ]
 
 { #category : #logic }
 JITAssemblerAMD64 >> addSPwithImmediate: imm [
-	#imm8.
-	#imm32.
-	self assemble: 'add' with: self regSP withImm: imm
+	backend addImm: imm to: backend regSP
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addSslotsToSP [
-	pointer
-		reset;
-		length: self addressLength;
-		base: self regSP;
-		index: self regS;
-		scale: self regSP sizeInBytes.
-	self assemble: 'lea' with: self regSP with: pointer
-]
+	backend lea: backend regSP base: backend regSP index: backend regS scale: backend regSP sizeInBytes
 
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> addToTconstant: imm [
-	self assemble: 'add' with: self regT withImm: imm
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addTslotsToSP [
-	pointer
-		reset;
-		length: self addressLength;
-		base: self regSP;
-		index: self regT;
-		scale: self regSP sizeInBytes.
-	self assemble: 'lea' with: self regSP with: pointer
+	backend
+		lea: backend regSP
+		base: backend regSP
+		index: backend regT
+		scale: backend regSP sizeInBytes
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addTtoR [
-	self assemble: 'add' with: self regR with: self regT
+	backend add: backend regT to: backend regR
+]
+
+{ #category : #logic }
+JITAssemblerAMD64 >> addTwithImmediate: imm [
+	backend addImm: imm to: backend regT
 ]
 
 { #category : #services }
@@ -102,22 +93,17 @@ JITAssemblerAMD64 >> addressOfExternal: function [
 
 { #category : #logic }
 JITAssemblerAMD64 >> andRwithA [
-	self assemble: 'and' with: self regR with: self regA
+	backend and: backend regR with: backend regA
 ]
 
-{ #category : #logic }
+{ #category : #arithmetic }
 JITAssemblerAMD64 >> andRwithImmediate: imm [
-	#imm8.
-	#imm32.
-	self assemble: 'and' with: self regR withImm: imm
+	backend and: backend regR withImm: imm
 ]
 
 { #category : #logic }
-JITAssemblerAMD64 >> andTosWithImmediate: anInteger [
-	#imm8.
-	#imm32.
-	pointer reset; length: self addressLength; base: self regSP.
-	self assemble: 'and' with: pointer withImm: anInteger
+JITAssemblerAMD64 >> andSPindirectWithImmediate: imm [
+	backend andIndirect: backend regSP withImm: imm
 ]
 
 { #category : #private }
@@ -1609,7 +1595,7 @@ JITAssemblerAMD64 >> pushRbyte: index [
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
-		andTosWithImmediate: 16rFF;
+		andSPindirectWithImmediate: 16rFF;
 		convertTosToSmallInteger
 ]
 
@@ -1623,7 +1609,7 @@ JITAssemblerAMD64 >> pushRwordAt: index [
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
-		andTosWithImmediate: 16rFFFF;
+		andSPindirectWithImmediate: 16rFFFF;
 		convertTosToSmallInteger
 ]
 
@@ -1646,7 +1632,7 @@ JITAssemblerAMD64 >> pushSbyte: index [
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
-		andTosWithImmediate: 16rFF;
+		andSPindirectWithImmediate: 16rFF;
 		convertTosToSmallInteger
 ]
 
@@ -1669,7 +1655,7 @@ JITAssemblerAMD64 >> pushSwordAt: index [
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
-		andTosWithImmediate: 16rFFFF;
+		andSPindirectWithImmediate: 16rFFFF;
 		convertTosToSmallInteger
 ]
 
