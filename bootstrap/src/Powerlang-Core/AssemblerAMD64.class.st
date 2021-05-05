@@ -554,9 +554,10 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 ]
 
 { #category : #services }
-AssemblerAMD64 >> move: reg2 to: reg1 [
-	self ASSERT: (reg2 class = Register and: [reg1 class = Register]).
-	self assemble: 'mov' with: reg1 with: reg2
+AssemblerAMD64 >> move: srcReg to: dstReg [
+	self ASSERT: (srcReg class = Register and: [dstReg class = Register]).
+	self assemble: 'mov' with: dstReg with: srcReg
+
 ]
 
 { #category : #'private - jumps' }
