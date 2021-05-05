@@ -682,7 +682,97 @@ AssemblerAMD64 >> putPointer: oop at: position [
 		ensure: [memory position: original]
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regA [
+	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regA8 [
+	^dl
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regB [
+	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regC [
+	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regE [
+	^wordSize = 8 ifTrue: [rdi] ifFalse: [edi]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regFP [
+	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regFalse [
+	^ r14
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regG [
+	^r15
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regIP [
+	^ rip
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regM [
+	^rbx
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regNil [
+	^ r12
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regR [
+	^wordSize = 8 ifTrue: [rax] ifFalse: [eax]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regR8 [
+	^al
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regS [
+	^wordSize = 8 ifTrue: [rsi] ifFalse: [esi]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regSP [
+	^wordSize = 8 ifTrue: [rsp] ifFalse: [esp]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regT [
+	^wordSize = 8 ifTrue: [rcx] ifFalse: [ecx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regT8 [
+	^ cl
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regTrue [
+	^ r13
+]
+
+{ #category : #'registers - IR' }
 AssemblerAMD64 >> regV [
 	^r11
 ]

@@ -38,6 +38,120 @@ JITAssembler >> lea: dest base: base index: index scale: scale [
 	self subclassResponsibility
 ]
 
+{ #category : #'registers - IR' }
+JITAssembler >> regA [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regA8 [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regB [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regC [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regE [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regFP [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regFalse [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regG [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regIP [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regM [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regNil [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regR [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regR8 [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regS [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regSP [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regT [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regT8 [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regTrue [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regV [
+	^ self subclassResponsibility
+
+]
+
 { #category : #storing }
 JITAssembler >> store: reg1 in: reg2 index: index [
 	self subclassResponsibility
