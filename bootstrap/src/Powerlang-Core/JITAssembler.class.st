@@ -38,6 +38,12 @@ JITAssembler >> lea: dest base: base index: index scale: scale [
 	self subclassResponsibility
 ]
 
+{ #category : #services }
+JITAssembler >> move: srcReg to: dstReg [
+	^ self subclassResponsibility
+
+]
+
 { #category : #'registers - IR' }
 JITAssembler >> regA [
 	^ self subclassResponsibility

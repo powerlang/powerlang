@@ -463,7 +463,7 @@ JITAssemblerAMD64 >> initialize [
 
 { #category : #private }
 JITAssemblerAMD64 >> initializeS [
-	self assemble: 'mov' with: backend regS with: backend regR
+	backend move: backend regR to: backend regS
 ]
 
 { #category : #private }
@@ -589,7 +589,7 @@ JITAssemblerAMD64 >> loadAwithFPindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithFalse [
-	self assemble: 'mov' with: backend regA with: backend regFalse
+	backend move: backend regFalse to: backend regA
 ]
 
 { #category : #private }
@@ -637,12 +637,12 @@ JITAssemblerAMD64 >> loadAwithMindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithNil [
-	self assemble: 'mov' with: backend regA with: backend regNil
+	backend move: backend regNil to: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithR [
-	self assemble: 'mov' with: backend regA with: backend regR
+	backend move: backend regR to: backend regA
 ]
 
 { #category : #loading }
@@ -662,7 +662,7 @@ JITAssemblerAMD64 >> loadAwithRoffsetAtA [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithS [
-	self assemble: 'mov' with: backend regA with: backend regS
+	backend move: backend regS to: backend regA
 ]
 
 { #category : #loading }
@@ -677,12 +677,12 @@ JITAssemblerAMD64 >> loadAwithSmallInteger: anInteger [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithT [
-	self assemble: 'mov' with: backend regA with: backend regT
+	backend move: backend regT to: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithTrue [
-	self assemble: 'mov' with: backend regA with: backend regTrue
+	backend move: backend regTrue to: backend regA
 ]
 
 { #category : #integers }
@@ -710,22 +710,22 @@ JITAssemblerAMD64 >> loadEwithImmediate: imm [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithNil [
-	self assemble: 'mov' with: backend regE with: backend regNil
+	backend move: backend regNil to: backend regE
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithR [
-	self assemble: 'mov' with: backend regE with: backend regR
+	backend move: backend regR to: backend regE
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadFPwithR [
-	self assemble: 'mov' with: backend regFP with: backend regR
+	backend move: backend regR to: backend regFP
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadFPwithSP [
-	self assemble: 'mov' with: backend regFP with: backend regSP
+	backend move: backend regSP to: backend regFP
 ]
 
 { #category : #loading }
@@ -816,7 +816,7 @@ JITAssemblerAMD64 >> loadMXCSRfromA [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> loadMwithA [
-	self assemble: 'mov' with: backend regM with: backend regA
+	backend move: backend regA to: backend regM
 ]
 
 { #category : #loading }
@@ -913,7 +913,7 @@ JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithA [
-	self assemble: 'mov' with: backend regR with: backend regA
+	backend move: backend regA to: backend regR
 ]
 
 { #category : #loading }
@@ -935,7 +935,7 @@ JITAssemblerAMD64 >> loadRwithBoolean: aBoolean [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithE [
-	self assemble: 'mov' with: backend regR with: backend regE
+	backend move: backend regE to: backend regR
 ]
 
 { #category : #loading }
@@ -945,7 +945,7 @@ JITAssemblerAMD64 >> loadRwithEindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithFP [
-	self assemble: 'mov' with: backend regR with: backend regFP
+	backend move: backend regFP to: backend regR
 ]
 
 { #category : #loading }
@@ -955,7 +955,7 @@ JITAssemblerAMD64 >> loadRwithFPindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithFalse [
-	self assemble: 'mov' with: backend regR with: backend regFalse
+	backend move: backend regFalse to: backend regR
 ]
 
 { #category : #loading }
@@ -973,7 +973,7 @@ JITAssemblerAMD64 >> loadRwithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithM [
-	self assemble: 'mov' with: backend regR with: backend regM
+	backend move: backend regM to: backend regR
 ]
 
 { #category : #loading }
@@ -987,7 +987,7 @@ JITAssemblerAMD64 >> loadRwithMindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithNil [
-	self assemble: 'mov' with: backend regR with: backend regNil
+	backend move: backend regNil to: backend regR
 ]
 
 { #category : #integers }
@@ -1038,12 +1038,12 @@ JITAssemblerAMD64 >> loadRwithRwordAt: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithS [
-	self assemble: 'mov' with: backend regR with: backend regS
+	backend move: backend regS to: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithSP [
-	self assemble: 'mov' with: backend regR with: backend regSP
+	backend move: backend regSP to: backend regR
 ]
 
 { #category : #loading }
@@ -1089,7 +1089,7 @@ JITAssemblerAMD64 >> loadRwithSwordAt: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithT [
-	self assemble: 'mov' with: backend regR with: backend regT
+	backend move: backend regT to: backend regR
 ]
 
 { #category : #storing }
@@ -1131,7 +1131,7 @@ JITAssemblerAMD64 >> loadRwithTos [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithTrue [
-	self assemble: 'mov' with: backend regR with: backend regTrue
+	backend move: backend regTrue to: backend regR
 ]
 
 { #category : #loading }
@@ -1143,12 +1143,12 @@ JITAssemblerAMD64 >> loadRwithX0 [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSPwithFP [
-	self assemble: 'mov' with: backend regSP with: backend regFP
+	backend move: backend regFP to: backend regSP
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSPwithT [
-	self assemble: 'mov' with: backend regSP with: backend regT
+	backend move: backend regT to: backend regSP
 ]
 
 { #category : #loading }
@@ -1158,7 +1158,7 @@ JITAssemblerAMD64 >> loadSWithRIndex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithA [
-	self assemble: 'mov' with: backend regS with: backend regA
+	backend move: backend regA to: backend regS
 ]
 
 { #category : #integers }
@@ -1198,7 +1198,7 @@ JITAssemblerAMD64 >> loadSwithImmediate: imm [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithNil [
-	self assemble: 'mov' with: backend regS with: backend regNil
+	backend move: backend regNil to: backend regS
 ]
 
 { #category : #loading }
@@ -1208,7 +1208,7 @@ JITAssemblerAMD64 >> loadSwithRindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithT [
-	self assemble: 'mov' with: backend regS with: backend regT
+	backend move: backend regT to: backend regS
 ]
 
 { #category : #loading }
@@ -1225,7 +1225,7 @@ JITAssemblerAMD64 >> loadTrueWithMindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithA [
-	self assemble: 'mov' with: backend regT with: backend regA
+	backend move: backend regA to: backend regT
 ]
 
 { #category : #loading }
@@ -1267,7 +1267,7 @@ JITAssemblerAMD64 >> loadTwithMindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithR [
-	self assemble: 'mov' with: backend regT with: backend regR
+	backend move: backend regR to: backend regT
 ]
 
 { #category : #loading }
@@ -1282,21 +1282,18 @@ JITAssemblerAMD64 >> loadVwithImmediate: imm [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadWithFalse: register [
-	self assemble: 'mov' with: register with: backend regFalse
+JITAssemblerAMD64 >> loadWithFalse: register [ 
+	backend move: backend regFalse to: register
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadWithNil: register [
-	self
-		assemble: 'mov'
-		with: register
-		with: backend regNil
+JITAssemblerAMD64 >> loadWithNil: register [ 
+	backend move: backend regNil to: register
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadWithTrue: register [
-	self assemble: 'mov' with: register with: backend regTrue
+JITAssemblerAMD64 >> loadWithTrue: register [ 
+	backend move: backend regTrue to: register
 ]
 
 { #category : #loading }
