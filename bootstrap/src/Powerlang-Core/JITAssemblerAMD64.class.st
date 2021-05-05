@@ -37,7 +37,7 @@ JITAssemblerAMD64 >> addDoubleX1toX0 [
 
 { #category : #loading }
 JITAssemblerAMD64 >> addLiteral: anObject [
-	| index | 
+	| index |
 	index := literals
 		indexOf: anObject
 		ifAbsent: [ literals
@@ -109,35 +109,35 @@ JITAssemblerAMD64 >> andSPindirectWithImmediate: imm [
 { #category : #private }
 JITAssemblerAMD64 >> buildFrame [
 	self
-		push: self regFP;
-		move: self regSP to: self regFP
+		push: backend regFP;
+		move: backend regSP to: backend regFP
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> callA [
-	self assemble: 'call' with: self regA
+	self assemble: 'call' with: backend regA
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> callIndirectA [
-	pointer reset; length: self addressLength; base: self regA.
+	pointer reset; length: self addressLength; base: backend regA.
 	self assemble: 'call' with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> callIndirectM [
-	pointer reset; length: self addressLength; base: self regM.
+	pointer reset; length: self addressLength; base: backend regM.
 	self assemble: 'call' with: pointer
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> callR [
-	self assemble: 'call' with: self regR
+	self assemble: 'call' with: backend regR
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> clearAintegerBit [
-	self assemble: 'dec' with: self regA
+	self assemble: 'dec' with: backend regA
 ]
 
 { #category : #loading }
@@ -147,12 +147,12 @@ JITAssemblerAMD64 >> clearFPUFlags [
 
 { #category : #integers }
 JITAssemblerAMD64 >> clearRhighHalf [
-	self assemble: 'mov' with: self regR e with: self regR e
+	self assemble: 'mov' with: backend regR e with: backend regR e
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> clearRintegerBit [
-	self assemble: 'dec' with: self regR
+	self assemble: 'dec' with: backend regR
 ]
 
 { #category : #integers }
@@ -175,7 +175,7 @@ JITAssemblerAMD64 >> compare: register withLiteral: anObject [
 	self
 		assemble: 'cmp'
 		withReg: register
-		withReg: self regM
+		withReg: backend regM
 		index: index
 ]
 
@@ -188,14 +188,14 @@ JITAssemblerAMD64 >> compareAwithBoolean: aBoolean [
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareAwithFalse [
-	self assemble: 'cmp' with: self regA with: self regFalse
+	self assemble: 'cmp' with: backend regA with: backend regFalse
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareAwithImmediate: imm [
 	#imm8.
 	#imm32.
-	self assemble: 'cmp' with: self regA withImm: imm
+	self assemble: 'cmp' with: backend regA withImm: imm
 ]
 
 { #category : #comparing }
@@ -205,24 +205,24 @@ JITAssemblerAMD64 >> compareAwithSmallInteger: anInteger [
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareAwithTrue [
-	self assemble: 'cmp' with: self regA with: self regTrue
+	self assemble: 'cmp' with: backend regA with: backend regTrue
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
-	pointer reset; length: 64; base: self regA.
+	pointer reset; length: 64; base: backend regA.
 	self assemble: 'cmpsd' with: xmm0 with: pointer with: 0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
-	pointer reset; length: 64; base: self regA.
+	pointer reset; length: 64; base: backend regA.
 	self assemble: 'cmpsd' with: xmm0 with: pointer with: 1
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithA [
-	self assemble: 'cmp' with: self regR with: self regA
+	self assemble: 'cmp' with: backend regR with: backend regA
 ]
 
 { #category : #comparing }
@@ -234,24 +234,24 @@ JITAssemblerAMD64 >> compareRwithBoolean: aBoolean [
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareRwithEindex: index [
-	self assemble: 'cmp' withReg: self regR withReg: self regE index: index
+	self assemble: 'cmp' withReg: backend regR withReg: backend regE index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareRwithFPindex: index [
-	self assemble: 'cmp' withReg: self regR withReg: self regFP index: index
+	self assemble: 'cmp' withReg: backend regR withReg: backend regFP index: index
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithFalse [
-	self assemble: 'cmp' with: self regR with: self regFalse
+	self assemble: 'cmp' with: backend regR with: backend regFalse
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithImmediate: imm [
 	#imm8.
 	#imm32.
-	self assemble: 'cmp' with: self regR withImm: imm
+	self assemble: 'cmp' with: backend regR withImm: imm
 ]
 
 { #category : #storing }
@@ -262,17 +262,17 @@ JITAssemblerAMD64 >> compareRwithIndirect: reg1 andExchange: reg2 [
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithNil [
-	self assemble: 'cmp' with: self regR with: self regNil
+	self assemble: 'cmp' with: backend regR with: backend regNil
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithS [
-	self assemble: 'cmp' with: self regR with: self regS
+	self assemble: 'cmp' with: backend regR with: backend regS
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareRwithSindex: index [
-	self assemble: 'cmp' withReg: self regR withReg: self regS index: index
+	self assemble: 'cmp' withReg: backend regR withReg: backend regS index: index
 ]
 
 { #category : #comparing }
@@ -282,74 +282,74 @@ JITAssemblerAMD64 >> compareRwithSmallInteger: anInteger [
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareRwithTrue [
-	self assemble: 'cmp' with: self regR with: self regTrue
+	self assemble: 'cmp' with: backend regR with: backend regTrue
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareRwithVindex: index [
-	self assemble: 'cmp' withReg: self regR withReg: self regV index: index
+	self assemble: 'cmp' withReg: backend regR withReg: backend regV index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareSwithTindex: index [
-	self assemble: 'cmp' withReg: self regS withReg: self regT index: index
+	self assemble: 'cmp' withReg: backend regS withReg: backend regT index: index
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareTwithA [
-	self assemble: 'cmp' with: self regT with: self regA
+	self assemble: 'cmp' with: backend regT with: backend regA
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> compareTwithImmediate: imm [
 	#imm8.
 	#imm32.
-	self assemble: 'cmp' with: self regT withImm: imm
+	self assemble: 'cmp' with: backend regT withImm: imm
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareWithFalse: register [
-	self assemble: 'cmp' with: register with: self regFalse
+	self assemble: 'cmp' with: register with: backend regFalse
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareWithNil: register [
-	self assemble: 'cmp' with: register with: self regNil
+	self assemble: 'cmp' with: register with: backend regNil
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareWithTrue: register [
-	self assemble: 'cmp' with: register with: self regTrue
+	self assemble: 'cmp' with: register with: backend regTrue
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertAtoNativeInteger [
-	self convertToNativeInteger: self regA
+	self convertToNativeInteger: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertAtoSmallInteger [
-	self convertToSmallInteger: self regA
+	self convertToSmallInteger: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertRtoNativeInteger [
-	self convertToNativeInteger: self regR
+	self convertToNativeInteger: backend regR
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertRtoSmallInteger [
-	self convertToSmallInteger: self regR
+	self convertToSmallInteger: backend regR
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertTToNativeInteger [
-	self convertToNativeInteger: self regT
+	self convertToNativeInteger: backend regT
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertTosToSmallInteger [
-	pointer reset; length: self addressLength; base: self regSP.
+	pointer reset; length: self addressLength; base: backend regSP.
 	self
 		assemble: 'shl' with: pointer with: 1;
 		assemble: 'inc' with: pointer
@@ -357,7 +357,7 @@ JITAssemblerAMD64 >> convertTosToSmallInteger [
 
 { #category : #integers }
 JITAssemblerAMD64 >> convertTtoNativeInteger [
-	self convertToNativeInteger: self regT
+	self convertToNativeInteger: backend regT
 ]
 
 { #category : #jumps }
@@ -367,12 +367,12 @@ JITAssemblerAMD64 >> dec: op1 [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> decR [
-	self assemble: 'dec' with: self regR
+	self assemble: 'dec' with: backend regR
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> decRindirect [
-	pointer reset; length: self addressLength; base: self regR.
+	pointer reset; length: self addressLength; base: backend regR.
 	self assemble: 'dec' with: pointer
 ]
 
@@ -400,11 +400,11 @@ JITAssemblerAMD64 >> divideDoubleX0byX1 [
 { #category : #arithmetic }
 JITAssemblerAMD64 >> divideRbyT [
 	| conversion |
-	self ASSERT: (self regR r == rax and: [self regA r == rdx]).
+	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
 	conversion := wordSize = 8 ifTrue: ['cqo'] ifFalse: ['cdq'].
 	self
 		assemble: conversion;
-		assemble: 'idiv' with: self regT
+		assemble: 'idiv' with: backend regT
 ]
 
 { #category : #loading }
@@ -419,7 +419,7 @@ JITAssemblerAMD64 >> dropTopOfFPU [
 JITAssemblerAMD64 >> dropTos: count [
 	| imm |
 	imm := count * self addressSize.
-	self assemble: 'add' with: self regSP with: imm
+	self assemble: 'add' with: backend regSP with: imm
 ]
 
 { #category : #loading }
@@ -440,18 +440,18 @@ JITAssemblerAMD64 >> ensureSafeRintegerBit [
 
 { #category : #loading }
 JITAssemblerAMD64 >> exchangeRindirectWithT [
-	pointer reset; length: self addressLength; base: self regR.
-	self assemble: 'xchg' with: pointer with: self regT
+	pointer reset; length: self addressLength; base: backend regR.
+	self assemble: 'xchg' with: pointer with: backend regT
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> incA [
-	self assemble: 'inc' with: self regA
+	self assemble: 'inc' with: backend regA
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> incC [
-	self assemble: 'inc' with: self regC
+	self assemble: 'inc' with: backend regC
 ]
 
 { #category : #private }
@@ -463,33 +463,33 @@ JITAssemblerAMD64 >> initialize [
 
 { #category : #private }
 JITAssemblerAMD64 >> initializeS [
-	self assemble: 'mov' with: self regS with: self regR
+	self assemble: 'mov' with: backend regS with: backend regR
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> jumpIndirectA [
-	pointer reset; length: self addressLength; base: self regA.
+	pointer reset; length: self addressLength; base: backend regA.
 	self assemble: 'jmp' with: pointer
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> jumpToA [
-	self assemble: 'jmp' with: self regA
+	self assemble: 'jmp' with: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> jumpToMindex: index [
-	self assemble: 'jmp' withReg: self regM index: index
+	self assemble: 'jmp' withReg: backend regM index: index
 ]
 
 { #category : #comparing }
 JITAssemblerAMD64 >> jumpToS [
-	self assemble: 'jmp' with: self regS
+	self assemble: 'jmp' with: backend regS
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> jumpToTindex: index [
-	self assemble: 'jmp' withReg: self regT index: index
+	self assemble: 'jmp' withReg: backend regT index: index
 ]
 
 { #category : #integers }
@@ -503,17 +503,17 @@ JITAssemblerAMD64 >> labeledIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerBitTestOfA [
-	^self labeledIntegerBitTestOf: self regA8
+	^self labeledIntegerBitTestOf: backend regA8
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerBitTestOfR [
-	^self labeledIntegerBitTestOf: self regR8
+	^self labeledIntegerBitTestOf: backend regR8
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerBitTestOfT [
-	^self labeledIntegerBitTestOf: self regT byte
+	^self labeledIntegerBitTestOf: backend regT byte
 ]
 
 { #category : #integers }
@@ -527,17 +527,17 @@ JITAssemblerAMD64 >> labeledIntegerNativizationOf: aRegister [
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerNativizationOfA [
-	^self labeledIntegerNativizationOf: self regA
+	^self labeledIntegerNativizationOf: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerNativizationOfR [
-	^self labeledIntegerNativizationOf: self regR
+	^self labeledIntegerNativizationOf: backend regR
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledIntegerNativizationOfT [
-	^self labeledIntegerNativizationOf: self regT
+	^self labeledIntegerNativizationOf: backend regT
 ]
 
 { #category : #integers }
@@ -551,7 +551,7 @@ JITAssemblerAMD64 >> labeledNonIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 JITAssemblerAMD64 >> labeledNonIntegerBitTestOfR [
-	^self labeledNonIntegerBitTestOf: self regR8
+	^self labeledNonIntegerBitTestOf: backend regR8
 ]
 
 { #category : #loading }
@@ -561,13 +561,13 @@ JITAssemblerAMD64 >> load: register withLiteral: anObject [
 	self
 		assemble: 'mov'
 		withReg: register
-		withReg: self regM
+		withReg: backend regM
 		index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithAindex: index [
-	self assemble: 'mov' withReg: self regA withReg: self regA index: index
+	self assemble: 'mov' withReg: backend regA withReg: backend regA index: index
 ]
 
 { #category : #loading }
@@ -579,25 +579,25 @@ JITAssemblerAMD64 >> loadAwithBoolean: aBoolean [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithEindex: index [
-	self assemble: 'mov' withReg: self regA withReg: self regE index: index
+	self assemble: 'mov' withReg: backend regA withReg: backend regE index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithFPindex: index [
-	self assemble: 'mov' withReg: self regA withReg: self regFP index: index
+	self assemble: 'mov' withReg: backend regA withReg: backend regFP index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithFalse [
-	self assemble: 'mov' with: self regA with: self regFalse
+	self assemble: 'mov' with: backend regA with: backend regFalse
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> loadAwithGindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regA
-		withReg: self regG
+		withReg: backend regA
+		withReg: backend regG
 		index: index
 ]
 
@@ -611,7 +611,7 @@ JITAssemblerAMD64 >> loadAwithGlobal: aSymbol [
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regA withImm: imm
+	self assemble: 'mov' with: backend regA withImm: imm
 ]
 
 { #category : #loading }
@@ -630,24 +630,24 @@ JITAssemblerAMD64 >> loadAwithLiteral: anObject [
 JITAssemblerAMD64 >> loadAwithMindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regA
-		withReg: self regM
+		withReg: backend regA
+		withReg: backend regM
 		index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithNil [
-	self assemble: 'mov' with: self regA with: self regNil
+	self assemble: 'mov' with: backend regA with: backend regNil
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithR [
-	self assemble: 'mov' with: self regA with: self regR
+	self assemble: 'mov' with: backend regA with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithRindex: index [
-	self assemble: 'mov' withReg: self regA withReg: self regR index: index
+	self assemble: 'mov' withReg: backend regA withReg: backend regR index: index
 ]
 
 { #category : #loading }
@@ -655,19 +655,19 @@ JITAssemblerAMD64 >> loadAwithRoffsetAtA [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: self regA with: pointer
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: backend regA with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithS [
-	self assemble: 'mov' with: self regA with: self regS
+	self assemble: 'mov' with: backend regA with: backend regS
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithSindex: index [
-	self assemble: 'mov' withReg: self regA withReg: self regS index: index
+	self assemble: 'mov' withReg: backend regA withReg: backend regS index: index
 ]
 
 { #category : #integers }
@@ -677,12 +677,12 @@ JITAssemblerAMD64 >> loadAwithSmallInteger: anInteger [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithT [
-	self assemble: 'mov' with: self regA with: self regT
+	self assemble: 'mov' with: backend regA with: backend regT
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithTrue [
-	self assemble: 'mov' with: self regA with: self regTrue
+	self assemble: 'mov' with: backend regA with: backend regTrue
 ]
 
 { #category : #integers }
@@ -690,42 +690,42 @@ JITAssemblerAMD64 >> loadEwithAddressOfRatA [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regR;
-		index: self regA;
-		scale: self regE sizeInBytes;
-		displacement: 0 - self regE sizeInBytes.
-	self assemble: 'lea' with: self regE with: pointer
+		base: backend regR;
+		index: backend regA;
+		scale: backend regE sizeInBytes;
+		displacement: 0 - backend regE sizeInBytes.
+	self assemble: 'lea' with: backend regE with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithFPindex: index [
-	self assemble: 'mov' withReg: self regE withReg: self regFP index: index
+	self assemble: 'mov' withReg: backend regE withReg: backend regFP index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regE withImm: imm
+	self assemble: 'mov' with: backend regE withImm: imm
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithNil [
-	self assemble: 'mov' with: self regE with: self regNil
+	self assemble: 'mov' with: backend regE with: backend regNil
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadEwithR [
-	self assemble: 'mov' with: self regE with: self regR
+	self assemble: 'mov' with: backend regE with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadFPwithR [
-	self assemble: 'mov' with: self regFP with: self regR
+	self assemble: 'mov' with: backend regFP with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadFPwithSP [
-	self assemble: 'mov' with: self regFP with: self regSP
+	self assemble: 'mov' with: backend regFP with: backend regSP
 ]
 
 { #category : #loading }
@@ -737,7 +737,7 @@ JITAssemblerAMD64 >> loadFalseWithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadFalseWithMindex: index [
-	self assemble: 'mov' withReg: self regFalse withReg: self regM index: index
+	self assemble: 'mov' withReg: backend regFalse withReg: backend regM index: index
 ]
 
 { #category : #loading }
@@ -749,18 +749,18 @@ JITAssemblerAMD64 >> loadGwithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadGwithMindex: index [
-	self assemble: 'mov' withReg: self regG withReg: self regM index: index
+	self assemble: 'mov' withReg: backend regG withReg: backend regM index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadLargeX0withRindirect [
-	pointer reset; length: 64; base: self regR.
+	pointer reset; length: 64; base: backend regR.
 	self assemble: 'movq' with: xmm0 with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadLargeX1withAindirect [
-	pointer reset; length: 64; base: self regA.
+	pointer reset; length: 64; base: backend regA.
 	self assemble: 'movq' with: xmm1 with: pointer
 ]
 
@@ -772,9 +772,9 @@ JITAssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
 	pointer
 		reset;
 		length: 32;
-		base: self regIP;
+		base: backend regIP;
 		displacement: anInteger - instsize.
-	self assemble: 'mov' with: self regM e with: pointer
+	self assemble: 'mov' with: backend regM e with: pointer
 ]
 
 { #category : #loading }
@@ -782,9 +782,9 @@ JITAssemblerAMD64 >> loadLongRWithRAtOffsetA [
 	pointer
 		reset;
 		length: 32;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: self regR e with: pointer
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: backend regR e with: pointer
 ]
 
 { #category : #loading }
@@ -792,9 +792,9 @@ JITAssemblerAMD64 >> loadLongRwithRatOffsetA [
 	pointer
 		reset;
 		length: 32;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: self regR e with: pointer
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: backend regR e with: pointer
 ]
 
 { #category : #loading }
@@ -803,34 +803,34 @@ JITAssemblerAMD64 >> loadLongSwithRindex: index [
 	pointer
 		reset;
 		length: 32;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1 * 4.
-	self assemble: 'mov' with: self regS e with: pointer
+	self assemble: 'mov' with: backend regS e with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadMXCSRfromA [
-	pointer reset; length: 32; base: self regA.
+	pointer reset; length: 32; base: backend regA.
 	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> loadMwithA [
-	self assemble: 'mov' with: self regM with: self regA
+	self assemble: 'mov' with: backend regM with: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadMwithFPindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regM
-		withReg: self regFP
+		withReg: backend regM
+		withReg: backend regFP
 		index: index
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> loadMwithGindex: index [
-	self assemble: 'mov' withReg: self regM withReg: self regG index: index
+	self assemble: 'mov' withReg: backend regM withReg: backend regG index: index
 ]
 
 { #category : #loading }
@@ -843,7 +843,7 @@ JITAssemblerAMD64 >> loadMwithGlobal: aSymbol [
 { #category : #loading }
 JITAssemblerAMD64 >> loadMwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regM withImm: imm
+	self assemble: 'mov' with: backend regM withImm: imm
 ]
 
 { #category : #loading }
@@ -857,8 +857,8 @@ JITAssemblerAMD64 >> loadMwithLiteral: anObject [
 JITAssemblerAMD64 >> loadMwithMindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regM
-		withReg: self regM
+		withReg: backend regM
+		withReg: backend regM
 		index: index
 ]
 
@@ -870,21 +870,21 @@ JITAssemblerAMD64 >> loadMwithRIPoffset: imm [
 		base: rip;
 		displacement: imm.
 
-	self assemble: 'lea' with: self regM with: pointer
+	self assemble: 'lea' with: backend regM with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadMwithRindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regM
-		withReg: self regR
+		withReg: backend regM
+		withReg: backend regR
 		index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadMwithTindex: index [
-	self assemble: 'mov' withReg: self regM withReg: self regT index: index
+	self assemble: 'mov' withReg: backend regM withReg: backend regT index: index
 ]
 
 { #category : #loading }
@@ -896,24 +896,24 @@ JITAssemblerAMD64 >> loadNilWithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadNilWithMindex: index [
-	self assemble: 'mov' withReg: self regNil withReg: self regM index: index
+	self assemble: 'mov' withReg: backend regNil withReg: backend regM index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRConvertingDoubleRindirect [
-	pointer reset; length: 64; base: self regR.
-	self assemble: 'cvttsd2si' with: self regR with: pointer
+	pointer reset; length: 64; base: backend regR.
+	self assemble: 'cvttsd2si' with: backend regR with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
-	pointer reset; length: 64; base: self regR.
-	self assemble: 'cvttsd2si' with: self regR with: pointer
+	pointer reset; length: 64; base: backend regR.
+	self assemble: 'cvttsd2si' with: backend regR with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithA [
-	self assemble: 'mov' with: self regR with: self regA
+	self assemble: 'mov' with: backend regR with: backend regA
 ]
 
 { #category : #loading }
@@ -921,9 +921,9 @@ JITAssemblerAMD64 >> loadRwithArgPointer [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regFP;
+		base: backend regFP;
 		displacement: wordSize * 2.
-	self assemble: 'lea' with: self regR with: pointer
+	self assemble: 'lea' with: backend regR with: pointer
 ]
 
 { #category : #loading }
@@ -935,33 +935,33 @@ JITAssemblerAMD64 >> loadRwithBoolean: aBoolean [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithE [
-	self assemble: 'mov' with: self regR with: self regE
+	self assemble: 'mov' with: backend regR with: backend regE
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithEindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regE index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regE index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithFP [
-	self assemble: 'mov' with: self regR with: self regFP
+	self assemble: 'mov' with: backend regR with: backend regFP
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithFPindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regFP index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regFP index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithFalse [
-	self assemble: 'mov' with: self regR with: self regFalse
+	self assemble: 'mov' with: backend regR with: backend regFalse
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regR withImm: imm
+	self assemble: 'mov' with: backend regR withImm: imm
 ]
 
 { #category : #loading }
@@ -973,26 +973,26 @@ JITAssemblerAMD64 >> loadRwithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithM [
-	self assemble: 'mov' with: self regR with: self regM
+	self assemble: 'mov' with: backend regR with: backend regM
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithMindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regR
-		withReg: self regM
+		withReg: backend regR
+		withReg: backend regM
 		index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithNil [
-	self assemble: 'mov' with: self regR with: self regNil
+	self assemble: 'mov' with: backend regR with: backend regNil
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadRwithRatA [
-	self load: self regR from: self regR atIndexAt: self regA
+	self load: backend regR from: backend regR atIndexAt: backend regA
 ]
 
 { #category : #loading }
@@ -1000,9 +1000,9 @@ JITAssemblerAMD64 >> loadRwithRatOffsetA [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: self regR with: pointer
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: backend regR with: pointer
 ]
 
 { #category : #loading }
@@ -1010,17 +1010,17 @@ JITAssemblerAMD64 >> loadRwithRbyte: index [
 	pointer
 		reset;
 		length: 8;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1.
 	self
-		assemble: 'mov' with: self regR b with: pointer;
+		assemble: 'mov' with: backend regR b with: pointer;
 		andRwithImmediate: 16rFF;
 		convertRtoSmallInteger
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithRindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regR index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regR index: index
 ]
 
 { #category : #loading }
@@ -1028,27 +1028,27 @@ JITAssemblerAMD64 >> loadRwithRwordAt: index [
 	pointer
 		reset;
 		length: 16;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1.
 	self
-		assemble: 'mov' with: self regR with: pointer;
+		assemble: 'mov' with: backend regR with: pointer;
 		andRwithImmediate: 16rFFFF;
 		convertRtoSmallInteger
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithS [
-	self assemble: 'mov' with: self regR with: self regS
+	self assemble: 'mov' with: backend regR with: backend regS
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithSP [
-	self assemble: 'mov' with: self regR with: self regSP
+	self assemble: 'mov' with: backend regR with: backend regSP
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithSPindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regSP index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regSP index: index
 ]
 
 { #category : #loading }
@@ -1056,17 +1056,17 @@ JITAssemblerAMD64 >> loadRwithSbyte: index [
 	pointer
 		reset;
 		length: 8;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
 	self
-		assemble: 'mov' with: self regR b with: pointer;
+		assemble: 'mov' with: backend regR b with: pointer;
 		andRwithImmediate: 16rFF;
 		convertRtoSmallInteger
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithSindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regS index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regS index: index
 ]
 
 { #category : #integers }
@@ -1079,17 +1079,17 @@ JITAssemblerAMD64 >> loadRwithSwordAt: index [
 	pointer
 		reset;
 		length: 16;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
 	self
-		assemble: 'mov' with: self regR w with: pointer;
+		assemble: 'mov' with: backend regR w with: pointer;
 		andRwithImmediate: 16rFFFF;
 		convertRtoSmallInteger
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithT [
-	self assemble: 'mov' with: self regR with: self regT
+	self assemble: 'mov' with: backend regR with: backend regT
 ]
 
 { #category : #storing }
@@ -1099,10 +1099,10 @@ JITAssemblerAMD64 >> loadRwithTIBatIndexR [
 	pointer
 		reset;
 		length: self addressLength;
-		index: self regR;
+		index: backend regR;
 		scale: wordSize;
 		segment: seg.
-	self assemble: 'mov' with: self regR with: pointer
+	self assemble: 'mov' with: backend regR with: pointer
 ]
 
 { #category : #storing }
@@ -1110,55 +1110,55 @@ JITAssemblerAMD64 >> loadRwithThreadVariableAtIndexR [
 	pointer
 		reset;
 		length: self addressLength;
-		index: self regR;
+		index: backend regR;
 		scale: wordSize.
 	wordSize = 8
 		ifTrue: [pointer segment: gs; displacement: 16r1480]
 		ifFalse: [pointer segment: fs; displacement: 16rE10].
-	self assemble: 'mov' with: self regR with: pointer
+	self assemble: 'mov' with: backend regR with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithTindex: index [
-	self assemble: 'mov' withReg: self regR withReg: self regT index: index
+	self assemble: 'mov' withReg: backend regR withReg: backend regT index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithTos [
-	pointer reset; length: self addressLength; base: self regSP.
-	self assemble: 'mov' with: self regR with: pointer
+	pointer reset; length: self addressLength; base: backend regSP.
+	self assemble: 'mov' with: backend regR with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithTrue [
-	self assemble: 'mov' with: self regR with: self regTrue
+	self assemble: 'mov' with: backend regR with: backend regTrue
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithX0 [
 	| mov |
 	mov := wordSize = 8 ifTrue: ['movq'] ifFalse: ['movd'].
-	self assemble: mov with: self regR with: xmm0
+	self assemble: mov with: backend regR with: xmm0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSPwithFP [
-	self assemble: 'mov' with: self regSP with: self regFP
+	self assemble: 'mov' with: backend regSP with: backend regFP
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSPwithT [
-	self assemble: 'mov' with: self regSP with: self regT
+	self assemble: 'mov' with: backend regSP with: backend regT
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSWithRIndex: index [
-	self load: self regS from: self regR atIndex: index
+	self load: backend regS from: backend regR atIndex: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithA [
-	self assemble: 'mov' with: self regS with: self regA
+	self assemble: 'mov' with: backend regS with: backend regA
 ]
 
 { #category : #integers }
@@ -1166,21 +1166,21 @@ JITAssemblerAMD64 >> loadSwithAddressOfSatA [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regS;
-		index: self regA;
-		scale: self regS sizeInBytes;
-		displacement: 0 - self regS sizeInBytes.
-	self assemble: 'lea' with: self regS with: pointer
+		base: backend regS;
+		index: backend regA;
+		scale: backend regS sizeInBytes;
+		displacement: 0 - backend regS sizeInBytes.
+	self assemble: 'lea' with: backend regS with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithFPindex: index [
-	self assemble: 'mov' withReg: self regS withReg: self regFP index: index
+	self assemble: 'mov' withReg: backend regS withReg: backend regFP index: index
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> loadSwithGindex: index [
-	self assemble: 'mov' withReg: self regS withReg: self regG index: index
+	self assemble: 'mov' withReg: backend regS withReg: backend regG index: index
 ]
 
 { #category : #loading }
@@ -1193,22 +1193,22 @@ JITAssemblerAMD64 >> loadSwithGlobal: aSymbol [
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regS withImm: imm
+	self assemble: 'mov' with: backend regS withImm: imm
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithNil [
-	self assemble: 'mov' with: self regS with: self regNil
+	self assemble: 'mov' with: backend regS with: backend regNil
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithRindex: index [
-	self assemble: 'mov' withReg: self regS withReg: self regR index: index
+	self assemble: 'mov' withReg: backend regS withReg: backend regR index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadSwithT [
-	self assemble: 'mov' with: self regS with: self regT
+	self assemble: 'mov' with: backend regS with: backend regT
 ]
 
 { #category : #loading }
@@ -1220,33 +1220,33 @@ JITAssemblerAMD64 >> loadTrueWithLiteral: anObject [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTrueWithMindex: index [
-	self assemble: 'mov' withReg: self regTrue withReg: self regM index: index
+	self assemble: 'mov' withReg: backend regTrue withReg: backend regM index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithA [
-	self assemble: 'mov' with: self regT with: self regA
+	self assemble: 'mov' with: backend regT with: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithAindex: index [
-	self assemble: 'mov' withReg: self regT withReg: self regA index: index
+	self assemble: 'mov' withReg: backend regT withReg: backend regA index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithEindex: index [
-	self assemble: 'mov' withReg: self regT withReg: self regE index: index
+	self assemble: 'mov' withReg: backend regT withReg: backend regE index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithFPindex: index [
-	self assemble: 'mov' withReg: self regT withReg: self regFP index: index
+	self assemble: 'mov' withReg: backend regT withReg: backend regFP index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regT withImm: imm
+	self assemble: 'mov' with: backend regT withImm: imm
 ]
 
 { #category : #loading }
@@ -1260,30 +1260,30 @@ JITAssemblerAMD64 >> loadTwithLiteral: anObject [
 JITAssemblerAMD64 >> loadTwithMindex: index [
 	self
 		assemble: 'mov'
-		withReg: self regT
-		withReg: self regM
+		withReg: backend regT
+		withReg: backend regM
 		index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithR [
-	self assemble: 'mov' with: self regT with: self regR
+	self assemble: 'mov' with: backend regT with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadTwithTindex: index [
-	self assemble: 'mov' withReg: self regT withReg: self regT index: index
+	self assemble: 'mov' withReg: backend regT withReg: backend regT index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadVwithImmediate: imm [
 	#imm32.
-	self assemble: 'mov' with: self regV withImm: imm
+	self assemble: 'mov' with: backend regV withImm: imm
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadWithFalse: register [
-	self assemble: 'mov' with: register with: self regFalse
+	self assemble: 'mov' with: register with: backend regFalse
 ]
 
 { #category : #loading }
@@ -1291,17 +1291,17 @@ JITAssemblerAMD64 >> loadWithNil: register [
 	self
 		assemble: 'mov'
 		with: register
-		with: self regNil
+		with: backend regNil
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadWithTrue: register [
-	self assemble: 'mov' with: register with: self regTrue
+	self assemble: 'mov' with: register with: backend regTrue
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadX0withRasDouble [
-	self assemble: 'cvtsi2sd' with: xmm0 with: self regR
+	self assemble: 'cvtsi2sd' with: xmm0 with: backend regR
 ]
 
 { #category : #loading }
@@ -1311,35 +1311,35 @@ JITAssemblerAMD64 >> loadX1roundingX0 [
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendByteRwithRatA [
-	self loadZeroExtendByte: self regR from: self regR atIndexAt: self regA
+	self loadZeroExtendByte: backend regR from: backend regR atIndexAt: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendByteRwithRindex: index [
 	#dontOptimize.
-	self loadZeroExtendByte: self regR from: self regR atIndex: index
+	self loadZeroExtendByte: backend regR from: backend regR atIndex: index
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendByteRwithSPatA [
-	self loadZeroExtendByte: self regR from: self regSP atIndexAt: self regA
+	self loadZeroExtendByte: backend regR from: backend regSP atIndexAt: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendByteTwithAindex: index [
 	#dontOptimize.
-	self loadZeroExtendByte: self regT from: self regA atIndex: index
+	self loadZeroExtendByte: backend regT from: backend regA atIndex: index
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendLongRwithRatA [
-	self load: self regR e from: self regR atIndexAt: self regA
+	self load: backend regR e from: backend regR atIndexAt: backend regA
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendLongRwithRindex: index [
 	#dontOptimize.
-	self load: self regR e from: self regR atIndex: index
+	self load: backend regR e from: backend regR atIndex: index
 ]
 
 { #category : #integers }
@@ -1347,9 +1347,9 @@ JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer
 		reset;
 		length: 16;
-		base: self regR;
+		base: backend regR;
 		displacement: offset.
-	self assemble: 'movzx' with: self regR with: pointer
+	self assemble: 'movzx' with: backend regR with: pointer
 ]
 
 { #category : #arithmetic }
@@ -1363,13 +1363,13 @@ JITAssemblerAMD64 >> loop: aBlock times: anInteger [
 	loop := self newLabel.
 	self loadTwithImmediate: anInteger; @ loop.
 	aBlock value.
-	self dec: self regT; shortJumpIfNotZeroTo: loop
+	self dec: backend regT; shortJumpIfNotZeroTo: loop
 ]
 
 { #category : #jumps }
 JITAssemblerAMD64 >> loopTo: label [
 	self
-		assemble: 'dec' with: self regT;
+		assemble: 'dec' with: backend regT;
 		jumpIfNotZeroTo: label
 ]
 
@@ -1384,7 +1384,7 @@ JITAssemblerAMD64 >> loopTtimes: aBlock [
 		shortJumpIfEqualTo: end.
 	aBlock value.
 	self
-		dec: self regT;
+		dec: backend regT;
 		shortJumpTo: loop;
 		@ end
 ]
@@ -1404,13 +1404,13 @@ JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> multiplyRbyA [
-	self ASSERT: (self regR r == rax and: [self regA r == rdx]).
-	self assemble: 'imul' with: self regA
+	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
+	self assemble: 'imul' with: backend regA
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> multiplyRbyConstant: imm [
-	self assemble: 'imul' with: self regR with: self regR with: imm
+	self assemble: 'imul' with: backend regR with: backend regR with: imm
 ]
 
 { #category : #arithmetic }
@@ -1420,88 +1420,88 @@ JITAssemblerAMD64 >> nativeCode [
 
 { #category : #logic }
 JITAssemblerAMD64 >> orRwithA [
-	self assemble: 'or' with: self regR with: self regA
+	self assemble: 'or' with: backend regR with: backend regA
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popA [
-	self assemble: 'pop' with: self regA
+	self assemble: 'pop' with: backend regA
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popB [
-	self assemble: 'pop' with: self regB
+	self assemble: 'pop' with: backend regB
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popE [
-	self assemble: 'pop' with: self regE
+	self assemble: 'pop' with: backend regE
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popFP [
-	self assemble: 'pop' with: self regFP
+	self assemble: 'pop' with: backend regFP
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popFalse [
-	self assemble: 'pop' with: self regFalse
+	self assemble: 'pop' with: backend regFalse
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> popG [
-	self assemble: 'pop' with: self regG
+	self assemble: 'pop' with: backend regG
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popM [
-	self assemble: 'pop' with: self regM
+	self assemble: 'pop' with: backend regM
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popNil [
-	self assemble: 'pop' with: self regNil
+	self assemble: 'pop' with: backend regNil
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popR [
-	self assemble: 'pop' with: self regR
+	self assemble: 'pop' with: backend regR
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popS [
-	self assemble: 'pop' with: self regS
+	self assemble: 'pop' with: backend regS
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popSP [
-	self assemble: 'pop' with: self regSP
+	self assemble: 'pop' with: backend regSP
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popSPindirect [
-	pointer reset; length: self addressLength; base: self regSP.
+	pointer reset; length: self addressLength; base: backend regSP.
 	self assemble: 'pop' with: pointer
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popT [
-	self assemble: 'pop' with: self regT
+	self assemble: 'pop' with: backend regT
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popTrue [
-	self assemble: 'pop' with: self regTrue
+	self assemble: 'pop' with: backend regTrue
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushA [
-	self assemble: 'push' with: self regA
+	self assemble: 'push' with: backend regA
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> pushAOnFPUStack [
-	pointer reset; length: 64; base: self regA.
+	pointer reset; length: 64; base: backend regA.
 	self assemble: 'fld' with: pointer
 ]
 
@@ -1510,46 +1510,46 @@ JITAssemblerAMD64 >> pushAatToffset: offset [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regA;
-		index: self regT;
-		scale: self regSP sizeInBytes;
+		base: backend regA;
+		index: backend regT;
+		scale: backend regSP sizeInBytes;
 		displacement: offset.
 	self assemble: 'push' with: pointer
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushB [
-	self assemble: 'push' with: self regB
+	self assemble: 'push' with: backend regB
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushE [
-	self assemble: 'push' with: self regE
+	self assemble: 'push' with: backend regE
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushEindex: index [
-	self assemble: 'push' withReg: self regE index: index
+	self assemble: 'push' withReg: backend regE index: index
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushFP [
-	self assemble: 'push' with: self regFP
+	self assemble: 'push' with: backend regFP
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushFPindex: index [
-	self assemble: 'push' withReg: self regFP index: index
+	self assemble: 'push' withReg: backend regFP index: index
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushFalse [
-	self assemble: 'push' with: self regFalse
+	self assemble: 'push' with: backend regFalse
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> pushG [
-	self assemble: 'push' with: self regG
+	self assemble: 'push' with: backend regG
 ]
 
 { #category : #'push/pop' }
@@ -1561,28 +1561,28 @@ JITAssemblerAMD64 >> pushImmediate: imm [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushIndirectR [
-	pointer reset; length: self addressLength; base: self regR.
+	pointer reset; length: self addressLength; base: backend regR.
 	self assemble: 'push' with: pointer
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushM [
-	self assemble: 'push' with: self regM
+	self assemble: 'push' with: backend regM
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushNil [
-	self assemble: 'push' with: self regNil
+	self assemble: 'push' with: backend regNil
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushR [
-	self assemble: 'push' with: self regR
+	self assemble: 'push' with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> pushROnFPUStack [
-	pointer reset; length: 64; base: self regR.
+	pointer reset; length: 64; base: backend regR.
 	self assemble: 'fld' with: pointer
 ]
 
@@ -1591,7 +1591,7 @@ JITAssemblerAMD64 >> pushRbyte: index [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
@@ -1605,7 +1605,7 @@ JITAssemblerAMD64 >> pushRwordAt: index [
 		halt;
 		reset;
 		length: self addressLength;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
@@ -1615,12 +1615,12 @@ JITAssemblerAMD64 >> pushRwordAt: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushS [
-	self assemble: 'push' with: self regS
+	self assemble: 'push' with: backend regS
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushSP [
-	self assemble: 'push' with: self regSP
+	self assemble: 'push' with: backend regSP
 ]
 
 { #category : #'push/pop' }
@@ -1628,7 +1628,7 @@ JITAssemblerAMD64 >> pushSbyte: index [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
@@ -1638,7 +1638,7 @@ JITAssemblerAMD64 >> pushSbyte: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushSindex: index [
-	self assemble: 'push' withReg: self regS index: index
+	self assemble: 'push' withReg: backend regS index: index
 ]
 
 { #category : #'push/pop' }
@@ -1651,7 +1651,7 @@ JITAssemblerAMD64 >> pushSwordAt: index [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
 	self
 		assemble: 'push' with: pointer;
@@ -1661,33 +1661,33 @@ JITAssemblerAMD64 >> pushSwordAt: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushT [
-	self assemble: 'push' with: self regT
+	self assemble: 'push' with: backend regT
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushTindex: index [
-	self assemble: 'push' withReg: self regT index: index
+	self assemble: 'push' withReg: backend regT index: index
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushTrue [
-	self assemble: 'push' with: self regTrue
+	self assemble: 'push' with: backend regTrue
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushVindex: index [
-	self assemble: 'push' withReg: self regV index: index
+	self assemble: 'push' withReg: backend regV index: index
 ]
 
 { #category : #services }
 JITAssemblerAMD64 >> readFPUStatusOnA [
-	pointer reset; length: 16; base: self regA.
+	pointer reset; length: 16; base: backend regA.
 	self assemble: 'fstsw' with: pointer
 ]
 
 { #category : #private }
 JITAssemblerAMD64 >> reserveStackSlots: amount [
-	self subtract: amount * self addressSize from: self regSP
+	self subtract: amount * self addressSize from: backend regSP
 ]
 
 { #category : #comparing }
@@ -1704,8 +1704,8 @@ JITAssemblerAMD64 >> restoreCallerEnvironment [
 { #category : #epilogue }
 JITAssemblerAMD64 >> restoreCallerFrame [
 	self
-		move: self regFP to: self regSP;
-		pop: self regFP
+		move: backend regFP to: backend regSP;
+		pop: backend regFP
 ]
 
 { #category : #epilogue }
@@ -1720,12 +1720,12 @@ JITAssemblerAMD64 >> restoreCallerSelf [
 
 { #category : #integers }
 JITAssemblerAMD64 >> restoreRSmallInteger [
-	self assemble: 'rcl' with: self regR with: 1
+	self assemble: 'rcl' with: backend regR with: 1
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> restoreRsmallInteger [
-	self assemble: 'rcl' with: self regR with: 1
+	self assemble: 'rcl' with: backend regR with: 1
 ]
 
 { #category : #services }
@@ -1741,50 +1741,50 @@ JITAssemblerAMD64 >> saveCallerFrame [
 { #category : #loading }
 JITAssemblerAMD64 >> scaleFloatOnRWithA [
 	self pushAOnFPUStack; pushROnFPUStack; assemble: 'fscale'.
-	pointer reset; length: 64; base: self regR.
+	pointer reset; length: 64; base: backend regR.
 	self assemble: 'fstp' with: pointer; dropTopOfFPU
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftLeftRwithT [
-	self ASSERT: self regT r == rcx.
-	self assemble: 'sal' with: self regR with: self regT b
+	self ASSERT: backend regT r == rcx.
+	self assemble: 'sal' with: backend regR with: backend regT b
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftLogicalRright: count [
 	self ASSERT: count < 32.
-	self assemble: 'shr' with: self regR with: count
+	self assemble: 'shr' with: backend regR with: count
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRightRwithT [
-	self ASSERT: self regT r == rcx.
-	self assemble: 'sar' with: self regR with: self regT b
+	self ASSERT: backend regT r == rcx.
+	self assemble: 'sar' with: backend regR with: backend regT b
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRleft: count [
 	self ASSERT: count < 32.
-	self assemble: 'sal' with: self regR with: count
+	self assemble: 'sal' with: backend regR with: count
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRright: count [
 	self ASSERT: count < (wordSize * 8).
-	self assemble: 'sar' with: self regR with: count
+	self assemble: 'sar' with: backend regR with: count
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftTleft: count [
 	self ASSERT: count < 32.
-	self assemble: 'sal' with: self regT with: count
+	self assemble: 'sal' with: backend regT with: count
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftTright: count [
 	self ASSERT: count < 32.
-	self assemble: 'sar' with: self regT with: count
+	self assemble: 'sar' with: backend regT with: count
 ]
 
 { #category : #comparing }
@@ -1799,12 +1799,12 @@ JITAssemblerAMD64 >> sqrtDoubleX0 [
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeAinRindex: index [
-	self store: self regA in: self regR index: index
+	self store: backend regA in: backend regR index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeAinSPatT [
-	self store: self regA in: self regSP indexAt: self regT
+	self store: backend regA in: backend regSP indexAt: backend regT
 ]
 
 { #category : #storing }
@@ -1812,17 +1812,17 @@ JITAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
 	pointer
 		reset;
 		length: self addressLength;
-		index: self regR;
+		index: backend regR;
 		scale: wordSize.
 	wordSize = 8
 		ifTrue: [pointer segment: gs; displacement: 16r1480]
 		ifFalse: [pointer segment: fs; displacement: 16rE10].
-	self assemble: 'mov' with: pointer with: self regA
+	self assemble: 'mov' with: pointer with: backend regA
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeAinTindex: index [
-	self store: self regA in: self regT index: index
+	self store: backend regA in: backend regT index: index
 ]
 
 { #category : #integers }
@@ -1840,9 +1840,9 @@ JITAssemblerAMD64 >> storeByteAinRindex: index [
 	pointer
 		reset;
 		length: 8;
-		base: self regR;
+		base: backend regR;
 		displacement: index - 1.
-	self assemble: 'mov' with: pointer with: self regA b
+	self assemble: 'mov' with: pointer with: backend regA b
 ]
 
 { #category : #storing }
@@ -1850,15 +1850,15 @@ JITAssemblerAMD64 >> storeByteTinRatA [
 	pointer
 		reset;
 		length: 8;
-		base: self regR;
-		index: self regA;
+		base: backend regR;
+		index: backend regA;
 		displacement: -1.
-	self assemble: 'mov' with: pointer with: self regT b
+	self assemble: 'mov' with: pointer with: backend regT b
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> storeDoubleResultInRindirect [
-	pointer reset; length: 64; base: self regR.
+	pointer reset; length: 64; base: backend regR.
 	wordSize = 8
 		ifTrue: [self assemble: 'movq' with: pointer with: xmm0]
 		ifFalse: [self assemble: 'fstp' with: pointer]
@@ -1866,40 +1866,40 @@ JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeEinAindex: index [
-	self store: self regE in: self regA index: index
+	self store: backend regE in: backend regA index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeEinRindex: index [
-	self store: self regE in: self regR index: index
+	self store: backend regE in: backend regR index: index
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inA [
-	pointer reset; length: 64; base: self regA.
+	pointer reset; length: 64; base: backend regA.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inR [
-	pointer reset; length: 64; base: self regR.
+	pointer reset; length: 64; base: backend regR.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inT [
-	pointer reset; length: 64; base: self regT.
+	pointer reset; length: 64; base: backend regT.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeLongTInRAtA [
-	self store: self regT e in: self regR indexAt: self regA
+	self store: backend regT e in: backend regR indexAt: backend regA
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeLongTinRatA [
-	self store: self regT e in: self regR indexAt: self regA
+	self store: backend regT e in: backend regR indexAt: backend regA
 ]
 
 { #category : #storing }
@@ -1907,30 +1907,30 @@ JITAssemblerAMD64 >> storeLongTinRatOffsetA [
 	pointer
 		reset;
 		length: 32;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: pointer with: self regT e
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: pointer with: backend regT e
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeMXCSRintoA [
-	pointer reset; length: 32; base: self regA.
+	pointer reset; length: 32; base: backend regA.
 	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeRinAindex: index [
-	self store: self regR in: self regA index: index
+	self store: backend regR in: backend regA index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeRinEindex: index [
-	self store: self regR in: self regE index: index
+	self store: backend regR in: backend regE index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeRinFPindex: index [
-	self store: self regR in: self regFP index: index
+	self store: backend regR in: backend regFP index: index
 ]
 
 { #category : #storing }
@@ -1938,9 +1938,9 @@ JITAssemblerAMD64 >> storeRinSbyte: index [
 	pointer
 		reset;
 		length: 8;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
-	self assemble: 'mov' with: pointer with: self regR b
+	self assemble: 'mov' with: pointer with: backend regR b
 ]
 
 { #category : #storing }
@@ -1953,17 +1953,17 @@ JITAssemblerAMD64 >> storeRinSwordAt: index [
 	pointer
 		reset;
 		length: 16;
-		base: self regS;
+		base: backend regS;
 		displacement: index - 1.
 	self
 		convertRtoNativeInteger;
-		assemble: 'mov' with: pointer with: self regR w;
+		assemble: 'mov' with: pointer with: backend regR w;
 		convertRtoSmallInteger
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeRinTindex: index [
-	self store: self regR in: self regT index: index
+	self store: backend regR in: backend regT index: index
 ]
 
 { #category : #integers }
@@ -1971,9 +1971,9 @@ JITAssemblerAMD64 >> storeShortAinRoffset: offset [
 	pointer
 		reset;
 		length: 16;
-		base: self regR;
+		base: backend regR;
 		displacement: offset.
-	self assemble: 'mov' with: pointer with: self regA w
+	self assemble: 'mov' with: pointer with: backend regA w
 ]
 
 { #category : #storing }
@@ -1981,19 +1981,19 @@ JITAssemblerAMD64 >> storeShortTinRatOffsetA [
 	pointer
 		reset;
 		length: 16;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: pointer with: self regT w
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: pointer with: backend regT w
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeSinAindex: index [
-	self store: self regS in: self regA index: index
+	self store: backend regS in: backend regA index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeSinRindex: index [
-	self store: self regS in: self regR index: index
+	self store: backend regS in: backend regR index: index
 ]
 
 { #category : #storing }
@@ -2003,25 +2003,25 @@ JITAssemblerAMD64 >> storeTIBwithAatIndexR [
 	pointer
 		reset;
 		length: self addressLength;
-		index: self regR;
+		index: backend regR;
 		scale: wordSize;
 		segment: seg.
-	self assemble: 'mov' with: pointer with: self regA
+	self assemble: 'mov' with: pointer with: backend regA
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeTInRAtA [
-	self store: self regT in: self regR indexAt: self regA
+	self store: backend regT in: backend regR indexAt: backend regA
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeTinAindex: index [
-	self store: self regT in: self regA index: index
+	self store: backend regT in: backend regA index: index
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeTinRatA [
-	self store: self regT in: self regR indexAt: self regA
+	self store: backend regT in: backend regR indexAt: backend regA
 ]
 
 { #category : #storing }
@@ -2029,24 +2029,24 @@ JITAssemblerAMD64 >> storeTinRatOffsetA [
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regR;
-		index: self regA.
-	self assemble: 'mov' with: pointer with: self regT
+		base: backend regR;
+		index: backend regA.
+	self assemble: 'mov' with: pointer with: backend regT
 ]
 
 { #category : #storing }
 JITAssemblerAMD64 >> storeTinRindex: index [
-	self store: self regT in: self regR index: index
+	self store: backend regT in: backend regR index: index
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subAfromR [
-	self assemble: 'sub' with: self regR with: self regA
+	self assemble: 'sub' with: backend regR with: backend regA
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subAfromT [
-	self assemble: 'sub' with: self regT with: self regA
+	self assemble: 'sub' with: backend regT with: backend regA
 ]
 
 { #category : #arithmetic }
@@ -2056,31 +2056,31 @@ JITAssemblerAMD64 >> subDoubleX1fromX0 [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subFromRconstant: imm [
-	self assemble: 'sub' with: self regR withImm: imm
+	self assemble: 'sub' with: backend regR withImm: imm
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subTfromR [
-	self assemble: 'sub' with: self regR with: self regT
+	self assemble: 'sub' with: backend regR with: backend regT
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subTslotsToSP [
-	self assemble: 'neg' with: self regT.
+	self assemble: 'neg' with: backend regT.
 	pointer
 		reset;
 		length: self addressLength;
-		base: self regSP;
-		index: self regT;
-		scale: self regSP sizeInBytes.
+		base: backend regSP;
+		index: backend regT;
+		scale: backend regSP sizeInBytes.
 	self
-		assemble: 'lea' with: self regSP with: pointer;
-		assemble: 'neg' with: self regT
+		assemble: 'lea' with: backend regSP with: pointer;
+		assemble: 'neg' with: backend regT
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> testAintegerBit [
-	self assemble: 'test' with: self regA8 with: 1
+	self assemble: 'test' with: backend regA8 with: 1
 ]
 
 { #category : #integers }
@@ -2090,22 +2090,22 @@ JITAssemblerAMD64 >> testIntegerBitOf: aRegister [
 
 { #category : #integers }
 JITAssemblerAMD64 >> testRintegerBit [
-	self assemble: 'test' with: self regR8 with: 1
+	self assemble: 'test' with: backend regR8 with: 1
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> testRwithR [
-	self assemble: 'test' with: self regR with: self regR
+	self assemble: 'test' with: backend regR with: backend regR
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> testTIntegerBit [
-	self assemble: 'test' with: self regT byte with: 1
+	self assemble: 'test' with: backend regT byte with: 1
 ]
 
 { #category : #integers }
 JITAssemblerAMD64 >> testTintegerBit [
-	self assemble: 'test' with: self regT byte with: 1
+	self assemble: 'test' with: backend regT byte with: 1
 ]
 
 { #category : #services }
@@ -2123,15 +2123,15 @@ JITAssemblerAMD64 >> writeTslots [
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorAwithR [
-	self assemble: 'xor' with: self regA with: self regR
+	self assemble: 'xor' with: backend regA with: backend regR
 ]
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorFPwithFP [
-	self assemble: 'xor' with: self regFP with: self regFP
+	self assemble: 'xor' with: backend regFP with: backend regFP
 ]
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorRwithA [
-	self assemble: 'xor' with: self regR with: self regA
+	self assemble: 'xor' with: backend regR with: backend regA
 ]
