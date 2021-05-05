@@ -105,7 +105,7 @@ OptimizingCodeEmitter >> assembleBasicAtConstant: instruction [
 	src := allocation at: instruction left.
 	dst := allocation at: instruction ifAbsent: [^self].
 	index := instruction right.
-	assembler load: dst from: src atIndex: index
+	assembler load: dst fromBase: src indexImm: index
 ]
 
 { #category : #unclassified }
@@ -118,8 +118,9 @@ OptimizingCodeEmitter >> assembleBasicAtPut: instruction [
 	index := allocation at: index.
 	assembler
 		convertToNativeInteger: index;
-		store: value in: base indexAt: index;
+		store: value intoBase: base index: index;
 		convertToSmallInteger: index
+
 ]
 
 { #category : #unclassified }
@@ -128,7 +129,10 @@ OptimizingCodeEmitter >> assembleBasicAtPutConstant: instruction [
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	position := instruction left value.
-	assembler store: value in: base index: position
+	assembler 
+		  store: value
+		  intoBase: base
+		  indexImm: position
 ]
 
 { #category : #private }
@@ -333,9 +337,10 @@ OptimizingCodeEmitter >> assembleByteAtPut: instruction [
 		renameByteRegisterIfNeeded: value
 		preserving: base
 		preserving: index
-		during: [:final | assembler store: final byte in: base indexAt: index];
+		during: [:final | assembler store: final b in: base indexAt: index];
 		convertToSmallInteger: value;
 		convertToSmallInteger: index
+
 ]
 
 { #category : #unclassified }
@@ -897,10 +902,11 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 		ifFalse: [ ^ self ].
 	assembler
 		reserveStackSlots: frame temporaries + 2;
-		store: assembler regR in: assembler regFP index: 0;
-		store: assembler regM in: assembler regFP index: -1.
+		store: assembler regR intoBase: assembler regFP indexImm: 0;
+		store: assembler regM intoBase: assembler regFP indexImm: -1.
 	self savesPreviousSelf
 		ifTrue: [ assembler pushS; pushM; loadMwithA ]
+
 ]
 
 { #category : #unclassified }

@@ -38,6 +38,38 @@ JITAssembler >> lea: dest base: base index: index scale: scale [
 	self subclassResponsibility
 ]
 
+{ #category : #loading }
+JITAssembler >> load: dstReg fromBase: baseReg index: indexReg [
+	self load: dstReg fromBase: baseReg offsetImm: 0 - wordSize index: indexReg scaleImm: wordSize
+
+]
+
+{ #category : #loading }
+JITAssembler >> load: dstReg fromBase: baseReg indexImm: index [ 
+	self load: dstReg fromBase: baseReg offsetImm: (index - 1) * wordSize
+
+]
+
+{ #category : #loading }
+JITAssembler >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes [
+	"Load pointer into `dstReg` from memory. The effective address is computed as:
+
+		EA := baseReg + offsetInBytes
+	"    
+	^ self subclassResponsibility
+
+]
+
+{ #category : #loading }
+JITAssembler >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
+	"Load pointer into `dstReg` from memory. The effective address is computed as:
+
+		EA := baseReg + offsetInBytes + ((indexReg - 1) * scaleInBytes)
+	"    
+	^ self subclassResponsibility
+
+]
+
 { #category : #services }
 JITAssembler >> move: srcReg to: dstReg [
 	^ self subclassResponsibility
@@ -192,6 +224,33 @@ JITAssembler >> regV [
 ]
 
 { #category : #storing }
-JITAssembler >> store: reg1 in: reg2 index: index [
-	self subclassResponsibility
+JITAssembler >> store: srcReg intoBase: baseReg index: indexReg [
+	self store: srcReg intoBase: baseReg offsetImm: 0 - wordSize index: indexReg scaleImm: wordSize
+
+]
+
+{ #category : #storing }
+JITAssembler >> store: srcReg intoBase: baseReg indexImm: index [ 
+	self store: srcReg intoBase: baseReg offsetImm: (index - 1) * wordSize
+
+]
+
+{ #category : #storing }
+JITAssembler >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes [
+	"Store pointer from `dstReg` into memory. The effective address is computed as:
+
+		EA := baseReg + offsetInBytes
+	"    
+	^ self subclassResponsibility
+
+]
+
+{ #category : #storing }
+JITAssembler >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
+	"Store pointer from `dstReg` into memory. The effective address is computed as:
+
+		EA := baseReg + offsetInBytes + ((indexReg - 1) * scaleInBytes)
+	"    
+	^ self subclassResponsibility
+
 ]

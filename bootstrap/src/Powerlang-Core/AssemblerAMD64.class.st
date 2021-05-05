@@ -498,7 +498,7 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
-{ #category : #storing }
+{ #category : #OBSOLETE }
 AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
 	| offset |
 	offset := reg1 offsetOfIndex: index.
@@ -510,16 +510,47 @@ AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
 	self assemble: 'mov' with: reg1 with: pointer
 ]
 
-{ #category : #storing }
+{ #category : #OBSOLETE }
 AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
+		pointer
+				reset;
+				length: reg1 length;
+				base: reg2;
+				index: reg3;
+				scale: reg1 sizeInBytes;
+				displacement: 0 - reg1 sizeInBytes.
+		self assemble: 'mov' with: reg1 with: pointer
+
+]
+
+{ #category : #loading }
+AssemblerAMD64 >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes [ 
 	pointer
 		reset;
-		length: reg1 length;
-		base: reg2;
-		index: reg3;
-		scale: reg1 sizeInBytes;
-		displacement: 0 - reg1 sizeInBytes.
-	self assemble: 'mov' with: reg1 with: pointer
+		length: wordSize * 8;
+		base: baseReg;
+		displacement: offsetInBytes.
+	self 
+		assemble: 'mov'
+		with: dstReg
+		with: pointer
+
+]
+
+{ #category : #loading }
+AssemblerAMD64 >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
+	pointer
+		reset;
+		length: wordSize * 8;
+		base: baseReg;
+		index: indexReg;
+		scale: scaleInBytes;
+		displacement: offsetInBytes.
+	self 
+		assemble: 'mov'
+		with: dstReg
+		with: pointer
+
 ]
 
 { #category : #jumps }
@@ -954,28 +985,60 @@ AssemblerAMD64 >> shortJumpTo: label [
 	self shortJump: 'jmp' to: label
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> store: reg1 in: reg2 index: index [
-	| offset |
-	offset := reg1 offsetOfIndex: index.
-	pointer
-		reset;
-		length: reg1 length;
-		base: reg2;
-		displacement: offset.
-	self assemble: 'mov' with: pointer with: reg1
+{ #category : #OBSOLETE }
+AssemblerAMD64 >> store: reg1 in: reg2 index: index [ 
+		| offset |
+		offset := reg1 offsetOfIndex: index.
+		pointer
+				reset;
+				length: reg1 length;
+				base: reg2;
+				displacement: offset.
+		self assemble: 'mov' with: pointer with: reg1
+
+]
+
+{ #category : #OBSOLETE }
+AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [ 
+		pointer
+				reset;
+				length: op1 length;
+				base: reg2;
+				index: reg3;
+				scale: op1 sizeInBytes;
+				displacement: 0 - op1 sizeInBytes.
+		self assemble: 'mov' with: pointer with: op1
+
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [
+AssemblerAMD64 >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes [ 
 	pointer
 		reset;
-		length: op1 length;
-		base: reg2;
-		index: reg3;
-		scale: op1 sizeInBytes;
-		displacement: 0 - op1 sizeInBytes.
-	self assemble: 'mov' with: pointer with: op1
+		length: wordSize * 8;
+		base: baseReg;
+		displacement: offsetInBytes.
+	self
+		assemble: 'mov'
+		with: pointer
+		with: srcReg
+
+]
+
+{ #category : #storing }
+AssemblerAMD64 >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [         
+	pointer
+		reset;
+		length: wordSize * 8;
+		base: baseReg;
+		index: indexReg;
+		scale: scaleInBytes;
+		displacement: offsetInBytes.
+	self
+		assemble: 'mov'
+		with: pointer
+		with: srcReg
+
 ]
 
 { #category : #storing }
