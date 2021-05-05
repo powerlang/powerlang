@@ -44,6 +44,39 @@ JITAssembler >> move: srcReg to: dstReg [
 
 ]
 
+{ #category : #private }
+JITAssembler >> pop: dstReg [
+	"This can be implemented like:
+
+	 self add: self regSP i: wordSize
+	 self load: dstReg with: self regSP offset: 0
+
+	 Architectures with specialized push/pop may override
+	 this.
+
+	 TODO.
+	"
+	self error: 'Unfinished, see comment above'
+
+]
+
+{ #category : #private }
+JITAssembler >> push: srcReg [
+	"This can be implemented like:
+
+	 self store: srcReg with: self regSP offset: 0
+	 self sub: self regSP i: wordSize
+
+
+	 Architectures with specialized push/pop may override
+	 this.
+
+	 TODO.
+	"
+	self error: 'Unfinished, see comment above'
+
+]
+
 { #category : #'registers - IR' }
 JITAssembler >> regA [
 	^ self subclassResponsibility

@@ -148,6 +148,7 @@ JITAssemblerAMD64 >> clearFPUFlags [
 { #category : #integers }
 JITAssemblerAMD64 >> clearRhighHalf [
 	self assemble: 'mov' with: backend regR e with: backend regR e
+
 ]
 
 { #category : #integers }
@@ -1422,57 +1423,57 @@ JITAssemblerAMD64 >> orRwithA [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popA [
-	self assemble: 'pop' with: backend regA
+	backend pop: backend regA
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popB [
-	self assemble: 'pop' with: backend regB
+	backend pop: backend regB
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popE [
-	self assemble: 'pop' with: backend regE
+	backend pop: backend regE
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popFP [
-	self assemble: 'pop' with: backend regFP
+	backend pop: backend regFP
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popFalse [
-	self assemble: 'pop' with: backend regFalse
+	backend pop: backend regFalse
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 JITAssemblerAMD64 >> popG [
-	self assemble: 'pop' with: backend regG
+	backend pop: backend regG
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popM [
-	self assemble: 'pop' with: backend regM
+	backend pop: backend regM
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popNil [
-	self assemble: 'pop' with: backend regNil
+	backend pop: backend regNil
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popR [
-	self assemble: 'pop' with: backend regR
+	backend pop: backend regR
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popS [
-	self assemble: 'pop' with: backend regS
+	backend pop: backend regS
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popSP [
-	self assemble: 'pop' with: backend regSP
+	backend pop: backend regSP
 ]
 
 { #category : #'push/pop' }
@@ -1483,17 +1484,17 @@ JITAssemblerAMD64 >> popSPindirect [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popT [
-	self assemble: 'pop' with: backend regT
+	backend pop: backend regT
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popTrue [
-	self assemble: 'pop' with: backend regTrue
+	backend pop: backend regTrue
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushA [
-	self assemble: 'push' with: backend regA
+	backend push: backend regA
 ]
 
 { #category : #loading }
@@ -1516,12 +1517,12 @@ JITAssemblerAMD64 >> pushAatToffset: offset [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushB [
-	self assemble: 'push' with: backend regB
+	backend push: backend regB
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushE [
-	self assemble: 'push' with: backend regE
+	backend push: backend regE
 ]
 
 { #category : #'push/pop' }
@@ -1531,7 +1532,7 @@ JITAssemblerAMD64 >> pushEindex: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushFP [
-	self assemble: 'push' with: backend regFP
+	backend push: backend regFP
 ]
 
 { #category : #'push/pop' }
@@ -1541,12 +1542,12 @@ JITAssemblerAMD64 >> pushFPindex: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushFalse [
-	self assemble: 'push' with: backend regFalse
+	backend push: backend regFalse
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 JITAssemblerAMD64 >> pushG [
-	self assemble: 'push' with: backend regG
+	backend push: backend regG
 ]
 
 { #category : #'push/pop' }
@@ -1564,17 +1565,17 @@ JITAssemblerAMD64 >> pushIndirectR [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushM [
-	self assemble: 'push' with: backend regM
+	backend push: backend regM
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushNil [
-	self assemble: 'push' with: backend regNil
+	backend push: backend regNil
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushR [
-	self assemble: 'push' with: backend regR
+	backend push: backend regR
 ]
 
 { #category : #loading }
@@ -1612,12 +1613,12 @@ JITAssemblerAMD64 >> pushRwordAt: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushS [
-	self assemble: 'push' with: backend regS
+	backend push: backend regS
 ]
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushSP [
-	self assemble: 'push' with: backend regSP
+	backend push: backend regSP
 ]
 
 { #category : #'push/pop' }
@@ -1658,7 +1659,7 @@ JITAssemblerAMD64 >> pushSwordAt: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushT [
-	self assemble: 'push' with: backend regT
+	backend push: backend regT
 ]
 
 { #category : #'push/pop' }
@@ -1668,7 +1669,7 @@ JITAssemblerAMD64 >> pushTindex: index [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushTrue [
-	self assemble: 'push' with: backend regTrue
+	backend push: backend regTrue
 ]
 
 { #category : #'push/pop' }
