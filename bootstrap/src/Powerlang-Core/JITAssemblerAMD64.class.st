@@ -670,12 +670,8 @@ JITAssemblerAMD64 >> loadAwithRindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadAwithRoffsetAtA [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: backend regA with: pointer
+	backend load: backend regA fromBase: backend regR offsetImm: 0 index: backend regA scaleImm: 1.
+
 ]
 
 { #category : #loading }
@@ -1052,12 +1048,8 @@ JITAssemblerAMD64 >> loadRwithRatA [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithRatOffsetA [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: backend regR with: pointer
+	backend load: backend regR fromBase: backend regR offsetImm: 0 index: backend regA scaleImm: 1.
+
 ]
 
 { #category : #loading }
@@ -1196,8 +1188,8 @@ JITAssemblerAMD64 >> loadRwithTindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithTos [
-	pointer reset; length: self addressLength; base: backend regSP.
-	self assemble: 'mov' with: backend regR with: pointer
+	backend load: backend regR fromBase: backend regSP offsetImm: 0
+
 ]
 
 { #category : #loading }
