@@ -61,8 +61,17 @@ AssemblerAMD64 >> add: op1 to: op2 [
 ]
 
 { #category : #services }
-AssemblerAMD64 >> addImm: imm to: reg [ 
-	self assemble: 'add' with: reg withImm: imm
+AssemblerAMD64 >> addImm: imm to: reg [
+	imm == 1 ifTrue: [ 
+		self assemble: 'inc' with: reg
+	] ifFalse: [ 
+		imm == -1 ifTrue: [ 
+			self assemble: 'dec' with: reg
+		] ifFalse: [  
+			self assemble: 'add' with: reg withImm: imm
+		].
+	].
+
 ]
 
 { #category : #labels }
