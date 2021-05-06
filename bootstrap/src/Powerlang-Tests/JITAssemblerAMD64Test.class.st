@@ -108,7 +108,7 @@ JITAssemblerAMD64Test >> testAddRconstant__1 [
 	assembler perform: #addRwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
-		equals: (#[72 131 192 1])
+		equals: (#[72 255 192])
 
 ]
 
@@ -178,7 +178,7 @@ JITAssemblerAMD64Test >> testAddToTconstant__1 [
 	assembler perform: #addTwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
-		equals: (#[72 131 193 1])
+		equals: (#[72 255 193])
 
 ]
 
