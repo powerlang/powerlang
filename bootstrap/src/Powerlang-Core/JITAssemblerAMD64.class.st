@@ -287,11 +287,6 @@ JITAssemblerAMD64 >> compareRwithTrue [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> compareRwithVindex: index [
-	self assemble: 'cmp' withReg: backend regR withReg: backend regV index: index
-]
-
-{ #category : #loading }
 JITAssemblerAMD64 >> compareSwithTindex: index [
 	self assemble: 'cmp' withReg: backend regS withReg: backend regT index: index
 ]
@@ -1378,12 +1373,6 @@ JITAssemblerAMD64 >> loadTwithTindex: index [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadVwithImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: backend regV withImm: imm
-]
-
-{ #category : #loading }
 JITAssemblerAMD64 >> loadWithFalse: register [ 
 	backend move: backend regFalse to: register
 ]
@@ -1776,11 +1765,6 @@ JITAssemblerAMD64 >> pushTindex: index [
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushTrue [
 	backend push: backend regTrue
-]
-
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> pushVindex: index [
-	self assemble: 'push' withReg: backend regV index: index
 ]
 
 { #category : #services }
