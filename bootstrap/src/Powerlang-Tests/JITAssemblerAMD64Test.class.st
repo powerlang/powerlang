@@ -152,26 +152,6 @@ JITAssemblerAMD64Test >> testAddRconstant__m2 [
 
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testAddSPtoT [
-	
-	assembler addSPtoT.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 1 225])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testAddSslotsToSP [
-	
-	assembler addSslotsToSP.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 141 36 244])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testAddToTconstant__1 [
 	
@@ -180,16 +160,6 @@ JITAssemblerAMD64Test >> testAddToTconstant__1 [
 		assert: (assembler bytes)
 		equals: (#[72 255 193])
 
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testAddTslotsToSP [
-	
-	assembler addTslotsToSP.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 141 36 204])
-	
 ]
 
 { #category : #'tests - generated 2' }
@@ -242,16 +212,6 @@ JITAssemblerAMD64Test >> testBuildFrame [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testCallA [
-	
-	assembler callA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[255 210])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testCallIndirectA [
 	
@@ -279,16 +239,6 @@ JITAssemblerAMD64Test >> testCallR [
 	self 
 		assert: (assembler bytes)
 		equals: (#[255 208])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testClearAintegerBit [
-	
-	assembler clearAintegerBit.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 255 202])
 	
 ]
 
@@ -412,16 +362,6 @@ JITAssemblerAMD64Test >> testCompareRwithNil [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testCompareRwithS [
-	
-	assembler compareRwithS.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 57 240])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testCompareRwithSmallInteger__0 [
 	
@@ -542,16 +482,6 @@ JITAssemblerAMD64Test >> testConvertAtoNativeInteger [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testConvertAtoSmallInteger [
-	
-	assembler convertAtoSmallInteger.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 209 226 72 255 194])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testConvertRtoNativeInteger [
 	
@@ -572,26 +502,6 @@ JITAssemblerAMD64Test >> testConvertRtoSmallInteger [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testConvertTToNativeInteger [
-	
-	assembler convertTToNativeInteger.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 209 249])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testConvertTosToSmallInteger [
-	
-	assembler convertTosToSmallInteger.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 209 36 36 72 255 4 36])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testConvertTtoNativeInteger [
 	
@@ -602,17 +512,6 @@ JITAssemblerAMD64Test >> testConvertTtoNativeInteger [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testDecR [
-	
-	assembler decR.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 255 200])
-	
-]
-
-{ #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testDecRindirect [
 	
 	assembler perform: #decRindirect withArguments: #().
@@ -762,53 +661,12 @@ JITAssemblerAMD64Test >> testExchangeRindirectWithT [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testIncA [
-	
-	assembler incA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 255 194])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testIncC [
-	
-	assembler incC.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 255 195])
-	
-]
-
-{ #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testInitializeS [
 	
 	assembler perform: #initializeS withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 137 198])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testJumpIndirectA [
-	
-	assembler jumpIndirectA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[255 34])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testJumpToA [
-	
-	assembler jumpToA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[255 226])
 	
 ]
 
@@ -819,26 +677,6 @@ JITAssemblerAMD64Test >> testJumpToMindex__1 [
 	self 
 		assert: (assembler bytes)
 		equals: (#[255 35])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testJumpToS [
-	
-	assembler jumpToS.
-	self 
-		assert: (assembler bytes)
-		equals: (#[255 230])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLabeledIntegerBitTestOfA [
-	
-	assembler labeledIntegerBitTestOfA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[246 194 1 116 0])
 	
 ]
 
@@ -2343,16 +2181,6 @@ JITAssemblerAMD64Test >> testLoadAwithSmallInteger__m2 [
 ]
 
 { #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadAwithT [
-	
-	assembler loadAwithT.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 202])
-	
-]
-
-{ #category : #'tests - generated' }
 JITAssemblerAMD64Test >> testLoadAwithTrue [
 	
 	assembler loadAwithTrue.
@@ -2439,16 +2267,6 @@ JITAssemblerAMD64Test >> testLoadLongMwithIPoffset__m34 [
 	self 
 		assert: (assembler bytes)
 		equals: (#[139 29 216 255 255 255])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadLongRWithRAtOffsetA [
-	
-	assembler loadLongRWithRAtOffsetA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[139 4 16])
 	
 ]
 
@@ -2599,16 +2417,6 @@ JITAssemblerAMD64Test >> testLoadMwithTindex__8 [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 139 89 56])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadRConvertingDoubleRindirect [
-	
-	assembler loadRConvertingDoubleRindirect.
-	self 
-		assert: (assembler bytes)
-		equals: (#[242 72 15 44 0])
 	
 ]
 
@@ -3159,16 +2967,6 @@ JITAssemblerAMD64Test >> testLoadRwithS [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 137 240])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadRwithSP [
-	
-	assembler loadRwithSP.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 224])
 	
 ]
 
@@ -4422,16 +4220,6 @@ JITAssemblerAMD64Test >> testLoadRwithThreadVariableAtIndexR [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadRwithTos [
-	
-	assembler loadRwithTos.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 139 4 36])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testLoadRwithTrue [
 	
@@ -4459,26 +4247,6 @@ JITAssemblerAMD64Test >> testLoadSPwithFP [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 137 236])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadSPwithT [
-	
-	assembler loadSPwithT.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 204])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadSwithA [
-	
-	assembler loadSwithA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 214])
 	
 ]
 
@@ -4519,16 +4287,6 @@ JITAssemblerAMD64Test >> testLoadSwithRindex__4 [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 139 112 24])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadSwithT [
-	
-	assembler loadSwithT.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 206])
 	
 ]
 
@@ -4782,16 +4540,6 @@ JITAssemblerAMD64Test >> testPopA [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testPopB [
-	
-	assembler popB.
-	self 
-		assert: (assembler bytes)
-		equals: (#[91])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testPopE [
 	
@@ -4872,16 +4620,6 @@ JITAssemblerAMD64Test >> testPopS [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testPopSP [
-	
-	assembler popSP.
-	self 
-		assert: (assembler bytes)
-		equals: (#[92])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testPopSPindirect [
 	
@@ -4919,16 +4657,6 @@ JITAssemblerAMD64Test >> testPushA [
 	self 
 		assert: (assembler bytes)
 		equals: (#[82])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testPushB [
-	
-	assembler pushB.
-	self 
-		assert: (assembler bytes)
-		equals: (#[83])
 	
 ]
 
@@ -5029,16 +4757,6 @@ JITAssemblerAMD64Test >> testPushS [
 	self 
 		assert: (assembler bytes)
 		equals: (#[86])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testPushSP [
-	
-	assembler pushSP.
-	self 
-		assert: (assembler bytes)
-		equals: (#[84])
 	
 ]
 
@@ -5202,26 +4920,6 @@ JITAssemblerAMD64Test >> testRestoreCallerSelf [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testRestoreRSmallInteger [
-	
-	assembler restoreRSmallInteger.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 209 208])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testRestoreRsmallInteger [
-	
-	assembler restoreRsmallInteger.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 209 208])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testReturn [
 	
@@ -5283,16 +4981,6 @@ JITAssemblerAMD64Test >> testSqrtDoubleX0 [
 ]
 
 { #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreAinSPatT [
-	
-	assembler storeAinSPatT.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 84 204 248])
-	
-]
-
-{ #category : #'tests - generated' }
 JITAssemblerAMD64Test >> testStoreAinThreadVariableAtIndexR [
 	
 	assembler storeAinThreadVariableAtIndexR.
@@ -5319,16 +5007,6 @@ JITAssemblerAMD64Test >> testStoreAinTindex__2 [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 137 81 8])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreArgumentsInStack [
-	
-	assembler storeArgumentsInStack.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 77 16 72 137 85 24 76 137 69 32 76 137 77 40])
 	
 ]
 
@@ -5392,16 +5070,6 @@ JITAssemblerAMD64Test >> testStoreLargeX0inA [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreLargeX0inR [
-	
-	assembler storeLargeX0inR.
-	self 
-		assert: (assembler bytes)
-		equals: (#[102 72 15 126 0])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testStoreLargeX0inT [
 	
@@ -5409,16 +5077,6 @@ JITAssemblerAMD64Test >> testStoreLargeX0inT [
 	self 
 		assert: (assembler bytes)
 		equals: (#[102 72 15 126 1])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreLongTInRAtA [
-	
-	assembler storeLongTInRAtA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[137 76 144 252])
 	
 ]
 
@@ -5972,16 +5630,6 @@ JITAssemblerAMD64Test >> testStoreTIBwithAatIndexR [
 	
 ]
 
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreTInRAtA [
-	
-	assembler storeTInRAtA.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 137 76 208 248])
-	
-]
-
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testStoreTinRatA [
 	
@@ -6123,32 +5771,12 @@ JITAssemblerAMD64Test >> testSubFromRconstant__m2 [
 ]
 
 { #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testSubTfromR [
-	
-	assembler subTfromR.
-	self 
-		assert: (assembler bytes)
-		equals: (#[72 41 200])
-	
-]
-
-{ #category : #'tests - generated' }
 JITAssemblerAMD64Test >> testSubTslotsToSP [
 	
 	assembler subTslotsToSP.
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 247 217 72 141 36 204 72 247 217])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testTestAintegerBit [
-	
-	assembler testAintegerBit.
-	self 
-		assert: (assembler bytes)
-		equals: (#[246 194 1])
 	
 ]
 
@@ -6169,26 +5797,6 @@ JITAssemblerAMD64Test >> testTestRwithR [
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 133 192])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testTestTIntegerBit [
-	
-	assembler testTIntegerBit.
-	self 
-		assert: (assembler bytes)
-		equals: (#[246 193 1])
-	
-]
-
-{ #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testTestTintegerBit [
-	
-	assembler testTintegerBit.
-	self 
-		assert: (assembler bytes)
-		equals: (#[246 193 1])
 	
 ]
 

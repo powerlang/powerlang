@@ -115,16 +115,6 @@ AssemblerAMD64 >> and: src1AndDst withImm: imm [
 
 ]
 
-{ #category : #'operations - logical' }
-AssemblerAMD64 >> andIndirect: src1AndDst withImm: imm [
-	pointer
-		reset;
-		length: self addressLength;
-		base: src1AndDst.
-	self assemble: 'and' with: pointer withImm: imm
-
-]
-
 { #category : #relocation }
 AssemblerAMD64 >> applyFixups [
 	memory applyFixupsWith: self
@@ -234,17 +224,6 @@ index: index [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleAddress: mem [
-	| address |
-	address := mem isInteger ifTrue: [mem] ifFalse: [
-		memory addAbsoluteFixup: mem.
-		0].
-	wordSize = 8
-		ifTrue: [memory nextULargePut: address]
-		ifFalse: [memory nextULongPut: address]
-]
-
-{ #category : #basic }
 AssemblerAMD64 >> assembleByte: byte [
 	memory nextBytePut: byte
 ]
@@ -265,23 +244,6 @@ AssemblerAMD64 >> assembleBytes: value count: count [
 		memory nextLargePut: value
 	].
 
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> assembly [
-	^memory bytes
-]
-
-{ #category : #storing }
-AssemblerAMD64 >> at: position putPointer: value [
-	| original |
-	original := memory position.
-	[
-		memory position: position.
-		wordSize = 8
-			ifTrue: [memory nextULargePut: value]
-			ifFalse: [memory nextULongPut: value]]
-		ensure: [memory position: original]
 ]
 
 { #category : #relocation }
@@ -311,17 +273,6 @@ AssemblerAMD64 >> breakpoint [
 { #category : #accessing }
 AssemblerAMD64 >> bytes [
 	^memory bytes
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> callIndirectReg: reg [
-	pointer reset; length: reg length; base: reg.
-	self assemble: 'call' with: pointer
-]
-
-{ #category : #calls }
-AssemblerAMD64 >> callTo: label [
-	self jump: 'call' to: label size: 4
 ]
 
 { #category : #accessing }
@@ -390,11 +341,6 @@ AssemblerAMD64 >> jump: mnemonic to: label size: n [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfBelowOrEqualTo: label [
-	self nearJump: 'jbe' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> jumpIfEqualTo: label [
 	self nearJump: 'jz' to: label
 ]
@@ -420,18 +366,8 @@ AssemblerAMD64 >> jumpIfLessSignedTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfNotCarryTo: label [
-	self nearJump: 'jnc' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> jumpIfNotEqualTo: label [
 	self nearJump: 'jnz' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> jumpIfNotOverflowTo: label [
-	self nearJump: 'jno' to: label
 ]
 
 { #category : #jumps }
@@ -466,33 +402,6 @@ AssemblerAMD64 >> jumpOver: aBlock [
 { #category : #jumps }
 AssemblerAMD64 >> jumpTo: label [
 	self nearJump: 'jmp' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> jumpToReg: reg [
-	self assemble: 'jmp' with: reg
-]
-
-{ #category : #integers }
-AssemblerAMD64 >> lastEmittedPointer [
-	| patch |
-	patch := self currentAddress.
-	^patch - wordSize
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> lea: dest
-		base: base
-		index: index
-		scale: scale [
-
-	pointer
-		reset;
-		length: self addressLength;
-		base: base;
-		index: index;
-		scale: scale.
-	self assemble: 'lea' with: dest with: pointer
 ]
 
 { #category : #integers }
@@ -689,11 +598,6 @@ AssemblerAMD64 >> nop: count [
 	^self nop
 ]
 
-{ #category : #calls }
-AssemblerAMD64 >> offsetOfIndex: index [
-	^index - 1 * wordSize
-]
-
 { #category : #'operations - logical' }
 AssemblerAMD64 >> or: src1AndDst with: src2 [
 	self assemble: 'or' with: src1AndDst with: src2
@@ -718,18 +622,6 @@ AssemblerAMD64 >> push: srcReg [
 
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> putPointer: oop at: position [
-	| original |
-	original := memory position.
-	[
-		memory position: position.
-		wordSize = 8
-			ifTrue: [memory nextULargePut: oop]
-			ifFalse: [memory nextULongPut: oop]]
-		ensure: [memory position: original]
-]
-
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regA [
 	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
@@ -738,16 +630,6 @@ AssemblerAMD64 >> regA [
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regA8 [
 	^dl
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regB [
-	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regC [
-	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
 ]
 
 { #category : #'registers - IR' }
@@ -823,11 +705,6 @@ AssemblerAMD64 >> regT [
 ]
 
 { #category : #'registers - IR' }
-AssemblerAMD64 >> regT8 [
-	^ cl
-]
-
-{ #category : #'registers - IR' }
 AssemblerAMD64 >> regTrue [
 	^ r13
 ]
@@ -835,17 +712,6 @@ AssemblerAMD64 >> regTrue [
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regV [
 	^r11
-]
-
-{ #category : #relocation }
-AssemblerAMD64 >> relocateTo: address [
-	| delta |
-	delta := address - self baseAddress.
-	labels
-		keysAndValuesDo: [:label :location | labels
-			at: label
-			put: location + delta].
-	memory relocateTo: address with: self
 ]
 
 { #category : #accessing }
@@ -909,18 +775,6 @@ AssemblerAMD64 >> return: anInteger [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> rotateLeft: op1 count: count [
-	self ASSERT: count < 32.
-	self assemble: 'rol' with: op1 with: count
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> rotateRight: op1 count: count [
-	self ASSERT: count < 32.
-	self assemble: 'ror' with: op1 with: count
-]
-
-{ #category : #accessing }
 AssemblerAMD64 >> setIntegerBit: op1 [
 	self assemble: 'or' with: op1 with: 1
 ]
@@ -977,16 +831,6 @@ AssemblerAMD64 >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfLessOrEqualSignedTo: label [
-	self shortJump: 'jle' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfLessSignedTo: label [
-	self shortJump: 'jl' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]
@@ -997,18 +841,8 @@ AssemblerAMD64 >> shortJumpIfNotEqualTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotOverflowTo: label [
-	self shortJump: 'jno' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> shortJumpIfNotZeroTo: label [
 	self shortJumpIfNotEqualTo: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfOverflowTo: label [
-	self shortJump: 'jo' to: label
 ]
 
 { #category : #jumps }
@@ -1019,15 +853,6 @@ AssemblerAMD64 >> shortJumpIfSignTo: label [
 { #category : #jumps }
 AssemblerAMD64 >> shortJumpIfZeroTo: label [
 	self shortJumpIfEqualTo: label
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> shortJumpOver: aBlock [
-	| label |
-	label := self newLabel.
-	self shortJumpTo: label.
-	aBlock value.
-	self @ label
 ]
 
 { #category : #jumps }
@@ -1089,11 +914,6 @@ AssemblerAMD64 >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes index
 		with: pointer
 		with: srcReg
 
-]
-
-{ #category : #storing }
-AssemblerAMD64 >> storeByte: value in: reg2 index: index [
-	self storeByte: value in: reg2 offset: index - 1
 ]
 
 { #category : #storing }

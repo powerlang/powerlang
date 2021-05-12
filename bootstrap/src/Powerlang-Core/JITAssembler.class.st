@@ -28,11 +28,6 @@ JITAssembler >> and: source1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #'operations - logical' }
-JITAssembler >> andIndirect: source1andDest withImm: imm [
-	self subclassResponsibility
-]
-
 { #category : #storing }
 JITAssembler >> lea: dest base: base index: index scale: scale [
 	self subclassResponsibility
