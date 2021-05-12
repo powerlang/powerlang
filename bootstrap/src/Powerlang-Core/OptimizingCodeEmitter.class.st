@@ -264,15 +264,13 @@ OptimizingCodeEmitter >> assembleBitShift: instruction [
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBitShift: src by: amount [
 	amount > 0
-		ifTrue: [
-			assembler
+		ifTrue: [ assembler
 				convertToNativeInteger: src;
 				shiftLeft: src by: amount + 1;
-				convertToSmallInteger: src]
-		ifFalse: [
-			assembler
-				shiftRight: src by: 0 - amount;
-				setIntegerBit: src]
+				convertToSmallInteger: src ]
+		ifFalse: [ assembler
+				shiftRightArithmetic: src byImm: 0 - amount;
+				setIntegerBit: src ]
 ]
 
 { #category : #unclassified }
@@ -680,7 +678,7 @@ OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	shift := value == 4 ifTrue: [2] ifFalse: [value == 8 ifTrue: [3] ifFalse: [1]].
 	assembler
 		clearIntegerBit: left;
-		shiftLeft: left by: shift;
+		shiftLeft: left byImm: shift;
 		setIntegerBit: left
 ]
 

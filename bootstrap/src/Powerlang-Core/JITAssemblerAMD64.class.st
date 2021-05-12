@@ -414,9 +414,8 @@ JITAssemblerAMD64 >> dropTopOfFPU [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> dropTos: count [
-	| imm |
-	imm := count * self addressSize.
-	self assemble: 'add' with: backend regSP with: imm
+	backend addImm: (count * self addressSize) to: backend regSP
+
 ]
 
 { #category : #loading }
@@ -1513,7 +1512,8 @@ JITAssemblerAMD64 >> nativeCode [
 
 { #category : #logic }
 JITAssemblerAMD64 >> orRwithA [
-	self assemble: 'or' with: backend regR with: backend regA
+	backend or: backend regR with: backend regA
+
 ]
 
 { #category : #'push/pop' }
@@ -1835,44 +1835,44 @@ JITAssemblerAMD64 >> scaleFloatOnRWithA [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftLeftRwithT [
-	self ASSERT: backend regT r == rcx.
-	self assemble: 'sal' with: backend regR with: backend regT b
+	backend shiftLeft: backend regR by: backend regT
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftLogicalRright: count [
-	self ASSERT: count < 32.
-	self assemble: 'shr' with: backend regR with: count
+	backend shiftRight: backend regR byImm: count
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRightRwithT [
-	self ASSERT: backend regT r == rcx.
-	self assemble: 'sar' with: backend regR with: backend regT b
+	backend shiftRightArithmetic: backend regR by: backend regT
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRleft: count [
-	self ASSERT: count < 32.
-	self assemble: 'sal' with: backend regR with: count
+	 backend shiftLeft: backend regR byImm: count
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftRright: count [
-	self ASSERT: count < (wordSize * 8).
-	self assemble: 'sar' with: backend regR with: count
+	backend shiftRightArithmetic: backend regR byImm: count
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftTleft: count [
-	self ASSERT: count < 32.
-	self assemble: 'sal' with: backend regT with: count
+	backend shiftLeft: backend regT byImm: count
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> shiftTright: count [
-	self ASSERT: count < 32.
-	self assemble: 'sar' with: backend regT with: count
+	backend shiftRightArithmetic: backend regT byImm: count
+
 ]
 
 { #category : #comparing }
@@ -2180,12 +2180,14 @@ JITAssemblerAMD64 >> storeTinRindex: index [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subAfromR [
-	self assemble: 'sub' with: backend regR with: backend regA
+	backend sub: backend regA from: backend regR
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subAfromT [
-	self assemble: 'sub' with: backend regT with: backend regA
+	backend sub: backend regA from: backend regT    
+
 ]
 
 { #category : #arithmetic }
@@ -2195,12 +2197,14 @@ JITAssemblerAMD64 >> subDoubleX1fromX0 [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subFromRconstant: imm [
-	self assemble: 'sub' with: backend regR withImm: imm
+	backend subImm: imm from: backend regR
+
 ]
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subTfromR [
-	self assemble: 'sub' with: backend regR with: backend regT
+	backend sub: backend regT from: backend regR
+
 ]
 
 { #category : #arithmetic }
@@ -2262,15 +2266,18 @@ JITAssemblerAMD64 >> writeTslots [
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorAwithR [
-	self assemble: 'xor' with: backend regA with: backend regR
+	backend xor: backend regA with: backend regR
+
 ]
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorFPwithFP [
-	self assemble: 'xor' with: backend regFP with: backend regFP
+	backend xor: backend regFP with: backend regFP
+
 ]
 
 { #category : #logic }
 JITAssemblerAMD64 >> xorRwithA [
-	self assemble: 'xor' with: backend regR with: backend regA
+	backend xor: backend regR with: backend regA
+
 ]

@@ -225,7 +225,7 @@ InlineMessageLinker >> assembleBitShiftRight [
 	assembler
 		move: assembler regA to: assembler regT;
 		convertToNativeInteger: assembler regT;
-		shiftRight: assembler regR by: assembler regT b;
+		shiftRightArithmetic: assembler regR by: assembler regT b;
 		setIntegerBit: assembler regR
 ]
 
