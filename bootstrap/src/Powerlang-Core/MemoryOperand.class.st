@@ -71,12 +71,16 @@ MemoryOperand >> baseExtension [
 
 { #category : #accessing }
 MemoryOperand >> displacement [
-	^displacement ifNil: 0
+	^displacement
+
 ]
 
 { #category : #accessing }
 MemoryOperand >> displacement: anInteger [
-	displacement := anInteger ifNil: 0
+	self ASSERT: anInteger isInteger.
+	self ASSERT: (anInteger between: -2147483648 and: 2147483647).
+	displacement := anInteger
+
 ]
 
 { #category : #encoding }
@@ -203,7 +207,9 @@ MemoryOperand >> isTemplate [
 
 { #category : #accessing }
 MemoryOperand >> length: anInteger [
+	self ASSERT: (#(8 16 32 64 128) includes: anInteger).
 	length := anInteger
+
 ]
 
 { #category : #printing }
@@ -291,12 +297,15 @@ MemoryOperand >> rm [
 
 { #category : #accessing }
 MemoryOperand >> scale [
-	^scale ifNil: 0
+	^scale
+
 ]
 
 { #category : #accessing }
 MemoryOperand >> scale: anInteger [
-	scale := anInteger ifNil: 1
+	self ASSERT: (#(1 2 4 8) includes: anInteger).
+	scale := anInteger
+
 ]
 
 { #category : #accessing }

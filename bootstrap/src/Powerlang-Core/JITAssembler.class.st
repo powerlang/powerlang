@@ -18,6 +18,15 @@ JITAssembler >> addImm: imm to: dest [
 	self subclassResponsibility
 ]
 
+{ #category : #accessing }
+JITAssembler >> addressSize [
+	"Return the size of address in bytes, e.g, 4 for 32bit archs
+	 and 8 for 64bit archs"
+
+	^ self subclassResponsibility
+
+]
+
 { #category : #'operations - logical' }
 JITAssembler >> and: source1andDest with: source2 [
 	self subclassResponsibility
@@ -28,40 +37,113 @@ JITAssembler >> and: source1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #storing }
-JITAssembler >> lea: dest base: base index: index scale: scale [
-	self subclassResponsibility
-]
+{ #category : #'memory - load / store' }
+JITAssembler >> load: dstReg fromMem: srcMemRef [
+	"Load `dstReg` from memory location `srcMemRef`. 
 
-{ #category : #loading }
-JITAssembler >> load: dstReg fromBase: baseReg index: indexReg [
-	self load: dstReg fromBase: baseReg offsetImm: 0 - wordSize index: indexReg scaleImm: wordSize
+	 The size of data loaded is specified in `srcMemRef`"
 
-]
-
-{ #category : #loading }
-JITAssembler >> load: dstReg fromBase: baseReg indexImm: index [ 
-	self load: dstReg fromBase: baseReg offsetImm: (index - 1) * wordSize
-
-]
-
-{ #category : #loading }
-JITAssembler >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes [
-	"Load pointer into `dstReg` from memory. The effective address is computed as:
-
-		EA := baseReg + offsetInBytes
-	"    
 	^ self subclassResponsibility
 
 ]
 
-{ #category : #loading }
-JITAssembler >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
-	"Load pointer into `dstReg` from memory. The effective address is computed as:
+{ #category : #memory }
+JITAssembler >> memRef [
+	"Return clean instance of pointer-sized memory reference"
 
-		EA := baseReg + offsetInBytes + ((indexReg - 1) * scaleInBytes)
-	"    
 	^ self subclassResponsibility
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef16 [
+	"Return clean instance of memory reference."
+
+	^ self memRef length: 16; yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef32 [
+	"Return clean instance of memory reference."
+
+	^ self memRef length: 32; yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef32: baseReg index: indexReg [
+	^ self memRef32 
+		base: baseReg; 
+		displacement: -4;
+		index: indexReg;
+		scale: 4;
+		yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef32: baseReg indexImm: indexImm [
+	^ self memRef32 
+		base: baseReg; 
+		displacement: (indexImm - 1) * 4;
+		yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef64 [
+	"Return clean instance of memory reference."
+
+	^ self memRef length: 64; yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef8 [
+	"Return clean instance of memory reference."
+
+	^ self memRef length: 8; yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef8: baseReg index: indexReg [
+	^ self memRef8 
+		base: baseReg; 
+		displacement: -1;
+		index: indexReg;
+		scale: 1;
+		yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef8: baseReg indexImm: indexImm [
+	^ self memRef8
+		base: baseReg; 
+		displacement: (indexImm - 1);
+		yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef: baseReg index: indexRef [
+	^ self memRef 
+		base: baseReg; 
+		displacement: self addressSize negated;
+		index: indexRef;
+		scale: self addressSize;
+		yourself
+
+]
+
+{ #category : #memory }
+JITAssembler >> memRef: baseReg indexImm: indexImm [
+	^ self memRef 
+		base: baseReg; 
+		displacement: (indexImm - 1) * self addressSize;
+		yourself
 
 ]
 
@@ -268,34 +350,12 @@ JITAssembler >> shiftRightArithmetic: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
-{ #category : #storing }
-JITAssembler >> store: srcReg intoBase: baseReg index: indexReg [
-	self store: srcReg intoBase: baseReg offsetImm: 0 - wordSize index: indexReg scaleImm: wordSize
+{ #category : #'memory - load / store' }
+JITAssembler >> store: srcReg intoMem: dstMemRef [
+	"Store `srcReg` into memory location `srcMemRef`. 
 
-]
+	 The size of data loaded is specified in `srcMemRef`"
 
-{ #category : #storing }
-JITAssembler >> store: srcReg intoBase: baseReg indexImm: index [ 
-	self store: srcReg intoBase: baseReg offsetImm: (index - 1) * wordSize
-
-]
-
-{ #category : #storing }
-JITAssembler >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes [
-	"Store pointer from `dstReg` into memory. The effective address is computed as:
-
-		EA := baseReg + offsetInBytes
-	"    
-	^ self subclassResponsibility
-
-]
-
-{ #category : #storing }
-JITAssembler >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
-	"Store pointer from `dstReg` into memory. The effective address is computed as:
-
-		EA := baseReg + offsetInBytes + ((indexReg - 1) * scaleInBytes)
-	"    
 	^ self subclassResponsibility
 
 ]

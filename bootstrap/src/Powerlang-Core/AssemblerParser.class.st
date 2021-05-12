@@ -165,8 +165,8 @@ AssemblerParser >> sib2 [
 		MemoryOperand new
 			base: nodes first;
 			index: nodes second;
-			scale: nodes third;
-			displacement: nodes fourth]
+			scale: (nodes third ifNil:[1]);
+			displacement: (nodes fourth ifNil:[0])]
 ]
 
 { #category : #accessing }
