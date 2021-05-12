@@ -55,20 +55,21 @@ AssemblerAMD64 >> @ label [
 	self addLabel: label
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> add: op1 to: op2 [
-	self assemble: 'add' with: op2 with: op1
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> add: src2 to: src1AndDst [
+	self assemble: 'add' with: src1AndDst with: src2
+
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> addImm: imm to: reg [
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> addImm: imm to: src2AndDst [
 	imm == 1 ifTrue: [ 
-		self assemble: 'inc' with: reg
+		self assemble: 'inc' with: src2AndDst
 	] ifFalse: [ 
 		imm == -1 ifTrue: [ 
-			self assemble: 'dec' with: reg
+			self assemble: 'dec' with: src2AndDst
 		] ifFalse: [  
-			self assemble: 'add' with: reg withImm: imm
+			self assemble: 'add' with: src2AndDst withImm: imm
 		].
 	].
 
@@ -102,23 +103,26 @@ AssemblerAMD64 >> alignTo: aNumber [
 	self nop: count
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> and: source1andDest with: source2 [
-	self assemble: 'and' with: source1andDest with: source2
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> and: src1AndDst with: source2 [
+	self assemble: 'and' with: src1AndDst with: source2
+
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> and: source1andDest withImm: imm [
-	self assemble: 'and' with: source1andDest withImm: imm
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> and: src1AndDst withImm: imm [
+	self assemble: 'and' with: src1AndDst withImm: imm
+
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> andIndirect: source1andDest withImm: imm [
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> andIndirect: src1AndDst withImm: imm [
 	pointer
 		reset;
 		length: self addressLength;
-		base: source1andDest.
+		base: src1AndDst.
 	self assemble: 'and' with: pointer withImm: imm
+
 ]
 
 { #category : #relocation }
@@ -690,9 +694,10 @@ AssemblerAMD64 >> offsetOfIndex: index [
 	^index - 1 * wordSize
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> or: op1 with: op2 [
-	self assemble: 'or' with: op1 with: op2
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> or: src1AndDst with: src2 [
+	self assemble: 'or' with: src1AndDst with: src2
+
 ]
 
 { #category : #private }
@@ -908,16 +913,40 @@ AssemblerAMD64 >> setIntegerBit: op1 [
 	self assemble: 'or' with: op1 with: 1
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> shiftLeft: op1 by: count [
-	self ASSERT: count < 32.
-	self assemble: 'sal' with: op1 with: count
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftLeft: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sal' with: srcAndDst with: countReg b
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftLeft: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'sal' with: srcAndDst withImm: count
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> shiftRight: op1 by: op2 [
-	self ASSERT: (op2 isInteger not or: [op2 < op1 length]).
-	self assemble: 'sar' with: op1 with: op2
+AssemblerAMD64 >> shiftRight: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sar' with: srcAndDst with: countReg b
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRight: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'shr' with: srcAndDst withImm: count
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRightArithmetic: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sar' with: srcAndDst with: countReg b
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRightArithmetic: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'sar' with: srcAndDst withImm: count
 ]
 
 { #category : #'private - jumps' }
@@ -1070,6 +1099,18 @@ AssemblerAMD64 >> stream [
 	^memory stream
 ]
 
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> sub: src2 from: src1AndDst [
+	self assemble: 'sub' with: src1AndDst with: src2
+
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> subImm: imm from: src2AndDst [
+	self assemble: 'sub' with: src2AndDst withImm: imm
+
+]
+
 { #category : #services }
 AssemblerAMD64 >> subtract: op1 from: op2 [
 	self assemble: 'sub' with: op2 with: op1
@@ -1093,4 +1134,10 @@ AssemblerAMD64 >> wordSize: anInteger [
 { #category : #accessing }
 AssemblerAMD64 >> wordSizeShift [
 	^wordSize = 8 ifTrue: [3] ifFalse: [2]
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> xor: src1AndDst with: src2 [
+	self assemble: 'xor' with: src1AndDst with: src2
+
 ]
