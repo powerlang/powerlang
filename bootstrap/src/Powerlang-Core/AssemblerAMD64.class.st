@@ -756,6 +756,18 @@ AssemblerAMD64 >> regE [
 ]
 
 { #category : #'registers - IR' }
+AssemblerAMD64 >> regF0 [
+	^xmm0
+
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regF1 [
+	^xmm1
+
+]
+
+{ #category : #'registers - IR' }
 AssemblerAMD64 >> regFP [
 	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
 ]

@@ -32,7 +32,11 @@ JITAssemblerAMD64 >> addAtoR [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> addDoubleX1toX0 [
-	self assemble: 'addsd' with: xmm0 with: xmm1
+	self 
+		assemble: 'addsd'
+		with: backend regF0
+		with: backend regF1
+
 ]
 
 { #category : #loading }
@@ -211,14 +215,28 @@ JITAssemblerAMD64 >> compareAwithTrue [
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
-	pointer reset; length: 64; base: backend regA.
-	self assemble: 'cmpsd' with: xmm0 with: pointer with: 0
+	pointer
+		reset;
+		length: 64;
+		base: backend regA.
+	self 
+		assemble: 'cmpsd'
+		with: backend regF0
+		with: pointer
+		with: 0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
-	pointer reset; length: 64; base: backend regA.
-	self assemble: 'cmpsd' with: xmm0 with: pointer with: 1
+	pointer
+		reset;
+		length: 64;
+		base: backend regA.
+	self 
+		assemble: 'cmpsd'
+		with: backend regF0
+		with: pointer
+		with: 1
 ]
 
 { #category : #comparing }
@@ -391,7 +409,11 @@ JITAssemblerAMD64 >> discardArguments: anInteger [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> divideDoubleX0byX1 [
-	self assemble: 'divsd' with: xmm0 with: xmm1
+	self 
+		assemble: 'divsd'
+		with: backend regF0
+		with: backend regF1
+
 ]
 
 { #category : #arithmetic }
@@ -781,14 +803,26 @@ JITAssemblerAMD64 >> loadGwithMindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadLargeX0withRindirect [
-	pointer reset; length: 64; base: backend regR.
-	self assemble: 'movq' with: xmm0 with: pointer
+	pointer
+		reset;
+		length: 64;
+		base: backend regR.
+	self 
+		assemble: 'movq'
+		with: backend regF0
+		with: pointer
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadLargeX1withAindirect [
-	pointer reset; length: 64; base: backend regA.
-	self assemble: 'movq' with: xmm1 with: pointer
+	pointer
+		reset;
+		length: 64;
+		base: backend regA.
+	self 
+		assemble: 'movq'
+		with: backend regF1
+		with: pointer
 ]
 
 { #category : #loading }
@@ -1197,8 +1231,14 @@ JITAssemblerAMD64 >> loadRwithTrue [
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithX0 [
 	| mov |
-	mov := wordSize = 8 ifTrue: ['movq'] ifFalse: ['movd'].
-	self assemble: mov with: backend regR with: xmm0
+
+	mov := wordSize = 8 ifTrue: [
+			'movq'
+		] ifFalse: [ 'movd' ].
+	self 
+		assemble: mov
+		with: backend regR
+		with: backend regF0
 ]
 
 { #category : #loading }
@@ -1388,12 +1428,20 @@ JITAssemblerAMD64 >> loadWithTrue: register [
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadX0withRasDouble [
-	self assemble: 'cvtsi2sd' with: xmm0 with: backend regR
+	self 
+		assemble: 'cvtsi2sd'
+		with: backend regF0
+		with: backend regR
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadX1roundingX0 [
-	self assemble: 'roundsd' with: xmm1 with: xmm0 with: 3
+	self 
+		assemble: 'roundsd'
+		with: backend regF1
+		with: backend regF0
+		with: 3
+
 ]
 
 { #category : #integers }
@@ -1491,7 +1539,11 @@ JITAssemblerAMD64 >> moveTslots [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
-	self assemble: 'mulsd' with: xmm0 with: xmm1
+	self 
+		assemble: 'mulsd'
+		with: backend regF0
+		with: backend regF1
+
 ]
 
 { #category : #arithmetic }
@@ -1882,7 +1934,10 @@ JITAssemblerAMD64 >> smallInteger: anInteger [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> sqrtDoubleX0 [
-	self assemble: 'sqrtsd' with: xmm0 with: xmm0
+	self 
+		assemble: 'sqrtsd'
+		with: backend regF0
+		with: backend regF0
 ]
 
 { #category : #storing }
@@ -1956,10 +2011,18 @@ JITAssemblerAMD64 >> storeByteTinRatA [
 
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> storeDoubleResultInRindirect [
-	pointer reset; length: 64; base: backend regR.
-	wordSize = 8
-		ifTrue: [self assemble: 'movq' with: pointer with: xmm0]
-		ifFalse: [self assemble: 'fstp' with: pointer]
+	pointer
+		reset;
+		length: 64;
+		base: backend regR.
+	wordSize = 8 ifTrue: [
+		self 
+			assemble: 'movq'
+			with: pointer
+			with: backend regF0
+	] ifFalse: [
+		self assemble: 'fstp' with: pointer
+	]
 ]
 
 { #category : #storing }
@@ -1980,20 +2043,38 @@ JITAssemblerAMD64 >> storeEinRindex: index [
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inA [
-	pointer reset; length: 64; base: backend regA.
-	self assemble: 'movq' with: pointer with: xmm0
+	pointer
+		reset;
+		length: 64;
+		base: backend regA.
+	self 
+		assemble: 'movq'
+		with: pointer
+		with: backend regF0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inR [
-	pointer reset; length: 64; base: backend regR.
-	self assemble: 'movq' with: pointer with: xmm0
+	pointer
+		reset;
+		length: 64;
+		base: backend regR.
+	self 
+		assemble: 'movq'
+		with: pointer
+		with: backend regF0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> storeLargeX0inT [
-	pointer reset; length: 64; base: backend regT.
-	self assemble: 'movq' with: pointer with: xmm0
+	pointer
+		reset;
+		length: 64;
+		base: backend regT.
+	self 
+		assemble: 'movq'
+		with: pointer
+		with: backend regF0
 ]
 
 { #category : #storing }
@@ -2192,7 +2273,11 @@ JITAssemblerAMD64 >> subAfromT [
 
 { #category : #arithmetic }
 JITAssemblerAMD64 >> subDoubleX1fromX0 [
-	self assemble: 'subsd' with: xmm0 with: xmm1
+	self 
+		assemble: 'subsd'
+		with: backend regF0
+		with: backend regF1
+
 ]
 
 { #category : #arithmetic }
