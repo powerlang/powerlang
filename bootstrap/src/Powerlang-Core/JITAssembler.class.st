@@ -146,6 +146,20 @@ JITAssembler >> regE [
 ]
 
 { #category : #'registers - IR' }
+JITAssembler >> regF0 [
+	"IEEE 754 double register"
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regF1 [
+	"IEEE 754 double register"
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
 JITAssembler >> regFP [
 	^ self subclassResponsibility
 
