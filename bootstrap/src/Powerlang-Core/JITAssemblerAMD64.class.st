@@ -38,7 +38,7 @@ JITAssemblerAMD64 >> addDoubleX1toX0 [
 JITAssemblerAMD64 >> addLiteral: anObject [
 	| index |
 	index := literals
-		indexOf: anObject
+		identityIndexOf: anObject
 		ifAbsent: [ literals
 				add: anObject;
 				size ].
