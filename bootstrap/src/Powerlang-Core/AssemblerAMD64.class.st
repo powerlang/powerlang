@@ -420,6 +420,11 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> load:dstReg fromMem:srcMemRef [
+	self assemble: 'mov' with: (dstReg forLength: srcMemRef length) with: srcMemRef. 
+]
+	
 { #category : #OBSOLETE }
 AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
 	| offset |
@@ -445,33 +450,6 @@ AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
 
 ]
 
-{ #category : #loading }
-AssemblerAMD64 >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes [ 
-	pointer
-		reset;
-		length: wordSize * 8;
-		base: baseReg;
-		displacement: offsetInBytes.
-	self 
-		assemble: 'mov'
-		with: dstReg
-		with: pointer
-
-]
-
-{ #category : #loading }
-AssemblerAMD64 >> load: dstReg fromBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [
-	pointer
-		reset;
-		length: wordSize * 8;
-		base: baseReg;
-		index: indexReg;
-		scale: scaleInBytes;
-		displacement: offsetInBytes.
-	self 
-		assemble: 'mov'
-		with: dstReg
-		with: pointer
 
 ]
 
@@ -504,6 +482,14 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 		base: reg2;
 		displacement: offset.
 	self assemble: 'movzx' with: reg1 with: pointer
+]
+
+{ #category : #memory }
+AssemblerAMD64 >> memRef [
+	pointer reset.
+	pointer length: self addressSize * 8.
+	^ pointer
+
 ]
 
 { #category : #services }
@@ -886,33 +872,9 @@ AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [
 
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes [ 
-	pointer
-		reset;
-		length: wordSize * 8;
-		base: baseReg;
-		displacement: offsetInBytes.
-	self
-		assemble: 'mov'
-		with: pointer
-		with: srcReg
-
-]
-
-{ #category : #storing }
-AssemblerAMD64 >> store: srcReg intoBase: baseReg offsetImm: offsetInBytes index: indexReg scaleImm: scaleInBytes [         
-	pointer
-		reset;
-		length: wordSize * 8;
-		base: baseReg;
-		index: indexReg;
-		scale: scaleInBytes;
-		displacement: offsetInBytes.
-	self
-		assemble: 'mov'
-		with: pointer
-		with: srcReg
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> store:srcReg intoMem:dstMemRef [
+	self assemble: 'mov' with: dstMemRef with: (srcReg forLength: dstMemRef length)
 
 ]
 
