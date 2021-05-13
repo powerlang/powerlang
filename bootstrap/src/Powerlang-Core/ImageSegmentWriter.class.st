@@ -116,9 +116,10 @@ ImageSegmentWriter >> image [
 ImageSegmentWriter >> initialize [
 	offsets := IdentityDictionary new.
 	objects := OrderedCollection new.
-	stream := #[] writeStream.
+	stream := ByteArray new writeStream.
 	nextHash := 1.
 	base := 0
+
 ]
 
 { #category : #accessing }
@@ -211,10 +212,11 @@ ImageSegmentWriter >> writeObjectBody: obj [
 { #category : #accessing }
 ImageSegmentWriter >> writeObjectBytes: obj [
 	| current aligned |
-	stream nextBytesPutAll: obj bytes.
+	stream nextPutAll: obj bytes.
 	current := stream position.
 	aligned := current alignedTo: wordSize.
 	aligned - current timesRepeat: [ stream nextPut: 0 ]
+
 ]
 
 { #category : #accessing }
@@ -261,9 +263,10 @@ ImageSegmentWriter >> writeReferenceTo: slot [
 { #category : #accessing }
 ImageSegmentWriter >> writeSignature [
 	stream
-		nextBytesPutAll: 'P_IM_S';
+		nextPutAll: 'P_IM_S' asByteArray;
 		nextPut: Character lf asInteger;
 		nextPut: 0
+
 ]
 
 { #category : #writing }
