@@ -10,7 +10,7 @@ BASEADDR= 16r1FF10000
 KERNEL  = $(BUILD)/$(shell cat bootstrap/specs/current || echo 'bee-dmr').bsl
 LAUNCHER= $(BUILD)/$(shell cat bootstrap/specs/current || echo 'bee-dmr')
 
-all: $(LAUNCHER) $(KERNEL) 
+all: $(KERNEL) $(LAUNCHER) $(LAUNCHER)-gdb.py
 	@echo
 	@echo "Build output is in"
 	@echo "    $(BUILD)"
@@ -25,6 +25,9 @@ $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 
 $(BUILD)/Makefile: launcher/CMakeLists.txt | $(BUILD)
 	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=$(BUILD)) -DCMAKE_BUILD_TYPE=Debug
+
+$(LAUNCHER)-gdb.py: debug/powerlang-gdb.py.in
+	sed "s#@POWERLANG_GDB_PYDIR@#$(shell realpath $(shell dirname $<))#g" $< > $@
 
 bootstrap/specs/current:
 	$(MAKE) -C bootstrap specs/current
