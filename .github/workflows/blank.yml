@@ -29,15 +29,22 @@ jobs:
       run: git fetch --unshallow
 
     - name: Compile
+      if: matrix.os != 'macos-latest'
       run: make
       env:
         CMAKE_GENERATOR: Unix Makefiles
 
     - name: Compile - bootstrap only
+      if: matrix.os == 'macos-latest'
       run: make -C bootstrap
 
     - name: Run tests
+      if: matrix.os != 'macos-latest'
       run: make test
+
+    - name: Run tests - bootstrap only
+      if: matrix.os == 'macos-latest'
+      run: make -C bootstrap test
 
     - name: XUnit Viewer
       if: matrix.os == 'ubuntu-latest'
