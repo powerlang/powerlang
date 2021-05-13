@@ -130,7 +130,8 @@ AssemblerParser >> operands3 [
 AssemblerParser >> parseInstruction: aString [
 	| array |
 	array := self parse: aString.
-	^array anyone
+	^array anyOne
+
 ]
 
 { #category : #accessing }

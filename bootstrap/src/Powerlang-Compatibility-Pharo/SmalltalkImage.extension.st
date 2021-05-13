@@ -1,6 +1,6 @@
 Extension { #name : #SmalltalkImage }
 
-{ #category : #'*Powerlang-Core' }
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 SmalltalkImage >> associationAt: aSymbol [
 	^globals associationAt: aSymbol
 ]

@@ -15,6 +15,14 @@ Class {
 	#category : #'Powerlang-Core-Metaphysics'
 }
 
+{ #category : #'instance creation' }
+DmrObjectFormat class >> new [
+	"return an initialized instance"
+
+	^ self basicNew initialize.
+
+]
+
 { #category : #services }
 DmrObjectFormat >> behaviorOf: oid [
 	^ storage uint32of: oid atOffset: BehaviorOffset
