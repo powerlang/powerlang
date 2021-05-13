@@ -35,8 +35,10 @@ bootstrap/specs/current:
 bootstrap/bootstrap.image bootstrap/pharo:
 	$(MAKE) -C bootstrap
 
-test:
+test: $(KERNEL) $(LAUNCHER)
 	make -C bootstrap test
+	($(LAUNCHER) $(KERNEL) ; test $$? -eq 3)
+
 
 $(BUILD):
 	mkdir -p $@
