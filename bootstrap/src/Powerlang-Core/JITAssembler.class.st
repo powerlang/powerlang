@@ -19,6 +19,12 @@ JITAssembler >> addImm: imm to: dest [
 ]
 
 { #category : #accessing }
+JITAssembler >> addressBitSize [
+	^self addressSize * 8
+
+]
+
+{ #category : #accessing }
 JITAssembler >> addressSize [
 	"Return the size of address in bytes, e.g, 4 for 32bit archs
 	 and 8 for 64bit archs"
