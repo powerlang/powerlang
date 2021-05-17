@@ -479,7 +479,7 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 { #category : #memory }
 AssemblerAMD64 >> memRef [
 	^ MemoryOperand new
-		length: self addressSize * 8
+		length: self addressBitSize
 ]
 
 { #category : #services }
