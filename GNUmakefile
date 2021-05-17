@@ -26,8 +26,11 @@ $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 $(BUILD)/Makefile: launcher/CMakeLists.txt | $(BUILD)
 	cd $(BUILD) && cmake $(realpath launcher/ --relative-to=$(BUILD)) -DCMAKE_BUILD_TYPE=Debug
 
-$(LAUNCHER)-gdb.py: debug/powerlang-gdb.py.in
+$(LAUNCHER)-gdb.py: debug/powerlang-gdb.py.in | debug
 	sed "s#@POWERLANG_GDB_PYDIR@#$(shell realpath $(shell dirname $<))#g" $< > $@
+
+debug:
+	$(MAKE) -C debug
 
 bootstrap/specs/current:
 	$(MAKE) -C bootstrap specs/current
@@ -39,7 +42,6 @@ test: $(KERNEL) $(LAUNCHER)
 	make -C bootstrap test
 	($(LAUNCHER) $(KERNEL) ; test $$? -eq 3)
 
-
 $(BUILD):
 	mkdir -p $@
 
@@ -49,3 +51,5 @@ clean:
 
 mrproper: clean
 	make -C bootstrap mrproper
+
+.PHONY: debug
