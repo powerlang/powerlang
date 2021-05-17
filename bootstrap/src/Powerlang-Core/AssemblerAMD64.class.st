@@ -441,8 +441,13 @@ AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> load:dstReg fromMem:srcMemRef [
-	self assemble: 'mov' with: (dstReg forLength: srcMemRef length) with: srcMemRef. 
+AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
+	| adjusted |
+	adjusted := dstReg forLength: srcMemRef length.
+	self
+		assemble: 'mov'
+		with: adjusted
+		with: srcMemRef
 ]
 
 { #category : #storing }
@@ -858,9 +863,13 @@ AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> store:srcReg intoMem:dstMemRef [
-	self assemble: 'mov' with: dstMemRef with: (srcReg forLength: dstMemRef length)
-
+AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
+	| adjusted |
+	adjusted := srcReg forLength: dstMemRef length.
+	self
+		assemble: 'mov'
+		with: dstMemRef
+		with: adjusted
 ]
 
 { #category : #storing }
