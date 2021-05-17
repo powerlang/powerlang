@@ -63,16 +63,11 @@ AssemblerAMD64 >> add: src2 to: src1AndDst [
 
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> addImm: imm to: src2AndDst [
-	imm == 1 ifTrue: [ 
-		self assemble: 'inc' with: src2AndDst
-	] ifFalse: [ 
-		imm == -1 ifTrue: [ 
-			self assemble: 'dec' with: src2AndDst
-		] ifFalse: [  
-			self assemble: 'add' with: src2AndDst withImm: imm
-		].
-	].
-
+	imm == 1
+		ifTrue: [ ^self assemble: 'inc' with: src2AndDst ].
+	imm == -1
+				ifTrue: [ ^self assemble: 'dec' with: src2AndDst ].
+	self assemble: 'add' with: src2AndDst withImm: imm
 ]
 
 { #category : #labels }
@@ -420,11 +415,6 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
-{ #category : #'memory - load / store' }
-AssemblerAMD64 >> load:dstReg fromMem:srcMemRef [
-	self assemble: 'mov' with: (dstReg forLength: srcMemRef length) with: srcMemRef. 
-]
-	
 { #category : #OBSOLETE }
 AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
 	| offset |
@@ -450,12 +440,9 @@ AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
 
 ]
 
-
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> load: reg withImmediate: imm [
-	self assemble: 'mov' with: reg with: imm
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> load:dstReg fromMem:srcMemRef [
+	self assemble: 'mov' with: (dstReg forLength: srcMemRef length) with: srcMemRef. 
 ]
 
 { #category : #storing }
