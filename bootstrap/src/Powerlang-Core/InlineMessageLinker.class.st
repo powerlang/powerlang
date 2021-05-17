@@ -278,15 +278,16 @@ InlineMessageLinker >> assembleCDeclCallWithArguments [
 		subTslotsToSP;
 		assemble: 'and' with: assembler regSP with: -16;
 		loopTtimes: [ assembler
-				load:  assembler regS fromMem: (assembler memRef: assembler regA  index: assembler regT);
-				store: assembler regS intoMem: (assembler memRef: assembler regSP index: assembler regT)].
+				load: assembler regS
+				fromMem: assembler memRefAatT;
+				store: assembler regS
+				intoMem: assembler memRefSPatT ].
 	assembler addressSize = 8
 		ifTrue: [ self loadArgumentsIntoRegisters ].
 	assembler
 		callR;
 		restoreCallerFrame;
 		popS
-
 ]
 
 { #category : #'private - assemble' }
@@ -944,16 +945,20 @@ InlineMessageLinker >> initialize [
 
 { #category : #'private - helpers' }
 InlineMessageLinker >> loadArgumentsIntoRegisters [
+	| stack1 stack2 stack3 stack4 |
+	stack1 :=assembler memRef: rsp indexImm: 1.
+	stack2 :=assembler memRef: rsp indexImm: 2.
+	stack3 :=assembler memRef: rsp indexImm: 3.
+	stack4 :=assembler memRef: rsp indexImm: 4.
 	assembler
-		load: rcx fromMem: (assembler memRef: rsp indexImm: 1);
-		load: rdx fromMem: (assembler memRef: rsp indexImm: 2);
-		load: r8  fromMem: (assembler memRef: rsp indexImm: 3);
-		load: r9  fromMem: (assembler memRef: rsp indexImm: 4);
+		load: rcx fromMem: stack1;
+		load: rdx fromMem: stack2;
+		load: r8 fromMem: stack3;
+		load: r9 fromMem: stack4;
 		assemble: 'movq' with: xmm0 with: rcx;
 		assemble: 'movq' with: xmm1 with: rdx;
 		assemble: 'movq' with: xmm2 with: r8;
 		assemble: 'movq' with: xmm3 with: r9
-
 ]
 
 { #category : #'private - helpers' }
