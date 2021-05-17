@@ -429,6 +429,12 @@ JITAssemblerAMD64 >> labeledNonIntegerBitTestOfR [
 ]
 
 { #category : #loading }
+JITAssemblerAMD64 >> load:dstReg withImmediate: imm [
+	#imm32.
+	self assemble: 'mov' with: dstReg withImm: imm
+]
+
+{ #category : #loading }
 JITAssemblerAMD64 >> load: register withLiteral: anObject [ 
 	| index |
 
@@ -473,12 +479,7 @@ JITAssemblerAMD64 >> loadAwithGlobal: aSymbol [
 	self loadAwithGindex: index
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> load:dstReg withImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: dstReg withImm: imm
-]
-
+{ #category : #'as yet unclassified' }
 JITAssemblerAMD64 >> loadAwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: backend regA withImm: imm
