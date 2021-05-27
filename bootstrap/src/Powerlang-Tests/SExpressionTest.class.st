@@ -21,8 +21,8 @@ SExpressionTest class >> supportMethodsUsing: anEnvironment [
 	^ self supportMethods collect: [ :method | 
 		  | copy |
 		  copy := method copy
-			          classBinding: Object;
-			          yourself.
+					  classBinding: Object;
+					  yourself.
 		  self nativize: copy using: anEnvironment.
 		  copy ]
 ]

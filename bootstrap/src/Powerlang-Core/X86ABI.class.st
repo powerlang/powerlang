@@ -5,6 +5,9 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #X86ABI,
 	#superclass : #ABI,
+	#pools : [
+		'Registers'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 

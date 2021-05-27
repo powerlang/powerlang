@@ -10,7 +10,7 @@ Class {
 		'address',
 		'fixups'
 	],
-	#category : #'Powerlang-Core-Assembler-JIT'
+	#category : #'Powerlang-Core-Assembler'
 }
 
 { #category : #'instance creation' }

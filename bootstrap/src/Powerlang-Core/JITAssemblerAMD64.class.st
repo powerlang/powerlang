@@ -3,40 +3,40 @@ Copyright (c) 2020 Aucerna.
     See (MIT) license in root directory.
 "
 Class {
-	#name : #JITAssembler64,
-	#superclass : #Assembler64,
+	#name : #JITAssemblerAMD64,
+	#superclass : #AssemblerAMD64,
 	#instVars : [
 		'literals'
 	],
 	#classVars : [
 		'ExternalFunctions'
 	],
-	#category : #'Powerlang-Core-Assembler-JIT'
+	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
 { #category : #inspecting }
-JITAssembler64 class >> aspects [
+JITAssemblerAMD64 class >> aspects [
 	^#(#disassembledText32 #disassembledText64)
 ]
 
 { #category : #initialization }
-JITAssembler64 class >> initialize [
+JITAssemblerAMD64 class >> initialize [
 	super initialize.
 	ExternalFunctions := Dictionary new
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addAtoR [
+JITAssemblerAMD64 >> addAtoR [
 	self assemble: 'add' with: self regR with: self regA
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addDoubleX1toX0 [
+JITAssemblerAMD64 >> addDoubleX1toX0 [
 	self assemble: 'addsd' with: xmm0 with: xmm1
 ]
 
 { #category : #loading }
-JITAssembler64 >> addLiteral: anObject [
+JITAssemblerAMD64 >> addLiteral: anObject [
 	| index | 
 	index := literals
 		indexOf: anObject
@@ -47,24 +47,24 @@ JITAssembler64 >> addLiteral: anObject [
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addRconstant: imm [
+JITAssemblerAMD64 >> addRconstant: imm [
 	self assemble: 'add' with: self regR withImm: imm
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addSPtoT [
+JITAssemblerAMD64 >> addSPtoT [
 	self assemble: 'add' with: self regT with: self regSP
 ]
 
 { #category : #logic }
-JITAssembler64 >> addSPwithImmediate: imm [
+JITAssemblerAMD64 >> addSPwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'add' with: self regSP withImm: imm
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addSslotsToSP [
+JITAssemblerAMD64 >> addSslotsToSP [
 	pointer
 		reset;
 		length: self addressLength;
@@ -75,12 +75,12 @@ JITAssembler64 >> addSslotsToSP [
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addToTconstant: imm [
+JITAssemblerAMD64 >> addToTconstant: imm [
 	self assemble: 'add' with: self regT withImm: imm
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addTslotsToSP [
+JITAssemblerAMD64 >> addTslotsToSP [
 	pointer
 		reset;
 		length: self addressLength;
@@ -91,29 +91,29 @@ JITAssembler64 >> addTslotsToSP [
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> addTtoR [
+JITAssemblerAMD64 >> addTtoR [
 	self assemble: 'add' with: self regR with: self regT
 ]
 
 { #category : #services }
-JITAssembler64 >> addressOfExternal: function [
+JITAssemblerAMD64 >> addressOfExternal: function [
 	^ExternalFunctions at: function ifAbsent: nil
 ]
 
 { #category : #logic }
-JITAssembler64 >> andRwithA [
+JITAssemblerAMD64 >> andRwithA [
 	self assemble: 'and' with: self regR with: self regA
 ]
 
 { #category : #logic }
-JITAssembler64 >> andRwithImmediate: imm [
+JITAssemblerAMD64 >> andRwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'and' with: self regR withImm: imm
 ]
 
 { #category : #logic }
-JITAssembler64 >> andTosWithImmediate: anInteger [
+JITAssemblerAMD64 >> andTosWithImmediate: anInteger [
 	#imm8.
 	#imm32.
 	pointer reset; length: self addressLength; base: self regSP.
@@ -121,69 +121,69 @@ JITAssembler64 >> andTosWithImmediate: anInteger [
 ]
 
 { #category : #private }
-JITAssembler64 >> buildFrame [
+JITAssemblerAMD64 >> buildFrame [
 	self
 		push: self regFP;
 		move: self regSP to: self regFP
 ]
 
 { #category : #private }
-JITAssembler64 >> callA [
+JITAssemblerAMD64 >> callA [
 	self assemble: 'call' with: self regA
 ]
 
 { #category : #private }
-JITAssembler64 >> callIndirectA [
+JITAssemblerAMD64 >> callIndirectA [
 	pointer reset; length: self addressLength; base: self regA.
 	self assemble: 'call' with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> callIndirectM [
+JITAssemblerAMD64 >> callIndirectM [
 	pointer reset; length: self addressLength; base: self regM.
 	self assemble: 'call' with: pointer
 ]
 
 { #category : #private }
-JITAssembler64 >> callR [
+JITAssemblerAMD64 >> callR [
 	self assemble: 'call' with: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> clearAintegerBit [
+JITAssemblerAMD64 >> clearAintegerBit [
 	self assemble: 'dec' with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> clearFPUFlags [
+JITAssemblerAMD64 >> clearFPUFlags [
 	self assemble: 'fnclex'
 ]
 
 { #category : #integers }
-JITAssembler64 >> clearRhighHalf [
+JITAssemblerAMD64 >> clearRhighHalf [
 	self assemble: 'mov' with: self regR e with: self regR e
 ]
 
 { #category : #integers }
-JITAssembler64 >> clearRintegerBit [
+JITAssemblerAMD64 >> clearRintegerBit [
 	self assemble: 'dec' with: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> clearSafeRintegerBit [
+JITAssemblerAMD64 >> clearSafeRintegerBit [
 	immediate value: 16rFE; length: 8.
 	self assemble: 'and' with: al with: immediate
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compare: register withBoolean: aBoolean [
+JITAssemblerAMD64 >> compare: register withBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareWithTrue: register ]
 		ifFalse: [ self compareWithFalse: register ]
 ]
 
 { #category : #loading }
-JITAssembler64 >> compare: register withLiteral: anObject [
+JITAssemblerAMD64 >> compare: register withLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self
@@ -194,175 +194,175 @@ JITAssembler64 >> compare: register withLiteral: anObject [
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareAwithBoolean: aBoolean [
+JITAssemblerAMD64 >> compareAwithBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareAwithTrue ]
 		ifFalse: [ self compareAwithFalse ]
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareAwithFalse [
+JITAssemblerAMD64 >> compareAwithFalse [
 	self assemble: 'cmp' with: self regA with: self regFalse
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareAwithImmediate: imm [
+JITAssemblerAMD64 >> compareAwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'cmp' with: self regA withImm: imm
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareAwithSmallInteger: anInteger [
+JITAssemblerAMD64 >> compareAwithSmallInteger: anInteger [
 	self compareAwithImmediate: (anInteger bitShift: 1) + 1
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareAwithTrue [
+JITAssemblerAMD64 >> compareAwithTrue [
 	self assemble: 'cmp' with: self regA with: self regTrue
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareEqualLargeX0withAindirect [
+JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'cmpsd' with: xmm0 with: pointer with: 0
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareLessThanLargeX0withAindirect [
+JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'cmpsd' with: xmm0 with: pointer with: 1
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithA [
+JITAssemblerAMD64 >> compareRwithA [
 	self assemble: 'cmp' with: self regR with: self regA
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithBoolean: aBoolean [
+JITAssemblerAMD64 >> compareRwithBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareRwithTrue ]
 		ifFalse: [ self compareRwithFalse ]
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareRwithEindex: index [
+JITAssemblerAMD64 >> compareRwithEindex: index [
 	self assemble: 'cmp' withReg: self regR withReg: self regE index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareRwithFPindex: index [
+JITAssemblerAMD64 >> compareRwithFPindex: index [
 	self assemble: 'cmp' withReg: self regR withReg: self regFP index: index
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithFalse [
+JITAssemblerAMD64 >> compareRwithFalse [
 	self assemble: 'cmp' with: self regR with: self regFalse
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithImmediate: imm [
+JITAssemblerAMD64 >> compareRwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'cmp' with: self regR withImm: imm
 ]
 
 { #category : #storing }
-JITAssembler64 >> compareRwithIndirect: reg1 andExchange: reg2 [
+JITAssemblerAMD64 >> compareRwithIndirect: reg1 andExchange: reg2 [
 	pointer reset; length: self addressLength; base: reg1.
 	self assemble: 'cmpxchg' with: pointer with: reg2
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithNil [
+JITAssemblerAMD64 >> compareRwithNil [
 	self assemble: 'cmp' with: self regR with: self regNil
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithS [
+JITAssemblerAMD64 >> compareRwithS [
 	self assemble: 'cmp' with: self regR with: self regS
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareRwithSindex: index [
+JITAssemblerAMD64 >> compareRwithSindex: index [
 	self assemble: 'cmp' withReg: self regR withReg: self regS index: index
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithSmallInteger: anInteger [
+JITAssemblerAMD64 >> compareRwithSmallInteger: anInteger [
 	self compareRwithImmediate: (anInteger bitShift: 1) + 1
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareRwithTrue [
+JITAssemblerAMD64 >> compareRwithTrue [
 	self assemble: 'cmp' with: self regR with: self regTrue
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareRwithVindex: index [
+JITAssemblerAMD64 >> compareRwithVindex: index [
 	self assemble: 'cmp' withReg: self regR withReg: self regV index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareSwithTindex: index [
+JITAssemblerAMD64 >> compareSwithTindex: index [
 	self assemble: 'cmp' withReg: self regS withReg: self regT index: index
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareTwithA [
+JITAssemblerAMD64 >> compareTwithA [
 	self assemble: 'cmp' with: self regT with: self regA
 ]
 
 { #category : #comparing }
-JITAssembler64 >> compareTwithImmediate: imm [
+JITAssemblerAMD64 >> compareTwithImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'cmp' with: self regT withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareWithFalse: register [
+JITAssemblerAMD64 >> compareWithFalse: register [
 	self assemble: 'cmp' with: register with: self regFalse
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareWithNil: register [
+JITAssemblerAMD64 >> compareWithNil: register [
 	self assemble: 'cmp' with: register with: self regNil
 ]
 
 { #category : #loading }
-JITAssembler64 >> compareWithTrue: register [
+JITAssemblerAMD64 >> compareWithTrue: register [
 	self assemble: 'cmp' with: register with: self regTrue
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertAtoNativeInteger [
+JITAssemblerAMD64 >> convertAtoNativeInteger [
 	self convertToNativeInteger: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertAtoSmallInteger [
+JITAssemblerAMD64 >> convertAtoSmallInteger [
 	self convertToSmallInteger: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertRtoNativeInteger [
+JITAssemblerAMD64 >> convertRtoNativeInteger [
 	self convertToNativeInteger: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertRtoSmallInteger [
+JITAssemblerAMD64 >> convertRtoSmallInteger [
 	self convertToSmallInteger: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertTToNativeInteger [
+JITAssemblerAMD64 >> convertTToNativeInteger [
 	self convertToNativeInteger: self regT
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertTosToSmallInteger [
+JITAssemblerAMD64 >> convertTosToSmallInteger [
 	pointer reset; length: self addressLength; base: self regSP.
 	self
 		assemble: 'shl' with: pointer with: 1;
@@ -370,49 +370,49 @@ JITAssembler64 >> convertTosToSmallInteger [
 ]
 
 { #category : #integers }
-JITAssembler64 >> convertTtoNativeInteger [
+JITAssemblerAMD64 >> convertTtoNativeInteger [
 	self convertToNativeInteger: self regT
 ]
 
 { #category : #jumps }
-JITAssembler64 >> dec: op1 [
+JITAssemblerAMD64 >> dec: op1 [
 	self assemble: 'dec' with: op1
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> decR [
+JITAssemblerAMD64 >> decR [
 	self assemble: 'dec' with: self regR
 ]
 
 { #category : #private }
-JITAssembler64 >> decRindirect [
+JITAssemblerAMD64 >> decRindirect [
 	pointer reset; length: self addressLength; base: self regR.
 	self assemble: 'dec' with: pointer
 ]
 
 { #category : #services }
-JITAssembler64 >> disassembledText32 [
+JITAssemblerAMD64 >> disassembledText32 [
 	^self nativeCode disassembledText32
 ]
 
 { #category : #services }
-JITAssembler64 >> disassembledText64 [
+JITAssemblerAMD64 >> disassembledText64 [
 	^self nativeCode disassembledText64
 ]
 
 { #category : #private }
-JITAssembler64 >> discardArguments: anInteger [
+JITAssemblerAMD64 >> discardArguments: anInteger [
 	anInteger = 0 ifTrue: [^self].
 	self addSPwithImmediate: anInteger * wordSize
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> divideDoubleX0byX1 [
+JITAssemblerAMD64 >> divideDoubleX0byX1 [
 	self assemble: 'divsd' with: xmm0 with: xmm1
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> divideRbyT [
+JITAssemblerAMD64 >> divideRbyT [
 	| conversion |
 	self ASSERT: (self regR r == rax and: [self regA r == rdx]).
 	conversion := wordSize = 8 ifTrue: ['cqo'] ifFalse: ['cdq'].
@@ -422,7 +422,7 @@ JITAssembler64 >> divideRbyT [
 ]
 
 { #category : #loading }
-JITAssembler64 >> dropTopOfFPU [
+JITAssemblerAMD64 >> dropTopOfFPU [
 	"
 	fstp st(0)
 	"
@@ -430,83 +430,83 @@ JITAssembler64 >> dropTopOfFPU [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> dropTos: count [
+JITAssemblerAMD64 >> dropTos: count [
 	| imm |
 	imm := count * self addressSize.
 	self assemble: 'add' with: self regSP with: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> dummyPointer [
+JITAssemblerAMD64 >> dummyPointer [
 	#dontOptimize.
 	^wordSize = 8 ifTrue: [16r1BADADD01BADADD0] ifFalse: [16r1BADADD0]
 ]
 
 { #category : #integers }
-JITAssembler64 >> ensureRintegerBit [
+JITAssemblerAMD64 >> ensureRintegerBit [
 	self assemble: 'or' with: al with: 1
 ]
 
 { #category : #integers }
-JITAssembler64 >> ensureSafeRintegerBit [
+JITAssemblerAMD64 >> ensureSafeRintegerBit [
 	self assemble: 'or' with: al with: 1
 ]
 
 { #category : #loading }
-JITAssembler64 >> exchangeRindirectWithT [
+JITAssemblerAMD64 >> exchangeRindirectWithT [
 	pointer reset; length: self addressLength; base: self regR.
 	self assemble: 'xchg' with: pointer with: self regT
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> incA [
+JITAssemblerAMD64 >> incA [
 	self assemble: 'inc' with: self regA
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> incC [
+JITAssemblerAMD64 >> incC [
 	self assemble: 'inc' with: self regC
 ]
 
 { #category : #private }
-JITAssembler64 >> initialize [
+JITAssemblerAMD64 >> initialize [
 	super initialize.
 	literals := OrderedCollection new
 ]
 
 { #category : #private }
-JITAssembler64 >> initializeS [
+JITAssemblerAMD64 >> initializeS [
 	self assemble: 'mov' with: self regS with: self regR
 ]
 
 { #category : #private }
-JITAssembler64 >> jumpIndirectA [
+JITAssemblerAMD64 >> jumpIndirectA [
 	pointer reset; length: self addressLength; base: self regA.
 	self assemble: 'jmp' with: pointer
 ]
 
 { #category : #comparing }
-JITAssembler64 >> jumpToA [
+JITAssemblerAMD64 >> jumpToA [
 	self assemble: 'jmp' with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> jumpToMindex: index [
+JITAssemblerAMD64 >> jumpToMindex: index [
 	self assemble: 'jmp' withReg: self regM index: index
 ]
 
 { #category : #comparing }
-JITAssembler64 >> jumpToS [
+JITAssemblerAMD64 >> jumpToS [
 	self assemble: 'jmp' with: self regS
 ]
 
 { #category : #loading }
-JITAssembler64 >> jumpToTindex: index [
+JITAssemblerAMD64 >> jumpToTindex: index [
 	self assemble: 'jmp' withReg: self regT index: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerBitTestOf: aRegister [
+JITAssemblerAMD64 >> labeledIntegerBitTestOf: aRegister [
 	| label |
 	self testIntegerBitOf: aRegister.
 	label := self newLabel.
@@ -515,22 +515,22 @@ JITAssembler64 >> labeledIntegerBitTestOf: aRegister [
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerBitTestOfA [
+JITAssemblerAMD64 >> labeledIntegerBitTestOfA [
 	^self labeledIntegerBitTestOf: self regA8
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerBitTestOfR [
+JITAssemblerAMD64 >> labeledIntegerBitTestOfR [
 	^self labeledIntegerBitTestOf: self regR8
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerBitTestOfT [
+JITAssemblerAMD64 >> labeledIntegerBitTestOfT [
 	^self labeledIntegerBitTestOf: self regT byte
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerNativizationOf: aRegister [
+JITAssemblerAMD64 >> labeledIntegerNativizationOf: aRegister [
 	| label |
 	self convertToNativeInteger: aRegister.
 	label := self newLabel.
@@ -539,22 +539,22 @@ JITAssembler64 >> labeledIntegerNativizationOf: aRegister [
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerNativizationOfA [
+JITAssemblerAMD64 >> labeledIntegerNativizationOfA [
 	^self labeledIntegerNativizationOf: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerNativizationOfR [
+JITAssemblerAMD64 >> labeledIntegerNativizationOfR [
 	^self labeledIntegerNativizationOf: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledIntegerNativizationOfT [
+JITAssemblerAMD64 >> labeledIntegerNativizationOfT [
 	^self labeledIntegerNativizationOf: self regT
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledNonIntegerBitTestOf: aRegister [
+JITAssemblerAMD64 >> labeledNonIntegerBitTestOf: aRegister [
 	| label |
 	self testIntegerBitOf: aRegister.
 	label := self newLabel.
@@ -563,12 +563,12 @@ JITAssembler64 >> labeledNonIntegerBitTestOf: aRegister [
 ]
 
 { #category : #integers }
-JITAssembler64 >> labeledNonIntegerBitTestOfR [
+JITAssemblerAMD64 >> labeledNonIntegerBitTestOfR [
 	^self labeledNonIntegerBitTestOf: self regR8
 ]
 
 { #category : #loading }
-JITAssembler64 >> load: register withLiteral: anObject [
+JITAssemblerAMD64 >> load: register withLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self
@@ -579,34 +579,34 @@ JITAssembler64 >> load: register withLiteral: anObject [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithAindex: index [
+JITAssemblerAMD64 >> loadAwithAindex: index [
 	self assemble: 'mov' withReg: self regA withReg: self regA index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithBoolean: aBoolean [
+JITAssemblerAMD64 >> loadAwithBoolean: aBoolean [
 	aBoolean ifTrue: [self loadAwithTrue]
 	ifFalse: [self loadAwithFalse]
 
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithEindex: index [
+JITAssemblerAMD64 >> loadAwithEindex: index [
 	self assemble: 'mov' withReg: self regA withReg: self regE index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithFPindex: index [
+JITAssemblerAMD64 >> loadAwithFPindex: index [
 	self assemble: 'mov' withReg: self regA withReg: self regFP index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithFalse [
+JITAssemblerAMD64 >> loadAwithFalse [
 	self assemble: 'mov' with: self regA with: self regFalse
 ]
 
 { #category : #private }
-JITAssembler64 >> loadAwithGindex: index [
+JITAssemblerAMD64 >> loadAwithGindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regA
@@ -615,32 +615,32 @@ JITAssembler64 >> loadAwithGindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithGlobal: aSymbol [
+JITAssemblerAMD64 >> loadAwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadAwithGindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithImmediate: imm [
+JITAssemblerAMD64 >> loadAwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regA withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithKnown: anObject [
+JITAssemblerAMD64 >> loadAwithKnown: anObject [
 	self breakpoint
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithLiteral: anObject [
+JITAssemblerAMD64 >> loadAwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadAwithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithMindex: index [
+JITAssemblerAMD64 >> loadAwithMindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regA
@@ -649,22 +649,22 @@ JITAssembler64 >> loadAwithMindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithNil [
+JITAssemblerAMD64 >> loadAwithNil [
 	self assemble: 'mov' with: self regA with: self regNil
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithR [
+JITAssemblerAMD64 >> loadAwithR [
 	self assemble: 'mov' with: self regA with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithRindex: index [
+JITAssemblerAMD64 >> loadAwithRindex: index [
 	self assemble: 'mov' withReg: self regA withReg: self regR index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithRoffsetAtA [
+JITAssemblerAMD64 >> loadAwithRoffsetAtA [
 	pointer
 		reset;
 		length: self addressLength;
@@ -674,32 +674,32 @@ JITAssembler64 >> loadAwithRoffsetAtA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithS [
+JITAssemblerAMD64 >> loadAwithS [
 	self assemble: 'mov' with: self regA with: self regS
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithSindex: index [
+JITAssemblerAMD64 >> loadAwithSindex: index [
 	self assemble: 'mov' withReg: self regA withReg: self regS index: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadAwithSmallInteger: anInteger [
+JITAssemblerAMD64 >> loadAwithSmallInteger: anInteger [
 	self loadAwithImmediate: (anInteger bitShift: 1) + 1
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithT [
+JITAssemblerAMD64 >> loadAwithT [
 	self assemble: 'mov' with: self regA with: self regT
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadAwithTrue [
+JITAssemblerAMD64 >> loadAwithTrue [
 	self assemble: 'mov' with: self regA with: self regTrue
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadEwithAddressOfRatA [
+JITAssemblerAMD64 >> loadEwithAddressOfRatA [
 	pointer
 		reset;
 		length: self addressLength;
@@ -711,74 +711,74 @@ JITAssembler64 >> loadEwithAddressOfRatA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadEwithFPindex: index [
+JITAssemblerAMD64 >> loadEwithFPindex: index [
 	self assemble: 'mov' withReg: self regE withReg: self regFP index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadEwithImmediate: imm [
+JITAssemblerAMD64 >> loadEwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regE withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadEwithNil [
+JITAssemblerAMD64 >> loadEwithNil [
 	self assemble: 'mov' with: self regE with: self regNil
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadEwithR [
+JITAssemblerAMD64 >> loadEwithR [
 	self assemble: 'mov' with: self regE with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadFPwithR [
+JITAssemblerAMD64 >> loadFPwithR [
 	self assemble: 'mov' with: self regFP with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadFPwithSP [
+JITAssemblerAMD64 >> loadFPwithSP [
 	self assemble: 'mov' with: self regFP with: self regSP
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadFalseWithLiteral: anObject [
+JITAssemblerAMD64 >> loadFalseWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadFalseWithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadFalseWithMindex: index [
+JITAssemblerAMD64 >> loadFalseWithMindex: index [
 	self assemble: 'mov' withReg: self regFalse withReg: self regM index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadGwithLiteral: anObject [
+JITAssemblerAMD64 >> loadGwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadGwithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadGwithMindex: index [
+JITAssemblerAMD64 >> loadGwithMindex: index [
 	self assemble: 'mov' withReg: self regG withReg: self regM index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLargeX0withRindirect [
+JITAssemblerAMD64 >> loadLargeX0withRindirect [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'movq' with: xmm0 with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLargeX1withAindirect [
+JITAssemblerAMD64 >> loadLargeX1withAindirect [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'movq' with: xmm1 with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLongMwithIPoffset: anInteger [
+JITAssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
 	| instsize |
 	#dontOptimize.
 	instsize := 6.
@@ -791,7 +791,7 @@ JITAssembler64 >> loadLongMwithIPoffset: anInteger [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLongRWithRAtOffsetA [
+JITAssemblerAMD64 >> loadLongRWithRAtOffsetA [
 	pointer
 		reset;
 		length: 32;
@@ -801,7 +801,7 @@ JITAssembler64 >> loadLongRWithRAtOffsetA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLongRwithRatOffsetA [
+JITAssemblerAMD64 >> loadLongRwithRatOffsetA [
 	pointer
 		reset;
 		length: 32;
@@ -811,7 +811,7 @@ JITAssembler64 >> loadLongRwithRatOffsetA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadLongSwithRindex: index [
+JITAssemblerAMD64 >> loadLongSwithRindex: index [
 	#dontOptimize.
 	pointer
 		reset;
@@ -822,18 +822,18 @@ JITAssembler64 >> loadLongSwithRindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMXCSRfromA [
+JITAssemblerAMD64 >> loadMXCSRfromA [
 	pointer reset; length: 32; base: self regA.
 	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> loadMwithA [
+JITAssemblerAMD64 >> loadMwithA [
 	self assemble: 'mov' with: self regM with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithFPindex: index [
+JITAssemblerAMD64 >> loadMwithFPindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regM
@@ -842,32 +842,32 @@ JITAssembler64 >> loadMwithFPindex: index [
 ]
 
 { #category : #private }
-JITAssembler64 >> loadMwithGindex: index [
+JITAssemblerAMD64 >> loadMwithGindex: index [
 	self assemble: 'mov' withReg: self regM withReg: self regG index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithGlobal: aSymbol [
+JITAssemblerAMD64 >> loadMwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadMwithGindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithImmediate: imm [
+JITAssemblerAMD64 >> loadMwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regM withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithLiteral: anObject [
+JITAssemblerAMD64 >> loadMwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadMwithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithMindex: index [
+JITAssemblerAMD64 >> loadMwithMindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regM
@@ -876,7 +876,7 @@ JITAssembler64 >> loadMwithMindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithRIPoffset: imm [
+JITAssemblerAMD64 >> loadMwithRIPoffset: imm [
 	pointer
 		reset;
 		length: self addressLength;
@@ -887,7 +887,7 @@ JITAssembler64 >> loadMwithRIPoffset: imm [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithRindex: index [
+JITAssemblerAMD64 >> loadMwithRindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regM
@@ -896,41 +896,41 @@ JITAssembler64 >> loadMwithRindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadMwithTindex: index [
+JITAssemblerAMD64 >> loadMwithTindex: index [
 	self assemble: 'mov' withReg: self regM withReg: self regT index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadNilWithLiteral: anObject [
+JITAssemblerAMD64 >> loadNilWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadNilWithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadNilWithMindex: index [
+JITAssemblerAMD64 >> loadNilWithMindex: index [
 	self assemble: 'mov' withReg: self regNil withReg: self regM index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRConvertingDoubleRindirect [
+JITAssemblerAMD64 >> loadRConvertingDoubleRindirect [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'cvttsd2si' with: self regR with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRconvertingDoublePointedByR [
+JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'cvttsd2si' with: self regR with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithA [
+JITAssemblerAMD64 >> loadRwithA [
 	self assemble: 'mov' with: self regR with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithArgPointer [
+JITAssemblerAMD64 >> loadRwithArgPointer [
 	pointer
 		reset;
 		length: self addressLength;
@@ -940,57 +940,57 @@ JITAssembler64 >> loadRwithArgPointer [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithBoolean: aBoolean [
+JITAssemblerAMD64 >> loadRwithBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self loadRwithTrue ]
 		ifFalse: [ self loadRwithFalse ]
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithE [
+JITAssemblerAMD64 >> loadRwithE [
 	self assemble: 'mov' with: self regR with: self regE
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithEindex: index [
+JITAssemblerAMD64 >> loadRwithEindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regE index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithFP [
+JITAssemblerAMD64 >> loadRwithFP [
 	self assemble: 'mov' with: self regR with: self regFP
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithFPindex: index [
+JITAssemblerAMD64 >> loadRwithFPindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regFP index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithFalse [
+JITAssemblerAMD64 >> loadRwithFalse [
 	self assemble: 'mov' with: self regR with: self regFalse
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithImmediate: imm [
+JITAssemblerAMD64 >> loadRwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regR withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithLiteral: anObject [
+JITAssemblerAMD64 >> loadRwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadRwithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithM [
+JITAssemblerAMD64 >> loadRwithM [
 	self assemble: 'mov' with: self regR with: self regM
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithMindex: index [
+JITAssemblerAMD64 >> loadRwithMindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regR
@@ -999,17 +999,17 @@ JITAssembler64 >> loadRwithMindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithNil [
+JITAssemblerAMD64 >> loadRwithNil [
 	self assemble: 'mov' with: self regR with: self regNil
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadRwithRatA [
+JITAssemblerAMD64 >> loadRwithRatA [
 	self load: self regR from: self regR atIndexAt: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithRatOffsetA [
+JITAssemblerAMD64 >> loadRwithRatOffsetA [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1019,7 +1019,7 @@ JITAssembler64 >> loadRwithRatOffsetA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithRbyte: index [
+JITAssemblerAMD64 >> loadRwithRbyte: index [
 	pointer
 		reset;
 		length: 8;
@@ -1032,12 +1032,12 @@ JITAssembler64 >> loadRwithRbyte: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithRindex: index [
+JITAssemblerAMD64 >> loadRwithRindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regR index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithRwordAt: index [
+JITAssemblerAMD64 >> loadRwithRwordAt: index [
 	pointer
 		reset;
 		length: 16;
@@ -1050,22 +1050,22 @@ JITAssembler64 >> loadRwithRwordAt: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithS [
+JITAssemblerAMD64 >> loadRwithS [
 	self assemble: 'mov' with: self regR with: self regS
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithSP [
+JITAssemblerAMD64 >> loadRwithSP [
 	self assemble: 'mov' with: self regR with: self regSP
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithSPindex: index [
+JITAssemblerAMD64 >> loadRwithSPindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regSP index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithSbyte: index [
+JITAssemblerAMD64 >> loadRwithSbyte: index [
 	pointer
 		reset;
 		length: 8;
@@ -1078,17 +1078,17 @@ JITAssembler64 >> loadRwithSbyte: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithSindex: index [
+JITAssemblerAMD64 >> loadRwithSindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regS index: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadRwithSmallInteger: anInteger [
+JITAssemblerAMD64 >> loadRwithSmallInteger: anInteger [
 	self loadRwithImmediate: (anInteger bitShift: 1) + 1
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithSwordAt: index [
+JITAssemblerAMD64 >> loadRwithSwordAt: index [
 	pointer
 		reset;
 		length: 16;
@@ -1101,12 +1101,12 @@ JITAssembler64 >> loadRwithSwordAt: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithT [
+JITAssemblerAMD64 >> loadRwithT [
 	self assemble: 'mov' with: self regR with: self regT
 ]
 
 { #category : #storing }
-JITAssembler64 >> loadRwithTIBatIndexR [
+JITAssemblerAMD64 >> loadRwithTIBatIndexR [
 	| seg |
 	seg := wordSize = 8 ifTrue: [gs] ifFalse: [fs].
 	pointer
@@ -1119,7 +1119,7 @@ JITAssembler64 >> loadRwithTIBatIndexR [
 ]
 
 { #category : #storing }
-JITAssembler64 >> loadRwithThreadVariableAtIndexR [
+JITAssemblerAMD64 >> loadRwithThreadVariableAtIndexR [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1132,50 +1132,50 @@ JITAssembler64 >> loadRwithThreadVariableAtIndexR [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithTindex: index [
+JITAssemblerAMD64 >> loadRwithTindex: index [
 	self assemble: 'mov' withReg: self regR withReg: self regT index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithTos [
+JITAssemblerAMD64 >> loadRwithTos [
 	pointer reset; length: self addressLength; base: self regSP.
 	self assemble: 'mov' with: self regR with: pointer
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithTrue [
+JITAssemblerAMD64 >> loadRwithTrue [
 	self assemble: 'mov' with: self regR with: self regTrue
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadRwithX0 [
+JITAssemblerAMD64 >> loadRwithX0 [
 	| mov |
 	mov := wordSize = 8 ifTrue: ['movq'] ifFalse: ['movd'].
 	self assemble: mov with: self regR with: xmm0
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSPwithFP [
+JITAssemblerAMD64 >> loadSPwithFP [
 	self assemble: 'mov' with: self regSP with: self regFP
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSPwithT [
+JITAssemblerAMD64 >> loadSPwithT [
 	self assemble: 'mov' with: self regSP with: self regT
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSWithRIndex: index [
+JITAssemblerAMD64 >> loadSWithRIndex: index [
 	self load: self regS from: self regR atIndex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithA [
+JITAssemblerAMD64 >> loadSwithA [
 	self assemble: 'mov' with: self regS with: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadSwithAddressOfSatA [
+JITAssemblerAMD64 >> loadSwithAddressOfSatA [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1187,90 +1187,90 @@ JITAssembler64 >> loadSwithAddressOfSatA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithFPindex: index [
+JITAssemblerAMD64 >> loadSwithFPindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regFP index: index
 ]
 
 { #category : #private }
-JITAssembler64 >> loadSwithGindex: index [
+JITAssemblerAMD64 >> loadSwithGindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regG index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithGlobal: aSymbol [
+JITAssemblerAMD64 >> loadSwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadSwithGindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithImmediate: imm [
+JITAssemblerAMD64 >> loadSwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regS withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithNil [
+JITAssemblerAMD64 >> loadSwithNil [
 	self assemble: 'mov' with: self regS with: self regNil
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithRindex: index [
+JITAssemblerAMD64 >> loadSwithRindex: index [
 	self assemble: 'mov' withReg: self regS withReg: self regR index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadSwithT [
+JITAssemblerAMD64 >> loadSwithT [
 	self assemble: 'mov' with: self regS with: self regT
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTrueWithLiteral: anObject [
+JITAssemblerAMD64 >> loadTrueWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadTrueWithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTrueWithMindex: index [
+JITAssemblerAMD64 >> loadTrueWithMindex: index [
 	self assemble: 'mov' withReg: self regTrue withReg: self regM index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithA [
+JITAssemblerAMD64 >> loadTwithA [
 	self assemble: 'mov' with: self regT with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithAindex: index [
+JITAssemblerAMD64 >> loadTwithAindex: index [
 	self assemble: 'mov' withReg: self regT withReg: self regA index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithEindex: index [
+JITAssemblerAMD64 >> loadTwithEindex: index [
 	self assemble: 'mov' withReg: self regT withReg: self regE index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithFPindex: index [
+JITAssemblerAMD64 >> loadTwithFPindex: index [
 	self assemble: 'mov' withReg: self regT withReg: self regFP index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithImmediate: imm [
+JITAssemblerAMD64 >> loadTwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regT withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithLiteral: anObject [
+JITAssemblerAMD64 >> loadTwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadTwithMindex: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithMindex: index [
+JITAssemblerAMD64 >> loadTwithMindex: index [
 	self
 		assemble: 'mov'
 		withReg: self regT
@@ -1279,28 +1279,28 @@ JITAssembler64 >> loadTwithMindex: index [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithR [
+JITAssemblerAMD64 >> loadTwithR [
 	self assemble: 'mov' with: self regT with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadTwithTindex: index [
+JITAssemblerAMD64 >> loadTwithTindex: index [
 	self assemble: 'mov' withReg: self regT withReg: self regT index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadVwithImmediate: imm [
+JITAssemblerAMD64 >> loadVwithImmediate: imm [
 	#imm32.
 	self assemble: 'mov' with: self regV withImm: imm
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadWithFalse: register [
+JITAssemblerAMD64 >> loadWithFalse: register [
 	self assemble: 'mov' with: register with: self regFalse
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadWithNil: register [
+JITAssemblerAMD64 >> loadWithNil: register [
 	self
 		assemble: 'mov'
 		with: register
@@ -1308,55 +1308,55 @@ JITAssembler64 >> loadWithNil: register [
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadWithTrue: register [
+JITAssemblerAMD64 >> loadWithTrue: register [
 	self assemble: 'mov' with: register with: self regTrue
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadX0withRasDouble [
+JITAssemblerAMD64 >> loadX0withRasDouble [
 	self assemble: 'cvtsi2sd' with: xmm0 with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> loadX1roundingX0 [
+JITAssemblerAMD64 >> loadX1roundingX0 [
 	self assemble: 'roundsd' with: xmm1 with: xmm0 with: 3
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendByteRwithRatA [
+JITAssemblerAMD64 >> loadZeroExtendByteRwithRatA [
 	self loadZeroExtendByte: self regR from: self regR atIndexAt: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendByteRwithRindex: index [
+JITAssemblerAMD64 >> loadZeroExtendByteRwithRindex: index [
 	#dontOptimize.
 	self loadZeroExtendByte: self regR from: self regR atIndex: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendByteRwithSPatA [
+JITAssemblerAMD64 >> loadZeroExtendByteRwithSPatA [
 	self loadZeroExtendByte: self regR from: self regSP atIndexAt: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendByteTwithAindex: index [
+JITAssemblerAMD64 >> loadZeroExtendByteTwithAindex: index [
 	#dontOptimize.
 	self loadZeroExtendByte: self regT from: self regA atIndex: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendLongRwithRatA [
+JITAssemblerAMD64 >> loadZeroExtendLongRwithRatA [
 	self load: self regR e from: self regR atIndexAt: self regA
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendLongRwithRindex: index [
+JITAssemblerAMD64 >> loadZeroExtendLongRwithRindex: index [
 	#dontOptimize.
 	self load: self regR e from: self regR atIndex: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> loadZeroExtendShortRwithRoffset: offset [
+JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer
 		reset;
 		length: 16;
@@ -1366,12 +1366,12 @@ JITAssembler64 >> loadZeroExtendShortRwithRoffset: offset [
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> lock [
+JITAssemblerAMD64 >> lock [
 	self assembleByte: 16rF0
 ]
 
 { #category : #jumps }
-JITAssembler64 >> loop: aBlock times: anInteger [
+JITAssemblerAMD64 >> loop: aBlock times: anInteger [
 	| loop |
 	loop := self newLabel.
 	self loadTwithImmediate: anInteger; @ loop.
@@ -1380,14 +1380,14 @@ JITAssembler64 >> loop: aBlock times: anInteger [
 ]
 
 { #category : #jumps }
-JITAssembler64 >> loopTo: label [
+JITAssemblerAMD64 >> loopTo: label [
 	self
 		assemble: 'dec' with: self regT;
 		jumpIfNotZeroTo: label
 ]
 
 { #category : #jumps }
-JITAssembler64 >> loopTtimes: aBlock [
+JITAssemblerAMD64 >> loopTtimes: aBlock [
 	| loop end |
 	loop := self newLabel.
 	end := self newLabel.
@@ -1403,7 +1403,7 @@ JITAssembler64 >> loopTtimes: aBlock [
 ]
 
 { #category : #'opcodes - integer related' }
-JITAssembler64 >> moveTslots [
+JITAssemblerAMD64 >> moveTslots [
 	| rep mnemonic |
 	rep := 16rF3.
 	mnemonic := wordSize = 8 ifTrue: ['movsq'] ifFalse: ['movsd'].
@@ -1411,115 +1411,115 @@ JITAssembler64 >> moveTslots [
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> multiplyDoubleX0byX1 [
+JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
 	self assemble: 'mulsd' with: xmm0 with: xmm1
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> multiplyRbyA [
+JITAssemblerAMD64 >> multiplyRbyA [
 	self ASSERT: (self regR r == rax and: [self regA r == rdx]).
 	self assemble: 'imul' with: self regA
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> multiplyRbyConstant: imm [
+JITAssemblerAMD64 >> multiplyRbyConstant: imm [
 	self assemble: 'imul' with: self regR with: self regR with: imm
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> nativeCode [
+JITAssemblerAMD64 >> nativeCode [
 	^(NativeCode withAll: literals) code: memory bytes
 ]
 
 { #category : #logic }
-JITAssembler64 >> orRwithA [
+JITAssemblerAMD64 >> orRwithA [
 	self assemble: 'or' with: self regR with: self regA
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popA [
+JITAssemblerAMD64 >> popA [
 	self assemble: 'pop' with: self regA
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popB [
+JITAssemblerAMD64 >> popB [
 	self assemble: 'pop' with: self regB
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popE [
+JITAssemblerAMD64 >> popE [
 	self assemble: 'pop' with: self regE
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popFP [
+JITAssemblerAMD64 >> popFP [
 	self assemble: 'pop' with: self regFP
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popFalse [
+JITAssemblerAMD64 >> popFalse [
 	self assemble: 'pop' with: self regFalse
 ]
 
 { #category : #private }
-JITAssembler64 >> popG [
+JITAssemblerAMD64 >> popG [
 	self assemble: 'pop' with: self regG
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popM [
+JITAssemblerAMD64 >> popM [
 	self assemble: 'pop' with: self regM
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popNil [
+JITAssemblerAMD64 >> popNil [
 	self assemble: 'pop' with: self regNil
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popR [
+JITAssemblerAMD64 >> popR [
 	self assemble: 'pop' with: self regR
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popS [
+JITAssemblerAMD64 >> popS [
 	self assemble: 'pop' with: self regS
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popSP [
+JITAssemblerAMD64 >> popSP [
 	self assemble: 'pop' with: self regSP
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popSPindirect [
+JITAssemblerAMD64 >> popSPindirect [
 	pointer reset; length: self addressLength; base: self regSP.
 	self assemble: 'pop' with: pointer
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popT [
+JITAssemblerAMD64 >> popT [
 	self assemble: 'pop' with: self regT
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> popTrue [
+JITAssemblerAMD64 >> popTrue [
 	self assemble: 'pop' with: self regTrue
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushA [
+JITAssemblerAMD64 >> pushA [
 	self assemble: 'push' with: self regA
 ]
 
 { #category : #loading }
-JITAssembler64 >> pushAOnFPUStack [
+JITAssemblerAMD64 >> pushAOnFPUStack [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'fld' with: pointer
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushAatToffset: offset [
+JITAssemblerAMD64 >> pushAatToffset: offset [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1531,76 +1531,76 @@ JITAssembler64 >> pushAatToffset: offset [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushB [
+JITAssemblerAMD64 >> pushB [
 	self assemble: 'push' with: self regB
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushE [
+JITAssemblerAMD64 >> pushE [
 	self assemble: 'push' with: self regE
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushEindex: index [
+JITAssemblerAMD64 >> pushEindex: index [
 	self assemble: 'push' withReg: self regE index: index
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushFP [
+JITAssemblerAMD64 >> pushFP [
 	self assemble: 'push' with: self regFP
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushFPindex: index [
+JITAssemblerAMD64 >> pushFPindex: index [
 	self assemble: 'push' withReg: self regFP index: index
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushFalse [
+JITAssemblerAMD64 >> pushFalse [
 	self assemble: 'push' with: self regFalse
 ]
 
 { #category : #private }
-JITAssembler64 >> pushG [
+JITAssemblerAMD64 >> pushG [
 	self assemble: 'push' with: self regG
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushImmediate: imm [
+JITAssemblerAMD64 >> pushImmediate: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'push' withImm: imm
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushIndirectR [
+JITAssemblerAMD64 >> pushIndirectR [
 	pointer reset; length: self addressLength; base: self regR.
 	self assemble: 'push' with: pointer
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushM [
+JITAssemblerAMD64 >> pushM [
 	self assemble: 'push' with: self regM
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushNil [
+JITAssemblerAMD64 >> pushNil [
 	self assemble: 'push' with: self regNil
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushR [
+JITAssemblerAMD64 >> pushR [
 	self assemble: 'push' with: self regR
 ]
 
 { #category : #loading }
-JITAssembler64 >> pushROnFPUStack [
+JITAssemblerAMD64 >> pushROnFPUStack [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'fld' with: pointer
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushRbyte: index [
+JITAssemblerAMD64 >> pushRbyte: index [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1613,7 +1613,7 @@ JITAssembler64 >> pushRbyte: index [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushRwordAt: index [
+JITAssemblerAMD64 >> pushRwordAt: index [
 	pointer
 		halt;
 		reset;
@@ -1627,17 +1627,17 @@ JITAssembler64 >> pushRwordAt: index [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushS [
+JITAssemblerAMD64 >> pushS [
 	self assemble: 'push' with: self regS
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushSP [
+JITAssemblerAMD64 >> pushSP [
 	self assemble: 'push' with: self regSP
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushSbyte: index [
+JITAssemblerAMD64 >> pushSbyte: index [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1650,17 +1650,17 @@ JITAssembler64 >> pushSbyte: index [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushSindex: index [
+JITAssemblerAMD64 >> pushSindex: index [
 	self assemble: 'push' withReg: self regS index: index
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushSmallInteger: integer [
+JITAssemblerAMD64 >> pushSmallInteger: integer [
 	self pushImmediate: (integer bitShift: 1) + 1
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushSwordAt: index [
+JITAssemblerAMD64 >> pushSwordAt: index [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1673,245 +1673,245 @@ JITAssembler64 >> pushSwordAt: index [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushT [
+JITAssemblerAMD64 >> pushT [
 	self assemble: 'push' with: self regT
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushTindex: index [
+JITAssemblerAMD64 >> pushTindex: index [
 	self assemble: 'push' withReg: self regT index: index
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushTrue [
+JITAssemblerAMD64 >> pushTrue [
 	self assemble: 'push' with: self regTrue
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> pushVindex: index [
+JITAssemblerAMD64 >> pushVindex: index [
 	self assemble: 'push' withReg: self regV index: index
 ]
 
 { #category : #services }
-JITAssembler64 >> readFPUStatusOnA [
+JITAssemblerAMD64 >> readFPUStatusOnA [
 	pointer reset; length: 16; base: self regA.
 	self assemble: 'fstsw' with: pointer
 ]
 
 { #category : #private }
-JITAssembler64 >> regA [
+JITAssemblerAMD64 >> regA [
 	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
 ]
 
 { #category : #private }
-JITAssembler64 >> regA8 [
+JITAssemblerAMD64 >> regA8 [
 	^dl
 ]
 
 { #category : #private }
-JITAssembler64 >> regB [
+JITAssemblerAMD64 >> regB [
 	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
 ]
 
 { #category : #private }
-JITAssembler64 >> regC [
+JITAssemblerAMD64 >> regC [
 	^wordSize = 8 ifTrue: [rbx] ifFalse: [ebx]
 ]
 
 { #category : #private }
-JITAssembler64 >> regE [
+JITAssemblerAMD64 >> regE [
 	^wordSize = 8 ifTrue: [rdi] ifFalse: [edi]
 ]
 
 { #category : #private }
-JITAssembler64 >> regFP [
+JITAssemblerAMD64 >> regFP [
 	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
 ]
 
 { #category : #private }
-JITAssembler64 >> regFalse [
+JITAssemblerAMD64 >> regFalse [
 	^ r14
 ]
 
 { #category : #private }
-JITAssembler64 >> regG [
+JITAssemblerAMD64 >> regG [
 	^r15
 ]
 
 { #category : #private }
-JITAssembler64 >> regIP [
+JITAssemblerAMD64 >> regIP [
 	^ rip
 ]
 
 { #category : #private }
-JITAssembler64 >> regM [
+JITAssemblerAMD64 >> regM [
 	^rbx
 ]
 
 { #category : #private }
-JITAssembler64 >> regNil [
+JITAssemblerAMD64 >> regNil [
 	^ r12
 ]
 
 { #category : #private }
-JITAssembler64 >> regR [
+JITAssemblerAMD64 >> regR [
 	^wordSize = 8 ifTrue: [rax] ifFalse: [eax]
 ]
 
 { #category : #private }
-JITAssembler64 >> regR8 [
+JITAssemblerAMD64 >> regR8 [
 	^al
 ]
 
 { #category : #private }
-JITAssembler64 >> regS [
+JITAssemblerAMD64 >> regS [
 	^wordSize = 8 ifTrue: [rsi] ifFalse: [esi]
 ]
 
 { #category : #private }
-JITAssembler64 >> regSP [
+JITAssemblerAMD64 >> regSP [
 	^wordSize = 8 ifTrue: [rsp] ifFalse: [esp]
 ]
 
 { #category : #private }
-JITAssembler64 >> regT [
+JITAssemblerAMD64 >> regT [
 	^wordSize = 8 ifTrue: [rcx] ifFalse: [ecx]
 ]
 
 { #category : #private }
-JITAssembler64 >> regT8 [
+JITAssemblerAMD64 >> regT8 [
 	^ cl
 ]
 
 { #category : #private }
-JITAssembler64 >> regTrue [
+JITAssemblerAMD64 >> regTrue [
 	^ r13
 ]
 
 { #category : #private }
-JITAssembler64 >> reserveStackSlots: amount [
+JITAssemblerAMD64 >> reserveStackSlots: amount [
 	self subtract: amount * self addressSize from: self regSP
 ]
 
 { #category : #comparing }
-JITAssembler64 >> reset [
+JITAssemblerAMD64 >> reset [
 	super reset.
 	literals := OrderedCollection new
 ]
 
 { #category : #epilogue }
-JITAssembler64 >> restoreCallerEnvironment [
+JITAssemblerAMD64 >> restoreCallerEnvironment [
 	self loadEwithFPindex: -2
 ]
 
 { #category : #epilogue }
-JITAssembler64 >> restoreCallerFrame [
+JITAssemblerAMD64 >> restoreCallerFrame [
 	self
 		move: self regFP to: self regSP;
 		pop: self regFP
 ]
 
 { #category : #epilogue }
-JITAssembler64 >> restoreCallerM [
+JITAssemblerAMD64 >> restoreCallerM [
 	self loadMwithFPindex: -1
 ]
 
 { #category : #epilogue }
-JITAssembler64 >> restoreCallerSelf [
+JITAssemblerAMD64 >> restoreCallerSelf [
 	self loadSwithFPindex: 0
 ]
 
 { #category : #integers }
-JITAssembler64 >> restoreRSmallInteger [
+JITAssemblerAMD64 >> restoreRSmallInteger [
 	self assemble: 'rcl' with: self regR with: 1
 ]
 
 { #category : #integers }
-JITAssembler64 >> restoreRsmallInteger [
+JITAssemblerAMD64 >> restoreRsmallInteger [
 	self assemble: 'rcl' with: self regR with: 1
 ]
 
 { #category : #services }
-JITAssembler64 >> returnFromCallback: argCount [
+JITAssemblerAMD64 >> returnFromCallback: argCount [
 	wordSize = 4 ifTrue: [self return: argCount] ifFalse: [self return]
 ]
 
 { #category : #loading }
-JITAssembler64 >> saveCallerFrame [
+JITAssemblerAMD64 >> saveCallerFrame [
 	self pushFP; loadFPwithSP
 ]
 
 { #category : #loading }
-JITAssembler64 >> scaleFloatOnRWithA [
+JITAssemblerAMD64 >> scaleFloatOnRWithA [
 	self pushAOnFPUStack; pushROnFPUStack; assemble: 'fscale'.
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'fstp' with: pointer; dropTopOfFPU
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftLeftRwithT [
+JITAssemblerAMD64 >> shiftLeftRwithT [
 	self ASSERT: self regT r == rcx.
 	self assemble: 'sal' with: self regR with: self regT b
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftLogicalRright: count [
+JITAssemblerAMD64 >> shiftLogicalRright: count [
 	self ASSERT: count < 32.
 	self assemble: 'shr' with: self regR with: count
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftRightRwithT [
+JITAssemblerAMD64 >> shiftRightRwithT [
 	self ASSERT: self regT r == rcx.
 	self assemble: 'sar' with: self regR with: self regT b
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftRleft: count [
+JITAssemblerAMD64 >> shiftRleft: count [
 	self ASSERT: count < 32.
 	self assemble: 'sal' with: self regR with: count
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftRright: count [
+JITAssemblerAMD64 >> shiftRright: count [
 	self ASSERT: count < (wordSize * 8).
 	self assemble: 'sar' with: self regR with: count
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftTleft: count [
+JITAssemblerAMD64 >> shiftTleft: count [
 	self ASSERT: count < 32.
 	self assemble: 'sal' with: self regT with: count
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> shiftTright: count [
+JITAssemblerAMD64 >> shiftTright: count [
 	self ASSERT: count < 32.
 	self assemble: 'sar' with: self regT with: count
 ]
 
 { #category : #comparing }
-JITAssembler64 >> smallInteger: anInteger [
+JITAssemblerAMD64 >> smallInteger: anInteger [
 	^(anInteger bitShift: 1) + 1
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> sqrtDoubleX0 [
+JITAssemblerAMD64 >> sqrtDoubleX0 [
 	self assemble: 'sqrtsd' with: xmm0 with: xmm0
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeAinRindex: index [
+JITAssemblerAMD64 >> storeAinRindex: index [
 	self store: self regA in: self regR index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeAinSPatT [
+JITAssemblerAMD64 >> storeAinSPatT [
 	self store: self regA in: self regSP indexAt: self regT
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeAinThreadVariableAtIndexR [
+JITAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
 	pointer
 		reset;
 		length: self addressLength;
@@ -1924,12 +1924,12 @@ JITAssembler64 >> storeAinThreadVariableAtIndexR [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeAinTindex: index [
+JITAssemblerAMD64 >> storeAinTindex: index [
 	self store: self regA in: self regT index: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> storeArgumentsInStack [
+JITAssemblerAMD64 >> storeArgumentsInStack [
 	self
 		store: rcx in: rbp index: 3;
 		store: rdx in: rbp index: 4;
@@ -1938,7 +1938,7 @@ JITAssembler64 >> storeArgumentsInStack [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeByteAinRindex: index [
+JITAssemblerAMD64 >> storeByteAinRindex: index [
 	#dontOptimize.
 	pointer
 		reset;
@@ -1949,7 +1949,7 @@ JITAssembler64 >> storeByteAinRindex: index [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeByteTinRatA [
+JITAssemblerAMD64 >> storeByteTinRatA [
 	pointer
 		reset;
 		length: 8;
@@ -1960,7 +1960,7 @@ JITAssembler64 >> storeByteTinRatA [
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> storeDoubleResultInRindirect [
+JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 	pointer reset; length: 64; base: self regR.
 	wordSize = 8
 		ifTrue: [self assemble: 'movq' with: pointer with: xmm0]
@@ -1968,45 +1968,45 @@ JITAssembler64 >> storeDoubleResultInRindirect [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeEinAindex: index [
+JITAssemblerAMD64 >> storeEinAindex: index [
 	self store: self regE in: self regA index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeEinRindex: index [
+JITAssemblerAMD64 >> storeEinRindex: index [
 	self store: self regE in: self regR index: index
 ]
 
 { #category : #loading }
-JITAssembler64 >> storeLargeX0inA [
+JITAssemblerAMD64 >> storeLargeX0inA [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #loading }
-JITAssembler64 >> storeLargeX0inR [
+JITAssemblerAMD64 >> storeLargeX0inR [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #loading }
-JITAssembler64 >> storeLargeX0inT [
+JITAssemblerAMD64 >> storeLargeX0inT [
 	pointer reset; length: 64; base: self regT.
 	self assemble: 'movq' with: pointer with: xmm0
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeLongTInRAtA [
+JITAssemblerAMD64 >> storeLongTInRAtA [
 	self store: self regT e in: self regR indexAt: self regA
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeLongTinRatA [
+JITAssemblerAMD64 >> storeLongTinRatA [
 	self store: self regT e in: self regR indexAt: self regA
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeLongTinRatOffsetA [
+JITAssemblerAMD64 >> storeLongTinRatOffsetA [
 	pointer
 		reset;
 		length: 32;
@@ -2016,28 +2016,28 @@ JITAssembler64 >> storeLongTinRatOffsetA [
 ]
 
 { #category : #loading }
-JITAssembler64 >> storeMXCSRintoA [
+JITAssemblerAMD64 >> storeMXCSRintoA [
 	pointer reset; length: 32; base: self regA.
 	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinAindex: index [
+JITAssemblerAMD64 >> storeRinAindex: index [
 	self store: self regR in: self regA index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinEindex: index [
+JITAssemblerAMD64 >> storeRinEindex: index [
 	self store: self regR in: self regE index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinFPindex: index [
+JITAssemblerAMD64 >> storeRinFPindex: index [
 	self store: self regR in: self regFP index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinSbyte: index [
+JITAssemblerAMD64 >> storeRinSbyte: index [
 	pointer
 		reset;
 		length: 8;
@@ -2047,12 +2047,12 @@ JITAssembler64 >> storeRinSbyte: index [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinSindex: index [
+JITAssemblerAMD64 >> storeRinSindex: index [
 	self store: self regR in: self regS index: index
 ]
 
 { #category : #'push/pop' }
-JITAssembler64 >> storeRinSwordAt: index [
+JITAssemblerAMD64 >> storeRinSwordAt: index [
 	pointer
 		reset;
 		length: 16;
@@ -2065,12 +2065,12 @@ JITAssembler64 >> storeRinSwordAt: index [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeRinTindex: index [
+JITAssemblerAMD64 >> storeRinTindex: index [
 	self store: self regR in: self regT index: index
 ]
 
 { #category : #integers }
-JITAssembler64 >> storeShortAinRoffset: offset [
+JITAssemblerAMD64 >> storeShortAinRoffset: offset [
 	pointer
 		reset;
 		length: 16;
@@ -2080,7 +2080,7 @@ JITAssembler64 >> storeShortAinRoffset: offset [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeShortTinRatOffsetA [
+JITAssemblerAMD64 >> storeShortTinRatOffsetA [
 	pointer
 		reset;
 		length: 16;
@@ -2090,17 +2090,17 @@ JITAssembler64 >> storeShortTinRatOffsetA [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeSinAindex: index [
+JITAssemblerAMD64 >> storeSinAindex: index [
 	self store: self regS in: self regA index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeSinRindex: index [
+JITAssemblerAMD64 >> storeSinRindex: index [
 	self store: self regS in: self regR index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTIBwithAatIndexR [
+JITAssemblerAMD64 >> storeTIBwithAatIndexR [
 	| seg |
 	seg := wordSize = 8 ifTrue: [gs] ifFalse: [fs].
 	pointer
@@ -2113,22 +2113,22 @@ JITAssembler64 >> storeTIBwithAatIndexR [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTInRAtA [
+JITAssemblerAMD64 >> storeTInRAtA [
 	self store: self regT in: self regR indexAt: self regA
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTinAindex: index [
+JITAssemblerAMD64 >> storeTinAindex: index [
 	self store: self regT in: self regA index: index
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTinRatA [
+JITAssemblerAMD64 >> storeTinRatA [
 	self store: self regT in: self regR indexAt: self regA
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTinRatOffsetA [
+JITAssemblerAMD64 >> storeTinRatOffsetA [
 	pointer
 		reset;
 		length: self addressLength;
@@ -2138,37 +2138,37 @@ JITAssembler64 >> storeTinRatOffsetA [
 ]
 
 { #category : #storing }
-JITAssembler64 >> storeTinRindex: index [
+JITAssemblerAMD64 >> storeTinRindex: index [
 	self store: self regT in: self regR index: index
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subAfromR [
+JITAssemblerAMD64 >> subAfromR [
 	self assemble: 'sub' with: self regR with: self regA
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subAfromT [
+JITAssemblerAMD64 >> subAfromT [
 	self assemble: 'sub' with: self regT with: self regA
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subDoubleX1fromX0 [
+JITAssemblerAMD64 >> subDoubleX1fromX0 [
 	self assemble: 'subsd' with: xmm0 with: xmm1
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subFromRconstant: imm [
+JITAssemblerAMD64 >> subFromRconstant: imm [
 	self assemble: 'sub' with: self regR withImm: imm
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subTfromR [
+JITAssemblerAMD64 >> subTfromR [
 	self assemble: 'sub' with: self regR with: self regT
 ]
 
 { #category : #arithmetic }
-JITAssembler64 >> subTslotsToSP [
+JITAssemblerAMD64 >> subTslotsToSP [
 	self assemble: 'neg' with: self regT.
 	pointer
 		reset;
@@ -2182,42 +2182,42 @@ JITAssembler64 >> subTslotsToSP [
 ]
 
 { #category : #integers }
-JITAssembler64 >> testAintegerBit [
+JITAssemblerAMD64 >> testAintegerBit [
 	self assemble: 'test' with: self regA8 with: 1
 ]
 
 { #category : #integers }
-JITAssembler64 >> testIntegerBitOf: aRegister [
+JITAssemblerAMD64 >> testIntegerBitOf: aRegister [
 	self assemble: 'test' with: aRegister byte with: 1
 ]
 
 { #category : #integers }
-JITAssembler64 >> testRintegerBit [
+JITAssemblerAMD64 >> testRintegerBit [
 	self assemble: 'test' with: self regR8 with: 1
 ]
 
 { #category : #loading }
-JITAssembler64 >> testRwithR [
+JITAssemblerAMD64 >> testRwithR [
 	self assemble: 'test' with: self regR with: self regR
 ]
 
 { #category : #integers }
-JITAssembler64 >> testTIntegerBit [
+JITAssemblerAMD64 >> testTIntegerBit [
 	self assemble: 'test' with: self regT byte with: 1
 ]
 
 { #category : #integers }
-JITAssembler64 >> testTintegerBit [
+JITAssemblerAMD64 >> testTintegerBit [
 	self assemble: 'test' with: self regT byte with: 1
 ]
 
 { #category : #services }
-JITAssembler64 >> wordSize [
+JITAssemblerAMD64 >> wordSize [
 	^wordSize
 ]
 
 { #category : #'opcodes - integer related' }
-JITAssembler64 >> writeTslots [
+JITAssemblerAMD64 >> writeTslots [
 	| rep mnemonic |
 	rep := 16rF3.
 	mnemonic := wordSize = 8 ifTrue: ['stosq'] ifFalse: ['stosd'].
@@ -2225,16 +2225,16 @@ JITAssembler64 >> writeTslots [
 ]
 
 { #category : #logic }
-JITAssembler64 >> xorAwithR [
+JITAssemblerAMD64 >> xorAwithR [
 	self assemble: 'xor' with: self regA with: self regR
 ]
 
 { #category : #logic }
-JITAssembler64 >> xorFPwithFP [
+JITAssemblerAMD64 >> xorFPwithFP [
 	self assemble: 'xor' with: self regFP with: self regFP
 ]
 
 { #category : #logic }
-JITAssembler64 >> xorRwithA [
+JITAssemblerAMD64 >> xorRwithA [
 	self assemble: 'xor' with: self regR with: self regA
 ]
