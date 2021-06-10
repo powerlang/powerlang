@@ -228,8 +228,15 @@ AssemblerAMD64 >> assembleBytes: aByteArray [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleBytes: aByteArray count: integer [
-	1 to: integer do: [:i | memory nextPut: (aByteArray byteAt: i)]
+AssemblerAMD64 >> assembleBytes: value count: count [
+	self ASSERT: value isInteger.
+	self ASSERT:(count == 4 or:[ count == 8 ]).
+
+	count == 4 ifTrue: [
+		memory nextLongPut: value
+	] ifFalse: [ 
+		memory nextLargePut: value
+	].
 
 ]
 

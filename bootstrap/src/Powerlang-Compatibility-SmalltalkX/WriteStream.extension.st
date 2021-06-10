@@ -12,6 +12,12 @@ WriteStream >> nextBytesPut: aCollection [
 ]
 
 { #category : #'*Powerlang-Compatibility-SmalltalkX' }
+WriteStream >> nextLargePut: anInteger [
+	self nextPutInt64: anInteger MSB: false.
+
+]
+
+{ #category : #'*Powerlang-Compatibility-SmalltalkX' }
 WriteStream >> nextLongPut: anInteger [
 	self nextPutInt32: anInteger MSB: false.
 

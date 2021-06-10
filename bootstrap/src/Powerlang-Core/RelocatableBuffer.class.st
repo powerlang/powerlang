@@ -83,6 +83,18 @@ RelocatableBuffer >> nextBytesPut: aByteArray [
 ]
 
 { #category : #writing }
+RelocatableBuffer >> nextLargePut: large [
+	stream nextLargePut: large
+
+]
+
+{ #category : #writing }
+RelocatableBuffer >> nextLongPut: long [
+	stream nextLongPut: long
+
+]
+
+{ #category : #writing }
 RelocatableBuffer >> nextPut: byte [
 	stream nextPut: byte
 ]
@@ -93,8 +105,9 @@ RelocatableBuffer >> nextPutAll: aByteArray [
 ]
 
 { #category : #writing }
-RelocatableBuffer >> nextULargePut: long [
-	stream nextULargePut: long
+RelocatableBuffer >> nextULargePut: large [
+	stream nextULargePut: large
+
 ]
 
 { #category : #writing }
