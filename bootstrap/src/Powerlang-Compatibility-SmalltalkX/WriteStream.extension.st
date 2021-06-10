@@ -13,15 +13,25 @@ WriteStream >> nextBytesPut: aCollection [
 
 { #category : #'*Powerlang-Compatibility-SmalltalkX' }
 WriteStream >> nextLongPut: anInteger [
-	| unsigned |
-	unsigned := anInteger < 0 ifTrue: [ anInteger + (1 << 32) ] ifFalse: [ anInteger  ]
-.self nextULongPut: unsigned.
+	self nextPutInt32: anInteger MSB: false.
+
 ]
 
 { #category : #'*Powerlang-Compatibility-SmalltalkX' }
 WriteStream >> nextULongPut: anInteger [
-	1 to: 4 do: [ :i | 
-		| bi |
-		bi := anInteger byteAt: i.
-		self nextPut: bi ]
+	|hh hl lh ll|
+
+	self ASSERT: anInteger >= 0.
+
+	ll := anInteger bitAnd: 16rFF.
+	lh := (anInteger bitShift: -8 ) bitAnd: 16rFF.
+	hl := (anInteger bitShift: -16) bitAnd: 16rFF.
+	hh := (anInteger bitShift: -24) bitAnd: 16rFF.
+
+	"low bytes first"
+	self nextPutByte:ll.
+	self nextPutByte:lh.
+	self nextPutByte:hl.
+	self nextPutByte:hh.       
+
 ]
