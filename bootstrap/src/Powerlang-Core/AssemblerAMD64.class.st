@@ -415,31 +415,6 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
-{ #category : #OBSOLETE }
-AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
-	| offset |
-	offset := reg1 offsetOfIndex: index.
-	pointer
-		reset;
-		length: reg1 length;
-		base: reg2;
-		displacement: offset.
-	self assemble: 'mov' with: reg1 with: pointer
-]
-
-{ #category : #OBSOLETE }
-AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
-		pointer
-				reset;
-				length: reg1 length;
-				base: reg2;
-				index: reg3;
-				scale: reg1 sizeInBytes;
-				displacement: 0 - reg1 sizeInBytes.
-		self assemble: 'mov' with: reg1 with: pointer
-
-]
-
 { #category : #'memory - load / store' }
 AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 	| adjusted |
@@ -486,6 +461,13 @@ AssemblerAMD64 >> memRef [
 AssemblerAMD64 >> move: srcReg to: dstReg [
 	self ASSERT: (srcReg class = Register and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: srcReg
+
+]
+
+{ #category : #services }
+AssemblerAMD64 >> moveImm: imm to: dstReg [
+	self ASSERT: (imm isInteger and: [dstReg class = Register]).
+	self assemble: 'mov' with: dstReg with: imm
 
 ]
 
@@ -836,32 +818,6 @@ AssemblerAMD64 >> shortJumpTo: label [
 	self shortJump: 'jmp' to: label
 ]
 
-{ #category : #OBSOLETE }
-AssemblerAMD64 >> store: reg1 in: reg2 index: index [ 
-		| offset |
-		offset := reg1 offsetOfIndex: index.
-		pointer
-				reset;
-				length: reg1 length;
-				base: reg2;
-				displacement: offset.
-		self assemble: 'mov' with: pointer with: reg1
-
-]
-
-{ #category : #OBSOLETE }
-AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [ 
-		pointer
-				reset;
-				length: op1 length;
-				base: reg2;
-				index: reg3;
-				scale: op1 sizeInBytes;
-				displacement: 0 - op1 sizeInBytes.
-		self assemble: 'mov' with: pointer with: op1
-
-]
-
 { #category : #'memory - load / store' }
 AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
 	| adjusted |
@@ -880,6 +836,15 @@ AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 		base: reg2;
 		displacement: offset.
 	self assemble: 'mov' with: pointer with: byte
+]
+
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
+	self
+		assemble: 'mov'
+		with: dstMemRef
+		withImm: imm
+
 ]
 
 { #category : #initialization }
