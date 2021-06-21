@@ -153,19 +153,17 @@ JITAssembler >> memRef: baseReg indexImm: indexImm [
 
 ]
 
-{ #category : #memory }
-JITAssembler >> memRefAatT [
-^self memRef: self regA index: self regT
-]
-
-{ #category : #memory }
-JITAssembler >> memRefSPatT [
-	^ self memRef: self regSP index: self regT
-]
-
 { #category : #services }
 JITAssembler >> move: srcReg to: dstReg [
 	^ self subclassResponsibility
+
+]
+
+{ #category : #services }
+JITAssembler >> moveImm: imm to: dstReg [
+	"Load constant to register `dstImm`"
+
+	self subclassResponsibility
 
 ]
 
@@ -368,11 +366,22 @@ JITAssembler >> shiftRightArithmetic: srcAndDst byImm: count [
 
 { #category : #'memory - load / store' }
 JITAssembler >> store: srcReg intoMem: dstMemRef [
-	"Store `srcReg` into memory location `srcMemRef`. 
+	"Store `srcReg` into memory location `dstMemRef`. 
 
-	 The size of data loaded is specified in `srcMemRef`"
+	 The size of data loaded is specified in `dstMemRef`"
 
 	^ self subclassResponsibility
+
+]
+
+{ #category : #'memory - load / store' }
+JITAssembler >> storeImm: imm intoMem: dstMemRef [
+	"Store constant into memory location `dstMemRef`. 
+
+	 The size of data loaded is specified in `dstMemRef`"
+
+	self moveImm: imm to: self regV.
+	self store: self regV intoMem: dstMemRef
 
 ]
 

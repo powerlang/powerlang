@@ -289,6 +289,7 @@ JITAssemblerAMD64 >> decRindirect [
 	pointer reset; length: self addressLength; base: backend regR.
 	self assemble: 'dec' with: pointer
 ]
+
 { #category : #services }
 JITAssemblerAMD64 >> disassembledText32 [
 	^self nativeCode disassembledText32
@@ -430,8 +431,8 @@ JITAssemblerAMD64 >> labeledNonIntegerBitTestOfR [
 
 { #category : #loading }
 JITAssemblerAMD64 >> load:dstReg withImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: dstReg withImm: imm
+	backend moveImm: imm to: dstReg
+
 ]
 
 { #category : #loading }
@@ -1223,6 +1224,17 @@ JITAssemblerAMD64 >> loopTtimes: aBlock [
 		dec: backend regT;
 		shortJumpTo: loop;
 		@ end
+]
+
+{ #category : #memory }
+JITAssemblerAMD64 >> memRefAatT [
+	^self memRef: self regA index: self regT
+
+]
+
+{ #category : #memory }
+JITAssemblerAMD64 >> memRefSPatT [
+	^ self memRef: self regSP index: self regT
 ]
 
 { #category : #'opcodes - integer related' }
