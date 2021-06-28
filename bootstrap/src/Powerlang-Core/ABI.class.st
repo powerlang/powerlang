@@ -5,10 +5,7 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #ABI,
 	#superclass : #Object,
-	#pools : [
-		'Registers'
-	],
-	#category : #'Powerlang-Core-Assembler-Intel'
+	#category : #'Powerlang-Core-Assembler'
 }
 
 { #category : #unclassified }

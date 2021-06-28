@@ -16,7 +16,7 @@ bootstrap.image: pharo Pharo.image src
 	@echo ""
 
 test: bootstrap.image pharo specs/current
-	./pharo $< test --junit-xml-output Powerlang-Tests
+	./pharo $< test --fail-on-failure --junit-xml-output Powerlang-Tests
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 

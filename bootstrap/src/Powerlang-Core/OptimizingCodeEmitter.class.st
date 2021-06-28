@@ -89,46 +89,54 @@ OptimizingCodeEmitter >> assembleAsSmallInteger: asNativeSend [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicAt: instruction [
-	| base index result |
+	| base index result memref |
 	base := allocation at: instruction left.
 	index := allocation at: instruction right.
 	result := allocation at: instruction.
+	memref := assembler memRef: base index: index.
 	assembler
 		convertToNativeInteger: index;
-		load: result from: base atIndexAt: index.
-	result != index ifTrue: [assembler convertToSmallInteger: index]
+		load: result fromMem: memref.
+	result != index
+		ifTrue: [ assembler convertToSmallInteger: index ]
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicAtConstant: instruction [
-	| src dst index |
+	| src dst index memref |
 	src := allocation at: instruction left.
-	dst := allocation at: instruction ifAbsent: [^self].
+	dst := allocation at: instruction ifAbsent: [ ^ self ].
 	index := instruction right.
-	assembler load: dst from: src atIndex: index
+	memref := assembler memRef: src indexImm: index.
+	assembler load: dst fromMem: memref
 ]
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBasicAtPut: instruction [
-	| base value index |
+	| base value index memref |
 	index := instruction left value.
-	index isInteger ifTrue: [^self assembleBasicAtPutConstant: instruction].
+	index isInteger
+		ifTrue: [ ^ self assembleBasicAtPutConstant: instruction ].
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	index := allocation at: index.
+	memref := assembler memRef: base index: index.
 	assembler
 		convertToNativeInteger: index;
-		store: value in: base indexAt: index;
+		store: value intoMem: memref;
 		convertToSmallInteger: index
 ]
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBasicAtPutConstant: instruction [
-	| base value position |
+	| base value position memref |
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	position := instruction left value.
-	assembler store: value in: base index: position
+	memref := assembler memRef: base indexImm: position.
+	assembler
+		store: value
+		intoMem: memref
 ]
 
 { #category : #private }
@@ -163,55 +171,68 @@ OptimizingCodeEmitter >> assembleBasicSizePut: basicSizePut [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicSizePutConstant: basicFlagsPutSend [
-	| base value |
+	| base value memRef |
+
 	base := allocation at: basicFlagsPutSend left.
 	value := basicFlagsPutSend right.
-	assembler storeByte: value in: base offset: SizeOffset
+	memRef := assembler memRef8 base: base; displacement: SizeOffset.
+	assembler storeImm: value intoMem: memRef.
+
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicULongAt: instruction [
-	| base index result |
+	| base index result memref |
 	base := allocation at: instruction left.
 	index := allocation at: instruction right.
 	result := allocation at: instruction.
+	memref := assembler memRef32: base index: index.
 	assembler
 		convertToNativeInteger: index;
-		load: result e from: base atIndexAt: index.
-	result != index ifTrue: [assembler convertToSmallInteger: index]
+		load: result fromMem: memref.
+	result != index
+		ifTrue: [ assembler convertToSmallInteger: index ]
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicULongAtConstant: instruction [
-	| src dst index |
+	| src dst index memref |
 	src := allocation at: instruction left.
-	dst := allocation at: instruction ifAbsent: [^self].
+	dst := allocation at: instruction ifAbsent: [ ^ self ].
 	index := instruction right.
-	assembler load: dst e from: src atIndex: index
+	memref := assembler memRef32: src indexImm: index.
+	assembler
+		load: dst
+		fromMem: memref
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicULongAtPut: instruction [
-	| base value index |
+	| base value index memRef |
 	index := instruction left value.
 	index isInteger
 		ifTrue: [^self assembleBasicULongAtPutConstant: instruction].
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	index := allocation at: index.
+	memRef := assembler memRef32: base index: index.
 	assembler
 		convertToNativeInteger: index;
-		store: value e in: base indexAt: index;
+		store: value intoMem: memRef;
 		convertToSmallInteger: index
+
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicULongAtPutConstant: instruction [
-	| base value position |
+	| base value position memref |
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	position := instruction left value.
-	assembler store: value e in: base index: position
+	memref := assembler memRef32: base indexImm: position.
+	assembler
+		store: value
+		intoMem: memref
 ]
 
 { #category : #unclassified }
@@ -260,15 +281,13 @@ OptimizingCodeEmitter >> assembleBitShift: instruction [
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleBitShift: src by: amount [
 	amount > 0
-		ifTrue: [
-			assembler
+		ifTrue: [ assembler
 				convertToNativeInteger: src;
 				shiftLeft: src by: amount + 1;
-				convertToSmallInteger: src]
-		ifFalse: [
-			assembler
-				shiftRight: src by: 0 - amount;
-				setIntegerBit: src]
+				convertToSmallInteger: src ]
+		ifFalse: [ assembler
+				shiftRightArithmetic: src byImm: 0 - amount;
+				setIntegerBit: src ]
 ]
 
 { #category : #unclassified }
@@ -317,23 +336,31 @@ OptimizingCodeEmitter >> assembleByteAtOffset: offset put: instruction [
 		convertToNativeInteger: value;
 		renameByteRegisterIfNeeded: value
 		preserving: base
-		during: [:final | assembler storeByte: final byte in: base offset: offset];
+		during: [:final | 
+			| memRef |
+
+			memRef := assembler memRef8 base: base; displacement: offset.
+			assembler store: final intoMem: memRef.
+		];
 		convertToSmallInteger: value
+
 ]
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleByteAtPut: instruction [
-	| index base value |
+	| index base value memref |
 	base := allocation at: instruction receiver.
 	index := allocation at: instruction left.
 	value := allocation at: instruction right.
+	memref := assembler memRef8: base index: index.
 	assembler
 		convertToNativeInteger: index;
 		convertToNativeInteger: value;
 		renameByteRegisterIfNeeded: value
-		preserving: base
-		preserving: index
-		during: [:final | assembler store: final byte in: base indexAt: index];
+			preserving: base
+			preserving: index
+			during:
+				[ :final | assembler store: final intoMem: memref ];
 		convertToSmallInteger: value;
 		convertToSmallInteger: index
 ]
@@ -348,15 +375,16 @@ OptimizingCodeEmitter >> assembleCompare: instruction [
 
 { #category : #unclassified }
 OptimizingCodeEmitter >> assembleCompareConstant: instruction jumpTrue: trueBlock jumpFalse: falseBlock [
-	| left value |
+	| left  |
 	left := allocation at: instruction left.
-	self assembleCompareConstant: left with: instruction right;
-	assembleJumpTrue: trueBlock orJumpFalse: falseBlock in: instruction
+	self
+		assembleCompareConstant: left with: instruction right;
+		assembleJumpTrue: trueBlock orJumpFalse: falseBlock in: instruction
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleCompareConstant: left with: right [
-	| index |
+
 	right isSmallInteger
 		ifTrue: [ ^ assembler compare: left with: right * 2 + 1 ].
 	right ifNil: [ ^ assembler compareWithNil: left ].
@@ -407,25 +435,26 @@ OptimizingCodeEmitter >> assembleEqualsConstant: instruction [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleExtendedSize: extendedSizeSend [
-	| base dst index |
+	| base dst index memref |
 	base := allocation at: extendedSizeSend receiver.
 	dst := allocation at: extendedSizeSend.
 	index := LargeSizeOffset // 4 + 1.
+	memref := assembler memRef32: base indexImm: index.
 	assembler
-	
-		load: dst e from: base atIndex: index;
+		load: dst fromMem: memref;
 		convertToSmallInteger: dst
 ]
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleExtendedSizePut: extendedSizeSend [
-	| base  index value |
+	| base index value memref |
 	base := allocation at: extendedSizeSend left.
 	value := allocation at: extendedSizeSend right.
 	index := LargeSizeOffset // 4 + 1.
+	memref := assembler memRef32: base indexImm: index.
 	assembler
 		convertToNativeInteger: value e;
-		store: value e in: base index: index;
+		store: value intoMem: memref;
 		convertToSmallInteger: value e
 ]
 
@@ -675,7 +704,7 @@ OptimizingCodeEmitter >> assembleTimesConstant: instruction [
 	shift := value == 4 ifTrue: [2] ifFalse: [value == 8 ifTrue: [3] ifFalse: [1]].
 	assembler
 		clearIntegerBit: left;
-		shiftLeft: left by: shift;
+		shiftLeft: left byImm: shift;
 		setIntegerBit: left
 ]
 
@@ -767,7 +796,8 @@ OptimizingCodeEmitter >> initializeAssemblers [
 
 { #category : #initialization }
 OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := TemplateAssembler64 new
+	assembler := JITAssemblerAMD64 new
+
 ]
 
 { #category : #unclassified }
@@ -885,7 +915,7 @@ OptimizingCodeEmitter >> visitLoadConstant: aLoadConstant [
 
 { #category : #visiting }
 OptimizingCodeEmitter >> visitLoadImplicit: instruction [
-	| frame |
+	| frame receiver nativecode |
 	instruction name == #activationRecord
 		ifTrue: [ assembler buildFrame.
 			^ self loadMifNeeded ].
@@ -894,12 +924,19 @@ OptimizingCodeEmitter >> visitLoadImplicit: instruction [
 	frame := instruction prev.
 	frame hasFrame
 		ifFalse: [ ^ self ].
+	receiver := assembler memRef: assembler regFP indexImm: 0.
+	nativecode := assembler memRef: assembler regFP indexImm: -1.
 	assembler
 		reserveStackSlots: frame temporaries + 2;
-		store: assembler regR in: assembler regFP index: 0;
-		store: assembler regM in: assembler regFP index: -1.
+		store: assembler regR
+			intoMem: receiver;
+		store: assembler regM
+			intoMem: nativecode.
 	self savesPreviousSelf
-		ifTrue: [ assembler pushS; pushM; loadMwithA ]
+		ifTrue: [ assembler
+				pushS;
+				pushM;
+				loadMwithA ]
 ]
 
 { #category : #unclassified }
@@ -922,15 +959,19 @@ OptimizingCodeEmitter >> visitPhi: phiInstruction [
 
 { #category : #visiting }
 OptimizingCodeEmitter >> visitReturn: aReturnInstruction [
-	| source |
+	| source memref |
 	source := allocation at: aReturnInstruction source.
 	self assembleCopyIfNeeded: source to: assembler regR.
 	self savesPreviousSelf
 		ifTrue: [ assembler
-				popM; popS; restoreCallerFrame ]
-		ifFalse: [ assembler
+				popM;
+				popS;
+				restoreCallerFrame ]
+		ifFalse: [ memref := assembler memRef: assembler regFP indexImm: 0. assembler
 				restoreCallerFrame;
-				load: assembler regS from: assembler regFP atIndex: 0; restoreCallerM ].
+				load: assembler regS
+					fromMem: memref;
+				restoreCallerM ].
 	assembler return
 ]
 

@@ -108,7 +108,7 @@ InlineMessageLinker >> assembleBasicCopyFromToWith [
 		loadEwithAddressOfRatA;
 		loadSwithAddressOfSatA;
 		subAfromT;
-		addToTconstant: 1;
+		addTwithImmediate: 1;
 		moveTslots;
 		popE
 ]
@@ -225,7 +225,7 @@ InlineMessageLinker >> assembleBitShiftRight [
 	assembler
 		move: assembler regA to: assembler regT;
 		convertToNativeInteger: assembler regT;
-		shiftRight: assembler regR by: assembler regT b;
+		shiftRightArithmetic: assembler regR by: assembler regT b;
 		setIntegerBit: assembler regR
 ]
 
@@ -279,9 +279,9 @@ InlineMessageLinker >> assembleCDeclCallWithArguments [
 		assemble: 'and' with: assembler regSP with: -16;
 		loopTtimes: [ assembler
 				load: assembler regS
-					from: assembler regA
-					atIndexAt: assembler regT;
-				store: assembler regS in: assembler regSP indexAt: assembler regT ].
+				fromMem: assembler memRefAatT;
+				store: assembler regS
+				intoMem: assembler memRefSPatT ].
 	assembler addressSize = 8
 		ifTrue: [ self loadArgumentsIntoRegisters ].
 	assembler
@@ -316,7 +316,7 @@ InlineMessageLinker >> assembleExpandInStackSized [
 		loadTwithA;
 		loopTtimes: [ assembler
 				pushIndirectR;
-				addRconstant: assembler addressSize ]
+				addRwithImmediate: assembler addressSize ]
 ]
 
 { #category : #'private - assemble' }
@@ -341,7 +341,7 @@ InlineMessageLinker >> assembleFloatEquals [
 		loadLargeX0withRindirect;
 		compareEqualLargeX0withAindirect;
 		loadRwithX0;
-		addRconstant: 1;
+		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus
 ]
@@ -364,7 +364,7 @@ InlineMessageLinker >> assembleFloatLessThan [
 		loadLargeX0withRindirect;
 		compareLessThanLargeX0withAindirect;
 		loadRwithX0;
-		addRconstant: 1;
+		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus
 ]
@@ -945,15 +945,20 @@ InlineMessageLinker >> initialize [
 
 { #category : #'private - helpers' }
 InlineMessageLinker >> loadArgumentsIntoRegisters [
+	| stack1 stack2 stack3 stack4 |
+	stack1 :=assembler memRef: rsp indexImm: 1.
+	stack2 :=assembler memRef: rsp indexImm: 2.
+	stack3 :=assembler memRef: rsp indexImm: 3.
+	stack4 :=assembler memRef: rsp indexImm: 4.
 	assembler
-		load: rcx from: rsp atIndex: 1;
-		load: rdx from: rsp atIndex: 2;
-		load: r8 from: rsp atIndex: 3;
-		load: r9 from: rsp atIndex: 4;
+		load: rcx fromMem: stack1;
+		load: rdx fromMem: stack2;
+		load: r8 fromMem: stack3;
+		load: r9 fromMem: stack4;
 		assemble: 'movq' with: xmm0 with: rcx;
 		assemble: 'movq' with: xmm1 with: rdx;
 		assemble: 'movq' with: xmm2 with: r8;
-		assemble: 'movq' with: xmm3 with: r9 
+		assemble: 'movq' with: xmm3 with: r9
 ]
 
 { #category : #'private - helpers' }

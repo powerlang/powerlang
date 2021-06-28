@@ -135,13 +135,6 @@ OptimizingNativizer >> removeRedundantCode [
 ]
 
 { #category : #unclassified }
-OptimizingNativizer >> selectInstructions [
-	| allocator |
-	allocator := OptimizingInstructionSelector new firstBlock: firstBlock.
-	^allocator doSelection
-]
-
-{ #category : #unclassified }
 OptimizingNativizer >> simplifyCFG [
 	OptimizingCFGSimplifier new cleanFrom: firstBlock
 ]
