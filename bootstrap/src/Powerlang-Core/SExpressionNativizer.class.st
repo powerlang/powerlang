@@ -414,7 +414,7 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	assembler := TemplateAssembler64 new
+	assembler := TemplateAssemblerAMD64 new
 ]
 
 { #category : #services }
