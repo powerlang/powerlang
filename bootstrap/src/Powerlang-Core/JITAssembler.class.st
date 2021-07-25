@@ -153,6 +153,16 @@ JITAssembler >> memRef: baseReg indexImm: indexImm [
 
 ]
 
+{ #category : #memory }
+JITAssembler >> memRefAatT [
+^self memRef: self regA index: self regT
+]
+
+{ #category : #memory }
+JITAssembler >> memRefSPatT [
+	^ self memRef: self regSP index: self regT
+]
+
 { #category : #services }
 JITAssembler >> move: srcReg to: dstReg [
 	^ self subclassResponsibility

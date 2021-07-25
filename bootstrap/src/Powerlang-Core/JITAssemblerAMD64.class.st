@@ -1226,17 +1226,6 @@ JITAssemblerAMD64 >> loopTtimes: aBlock [
 		@ end
 ]
 
-{ #category : #memory }
-JITAssemblerAMD64 >> memRefAatT [
-	^self memRef: self regA index: self regT
-
-]
-
-{ #category : #memory }
-JITAssemblerAMD64 >> memRefSPatT [
-	^ self memRef: self regSP index: self regT
-]
-
 { #category : #'opcodes - integer related' }
 JITAssemblerAMD64 >> moveTslots [
 	| rep mnemonic |
