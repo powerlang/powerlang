@@ -171,12 +171,12 @@ OptimizingCodeEmitter >> assembleBasicSizePut: basicSizePut [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicSizePutConstant: basicFlagsPutSend [
-	| base value memRef |
+	| base value memref |
 
 	base := allocation at: basicFlagsPutSend left.
 	value := basicFlagsPutSend right.
-	memRef := assembler memRef8 base: base; displacement: SizeOffset.
-	assembler storeImm: value intoMem: memRef.
+	memref := assembler memRef8 base: base; displacement: SizeOffset.
+	assembler storeImm: value intoMem: memref.
 
 ]
 
@@ -208,17 +208,17 @@ OptimizingCodeEmitter >> assembleBasicULongAtConstant: instruction [
 
 { #category : #private }
 OptimizingCodeEmitter >> assembleBasicULongAtPut: instruction [
-	| base value index memRef |
+	| base value index memref |
 	index := instruction left value.
 	index isInteger
 		ifTrue: [^self assembleBasicULongAtPutConstant: instruction].
 	base := allocation at: instruction receiver.
 	value := allocation at: instruction right.
 	index := allocation at: index.
-	memRef := assembler memRef32: base index: index.
+	memref := assembler memRef32: base index: index.
 	assembler
 		convertToNativeInteger: index;
-		store: value intoMem: memRef;
+		store: value intoMem: memref;
 		convertToSmallInteger: index
 
 ]
@@ -336,11 +336,9 @@ OptimizingCodeEmitter >> assembleByteAtOffset: offset put: instruction [
 		convertToNativeInteger: value;
 		renameByteRegisterIfNeeded: value
 		preserving: base
-		during: [:final | 
-			| memRef |
-
-			memRef := assembler memRef8 base: base; displacement: offset.
-			assembler store: final intoMem: memRef.
+		during: [:final | | memref |
+			memref := assembler memRef8 base: base; displacement: offset.
+			assembler store: final intoMem: memref.
 		];
 		convertToSmallInteger: value
 
