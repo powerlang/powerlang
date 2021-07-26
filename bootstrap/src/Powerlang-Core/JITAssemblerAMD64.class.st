@@ -6,7 +6,10 @@ Class {
 	#name : #JITAssemblerAMD64,
 	#superclass : #AssemblerAMD64,
 	#instVars : [
-		'backend'
+		'literals'
+	],
+	#classVars : [
+		'ExternalFunctions'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
