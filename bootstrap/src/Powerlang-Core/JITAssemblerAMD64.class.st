@@ -6,44 +6,10 @@ Class {
 	#name : #JITAssemblerAMD64,
 	#superclass : #AssemblerAMD64,
 	#instVars : [
-		'literals'
-	],
-	#classVars : [
-		'ExternalFunctions'
+		'backend'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
-
-{ #category : #initialization }
-JITAssemblerAMD64 class >> initialize [
-	super initialize.
-	ExternalFunctions := Dictionary new
-]
-
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> addDoubleX1toX0 [
-	self 
-		assemble: 'addsd'
-		with: backend regF0
-		with: backend regF1
-
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> addLiteral: anObject [
-	| index |
-	index := literals
-		identityIndexOf: anObject
-		ifAbsent: [ literals
-				add: anObject;
-				size ].
-	^ index + 2
-]
-
-{ #category : #services }
-JITAssemblerAMD64 >> addressOfExternal: function [
-	^ExternalFunctions at: function ifAbsent: nil
-]
 
 { #category : #private }
 JITAssemblerAMD64 >> callIndirectA [
@@ -308,7 +274,6 @@ JITAssemblerAMD64 >> inc: srcAndDstReg [
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.
-	literals := OrderedCollection new.
 	backend := self
 ]
 
@@ -320,63 +285,6 @@ JITAssemblerAMD64 >> initializeS [
 { #category : #loading }
 JITAssemblerAMD64 >> jumpToMindex: index [
 	self assemble: 'jmp' withReg: backend regM index: index
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerBitTestOf: aRegister [
-	| label |
-	self testIntegerBitOf: aRegister.
-	label := self newLabel.
-	self shortJumpIfZeroTo: label.
-	^label
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerBitTestOfR [
-	^self labeledIntegerBitTestOf: backend regR8
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerBitTestOfT [
-	^self labeledIntegerBitTestOf: backend regT byte
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerNativizationOf: aRegister [
-	| label |
-	self convertToNativeInteger: aRegister.
-	label := self newLabel.
-	self shortJumpIfNotCarryTo: label.
-	^label
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerNativizationOfA [
-	^self labeledIntegerNativizationOf: backend regA
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerNativizationOfR [
-	^self labeledIntegerNativizationOf: backend regR
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledIntegerNativizationOfT [
-	^self labeledIntegerNativizationOf: backend regT
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledNonIntegerBitTestOf: aRegister [
-	| label |
-	self testIntegerBitOf: aRegister.
-	label := self newLabel.
-	self shortJumpIfNotZeroTo: label.
-	^label
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> labeledNonIntegerBitTestOfR [
-	^self labeledNonIntegerBitTestOf: backend regR8
 ]
 
 { #category : #loading }
@@ -564,47 +472,6 @@ JITAssemblerAMD64 >> loadX1roundingX0 [
 ]
 
 { #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendByteRwithRatA [
-	self loadZeroExtendByte: backend regR from: backend regR atIndexAt: backend regA
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendByteRwithRindex: index [
-	#dontOptimize.
-	self loadZeroExtendByte: backend regR from: backend regR atIndex: index
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendByteRwithSPatA [
-	self loadZeroExtendByte: backend regR from: backend regSP atIndexAt: backend regA
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendByteTwithAindex: index [
-	#dontOptimize.
-	self loadZeroExtendByte: backend regT from: backend regA atIndex: index
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendLongRwithRatA [
-	| memref |
-	memref := backend memRef32: backend regR index: backend regA.
-	backend
-		load: backend regR
-		fromMem: memref
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadZeroExtendLongRwithRindex: index [
-	| memref |
-	#dontOptimize.
-	memref := backend memRef32: backend regR indexImm: index.
-	backend
-		load: backend regR e
-		fromMem: memref
-]
-
-{ #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer
 		reset;
@@ -617,31 +484,6 @@ JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 { #category : #arithmetic }
 JITAssemblerAMD64 >> lock [
 	self assembleByte: 16rF0
-]
-
-{ #category : #jumps }
-JITAssemblerAMD64 >> loop: aBlock times: anInteger [
-	| loop |
-	loop := self newLabel.
-	self loadTwithImmediate: anInteger; @ loop.
-	aBlock value.
-	self dec: backend regT; shortJumpIfNotZeroTo: loop
-]
-
-{ #category : #jumps }
-JITAssemblerAMD64 >> loopTtimes: aBlock [
-	| loop end |
-	loop := self newLabel.
-	end := self newLabel.
-	self
-		compareTwithImmediate: 0;
-		@ loop;
-		shortJumpIfEqualTo: end.
-	aBlock value.
-	self
-		dec: backend regT;
-		shortJumpTo: loop;
-		@ end
 ]
 
 { #category : #'opcodes - integer related' }
@@ -665,11 +507,6 @@ JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
 JITAssemblerAMD64 >> multiplyRbyA [
 	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
 	self assemble: 'imul' with: backend regA
-]
-
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> nativeCode [
-	^(NativeCode withAll: literals) code: memory bytes
 ]
 
 { #category : #'push/pop' }
@@ -736,12 +573,6 @@ JITAssemblerAMD64 >> readFPUStatusOnA [
 { #category : #private }
 JITAssemblerAMD64 >> reserveStackSlots: amount [
 	self subtract: amount * self addressSize from: backend regSP
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> reset [
-	super reset.
-	literals := OrderedCollection new
 ]
 
 { #category : #loading }
@@ -938,11 +769,6 @@ JITAssemblerAMD64 >> testRintegerBit [
 { #category : #loading }
 JITAssemblerAMD64 >> testRwithR [
 	self assemble: 'test' with: backend regR with: backend regR
-]
-
-{ #category : #services }
-JITAssemblerAMD64 >> wordSize [
-	^wordSize
 ]
 
 { #category : #'opcodes - integer related' }

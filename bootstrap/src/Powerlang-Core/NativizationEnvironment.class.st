@@ -195,7 +195,7 @@ NativizationEnvironment >> methodNativizer [
 { #category : #services }
 NativizationEnvironment >> monomorphicCache [
 	| asm lookup next |
-	asm := JITAssemblerAMD64 new.
+	asm := JITAssembler new useAMD64.
 	asm wordSize: abi wordSize.
 	lookup := asm newLabel.
 	asm
@@ -276,7 +276,7 @@ NativizationEnvironment >> optimizingNativizer [
 { #category : #services }
 NativizationEnvironment >> polymorphicCache [
 	| asm smi case2 case3 case4 case5 case6 case7 lookup |
-	asm := JITAssemblerAMD64 new.
+	asm := JITAssembler new useAMD64.
 	asm wordSize: abi wordSize.
 	smi := asm newLabel.
 	case2 := asm newLabel.

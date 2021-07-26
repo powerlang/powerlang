@@ -4,7 +4,7 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #AssemblerAMD64,
-	#superclass : #JITAssembler,
+	#superclass : #AssemblerBackend,
 	#instVars : [
 		'instruction',
 		'operands1',
@@ -12,48 +12,13 @@ Class {
 		'operands3',
 		'pointer',
 		'immediate',
-		'encoder',
-		'memory',
-		'labels'
-	],
-	#classVars : [
-		'IndexedLabels'
+		'encoder'
 	],
 	#pools : [
 		'Registers'
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
-
-{ #category : #initialization }
-AssemblerAMD64 class >> growIndexedLabelsTo: anInteger [
-	| new |
-	new := (IndexedLabels size + 1 to: anInteger)
-		collect: [:i | ('@' , i asString) asSymbol].
-	IndexedLabels := IndexedLabels , new
-]
-
-{ #category : #initialization }
-AssemblerAMD64 class >> initialize [
-	self initializeIndexedLabels
-	
-]
-
-{ #category : #initialization }
-AssemblerAMD64 class >> initializeIndexedLabels [
-	IndexedLabels := #().
-	self growIndexedLabelsTo: 100
-]
-
-{ #category : #'instance creation' }
-AssemblerAMD64 class >> new [
-	^super new initialize
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> @ label [
-	self addLabel: label
-]
 
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> add: src2 to: src1AndDst [
@@ -63,39 +28,7 @@ AssemblerAMD64 >> add: src2 to: src1AndDst [
 
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> addImm: imm to: src2AndDst [
-	imm == 1
-		ifTrue: [ ^self assemble: 'inc' with: src2AndDst ].
-	imm == -1
-				ifTrue: [ ^self assemble: 'dec' with: src2AndDst ].
 	self assemble: 'add' with: src2AndDst withImm: imm
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> addLabel: aString [
-	self addLabel: aString to: self currentAddress
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> addLabel: label to: location [
-	labels at: label put: location
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> addressLength [
-	^wordSize * 8
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> addressSize [
-	^wordSize
-]
-
-{ #category : #alignment }
-AssemblerAMD64 >> alignTo: aNumber [
-	| current count |
-	current := memory position.
-	count := (current alignedTo: aNumber) - current.
-	self nop: count
 ]
 
 { #category : #'operations - logical' }
@@ -108,11 +41,6 @@ AssemblerAMD64 >> and: src1AndDst with: source2 [
 AssemblerAMD64 >> and: src1AndDst withImm: imm [
 	self assemble: 'and' with: src1AndDst withImm: imm
 
-]
-
-{ #category : #relocation }
-AssemblerAMD64 >> applyFixups [
-	memory applyFixupsWith: self
 ]
 
 { #category : #basic }
@@ -218,66 +146,14 @@ index: index [
 	self assemble: mnemonic with: dst with: pointer
 ]
 
-{ #category : #basic }
-AssemblerAMD64 >> assembleByte: byte [
-	memory nextBytePut: byte
-]
-
-{ #category : #basic }
-AssemblerAMD64 >> assembleBytes: aByteArray [
-	memory nextBytesPut: aByteArray
-]
-
-{ #category : #basic }
-AssemblerAMD64 >> assembleBytes: value count: count [
-	self ASSERT: value isInteger.
-	self ASSERT:(count == 4 or:[ count == 8 ]).
-
-	count == 4 ifTrue: [
-		memory nextLongPut: value
-	] ifFalse: [ 
-		memory nextLargePut: value
-	].
-
-]
-
-{ #category : #relocation }
-AssemblerAMD64 >> baseAddress [
-	^memory baseAddress
-]
-
-{ #category : #private }
-AssemblerAMD64 >> bitLengthOf: anInteger [
-	(anInteger between: -16r80 and: 16r7F) ifTrue: [^8].
-	(anInteger between: -16r8000 and: 16r7FFF) ifTrue: [^16].
-	(anInteger between: -16r80000000 and: 16r7FFFFFFF) ifTrue: [^32].
-	(anInteger between: -16r8000000000000000 and: 16r7FFFFFFFFFFFFFFF)
-		ifTrue: [^64].
-	(anInteger
-		between: -16r80000000000000000000000000000000
-		and: 16r7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-		ifTrue: [^128].
-	^nil
-]
-
 { #category : #debugging }
 AssemblerAMD64 >> breakpoint [
 	self assemble: 'int' with: 3
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> bytes [
-	^memory bytes
-]
-
-{ #category : #accessing }
 AssemblerAMD64 >> clearIntegerBit: op1 [
 	self and: op1 with: -2
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> codeSize [
-	^memory codeSize
 ]
 
 { #category : #services }
@@ -297,11 +173,6 @@ AssemblerAMD64 >> convertToSmallInteger: reg [
 		assemble: 'inc' with: reg
 ]
 
-{ #category : #labels }
-AssemblerAMD64 >> currentAddress [
-	^memory currentAddress
-]
-
 { #category : #services }
 AssemblerAMD64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
@@ -317,8 +188,7 @@ AssemblerAMD64 >> initialize [
 	immediate := ISAImmediate new.
 	pointer := MemoryOperand new.
 	encoder := instruction encoder.
-	labels := Dictionary new: 100.
-	memory := RelocatableBuffer new
+
 ]
 
 { #category : #'private - jumps' }
@@ -383,15 +253,6 @@ AssemblerAMD64 >> jumpIfSignTo: label [
 { #category : #jumps }
 AssemblerAMD64 >> jumpIfZeroTo: label [
 	self jumpIfEqualTo: label
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> jumpOver: aBlock [
-	| label |
-	label := self newLabel.
-	self jumpTo: label.
-	aBlock value.
-	self @ label
 ]
 
 { #category : #jumps }
@@ -472,23 +333,8 @@ AssemblerAMD64 >> moveImm: imm to: dstReg [
 ]
 
 { #category : #'private - jumps' }
-AssemblerAMD64 >> nativeCode [
-	^ NativeCode new code: memory bytes
-]
-
-{ #category : #'private - jumps' }
 AssemblerAMD64 >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> newLabel [
-	| label next |
-	next := labels size + 1.
-	IndexedLabels size < next ifTrue: [self class growIndexedLabelsTo: next].
-	label := IndexedLabels at: next.
-	self addLabel: label to: nil.
-	^label
 ]
 
 { #category : #alignment }
@@ -588,6 +434,11 @@ AssemblerAMD64 >> regA [
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regA8 [
 	^dl
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regBP [
+	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
 ]
 
 { #category : #'registers - IR' }
@@ -709,17 +560,6 @@ AssemblerAMD64 >> renameRegisterPreserving: preserved1 preserving: preserved2 [
 	^self regR
 ]
 
-{ #category : #initialization }
-AssemblerAMD64 >> reset [
-	labels := Dictionary new: 100.
-	memory reset
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> resolveLabel: aString [
-	^labels at: aString ifAbsent: [self addressOfExternal: aString]
-]
-
 { #category : #calls }
 AssemblerAMD64 >> return [
 	self assemble: 'ret'
@@ -799,18 +639,8 @@ AssemblerAMD64 >> shortJumpIfNotEqualTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotZeroTo: label [
-	self shortJumpIfNotEqualTo: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> shortJumpIfSignTo: label [
 	self shortJump: 'js' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfZeroTo: label [
-	self shortJumpIfEqualTo: label
 ]
 
 { #category : #jumps }
@@ -845,11 +675,6 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 		with: dstMemRef
 		withImm: imm
 
-]
-
-{ #category : #initialization }
-AssemblerAMD64 >> stream [
-	^memory stream
 ]
 
 { #category : #'operations - arithmetic' }

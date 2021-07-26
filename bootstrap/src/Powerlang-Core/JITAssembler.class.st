@@ -6,11 +6,45 @@ Class {
 	#name : #JITAssembler,
 	#superclass : #Object,
 	#instVars : [
-		'wordSize',
-		'backend'
+		'backend',
+		'labels',
+		'literals'
+	],
+	#classVars : [
+		'IndexedLabels'
 	],
 	#category : #'Powerlang-Core-Assembler'
 }
+
+{ #category : #initialization }
+JITAssembler class >> growIndexedLabelsTo: anInteger [
+	| new |
+	new := (IndexedLabels size + 1 to: anInteger)
+		collect: [:i | ('@' , i asString) asSymbol].
+	IndexedLabels := IndexedLabels , new
+]
+
+{ #category : #initialization }
+JITAssembler class >> initialize [
+	self initializeIndexedLabels
+	
+]
+
+{ #category : #initialization }
+JITAssembler class >> initializeIndexedLabels [
+	IndexedLabels := #().
+	self growIndexedLabelsTo: 100
+]
+
+{ #category : #'instance creation' }
+JITAssembler class >> new [
+	^super new initialize
+]
+
+{ #category : #labels }
+JITAssembler >> @ label [
+	self addLabel: label
+]
 
 { #category : #'operations - arithmetic' }
 JITAssembler >> add: source1 to: source2andDest [
@@ -22,9 +56,39 @@ JITAssembler >> addAtoR [
 	backend add: backend regA to: backend regR
 ]
 
+{ #category : #arithmetic }
+JITAssembler >> addDoubleX1toX0 [
+	self 
+		assemble: 'addsd'
+		with: backend regF0
+		with: backend regF1
+
+]
+
 { #category : #'operations - arithmetic' }
 JITAssembler >> addImm: imm to: dest [
 	backend addImm: imm to: dest
+]
+
+{ #category : #labels }
+JITAssembler >> addLabel: aString [
+	self addLabel: aString to: self currentAddress
+]
+
+{ #category : #labels }
+JITAssembler >> addLabel: label to: location [
+	labels at: label put: location
+]
+
+{ #category : #loading }
+JITAssembler >> addLiteral: anObject [
+	| index |
+	index := literals
+		identityIndexOf: anObject
+		ifAbsent: [ literals
+				add: anObject;
+				size ].
+	^ index + 2
 ]
 
 { #category : #arithmetic }
@@ -47,21 +111,6 @@ JITAssembler >> addTwithImmediate: imm [
 	backend addImm: imm to: backend regT
 ]
 
-{ #category : #accessing }
-JITAssembler >> addressBitSize [
-	^self addressSize * 8
-
-]
-
-{ #category : #accessing }
-JITAssembler >> addressSize [
-	"Return the size of address in bytes, e.g, 4 for 32bit archs
-	 and 8 for 64bit archs"
-
-	^ self subclassResponsibility
-
-]
-
 { #category : #'operations - logical' }
 JITAssembler >> and: source1andDest with: source2 [
 	backend and: source1andDest with: source2
@@ -80,6 +129,11 @@ JITAssembler >> andRwithA [
 { #category : #arithmetic }
 JITAssembler >> andRwithImmediate: imm [
 	backend and: backend regR withImm: imm
+]
+
+{ #category : #relocation }
+JITAssembler >> applyFixups [
+	backend memory applyFixupsWith: self
 ]
 
 { #category : #private }
@@ -101,6 +155,15 @@ JITAssembler >> discardArguments: anInteger [
 	backend addImm: anInteger * backend wordSize to: backend regSP
 ]
 
+{ #category : #loading }
+JITAssembler >> doesNotUnderstand: aMessage [
+	(backend respondsTo: aMessage selector)
+		ifFalse: [ ^ super doesNotUnderstand: aMessage ].
+	^ backend
+		perform: aMessage selector
+		withArguments: aMessage arguments
+]
+
 { #category : #'push/pop' }
 JITAssembler >> dropTos: count [
 	backend addImm: (count * backend addressSize) to: backend regSP
@@ -111,6 +174,77 @@ JITAssembler >> dropTos: count [
 JITAssembler >> inc: srcAndDstReg [
 	backend inc: srcAndDstReg
 
+]
+
+{ #category : #accessing }
+JITAssembler >> jumpOver: aBlock [
+	| label |
+	label := self newLabel.
+	self jumpTo: label.
+	aBlock value.
+	self @ label
+]
+
+{ #category : #accessing }
+JITAssembler >> jumpTo: label [
+	backend jumpTo: label
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerBitTestOf: aRegister [
+	| label |
+	self testIntegerBitOf: aRegister.
+	label := self newLabel.
+	self shortJumpIfZeroTo: label.
+	^label
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerBitTestOfR [
+	^self labeledIntegerBitTestOf: backend regR8
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerBitTestOfT [
+	^self labeledIntegerBitTestOf: backend regT byte
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerNativizationOf: aRegister [
+	| label |
+	self convertToNativeInteger: aRegister.
+	label := self newLabel.
+	self shortJumpIfNotCarryTo: label.
+	^label
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerNativizationOfA [
+	^self labeledIntegerNativizationOf: backend regA
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerNativizationOfR [
+	^self labeledIntegerNativizationOf: backend regR
+]
+
+{ #category : #integers }
+JITAssembler >> labeledIntegerNativizationOfT [
+	^self labeledIntegerNativizationOf: backend regT
+]
+
+{ #category : #integers }
+JITAssembler >> labeledNonIntegerBitTestOf: aRegister [
+	| label |
+	self testIntegerBitOf: aRegister.
+	label := self newLabel.
+	self shortJumpIfNotZeroTo: label.
+	^label
+]
+
+{ #category : #integers }
+JITAssembler >> labeledNonIntegerBitTestOfR [
+	^self labeledNonIntegerBitTestOf: backend regR8
 ]
 
 { #category : #'memory - load / store' }
@@ -707,114 +841,42 @@ JITAssembler >> loadZeroExtendLongRwithRindex: index [
 		fromMem: memref
 ]
 
+{ #category : #jumps }
+JITAssembler >> loop: aBlock times: anInteger [
+	| loop |
+	loop := self newLabel.
+	self loadTwithImmediate: anInteger; @ loop.
+	aBlock value.
+	self dec: backend regT; shortJumpIfNotZeroTo: loop
+]
+
+{ #category : #jumps }
+JITAssembler >> loopTtimes: aBlock [
+	| loop end |
+	loop := self newLabel.
+	end := self newLabel.
+	self
+		compareTwithImmediate: 0;
+		@ loop;
+		shortJumpIfEqualTo: end.
+	aBlock value.
+	self
+		dec: backend regT;
+		shortJumpTo: loop;
+		@ end
+]
+
 { #category : #memory }
 JITAssembler >> memRef [
 	"Return clean instance of pointer-sized memory reference"
 
-	^ self subclassResponsibility
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef16 [
-	"Return clean instance of memory reference."
-
-	^ self memRef length: 16; yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef32 [
-	"Return clean instance of memory reference."
-
-	^ self memRef length: 32; yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef32: baseReg index: indexReg [
-	^ self memRef32 
-		base: baseReg; 
-		displacement: -4;
-		index: indexReg;
-		scale: 4;
-		yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef32: baseReg indexImm: indexImm [
-	^ self memRef32 
-		base: baseReg; 
-		displacement: (indexImm - 1) * 4;
-		yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef64 [
-	"Return clean instance of memory reference."
-
-	^ self memRef length: 64; yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef8 [
-	"Return clean instance of memory reference."
-
-	^ self memRef length: 8; yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef8: baseReg index: indexReg [
-	^ self memRef8 
-		base: baseReg; 
-		displacement: -1;
-		index: indexReg;
-		scale: 1;
-		yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef8: baseReg indexImm: indexImm [
-	^ self memRef8
-		base: baseReg; 
-		displacement: (indexImm - 1);
-		yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRef: baseReg index: indexRef [
-	^ self memRef 
-		base: baseReg; 
-		displacement: self addressSize negated;
-		index: indexRef;
-		scale: self addressSize;
-		yourself
+	^ backend memRef
 
 ]
 
 { #category : #memory }
 JITAssembler >> memRef: baseReg indexImm: indexImm [
-	^ self memRef 
-		base: baseReg; 
-		displacement: (indexImm - 1) * self addressSize;
-		yourself
-
-]
-
-{ #category : #memory }
-JITAssembler >> memRefAatT [
-^self memRef: self regA index: self regT
-]
-
-{ #category : #memory }
-JITAssembler >> memRefSPatT [
-	^ self memRef: self regSP index: self regT
+	^ backend memRef: baseReg indexImm: indexImm
 ]
 
 { #category : #services }
@@ -827,6 +889,21 @@ JITAssembler >> move: srcReg to: dstReg [
 JITAssembler >> moveImm: imm to: dstReg [
 	backend moveImm: imm to: dstReg
 
+]
+
+{ #category : #arithmetic }
+JITAssembler >> nativeCode [
+	^(NativeCode withAll: literals) code: backend memory bytes
+]
+
+{ #category : #labels }
+JITAssembler >> newLabel [
+	| label next |
+	next := labels size + 1.
+	IndexedLabels size < next ifTrue: [self class growIndexedLabelsTo: next].
+	label := IndexedLabels at: next.
+	self addLabel: label to: nil.
+	^label
 ]
 
 { #category : #'operations - logical' }
@@ -1078,6 +1155,18 @@ JITAssembler >> regV [
 
 ]
 
+{ #category : #initialization }
+JITAssembler >> reset [
+	labels := Dictionary new: 100.
+	literals := OrderedCollection new.
+	backend reset
+]
+
+{ #category : #labels }
+JITAssembler >> resolveLabel: aString [
+	^labels at: aString
+]
+
 { #category : #epilogue }
 JITAssembler >> restoreCallerEnvironment [
 	self loadEwithFPindex: -2
@@ -1170,6 +1259,16 @@ JITAssembler >> shiftRright: count [
 JITAssembler >> shiftTright: count [
 	backend shiftRightArithmetic: backend regT byImm: count
 
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpIfNotZeroTo: label [
+	self shortJumpIfNotEqualTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpIfZeroTo: label [
+	self shortJumpIfEqualTo: label
 ]
 
 { #category : #comparing }
@@ -1316,6 +1415,18 @@ JITAssembler >> subFromRconstant: imm [
 JITAssembler >> subImm: imm from: srcAndDst [
 	backend subImm: imm from: srcAndDst
 
+]
+
+{ #category : #initialization }
+JITAssembler >> useAMD64 [
+	backend := JITAssemblerAMD64 new wordSize: 8.
+	self reset
+]
+
+{ #category : #initialization }
+JITAssembler >> useTemplateAMD64 [
+	backend := TemplateAssemblerAMD64 new wordSize: 8.
+	self reset
 ]
 
 { #category : #'operations - logical' }

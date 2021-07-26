@@ -14,7 +14,7 @@ JITAssemblerAMD64Test class >> generateTest: aMessage [
 	"  For now, only handle messages with zero or more INTEGER arguments"
 	(aMessage arguments allSatisfy: [:e | e isInteger ]) ifFalse: [ ^ self ].
 
-	assembler := JITAssemblerAMD64 new wordSize: 8.
+	assembler := JITAssembler new useAMD64.
 	[ 
 		aMessage sendTo: assembler.
 		bytes := assembler bytes.
@@ -57,8 +57,8 @@ JITAssemblerAMD64Test class >> generateTests [
 
 	| messages |
 
-	JITAssemblerAMD64 class 
-			compile: 'new ^ MessageCollector for: super new' 
+	JITAssembler class 
+			compile: 'new ^ MessageCollector for: super new useAMD64 wordSize: 8' 
 			classified: #'temporary'.
 	[ 
 		MessageCollector messages removeAll.
@@ -67,7 +67,7 @@ JITAssemblerAMD64Test class >> generateTests [
 		MessageCollector messages copy.
 	] ensure: [ 
 		MessageCollector messages removeAll.
-		JITAssemblerAMD64 class removeSelector: #new.
+		JITAssembler class removeSelector: #new.
 	].
 
 	self halt.    
@@ -78,7 +78,7 @@ JITAssemblerAMD64Test class >> generateTests [
 { #category : #running }
 JITAssemblerAMD64Test >> setUp [
 	super setUp.
-	assembler := JITAssemblerAMD64 new wordSize: 8.
+	assembler := JITAssembler new useAMD64.
 	
 ]
 
@@ -108,7 +108,7 @@ JITAssemblerAMD64Test >> testAddRconstant__1 [
 	assembler perform: #addRwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
-		equals: (#[72 255 192])
+		equals: (#[72 131 192 1])
 
 ]
 
@@ -158,7 +158,7 @@ JITAssemblerAMD64Test >> testAddToTconstant__1 [
 	assembler perform: #addTwithImmediate: withArguments: #(1).
 	self 
 		assert: (assembler bytes)
-		equals: (#[72 255 193])
+		equals: (#[72 131 193 1])
 
 ]
 
@@ -512,6 +512,7 @@ JITAssemblerAMD64Test >> testConvertTtoNativeInteger [
 	
 ]
 
+{ #category : #'as yet unclassified' }
 JITAssemblerAMD64Test >> testDecRindirect [
 	
 	assembler perform: #decRindirect withArguments: #().
@@ -661,6 +662,7 @@ JITAssemblerAMD64Test >> testExchangeRindirectWithT [
 	
 ]
 
+{ #category : #'as yet unclassified' }
 JITAssemblerAMD64Test >> testInitializeS [
 	
 	assembler perform: #initializeS withArguments: #().

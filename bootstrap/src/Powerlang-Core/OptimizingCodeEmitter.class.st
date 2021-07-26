@@ -794,7 +794,7 @@ OptimizingCodeEmitter >> initializeAssemblers [
 
 { #category : #initialization }
 OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := JITAssemblerAMD64 new
+	assembler := JITAssembler new useAMD64
 
 ]
 

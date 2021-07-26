@@ -414,7 +414,7 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	ir := JITAssemblerAMD64 new
+	ir := JITAssembler new useAMD64
 
 ]
 
