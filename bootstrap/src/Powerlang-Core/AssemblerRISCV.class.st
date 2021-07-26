@@ -1,6 +1,6 @@
 Class {
 	#name : #AssemblerRISCV,
-	#superclass : #JITAssembler,
+	#superclass : #RISCAssemblerBackend,
 	#pools : [
 		'RegistersRISCV'
 	],

@@ -531,7 +531,7 @@ VirtualSmalltalkImage >> wordSize [
 { #category : #accessing }
 VirtualSmalltalkImage >> wordSize: anInteger [
 	wordSize := anInteger.
-		maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
+	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1
 
 ]
