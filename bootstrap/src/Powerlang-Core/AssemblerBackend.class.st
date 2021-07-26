@@ -94,7 +94,7 @@ AssemblerBackend >> initialize [
 	memory := RelocatableBuffer new.
 ]
 
-{ #category : #private }
+{ #category : #basic }
 AssemblerBackend >> jumpTo: label [
 	self subclassResponsibility
 ]
@@ -109,7 +109,7 @@ AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 
 ]
 
-{ #category : #'private - jumps' }
+{ #category : #memory }
 AssemblerBackend >> memRef [
 	self subclassResponsibility
 ]
@@ -229,7 +229,7 @@ AssemblerBackend >> moveImm: imm to: dstReg [
 
 ]
 
-{ #category : #'private - jumps' }
+{ #category : #accessing }
 AssemblerBackend >> nativeCode [
 	^ NativeCode new code: memory bytes
 ]
@@ -239,77 +239,77 @@ AssemblerBackend >> or: src1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regA [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regB [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regBP [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regC [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regE [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regFalse [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regIP [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regM [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regNil [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regR [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regS [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regSP [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regT [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regTrue [
 	^self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'registers - IR' }
 AssemblerBackend >> regV [
 	^self subclassResponsibility
 ]
@@ -334,7 +334,7 @@ AssemblerBackend >> shiftRightArithmetic: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #memory }
 AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 	^self subclassResponsibility
 ]
