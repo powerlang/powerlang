@@ -6,12 +6,8 @@ Class {
 	#name : #JITAssembler,
 	#superclass : #Object,
 	#instVars : [
-		'backend',
-		'labels',
-		'literals'
-	],
-	#classVars : [
-		'IndexedLabels'
+		'wordSize',
+		'backend'
 	],
 	#category : #'Powerlang-Core-Assembler'
 }
