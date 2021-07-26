@@ -6,8 +6,12 @@ Class {
 	#name : #JITAssembler,
 	#superclass : #Object,
 	#instVars : [
-		'wordSize',
-		'backend'
+		'backend',
+		'labels',
+		'literals'
+	],
+	#classVars : [
+		'IndexedLabels'
 	],
 	#category : #'Powerlang-Core-Assembler'
 }
@@ -368,6 +372,13 @@ JITAssembler >> loadMwithTindex: index [
 	backend
 		load: backend regM
 		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadNilWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadNilWithMindex: index
 ]
 
 { #category : #loading }
