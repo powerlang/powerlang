@@ -5,7 +5,7 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #ISAOpcodeReader,
 	#superclass : #ISAInstructionPartReader,
-	#category : #'Powerlang-Core-Assembler-Tools'
+	#category : #'Powerlang-Core-Assembler-Intel-Tools'
 }
 
 { #category : #private }
