@@ -152,6 +152,29 @@ index: index [
 	self assemble: mnemonic with: dst with: pointer
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> assembleByte: byte [
+	memory nextBytePut: byte
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> assembleBytes: aByteArray [
+	memory nextBytesPut: aByteArray
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> assembleBytes: value count: count [
+	self ASSERT: value isInteger.
+	self ASSERT:(count == 4 or:[ count == 8 ]).
+
+	count == 4 ifTrue: [
+		memory nextLongPut: value
+	] ifFalse: [ 
+		memory nextLargePut: value
+	].
+
+]
+
 { #category : #debugging }
 AssemblerAMD64 >> breakpoint [
 	self assemble: 'int' with: 3

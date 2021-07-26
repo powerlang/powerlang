@@ -55,29 +55,6 @@ AssemblerBackend >> and: source1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
-AssemblerBackend >> assembleByte: byte [
-	memory nextBytePut: byte
-]
-
-{ #category : #basic }
-AssemblerBackend >> assembleBytes: aByteArray [
-	memory nextBytesPut: aByteArray
-]
-
-{ #category : #basic }
-AssemblerBackend >> assembleBytes: value count: count [
-	self ASSERT: value isInteger.
-	self ASSERT:(count == 4 or:[ count == 8 ]).
-
-	count == 4 ifTrue: [
-		memory nextLongPut: value
-	] ifFalse: [ 
-		memory nextLargePut: value
-	].
-
-]
-
 { #category : #relocation }
 AssemblerBackend >> baseAddress [
 	^memory baseAddress
