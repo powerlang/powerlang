@@ -1,21 +1,54 @@
+"
+I am the JIT assembler frontend. I provide a high-level assembler interface (if that really exists)
+and delegate writing of the actual bytes to my backends.
+"
 Class {
 	#name : #JITAssembler,
 	#superclass : #Object,
 	#instVars : [
-		'wordSize',
-		'backend'
+		'backend',
+		'labels',
+		'literals'
+	],
+	#classVars : [
+		'IndexedLabels'
 	],
 	#category : #'Powerlang-Core-Assembler'
 }
 
 { #category : #'operations - arithmetic' }
 JITAssembler >> add: source1 to: source2andDest [
-	self subclassResponsibility
+	backend add: source1 to: source2andDest
+]
+
+{ #category : #arithmetic }
+JITAssembler >> addAtoR [
+	backend add: backend regA to: backend regR
 ]
 
 { #category : #'operations - arithmetic' }
 JITAssembler >> addImm: imm to: dest [
-	self subclassResponsibility
+	backend addImm: imm to: dest
+]
+
+{ #category : #arithmetic }
+JITAssembler >> addRwithImmediate: imm [
+	backend addImm: imm to: backend regR 
+]
+
+{ #category : #logic }
+JITAssembler >> addSPwithImmediate: imm [
+	backend addImm: imm to: backend regSP
+]
+
+{ #category : #arithmetic }
+JITAssembler >> addTtoR [
+	backend add: backend regT to: backend regR
+]
+
+{ #category : #logic }
+JITAssembler >> addTwithImmediate: imm [
+	backend addImm: imm to: backend regT
 ]
 
 { #category : #accessing }
@@ -35,22 +68,640 @@ JITAssembler >> addressSize [
 
 { #category : #'operations - logical' }
 JITAssembler >> and: source1andDest with: source2 [
-	self subclassResponsibility
+	backend and: source1andDest with: source2
 ]
 
 { #category : #'operations - logical' }
 JITAssembler >> and: source1andDest withImm: imm [
-	self subclassResponsibility
+	backend and: source1andDest withImm: imm
+]
+
+{ #category : #logic }
+JITAssembler >> andRwithA [
+	backend and: backend regR with: backend regA
+]
+
+{ #category : #arithmetic }
+JITAssembler >> andRwithImmediate: imm [
+	backend and: backend regR withImm: imm
+]
+
+{ #category : #private }
+JITAssembler >> buildFrame [
+	self
+		push: backend regFP;
+		move: backend regSP to: backend regFP
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> dec: srcAndDstReg [
+	backend dec: srcAndDstReg
+
+]
+
+{ #category : #private }
+JITAssembler >> discardArguments: anInteger [
+	anInteger = 0 ifTrue: [^self].
+	backend addImm: anInteger * backend wordSize to: backend regSP
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> dropTos: count [
+	backend addImm: (count * backend addressSize) to: backend regSP
+
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> inc: srcAndDstReg [
+	backend inc: srcAndDstReg
+
 ]
 
 { #category : #'memory - load / store' }
 JITAssembler >> load: dstReg fromMem: srcMemRef [
-	"Load `dstReg` from memory location `srcMemRef`. 
+	^backend load: dstReg fromMem: srcMemRef
 
-	 The size of data loaded is specified in `srcMemRef`"
+]
 
-	^ self subclassResponsibility
+{ #category : #loading }
+JITAssembler >> load:dstReg withImmediate: imm [
+	backend moveImm: imm to: dstReg
 
+]
+
+{ #category : #loading }
+JITAssembler >> load: register withLiteral: anObject [
+	| index memref |
+	index := self addLiteral: anObject.
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: register
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithAindex: index [
+	| memref |
+	memref := backend memRef: backend regA indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithEindex: index [
+	| memref |
+	memref := backend memRef: backend regE indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithFalse [
+	backend move: backend regFalse to: backend regA
+]
+
+{ #category : #private }
+JITAssembler >> loadAwithGindex: index [
+	| memref |
+	memref := backend memRef: backend regG indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadAwithGindex: index
+]
+
+{ #category : #integers }
+JITAssembler >> loadAwithImmediate: imm [
+	self load: backend regA withImmediate: imm
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadAwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithNil [
+	backend move: backend regNil to: backend regA
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithR [
+	backend move: backend regR to: backend regA
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithRoffsetAtA [
+	| memref |
+	memref := backend memRef
+				base: backend regR;
+				index: backend regA;
+				scale: 1.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithS [
+	backend move: backend regS to: backend regA
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithSindex: index [
+	| memref |
+	memref := backend memRef: backend regS indexImm: index.
+	backend
+		load: backend regA
+		fromMem: memref
+]
+
+{ #category : #integers }
+JITAssembler >> loadAwithSmallInteger: anInteger [
+	| smi |
+	smi := (anInteger bitShift: 1) + 1.
+	self loadAwithImmediate: smi
+]
+
+{ #category : #loading }
+JITAssembler >> loadAwithTrue [
+	backend move: backend regTrue to: backend regA
+]
+
+{ #category : #loading }
+JITAssembler >> loadEwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regE
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadEwithNil [
+	backend move: backend regNil to: backend regE
+]
+
+{ #category : #loading }
+JITAssembler >> loadEwithR [
+	backend move: backend regR to: backend regE
+]
+
+{ #category : #loading }
+JITAssembler >> loadFPwithR [
+	backend move: backend regR to: backend regFP
+]
+
+{ #category : #loading }
+JITAssembler >> loadFPwithSP [
+	backend move: backend regSP to: backend regFP
+]
+
+{ #category : #loading }
+JITAssembler >> loadFalseWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadFalseWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadFalseWithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regFalse
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadGwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadGwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadGwithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regG
+		fromMem: memref
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> loadMwithA [
+	backend move: backend regA to: backend regM
+]
+
+{ #category : #loading }
+JITAssembler >> loadMwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regM
+		fromMem: memref
+]
+
+{ #category : #private }
+JITAssembler >> loadMwithGindex: index [
+	| memref |
+	memref := backend memRef: backend regG indexImm: index.
+	backend
+		load: backend regM
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadMwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadMwithGindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadMwithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regM
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadMwithRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		load: backend regM
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadMwithTindex: index [
+	| memref |
+	memref := backend memRef: backend regT indexImm: index.
+	backend
+		load: backend regM
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadNilWithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regNil
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithA [
+	backend move: backend regA to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithE [
+	backend move: backend regE to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithEindex: index [
+	| memref |
+	memref := backend memRef: backend regE indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithFP [
+	backend move: backend regFP to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithFalse [
+	backend move: backend regFalse to: backend regR
+]
+
+{ #category : #integers }
+JITAssembler >> loadRwithImmediate: imm [
+	self load: backend regR withImmediate: imm
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadRwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithM [
+	backend move: backend regM to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithNil [
+	backend move: backend regNil to: backend regR
+]
+
+{ #category : #integers }
+JITAssembler >> loadRwithRatA [
+	| memref |
+	memref := backend memRef: backend regR index: backend regA.
+	self
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithRatOffsetA [
+	| memref |
+	memref := backend memRef
+				base: backend regR;
+				index: backend regA;
+				scale: 1.
+	backend
+		load: backend regR
+		fromMem:
+			memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithS [
+	backend move: backend regS to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithSPindex: index [
+	| memref |
+	memref := backend memRef: backend regSP indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithSindex: index [
+	| memref |
+	memref := backend memRef: backend regS indexImm: index.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #integers }
+JITAssembler >> loadRwithSmallInteger: anInteger [
+	| smi |
+	smi := (anInteger bitShift: 1) + 1.
+	self loadRwithImmediate: smi
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithT [
+	backend move: backend regT to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadRwithTrue [
+	backend move: backend regTrue to: backend regR
+]
+
+{ #category : #loading }
+JITAssembler >> loadSPwithFP [
+	backend move: backend regFP to: backend regSP
+]
+
+{ #category : #loading }
+JITAssembler >> loadSwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regS
+		fromMem: memref
+]
+
+{ #category : #private }
+JITAssembler >> loadSwithGindex: index [
+	| memref |
+	memref := backend memRef: backend regG indexImm: index.
+	backend
+		load: backend regS
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadSwithGlobal: aSymbol [
+	| index |
+	index := NativizationEnvironment indexOfGlobal: aSymbol.
+	self loadSwithGindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadSwithNil [
+	backend move: backend regNil to: backend regS
+]
+
+{ #category : #loading }
+JITAssembler >> loadSwithRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		load: backend regS
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadTrueWithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadTrueWithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadTrueWithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regTrue
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithA [
+	backend move: backend regA to: backend regT
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithAindex: index [
+	| memref |
+	memref := backend memRef: backend regA indexImm: index.
+	backend
+		load: backend regT
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithEindex: index [
+	| memref |
+	memref := backend memRef: backend regE indexImm: index.
+	backend
+		load: backend regT
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		load: backend regT
+		fromMem: memref
+]
+
+{ #category : #integers }
+JITAssembler >> loadTwithImmediate: imm [
+	self load: backend regT withImmediate: imm
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithLiteral: anObject [
+	| index |
+	index := self addLiteral: anObject.
+	self loadTwithMindex: index
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend
+		load: backend regT
+		fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithR [
+	backend move: backend regR to: backend regT
+]
+
+{ #category : #loading }
+JITAssembler >> loadTwithTindex: index [
+	| memref |
+	memref := backend memRef: backend regT indexImm: index.
+	backend load: backend regT fromMem: memref
+]
+
+{ #category : #loading }
+JITAssembler >> loadWithFalse: register [ 
+	backend move: backend regFalse to: register
+]
+
+{ #category : #loading }
+JITAssembler >> loadWithNil: register [ 
+	backend move: backend regNil to: register
+]
+
+{ #category : #loading }
+JITAssembler >> loadWithTrue: register [ 
+	backend move: backend regTrue to: register
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendByteRwithRatA [
+	self loadZeroExtendByte: backend regR from: backend regR atIndexAt: backend regA
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendByteRwithRindex: index [
+	#dontOptimize.
+	self loadZeroExtendByte: backend regR from: backend regR atIndex: index
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendByteRwithSPatA [
+	self loadZeroExtendByte: backend regR from: backend regSP atIndexAt: backend regA
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendByteTwithAindex: index [
+	#dontOptimize.
+	self loadZeroExtendByte: backend regT from: backend regA atIndex: index
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendLongRwithRatA [
+	| memref |
+	memref := backend memRef32: backend regR index: backend regA.
+	backend
+		load: backend regR
+		fromMem: memref
+]
+
+{ #category : #integers }
+JITAssembler >> loadZeroExtendLongRwithRindex: index [
+	| memref |
+	#dontOptimize.
+	memref := backend memRef32: backend regR indexImm: index.
+	backend
+		load: backend regR e
+		fromMem: memref
 ]
 
 { #category : #memory }
@@ -165,183 +816,290 @@ JITAssembler >> memRefSPatT [
 
 { #category : #services }
 JITAssembler >> move: srcReg to: dstReg [
-	^ self subclassResponsibility
+	^ backend move: srcReg to: dstReg
 
 ]
 
 { #category : #services }
 JITAssembler >> moveImm: imm to: dstReg [
-	"Load constant to register `dstImm`"
-
-	self subclassResponsibility
+	backend moveImm: imm to: dstReg
 
 ]
 
 { #category : #'operations - logical' }
 JITAssembler >> or: src1AndDst with: src2 [
-	^ self subclassResponsibility
+	^ backend or: src1AndDst with: src2
+]
+
+{ #category : #logic }
+JITAssembler >> orRwithA [
+	backend or: backend regR with: backend regA
 
 ]
 
 { #category : #private }
 JITAssembler >> pop: dstReg [
-	"This can be implemented like:
+	backend pop: dstReg
+]
 
-	 self add: self regSP i: wordSize
-	 self load: dstReg with: self regSP offset: 0
+{ #category : #'push/pop' }
+JITAssembler >> popA [
+	backend pop: backend regA
+]
 
-	 Architectures with specialized push/pop may override
-	 this.
+{ #category : #'push/pop' }
+JITAssembler >> popE [
+	backend pop: backend regE
+]
 
-	 TODO.
-	"
-	self error: 'Unfinished, see comment above'
+{ #category : #'push/pop' }
+JITAssembler >> popFP [
+	backend pop: backend regFP
+]
 
+{ #category : #'push/pop' }
+JITAssembler >> popFalse [
+	backend pop: backend regFalse
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popG [
+	backend pop: backend regG
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popM [
+	backend pop: backend regM
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popNil [
+	backend pop: backend regNil
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popR [
+	backend pop: backend regR
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popS [
+	backend pop: backend regS
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popT [
+	backend pop: backend regT
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> popTrue [
+	backend pop: backend regTrue
 ]
 
 { #category : #private }
 JITAssembler >> push: srcReg [
-	"This can be implemented like:
+	backend push: srcReg
 
-	 self store: srcReg with: self regSP offset: 0
-	 self sub: self regSP i: wordSize
+]
 
+{ #category : #'push/pop' }
+JITAssembler >> pushA [
+	backend push: backend regA
+]
 
-	 Architectures with specialized push/pop may override
-	 this.
+{ #category : #'push/pop' }
+JITAssembler >> pushE [
+	backend push: backend regE
+]
 
-	 TODO.
-	"
-	self error: 'Unfinished, see comment above'
+{ #category : #'push/pop' }
+JITAssembler >> pushFP [
+	backend push: backend regFP
+]
 
+{ #category : #'push/pop' }
+JITAssembler >> pushFalse [
+	backend push: backend regFalse
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushG [
+	backend push: backend regG
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushM [
+	backend push: backend regM
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushNil [
+	backend push: backend regNil
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushR [
+	backend push: backend regR
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushS [
+	backend push: backend regS
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushT [
+	backend push: backend regT
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regA [
-	^ self subclassResponsibility
+	^backend regA
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regA8 [
-	^ self subclassResponsibility
+	^ backend regA byte
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regB [
-	^ self subclassResponsibility
+	^ backend regB
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regC [
-	^ self subclassResponsibility
-
+	^ backend regC
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regE [
-	^ self subclassResponsibility
-
+	^ backend regE
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regF0 [
 	"IEEE 754 double register"
-	^ self subclassResponsibility
+	^ backend regF0
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regF1 [
 	"IEEE 754 double register"
-	^ self subclassResponsibility
-
+	^ backend regF1
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regFP [
-	^ self subclassResponsibility
+	^ backend regFP
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regFalse [
-	^ self subclassResponsibility
+	^ backend regFalse
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regG [
-	^ self subclassResponsibility
+	^ backend regG
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regIP [
-	^ self subclassResponsibility
+	^ backend regIP
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regM [
-	^ self subclassResponsibility
+	^ backend regM
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regNil [
-	^ self subclassResponsibility
+	^ backend regNil
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regR [
-	^ self subclassResponsibility
+	^ backend regR
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regR8 [
-	^ self subclassResponsibility
+	^ backend regR byte
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regS [
-	^ self subclassResponsibility
-
+	^ backend regS
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regSP [
-	^ self subclassResponsibility
+	^ backend regSP
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regT [
-	^ self subclassResponsibility
-
+	^ backend regT
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regT8 [
-	^ self subclassResponsibility
-
+	^ backend reg byte
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regTrue [
-	^ self subclassResponsibility
+	^ backend regTrue
 
 ]
 
 { #category : #'registers - IR' }
 JITAssembler >> regV [
-	^ self subclassResponsibility
+	^ backend regV
 
+]
+
+{ #category : #epilogue }
+JITAssembler >> restoreCallerEnvironment [
+	self loadEwithFPindex: -2
+]
+
+{ #category : #epilogue }
+JITAssembler >> restoreCallerFrame [
+	backend
+		move: backend regFP to: backend regSP;
+		pop: backend regFP
+]
+
+{ #category : #epilogue }
+JITAssembler >> restoreCallerM [
+	self loadMwithFPindex: -1
+]
+
+{ #category : #epilogue }
+JITAssembler >> restoreCallerSelf [
+	self loadSwithFPindex: 0
+]
+
+{ #category : #loading }
+JITAssembler >> saveCallerFrame [
+	self pushFP; loadFPwithSP
 ]
 
 { #category : #'operations - logical' }
@@ -351,7 +1109,19 @@ JITAssembler >> shiftLeft: srcAndDst by: countReg [
 
 { #category : #'operations - logical' }
 JITAssembler >> shiftLeft: srcAndDst byImm: count [
-	self subclassResponsibility
+	backend shiftLeft: srcAndDst byImm: count
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftLeftRwithT [
+	backend shiftLeft: backend regR by: backend regT
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftLogicalRright: count [
+	backend shiftRight: backend regR byImm: count
+
 ]
 
 { #category : #'operations - logical' }
@@ -366,12 +1136,42 @@ JITAssembler >> shiftRight: srcAndDst byImm: count [
 
 { #category : #'operations - logical' }
 JITAssembler >> shiftRightArithmetic: srcAndDst by: countReg [
-	self subclassResponsibility
+	backend shiftRightArithmetic: srcAndDst by: countReg
 ]
 
 { #category : #'operations - logical' }
 JITAssembler >> shiftRightArithmetic: srcAndDst byImm: count [
-	self subclassResponsibility
+	backend shiftRightArithmetic: srcAndDst byImm: count
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftRightRwithT [
+	backend shiftRightArithmetic: backend regR by: backend regT
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftRleft: count [
+	 backend shiftLeft: backend regR byImm: count
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftRright: count [
+	backend shiftRightArithmetic: backend regR byImm: count
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> shiftTright: count [
+	backend shiftRightArithmetic: backend regT byImm: count
+
+]
+
+{ #category : #comparing }
+JITAssembler >> smallInteger: anInteger [
+	^(anInteger bitShift: 1) + 1
 ]
 
 { #category : #'memory - load / store' }
@@ -380,8 +1180,17 @@ JITAssembler >> store: srcReg intoMem: dstMemRef [
 
 	 The size of data loaded is specified in `dstMemRef`"
 
-	^ self subclassResponsibility
+	^ backend store: srcReg intoMem: dstMemRef 
 
+]
+
+{ #category : #storing }
+JITAssembler >> storeEinRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		store: backend regE
+		intoMem: memref
 ]
 
 { #category : #'memory - load / store' }
@@ -390,9 +1199,90 @@ JITAssembler >> storeImm: imm intoMem: dstMemRef [
 
 	 The size of data loaded is specified in `dstMemRef`"
 
-	self moveImm: imm to: self regV.
-	self store: self regV intoMem: dstMemRef
+	self
+		moveImm: imm to: self regV;
+		store: self regV intoMem: dstMemRef
+]
 
+{ #category : #storing }
+JITAssembler >> storeLongTinRatA [
+	| memref |
+	memref := backend memRef32: backend regR index: backend regA.
+	backend
+		store: backend regT
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeRinAindex: index [
+	| memref |
+	memref := backend memRef: backend regA indexImm: index.
+	backend
+		store: backend regR
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeRinEindex: index [
+	| memref |
+	memref := backend memRef: backend regE indexImm: index.
+	backend
+		store: backend regR
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeRinFPindex: index [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: index.
+	backend
+		store: backend regR
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeRinSindex: index [
+	| memref |
+	memref := backend memRef: backend regS indexImm: index.
+	backend
+		store: backend regR
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeRinTindex: index [
+	| memref |
+	memref := backend memRef: backend regT indexImm: index.
+	backend
+		store: backend regR
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeSinRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		store: backend regS
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeTinRatA [
+	| memref |
+	memref := backend memRef: backend regR index: backend regA.
+	backend
+		store: backend regT
+		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeTinRindex: index [
+	| memref |
+	memref := backend memRef: backend regR indexImm: index.
+	backend
+		store: backend regT
+		intoMem: memref
 ]
 
 { #category : #'operations - arithmetic' }
@@ -401,14 +1291,50 @@ JITAssembler >> sub: src2 from: src1AndDst [
 
 ]
 
+{ #category : #arithmetic }
+JITAssembler >> subAfromR [
+	backend sub: backend regA from: backend regR
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> subAfromT [
+	backend sub: backend regA from: backend regT    
+
+]
+
+{ #category : #arithmetic }
+JITAssembler >> subFromRconstant: imm [
+	backend subImm: imm from: backend regR
+
+]
+
 { #category : #'operations - arithmetic' }
-JITAssembler >> subImm: imm from: src2AndDst [
-	self addImm: imm negated to: src2AndDst
+JITAssembler >> subImm: imm from: srcAndDst [
+	backend subImm: imm from: srcAndDst
 
 ]
 
 { #category : #'operations - logical' }
 JITAssembler >> xor: src1AndDst with: src2 [
 	^ self subclassResponsibility
+
+]
+
+{ #category : #logic }
+JITAssembler >> xorAwithR [
+	backend xor: backend regA with: backend regR
+
+]
+
+{ #category : #logic }
+JITAssembler >> xorFPwithFP [
+	backend xor: backend regFP with: backend regFP
+
+]
+
+{ #category : #logic }
+JITAssembler >> xorRwithA [
+	backend xor: backend regR with: backend regA
 
 ]
