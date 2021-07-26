@@ -20,6 +20,12 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
+{ #category : #'instance creation' }
+AssemblerAMD64 class >> new [
+	^ self basicNew initialize.
+
+]
+
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> add: src2 to: src1AndDst [
 	self assemble: 'add' with: src1AndDst with: src2
