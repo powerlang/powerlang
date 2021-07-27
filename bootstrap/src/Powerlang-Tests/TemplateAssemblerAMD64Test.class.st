@@ -7,6 +7,6 @@ Class {
 { #category : #running }
 TemplateAssemblerAMD64Test >> setUp [
 	super setUp.
-	assembler := JITAssembler new useTemplateAMD64.
+	assembler := TemplateAssemblerAMD64 new useAMD64.
 	
 ]

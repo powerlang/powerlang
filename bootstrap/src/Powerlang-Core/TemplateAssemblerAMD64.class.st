@@ -4,7 +4,10 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #TemplateAssemblerAMD64,
-	#superclass : #JITAssemblerAMD64,
+	#superclass : #JITAssembler,
+	#instVars : [
+		'wordSize'
+	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
@@ -1221,10 +1224,13 @@ TemplateAssemblerAMD64 >> testRwithR [
 	
 ]
 
-{ #category : #arithmetic }
-TemplateAssemblerAMD64 >> wordSize: anInteger [
-	self ASSERT: anInteger = 8.
-	super wordSize: anInteger
+{ #category : #'opcodes - integer related' }
+TemplateAssemblerAMD64 >> useAMD64 [
+	wordSize := 8.
+	backend := JITAssemblerAMD64 new wordSize: 8.
+	self reset.
+
+
 ]
 
 { #category : #'opcodes - integer related' }
