@@ -162,6 +162,49 @@ JITAssembler >> callR [
 	backend call: backend regR
 ]
 
+{ #category : #'operations - arithmetic' }
+JITAssembler >> clearRintegerBit [
+	self dec: backend regR
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> clearSafeRintegerBit [
+	self and: backend regR8 withImm: -2
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertAtoNativeInteger [
+	self convertToNativeInteger: backend regA
+	
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertRtoNativeInteger [
+	self convertToNativeInteger: backend regR
+	
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertRtoSmallInteger [
+	self convertToSmallInteger: backend regR
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertToNativeInteger: srcAndDstReg [
+	backend shiftRightArithmetic: srcAndDstReg byImm: 1
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertToSmallInteger: srcAndDstReg [ 
+	self shiftLeft: srcAndDstReg byImm: 1; inc: srcAndDstReg
+]
+
+{ #category : #arithmetic }
+JITAssembler >> convertTtoNativeInteger [
+	self convertToNativeInteger: backend regT
+	
+]
+
 { #category : #'push/pop' }
 JITAssembler >> dec: srcAndDstReg [
 	backend dec: srcAndDstReg
@@ -187,6 +230,16 @@ JITAssembler >> doesNotUnderstand: aMessage [
 JITAssembler >> dropTos: count [
 	backend addImm: (count * backend addressSize) to: backend regSP
 
+]
+
+{ #category : #arithmetic }
+JITAssembler >> ensureRintegerBit [
+	self ensureSafeRintegerBit
+]
+
+{ #category : #arithmetic }
+JITAssembler >> ensureSafeRintegerBit [
+	self or: backend regR8 withImm: 1
 ]
 
 { #category : #'push/pop' }
@@ -930,6 +983,11 @@ JITAssembler >> or: src1AndDst with: src2 [
 	^ backend or: src1AndDst with: src2
 ]
 
+{ #category : #'operations - logical' }
+JITAssembler >> or: source1andDest withImm: imm [
+	backend or: source1andDest withImm: imm
+]
+
 { #category : #logic }
 JITAssembler >> orRwithA [
 	backend or: backend regR with: backend regA
@@ -1027,6 +1085,12 @@ JITAssembler >> pushG [
 	backend push: backend regG
 ]
 
+{ #category : #private }
+JITAssembler >> pushImm: imm [
+	backend pushImm: imm
+
+]
+
 { #category : #'push/pop' }
 JITAssembler >> pushM [
 	backend push: backend regM
@@ -1047,9 +1111,21 @@ JITAssembler >> pushS [
 	backend push: backend regS
 ]
 
+{ #category : #arithmetic }
+JITAssembler >> pushSmallInteger: integer [
+	| smi |
+	smi := self smallInteger: integer.
+	self pushImm: smi
+]
+
 { #category : #'push/pop' }
 JITAssembler >> pushT [
 	backend push: backend regT
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> pushTrue [
+	backend push: backend regTrue
 ]
 
 { #category : #'registers - IR' }
@@ -1439,12 +1515,6 @@ JITAssembler >> subImm: imm from: srcAndDst [
 { #category : #initialization }
 JITAssembler >> useAMD64 [
 	backend := JITAssemblerAMD64 new wordSize: 8.
-	self reset
-]
-
-{ #category : #initialization }
-JITAssembler >> useTemplateAMD64 [
-	backend := TemplateAssemblerAMD64 new wordSize: 8.
 	self reset
 ]
 

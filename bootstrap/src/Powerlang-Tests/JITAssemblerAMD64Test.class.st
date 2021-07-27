@@ -4705,7 +4705,7 @@ JITAssemblerAMD64Test >> testPushG [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testPushImmediate__0 [
 	
-	assembler perform: #pushImmediate: withArguments: #(0).
+	assembler perform: #pushImm: withArguments: #(0).
 	self 
 		assert: (assembler bytes)
 		equals: (#[106 0])

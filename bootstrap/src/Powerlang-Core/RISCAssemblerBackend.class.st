@@ -35,6 +35,15 @@ RISCAssemblerBackend >> push: srcReg [
 ]
 
 { #category : #jumps }
+RISCAssemblerBackend >> pushImm: imm [
+	| memref |
+	memref := self memRef base: self regSP; displacement: -8.
+	self moveImm: imm to: self regV;
+		store: self regV intoMem: memref;
+		subImm: wordSize from: self regSP 
+]
+
+{ #category : #jumps }
 RISCAssemblerBackend >> subImm: anInteger from: srcAndDstReg [
 	self addImm: anInteger negated to: srcAndDstReg
 

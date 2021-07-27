@@ -22,17 +22,6 @@ JITAssemblerAMD64 >> clearRhighHalf [
 
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> clearRintegerBit [
-	self assemble: 'dec' with: backend regR
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> clearSafeRintegerBit [
-	immediate value: 16rFE; length: 8.
-	self assemble: 'and' with: al with: immediate
-]
-
 { #category : #comparing }
 JITAssemblerAMD64 >> compare: register withBoolean: aBoolean [
 	aBoolean
@@ -165,26 +154,6 @@ JITAssemblerAMD64 >> compareWithTrue: register [
 	self assemble: 'cmp' with: register with: backend regTrue
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> convertAtoNativeInteger [
-	self convertToNativeInteger: backend regA
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> convertRtoNativeInteger [
-	self convertToNativeInteger: backend regR
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> convertRtoSmallInteger [
-	self convertToSmallInteger: backend regR
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> convertTtoNativeInteger [
-	self convertToNativeInteger: backend regT
-]
-
 { #category : #private }
 JITAssemblerAMD64 >> dec: srcAndDstReg [
 	self assemble: 'dec' with: srcAndDstReg
@@ -231,16 +200,6 @@ JITAssemblerAMD64 >> dropTopOfFPU [
 	fstp st(0)
 	"
 	self assembleBytes: #[16rDD 16rD8]
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> ensureRintegerBit [
-	self assemble: 'or' with: al with: 1
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> ensureSafeRintegerBit [
-	self assemble: 'or' with: al with: 1
 ]
 
 { #category : #loading }
@@ -517,13 +476,6 @@ JITAssemblerAMD64 >> pushAatToffset: offset [
 ]
 
 { #category : #'push/pop' }
-JITAssemblerAMD64 >> pushImmediate: imm [
-	#imm8.
-	#imm32.
-	self assemble: 'push' withImm: imm
-]
-
-{ #category : #'push/pop' }
 JITAssemblerAMD64 >> pushIndirectR [
 	pointer reset; length: self addressLength; base: backend regR.
 	self assemble: 'push' with: pointer
@@ -533,18 +485,6 @@ JITAssemblerAMD64 >> pushIndirectR [
 JITAssemblerAMD64 >> pushROnFPUStack [
 	pointer reset; length: 64; base: backend regR.
 	self assemble: 'fld' with: pointer
-]
-
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> pushSmallInteger: integer [
-	| smi |
-	smi := (integer bitShift: 1) + 1.
-	self pushImmediate: smi
-]
-
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> pushTrue [
-	backend push: backend regTrue
 ]
 
 { #category : #services }

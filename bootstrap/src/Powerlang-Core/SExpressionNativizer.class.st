@@ -292,7 +292,7 @@ SExpressionNativizer >> emitCallbackPrologue [
 	environment abi emitEntrypoint: method descriptor with: ir.
 	retaddr := 0.
 	ir
-		pushImmediate: retaddr;
+		pushImm: retaddr;
 		xorFPwithFP;
 		loadLongMwithIPoffset: 0 - ir currentAddress + ImageSegmentWriter behaviorOffset;
 		loadMwithMindex: SCallbackMethod behaviorNativeCodeSlot;

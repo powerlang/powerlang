@@ -447,6 +447,12 @@ AssemblerAMD64 >> or: src1AndDst with: src2 [
 
 ]
 
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> or: src1AndDst withImm: imm [
+	self assemble: 'or' with: src1AndDst withImm: imm
+
+]
+
 { #category : #private }
 AssemblerAMD64 >> pop: dstReg [
 	self assemble: 'pop' with: dstReg
@@ -463,6 +469,13 @@ AssemblerAMD64 >> printOn: aStream [
 AssemblerAMD64 >> push: srcReg [
 	self assemble: 'push' with: srcReg
 
+]
+
+{ #category : #'push/pop' }
+AssemblerAMD64 >> pushImm: imm [
+	#imm8.
+	#imm32.
+	self assemble: 'push' withImm: imm
 ]
 
 { #category : #'registers - IR' }

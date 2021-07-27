@@ -249,6 +249,16 @@ AssemblerBackend >> or: src1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> push: srcReg [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> pushImm: imm [
+	self subclassResponsibility
+]
+
 { #category : #'registers - IR' }
 AssemblerBackend >> regA [
 	^self subclassResponsibility
