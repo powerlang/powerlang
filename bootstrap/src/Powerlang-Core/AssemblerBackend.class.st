@@ -80,6 +80,16 @@ AssemblerBackend >> bytes [
 ]
 
 { #category : #accessing }
+AssemblerBackend >> call: srcReg [ 
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
+AssemblerBackend >> callIndirect: aMemRef [ 
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
 AssemblerBackend >> codeSize [
 	^memory codeSize
 ]

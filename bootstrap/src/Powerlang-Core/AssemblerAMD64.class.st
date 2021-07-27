@@ -180,6 +180,16 @@ AssemblerAMD64 >> breakpoint [
 	self assemble: 'int' with: 3
 ]
 
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> call: srcReg [ 
+	self assemble: 'call' with: srcReg
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> callIndirect: aMemRef [
+	self assemble: 'call' with: aMemRef 
+]
+
 { #category : #accessing }
 AssemblerAMD64 >> clearIntegerBit: op1 [
 	self and: op1 with: -2

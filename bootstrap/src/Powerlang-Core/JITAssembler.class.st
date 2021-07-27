@@ -143,6 +143,25 @@ JITAssembler >> buildFrame [
 		move: backend regSP to: backend regFP
 ]
 
+{ #category : #'operations - arithmetic' }
+JITAssembler >> callIndirectA [
+	| memref |
+	memref := backend memRef: backend regA indexImm: 1.
+	backend callIndirect: memref
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> callIndirectM [
+	| memref |
+	memref := backend memRef: backend regM indexImm: 1.
+	backend callIndirect: memref
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> callR [
+	backend call: backend regR
+]
+
 { #category : #'push/pop' }
 JITAssembler >> dec: srcAndDstReg [
 	backend dec: srcAndDstReg

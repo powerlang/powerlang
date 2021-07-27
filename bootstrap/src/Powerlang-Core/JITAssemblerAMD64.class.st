@@ -11,23 +11,6 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
-{ #category : #private }
-JITAssemblerAMD64 >> callIndirectA [
-	pointer reset; length: self addressLength; base: backend regA.
-	self assemble: 'call' with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> callIndirectM [
-	pointer reset; length: self addressLength; base: backend regM.
-	self assemble: 'call' with: pointer
-]
-
-{ #category : #private }
-JITAssemblerAMD64 >> callR [
-	self assemble: 'call' with: backend regR
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> clearFPUFlags [
 	self assemble: 'fnclex'
