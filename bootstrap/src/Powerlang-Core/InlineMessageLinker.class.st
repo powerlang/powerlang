@@ -68,7 +68,7 @@ InlineMessageLinker >> assembleAsPointer [
 	assembler
 		convertRtoNativeInteger;
 		@ nonInteger;
-		ensureSafeRintegerBit
+		setSafeRintegerBit
 ]
 
 { #category : #'private - assemble' }
@@ -208,10 +208,10 @@ InlineMessageLinker >> assembleBitShiftLeft [
 		clearSafeRintegerBit;
 		convertTtoNativeInteger;
 		shiftLeftRwithT;
-		ensureSafeRintegerBit;
+		setSafeRintegerBit;
 		pushR;
 		shiftRightRwithT;
-		ensureSafeRintegerBit;
+		setSafeRintegerBit;
 		compareRwithA;
 		popR;
 		shortJumpIfEqualTo: success;
@@ -471,7 +471,7 @@ InlineMessageLinker >> assembleHigh16 [
 		ifTrue: [ assembler clearRhighHalf ].
 	assembler
 		shiftRright: 15;
-		ensureSafeRintegerBit
+		setSafeRintegerBit
 ]
 
 { #category : #'private - assemble' }
@@ -479,7 +479,7 @@ InlineMessageLinker >> assembleHigh32 [
 	#_high32.
 	assembler
 		shiftLogicalRright: 31;
-		ensureSafeRintegerBit
+		setSafeRintegerBit
 ]
 
 { #category : #'private - assemble' }
@@ -679,7 +679,7 @@ InlineMessageLinker >> assembleSaveCurrentEnvironment [
 		pushE;
 		popT;
 		storeTinRindex: 1;
-		ensureSafeRintegerBit
+		setSafeRintegerBit
 ]
 
 { #category : #'private - assemble' }
@@ -743,7 +743,7 @@ InlineMessageLinker >> assembleTestSmallInteger [
 { #category : #'private - assemble' }
 InlineMessageLinker >> assembleThisContext [
 	#_thisContext.
-	assembler loadRwithFP ensureRintegerBit
+	assembler loadRwithFP setRintegerBit
 ]
 
 { #category : #'private - assemble' }
@@ -781,7 +781,7 @@ InlineMessageLinker >> assembleULargeAtOffset [
 		shiftRleft: 1;
 		shortJumpIfCarryTo: overflow1;
 		shortJumpIfSignTo: overflow2;
-		ensureRintegerBit;
+		setRintegerBit;
 		shortJumpTo: end.
 	assembler
 		@ overflow1;
@@ -830,7 +830,7 @@ InlineMessageLinker >> assembleULongAtOffset [
 		shiftRleft: 1;
 		shortJumpIfCarryTo: overflow1;
 		shortJumpIfSignTo: overflow2;
-		ensureRintegerBit;
+		setRintegerBit;
 		shortJumpTo: end.
 	assembler
 		@ overflow1;

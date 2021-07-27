@@ -217,18 +217,6 @@ TemplateAssemblerAMD64 >> dropTopOfFPU [
 	
 ]
 
-{ #category : #integers }
-TemplateAssemblerAMD64 >> ensureRintegerBit [
-	self assembleBytes: #[16rC 16r1].
-	
-]
-
-{ #category : #integers }
-TemplateAssemblerAMD64 >> ensureSafeRintegerBit [
-	self assembleBytes: #[16rC 16r1].
-	
-]
-
 { #category : #loading }
 TemplateAssemblerAMD64 >> exchangeRindirectWithT [
 	self assembleBytes: #[16r48 16r87 16r8].
@@ -951,6 +939,18 @@ TemplateAssemblerAMD64 >> saveCallerFrame [
 { #category : #loading }
 TemplateAssemblerAMD64 >> scaleFloatOnRWithA [
 	self assembleBytes: #[16rDD 16r2 16rDD 16r0 16rD9 16rFD 16rDD 16r18 16rDD 16rD8].
+	
+]
+
+{ #category : #integers }
+TemplateAssemblerAMD64 >> setRintegerBit [
+	self assembleBytes: #[16rC 16r1].
+	
+]
+
+{ #category : #integers }
+TemplateAssemblerAMD64 >> setSafeRintegerBit [
+	self assembleBytes: #[16rC 16r1].
 	
 ]
 

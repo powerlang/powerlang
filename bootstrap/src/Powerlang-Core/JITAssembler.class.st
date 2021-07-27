@@ -163,13 +163,24 @@ JITAssembler >> callR [
 ]
 
 { #category : #'operations - arithmetic' }
+JITAssembler >> clearIntegerBit: srcAndDstReg [
+	self clearSafeIntegerBit: srcAndDstReg
+
+]
+
+{ #category : #'operations - arithmetic' }
 JITAssembler >> clearRintegerBit [
 	self dec: backend regR
 ]
 
 { #category : #'operations - arithmetic' }
+JITAssembler >> clearSafeIntegerBit: srcAndDstReg [
+	self and: srcAndDstReg withImm: -2
+]
+
+{ #category : #'operations - arithmetic' }
 JITAssembler >> clearSafeRintegerBit [
-	self and: backend regR8 withImm: -2
+	self clearSafeIntegerBit: backend regR8
 ]
 
 { #category : #arithmetic }
@@ -230,16 +241,6 @@ JITAssembler >> doesNotUnderstand: aMessage [
 JITAssembler >> dropTos: count [
 	backend addImm: (count * backend addressSize) to: backend regSP
 
-]
-
-{ #category : #arithmetic }
-JITAssembler >> ensureRintegerBit [
-	self ensureSafeRintegerBit
-]
-
-{ #category : #arithmetic }
-JITAssembler >> ensureSafeRintegerBit [
-	self or: backend regR8 withImm: 1
 ]
 
 { #category : #'push/pop' }
@@ -1287,6 +1288,26 @@ JITAssembler >> restoreCallerSelf [
 { #category : #loading }
 JITAssembler >> saveCallerFrame [
 	self pushFP; loadFPwithSP
+]
+
+{ #category : #arithmetic }
+JITAssembler >> setIntegerBit: srcAndDstReg [
+	self setSafeIntegerBit: srcAndDstReg
+]
+
+{ #category : #arithmetic }
+JITAssembler >> setRintegerBit [
+	self setIntegerBit: backend regR8
+]
+
+{ #category : #arithmetic }
+JITAssembler >> setSafeIntegerBit: srcAndDstReg [
+	self or: srcAndDstReg withImm: 1
+]
+
+{ #category : #arithmetic }
+JITAssembler >> setSafeRintegerBit [
+	self setSafeIntegerBit: backend regR8
 ]
 
 { #category : #'operations - logical' }

@@ -635,7 +635,7 @@ JITAssemblerAMD64Test >> testDropTos__1 [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testEnsureRintegerBit [
 	
-	assembler perform: #ensureRintegerBit withArguments: #().
+	assembler perform: #setRintegerBit withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[12 1])
@@ -645,7 +645,7 @@ JITAssemblerAMD64Test >> testEnsureRintegerBit [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testEnsureSafeRintegerBit [
 	
-	assembler perform: #ensureSafeRintegerBit withArguments: #().
+	assembler perform: #setSafeRintegerBit withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[12 1])

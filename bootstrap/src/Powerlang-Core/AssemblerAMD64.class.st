@@ -190,26 +190,9 @@ AssemblerAMD64 >> callIndirect: aMemRef [
 	self assemble: 'call' with: aMemRef 
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> clearIntegerBit: op1 [
-	self and: op1 with: -2
-]
-
 { #category : #services }
 AssemblerAMD64 >> compare: op1 with: op2 [
 	self assemble: 'cmp' with: op1 with: op2
-]
-
-{ #category : #integers }
-AssemblerAMD64 >> convertToNativeInteger: reg [
-	self assemble: 'sar' with: reg with: 1
-]
-
-{ #category : #integers }
-AssemblerAMD64 >> convertToSmallInteger: reg [
-	self
-		assemble: 'sal' with: reg with: 1;
-		assemble: 'inc' with: reg
 ]
 
 { #category : #services }
@@ -622,11 +605,6 @@ AssemblerAMD64 >> return: anInteger [
 	anInteger = 0
 		ifTrue: [self assemble: 'ret']
 		ifFalse: [self assemble: 'ret' with: anInteger * self addressSize]
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> setIntegerBit: op1 [
-	self assemble: 'or' with: op1 with: 1
 ]
 
 { #category : #'operations - logical' }
