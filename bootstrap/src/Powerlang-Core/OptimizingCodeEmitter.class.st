@@ -616,8 +616,8 @@ OptimizingCodeEmitter >> assembleMinus: instruction [
 	left := allocation at: instruction left.
 	right := allocation at: instruction right.
 	assembler
-		add: 1 to: left;
-		subtract: right from: left
+		addImm: 1 to: left;
+		sub: right from: left
 ]
 
 { #category : #unclassified }
@@ -625,7 +625,7 @@ OptimizingCodeEmitter >> assembleMinusConstant: instruction [
 	| left value |
 	left := allocation at: instruction left.
 	value := instruction right * 2.
-	assembler subtract: value from: left
+	assembler subImm: value from: left
 ]
 
 { #category : #unclassified }

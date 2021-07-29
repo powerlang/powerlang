@@ -74,6 +74,11 @@ AssemblerBackend >> bitLengthOf: anInteger [
 	^nil
 ]
 
+{ #category : #basic }
+AssemblerBackend >> breakpoint [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> bytes [
 	^memory bytes
@@ -97,6 +102,21 @@ AssemblerBackend >> codeSize [
 { #category : #labels }
 AssemblerBackend >> currentAddress [
 	^memory currentAddress
+]
+
+{ #category : #accessing }
+AssemblerBackend >> dec: srcAndDstReg [ 
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
+AssemblerBackend >> decMem: aMemRef [ 
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
+AssemblerBackend >> inc: srcAndDstReg [ 
+	self subclassResponsibility
 ]
 
 { #category : #basic }
@@ -259,6 +279,11 @@ AssemblerBackend >> pushImm: imm [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> pushMem: aMemRef [
+	self subclassResponsibility
+]
+
 { #category : #'registers - IR' }
 AssemblerBackend >> regA [
 	^self subclassResponsibility
@@ -362,6 +387,11 @@ AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 { #category : #initialization }
 AssemblerBackend >> stream [
 	^memory stream
+]
+
+{ #category : #accessing }
+AssemblerBackend >> subImm: imm from: srcAndDst [
+	self subclassResponsibility
 ]
 
 { #category : #services }

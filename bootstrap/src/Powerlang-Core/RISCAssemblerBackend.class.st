@@ -11,6 +11,12 @@ RISCAssemblerBackend >> dec: srcAndDstReg [
 ]
 
 { #category : #jumps }
+RISCAssemblerBackend >> decMem: aMemRef [
+	self addImm: -1 toMem: aMemRef
+
+]
+
+{ #category : #jumps }
 RISCAssemblerBackend >> inc: srcAndDstReg [
 	self addImm: 1 to: srcAndDstReg
 

@@ -195,9 +195,25 @@ AssemblerAMD64 >> compare: op1 with: op2 [
 	self assemble: 'cmp' with: op1 with: op2
 ]
 
+{ #category : #private }
+AssemblerAMD64 >> dec: srcAndDstReg [
+	self assemble: 'dec' with: srcAndDstReg
+]
+
+{ #category : #private }
+AssemblerAMD64 >> decMem: aMemRef [
+	self assemble: 'dec' with: aMemRef
+
+]
+
 { #category : #services }
 AssemblerAMD64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
+]
+
+{ #category : #private }
+AssemblerAMD64 >> inc: srcAndDstReg [
+	self assemble: 'inc' with: srcAndDstReg
 ]
 
 { #category : #initialization }
@@ -461,6 +477,11 @@ AssemblerAMD64 >> pushImm: imm [
 	self assemble: 'push' withImm: imm
 ]
 
+{ #category : #accessing }
+AssemblerAMD64 >> pushMem: aMemRef [
+	self push: aMemRef
+]
+
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regA [
 	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
@@ -708,14 +729,14 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> sub: src2 from: src1AndDst [
-	self assemble: 'sub' with: src1AndDst with: src2
+AssemblerAMD64 >> sub: src1 from: src2AndDst [
+	self assemble: 'sub' with: src2AndDst with:  src1
 
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> subImm: imm from: src2AndDst [
-	self assemble: 'sub' with: src2AndDst withImm: imm
+AssemblerAMD64 >> subImm: imm from: srcAndDst [
+	self assemble: 'sub' with: srcAndDst withImm: imm
 
 ]
 

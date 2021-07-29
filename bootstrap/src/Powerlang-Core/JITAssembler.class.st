@@ -223,6 +223,13 @@ JITAssembler >> dec: srcAndDstReg [
 ]
 
 { #category : #private }
+JITAssembler >> decRindirect [
+	| memref |
+	memref := backend memRef: backend regR indexImm: 1.
+	backend decMem: memref
+]
+
+{ #category : #private }
 JITAssembler >> discardArguments: anInteger [
 	anInteger = 0 ifTrue: [^self].
 	backend addImm: anInteger * backend wordSize to: backend regSP
@@ -393,6 +400,11 @@ JITAssembler >> loadAwithGlobal: aSymbol [
 { #category : #integers }
 JITAssembler >> loadAwithImmediate: imm [
 	self load: backend regA withImmediate: imm
+]
+
+{ #category : #arithmetic }
+JITAssembler >> loadAwithKnown: anObject [
+	backend breakpoint
 ]
 
 { #category : #loading }
@@ -719,7 +731,7 @@ JITAssembler >> loadRwithSindex: index [
 { #category : #integers }
 JITAssembler >> loadRwithSmallInteger: anInteger [
 	| smi |
-	smi := (anInteger bitShift: 1) + 1.
+	smi := self smallInteger: anInteger.
 	self loadRwithImmediate: smi
 ]
 
@@ -1092,6 +1104,13 @@ JITAssembler >> pushImm: imm [
 
 ]
 
+{ #category : #private }
+JITAssembler >> pushIndirectR [
+	| memref |
+	memref := backend memRef: backend regR indexImm: 1.
+	backend pushMem: memref
+]
+
 { #category : #'push/pop' }
 JITAssembler >> pushM [
 	backend push: backend regM
@@ -1251,6 +1270,11 @@ JITAssembler >> regV [
 
 ]
 
+{ #category : #loading }
+JITAssembler >> reserveStackSlots: amount [
+	backend subImm: amount * backend addressSize from: backend regSP
+]
+
 { #category : #initialization }
 JITAssembler >> reset [
 	labels := Dictionary new: 100.
@@ -1403,6 +1427,15 @@ JITAssembler >> store: srcReg intoMem: dstMemRef [
 ]
 
 { #category : #storing }
+JITAssembler >> storeAinTindex: index [
+	| memref |
+	memref := backend memRef: backend regT indexImm: index.
+	backend
+		store: backend regA
+		intoMem: memref
+]
+
+{ #category : #storing }
 JITAssembler >> storeEinRindex: index [
 	| memref |
 	memref := backend memRef: backend regR indexImm: index.
@@ -1505,7 +1538,7 @@ JITAssembler >> storeTinRindex: index [
 
 { #category : #'operations - arithmetic' }
 JITAssembler >> sub: src2 from: src1AndDst [
-	self subclassResponsibility
+	backend sub: src2  from: src1AndDst
 
 ]
 

@@ -154,17 +154,6 @@ JITAssemblerAMD64 >> compareWithTrue: register [
 	self assemble: 'cmp' with: register with: backend regTrue
 ]
 
-{ #category : #private }
-JITAssemblerAMD64 >> dec: srcAndDstReg [
-	self assemble: 'dec' with: srcAndDstReg
-]
-
-{ #category : #private }
-JITAssemblerAMD64 >> decRindirect [
-	pointer reset; length: self addressLength; base: backend regR.
-	self assemble: 'dec' with: pointer
-]
-
 { #category : #services }
 JITAssemblerAMD64 >> disassembledText32 [
 	^self nativeCode disassembledText32
@@ -209,11 +198,6 @@ JITAssemblerAMD64 >> exchangeRindirectWithT [
 ]
 
 { #category : #private }
-JITAssemblerAMD64 >> inc: srcAndDstReg [
-	self assemble: 'inc' with: srcAndDstReg
-]
-
-{ #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.
 	backend := self
@@ -227,17 +211,6 @@ JITAssemblerAMD64 >> initializeS [
 { #category : #loading }
 JITAssemblerAMD64 >> jumpToMindex: index [
 	self assemble: 'jmp' withReg: backend regM index: index
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadAwithImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: backend regA withImm: imm
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadAwithKnown: anObject [
-	self breakpoint
 ]
 
 { #category : #integers }
@@ -332,12 +305,6 @@ JITAssemblerAMD64 >> loadRwithArgPointer [
 	self assemble: 'lea' with: backend regR with: pointer
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> loadRwithImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: backend regR withImm: imm
-]
-
 { #category : #storing }
 JITAssemblerAMD64 >> loadRwithTIBatIndexR [
 	| seg |
@@ -387,12 +354,6 @@ JITAssemblerAMD64 >> loadSwithAddressOfSatA [
 		scale: backend regS sizeInBytes;
 		displacement: 0 - backend regS sizeInBytes.
 	self assemble: 'lea' with: backend regS with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadTwithImmediate: imm [
-	#imm32.
-	self assemble: 'mov' with: backend regT withImm: imm
 ]
 
 { #category : #loading }
@@ -475,12 +436,6 @@ JITAssemblerAMD64 >> pushAatToffset: offset [
 	self assemble: 'push' with: pointer
 ]
 
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> pushIndirectR [
-	pointer reset; length: self addressLength; base: backend regR.
-	self assemble: 'push' with: pointer
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> pushROnFPUStack [
 	pointer reset; length: 64; base: backend regR.
@@ -491,11 +446,6 @@ JITAssemblerAMD64 >> pushROnFPUStack [
 JITAssemblerAMD64 >> readFPUStatusOnA [
 	pointer reset; length: 16; base: backend regA.
 	self assemble: 'fstsw' with: pointer
-]
-
-{ #category : #private }
-JITAssemblerAMD64 >> reserveStackSlots: amount [
-	self subtract: amount * self addressSize from: backend regSP
 ]
 
 { #category : #loading }
@@ -524,15 +474,6 @@ JITAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
 		ifTrue: [pointer segment: gs; displacement: 16r1480]
 		ifFalse: [pointer segment: fs; displacement: 16rE10].
 	self assemble: 'mov' with: pointer with: backend regA
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeAinTindex: index [
-	| memref |
-	memref := backend memRef: backend regT indexImm: index.
-	backend
-		store: backend regA
-		intoMem: memref
 ]
 
 { #category : #storing }
