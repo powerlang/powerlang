@@ -5,6 +5,13 @@ Class {
 }
 
 { #category : #jumps }
+RISCAssemblerBackend >> clearHigh32: srcAndDstReg [
+	self
+		shiftLeft: srcAndDstReg byImm: 32;
+		shiftRight: srcAndDstReg byImm: 32
+]
+
+{ #category : #jumps }
 RISCAssemblerBackend >> dec: srcAndDstReg [
 	self addImm: -1 to: srcAndDstReg
 

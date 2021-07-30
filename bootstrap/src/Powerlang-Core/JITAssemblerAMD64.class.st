@@ -16,12 +16,6 @@ JITAssemblerAMD64 >> clearFPUFlags [
 	self assemble: 'fnclex'
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> clearRhighHalf [
-	self assemble: 'mov' with: backend regR e with: backend regR e
-
-]
-
 { #category : #comparing }
 JITAssemblerAMD64 >> compare: register withBoolean: aBoolean [
 	aBoolean

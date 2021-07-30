@@ -94,6 +94,11 @@ AssemblerBackend >> callIndirect: aMemRef [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> clearHigh32: srcAndDstReg [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> codeSize [
 	^memory codeSize
@@ -366,6 +371,11 @@ AssemblerBackend >> reset [
 
 { #category : #basic }
 AssemblerBackend >> shiftLeft: srcAndDst byImm: count [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> shiftRight: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 

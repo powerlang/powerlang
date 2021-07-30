@@ -255,7 +255,7 @@ JITAssemblerAMD64Test >> testClearFPUFlags [
 { #category : #'tests - generated' }
 JITAssemblerAMD64Test >> testClearRhighHalf [
 	
-	assembler clearRhighHalf.
+	assembler clearRhigh32.
 	self 
 		assert: (assembler bytes)
 		equals: (#[137 192])

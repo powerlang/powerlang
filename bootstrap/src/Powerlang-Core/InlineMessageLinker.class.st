@@ -468,7 +468,7 @@ InlineMessageLinker >> assembleGetThreadValue [
 InlineMessageLinker >> assembleHigh16 [
 	#_high16.
 	assembler wordSize > 4
-		ifTrue: [ assembler clearRhighHalf ].
+		ifTrue: [ assembler clearRhigh32 ].
 	assembler
 		shiftRright: 15;
 		setSafeRintegerBit

@@ -168,6 +168,12 @@ JITAssembler >> clearIntegerBit: srcAndDstReg [
 
 ]
 
+{ #category : #'push/pop' }
+JITAssembler >> clearRhigh32 [
+	backend clearHigh32: backend regR
+
+]
+
 { #category : #'operations - arithmetic' }
 JITAssembler >> clearRintegerBit [
 	self dec: backend regR

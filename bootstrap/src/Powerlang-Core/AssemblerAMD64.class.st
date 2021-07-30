@@ -190,6 +190,11 @@ AssemblerAMD64 >> callIndirect: aMemRef [
 	self assemble: 'call' with: aMemRef 
 ]
 
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> clearHigh32: srcAndDstReg [
+	self assemble: 'mov' with: srcAndDstReg e with: srcAndDstReg e
+]
+
 { #category : #services }
 AssemblerAMD64 >> compare: op1 with: op2 [
 	self assemble: 'cmp' with: op1 with: op2

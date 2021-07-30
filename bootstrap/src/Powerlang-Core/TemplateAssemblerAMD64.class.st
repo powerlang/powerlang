@@ -92,7 +92,7 @@ TemplateAssemblerAMD64 >> clearFPUFlags [
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> clearRhighHalf [
+TemplateAssemblerAMD64 >> clearRhigh32 [
 	self assembleBytes: #[16r89 16rC0].
 	
 ]
