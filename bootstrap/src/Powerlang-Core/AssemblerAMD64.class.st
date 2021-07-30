@@ -303,6 +303,11 @@ AssemblerAMD64 >> jumpTo: label [
 	self nearJump: 'jmp' to: label
 ]
 
+{ #category : #loading }
+AssemblerAMD64 >> jumpToMem: aMemRef [ 
+	self assemble: 'jmp' with: aMemRef
+]
+
 { #category : #integers }
 AssemblerAMD64 >> leadingRzeroCount [
 	"

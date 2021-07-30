@@ -276,6 +276,13 @@ JITAssembler >> jumpTo: label [
 	backend jumpTo: label
 ]
 
+{ #category : #accessing }
+JITAssembler >> jumpToMindex: index [
+	| memref |
+	memref := backend memRef: backend regM indexImm: index.
+	backend jumpToMem: memref
+]
+
 { #category : #integers }
 JITAssembler >> labeledIntegerBitTestOf: aRegister [
 	| label |

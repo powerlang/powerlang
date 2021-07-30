@@ -202,11 +202,6 @@ JITAssemblerAMD64 >> initializeS [
 	backend move: backend regR to: backend regS
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> jumpToMindex: index [
-	self assemble: 'jmp' withReg: backend regM index: index
-]
-
 { #category : #integers }
 JITAssemblerAMD64 >> loadEwithAddressOfRatA [
 	pointer

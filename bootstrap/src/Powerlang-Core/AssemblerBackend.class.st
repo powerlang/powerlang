@@ -134,6 +134,11 @@ AssemblerBackend >> jumpTo: label [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> jumpToMem: aMemRef [
+	self subclassResponsibility
+]
+
 { #category : #memory }
 AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 	"Load `dstReg` from memory location `srcMemRef`. 
