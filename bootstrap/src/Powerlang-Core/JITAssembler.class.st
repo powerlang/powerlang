@@ -489,6 +489,16 @@ JITAssembler >> loadAwithTrue [
 	backend move: backend regTrue to: backend regA
 ]
 
+{ #category : #'push/pop' }
+JITAssembler >> loadEwithAddressOfRatA [
+	| memref |
+	memref := backend
+		memRef: backend regR
+		index: backend regA
+		offset: backend wordSize negated.
+	backend lea: backend regE withMem: memref
+]
+
 { #category : #loading }
 JITAssembler >> loadEwithFPindex: index [
 	| memref |
@@ -626,6 +636,13 @@ JITAssembler >> loadNilWithMindex: index [
 { #category : #loading }
 JITAssembler >> loadRwithA [
 	backend move: backend regA to: backend regR
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> loadRwithArgPointer [
+	| memref |
+	memref := backend memRef: backend regFP indexImm: 3.
+	backend lea: backend regR withMem: memref
 ]
 
 { #category : #loading }
@@ -766,6 +783,16 @@ JITAssembler >> loadRwithTrue [
 { #category : #loading }
 JITAssembler >> loadSPwithFP [
 	backend move: backend regFP to: backend regSP
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> loadSwithAddressOfSatA [
+	| memref |
+	memref := backend
+		memRef: backend regS
+		index: backend regA
+		offset: backend wordSize negated.
+	backend lea: backend regS withMem: memref
 ]
 
 { #category : #loading }

@@ -308,6 +308,11 @@ AssemblerAMD64 >> jumpToMem: aMemRef [
 	self assemble: 'jmp' with: aMemRef
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> lea: dstReg withMem: srcMemRef [
+	self assemble: 'lea' with: dstReg with: srcMemRef
+]
+
 { #category : #integers }
 AssemblerAMD64 >> leadingRzeroCount [
 	"

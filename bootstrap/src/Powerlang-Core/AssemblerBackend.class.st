@@ -140,6 +140,11 @@ AssemblerBackend >> jumpToMem: aMemRef [
 ]
 
 { #category : #memory }
+AssemblerBackend >> lea: dstReg withMem: srcMemRef [
+	^self subclassResponsibility
+]
+
+{ #category : #memory }
 AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 	"Load `dstReg` from memory location `srcMemRef`. 
 
@@ -231,6 +236,17 @@ AssemblerBackend >> memRef: baseReg index: indexRef [
 	^ self memRef 
 		base: baseReg; 
 		displacement: self addressSize negated;
+		index: indexRef;
+		scale: self addressSize;
+		yourself
+
+]
+
+{ #category : #memory }
+AssemblerBackend >> memRef: baseReg index: indexRef offset: anInteger [
+	^ self memRef 
+		base: baseReg; 
+		displacement: anInteger;
 		index: indexRef;
 		scale: self addressSize;
 		yourself

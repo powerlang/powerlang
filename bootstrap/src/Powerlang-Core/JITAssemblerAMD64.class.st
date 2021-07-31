@@ -197,18 +197,6 @@ JITAssemblerAMD64 >> initialize [
 	backend := self
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> loadEwithAddressOfRatA [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regR;
-		index: backend regA;
-		scale: backend regE sizeInBytes;
-		displacement: 0 - backend regE sizeInBytes.
-	self assemble: 'lea' with: backend regE with: pointer
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> loadLargeX0withRindirect [
 	pointer
@@ -279,16 +267,6 @@ JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
 	self assemble: 'cvttsd2si' with: backend regR with: pointer
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> loadRwithArgPointer [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regFP;
-		displacement: wordSize * 2.
-	self assemble: 'lea' with: backend regR with: pointer
-]
-
 { #category : #storing }
 JITAssemblerAMD64 >> loadRwithTIBatIndexR [
 	| seg |
@@ -326,18 +304,6 @@ JITAssemblerAMD64 >> loadRwithX0 [
 		assemble: mov
 		with: backend regR
 		with: backend regF0
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> loadSwithAddressOfSatA [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regS;
-		index: backend regA;
-		scale: backend regS sizeInBytes;
-		displacement: 0 - backend regS sizeInBytes.
-	self assemble: 'lea' with: backend regS with: pointer
 ]
 
 { #category : #loading }
