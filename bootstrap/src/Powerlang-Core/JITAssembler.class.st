@@ -262,6 +262,11 @@ JITAssembler >> inc: srcAndDstReg [
 
 ]
 
+{ #category : #'push/pop' }
+JITAssembler >> initializeS [
+	backend move: backend regR to: backend regS
+]
+
 { #category : #accessing }
 JITAssembler >> jumpOver: aBlock [
 	| label |

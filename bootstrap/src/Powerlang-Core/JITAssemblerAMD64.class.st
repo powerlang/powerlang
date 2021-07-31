@@ -197,11 +197,6 @@ JITAssemblerAMD64 >> initialize [
 	backend := self
 ]
 
-{ #category : #private }
-JITAssemblerAMD64 >> initializeS [
-	backend move: backend regR to: backend regS
-]
-
 { #category : #integers }
 JITAssemblerAMD64 >> loadEwithAddressOfRatA [
 	pointer
