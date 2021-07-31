@@ -196,6 +196,16 @@ AssemblerBackend >> memRef32: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
+AssemblerBackend >> memRef32: baseReg offset: indexReg [
+	^ self memRef32 
+		base: baseReg; 
+		index: indexReg;
+		scale: 1;
+		yourself
+
+]
+
+{ #category : #memory }
 AssemblerBackend >> memRef64 [
 	"Return clean instance of memory reference."
 
@@ -243,7 +253,7 @@ AssemblerBackend >> memRef: baseReg index: indexRef [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef: baseReg index: indexRef offset: anInteger [
+AssemblerBackend >> memRef: baseReg index: indexRef offsetImm: anInteger [
 	^ self memRef 
 		base: baseReg; 
 		displacement: anInteger;
@@ -361,7 +371,22 @@ AssemblerBackend >> regR [
 ]
 
 { #category : #'registers - IR' }
+AssemblerBackend >> regR32 [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+AssemblerBackend >> regR8 [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
 AssemblerBackend >> regS [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+AssemblerBackend >> regS32 [
 	^self subclassResponsibility
 ]
 

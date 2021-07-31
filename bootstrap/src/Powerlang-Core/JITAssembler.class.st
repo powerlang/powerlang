@@ -495,7 +495,7 @@ JITAssembler >> loadEwithAddressOfRatA [
 	memref := backend
 		memRef: backend regR
 		index: backend regA
-		offset: backend wordSize negated.
+		offsetImm: backend wordSize negated.
 	backend lea: backend regE withMem: memref
 ]
 
@@ -558,6 +558,24 @@ JITAssembler >> loadGwithMindex: index [
 	backend
 		load: backend regG
 		fromMem: memref
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> loadLongRwithRatOffsetA [
+	| memref |
+	memref := backend
+		memRef32: backend regR
+		offset: backend regA.
+	backend load: backend regR32 fromMem: memref
+	
+
+]
+
+{ #category : #'push/pop' }
+JITAssembler >> loadLongSwithRindex: index [
+	| memref |
+	memref := backend memRef32: backend regR indexImm: index.
+	backend load: backend regS32 fromMem: memref
 ]
 
 { #category : #'push/pop' }
@@ -791,7 +809,7 @@ JITAssembler >> loadSwithAddressOfSatA [
 	memref := backend
 		memRef: backend regS
 		index: backend regA
-		offset: backend wordSize negated.
+		offsetImm: backend wordSize negated.
 	backend lea: backend regS withMem: memref
 ]
 

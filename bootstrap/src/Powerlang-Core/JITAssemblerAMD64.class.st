@@ -235,27 +235,6 @@ JITAssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadLongRwithRatOffsetA [
-	pointer
-		reset;
-		length: 32;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: backend regR e with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadLongSwithRindex: index [
-	#dontOptimize.
-	pointer
-		reset;
-		length: 32;
-		base: backend regR;
-		displacement: index - 1 * 4.
-	self assemble: 'mov' with: backend regS e with: pointer
-]
-
-{ #category : #loading }
 JITAssemblerAMD64 >> loadMXCSRfromA [
 	pointer reset; length: 32; base: backend regA.
 	self assemble: 'ldmxcsr' with: pointer
