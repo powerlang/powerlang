@@ -518,18 +518,6 @@ AssemblerAMD64 >> regE [
 ]
 
 { #category : #'registers - IR' }
-AssemblerAMD64 >> regF0 [
-	^xmm0
-
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regF1 [
-	^xmm1
-
-]
-
-{ #category : #'registers - IR' }
 AssemblerAMD64 >> regFP [
 	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
 ]
@@ -602,6 +590,18 @@ AssemblerAMD64 >> regTrue [
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regV [
 	^r11
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regX0 [
+	^xmm0
+
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regX1 [
+	^xmm1
+
 ]
 
 { #category : #accessing }

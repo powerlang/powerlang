@@ -60,8 +60,8 @@ JITAssembler >> addAtoR [
 JITAssembler >> addDoubleX1toX0 [
 	self 
 		assemble: 'addsd'
-		with: backend regF0
-		with: backend regF1
+		with: backend regX0
+		with: backend regX1
 
 ]
 
@@ -1240,19 +1240,6 @@ JITAssembler >> regE [
 ]
 
 { #category : #'registers - IR' }
-JITAssembler >> regF0 [
-	"IEEE 754 double register"
-	^ backend regF0
-
-]
-
-{ #category : #'registers - IR' }
-JITAssembler >> regF1 [
-	"IEEE 754 double register"
-	^ backend regF1
-]
-
-{ #category : #'registers - IR' }
 JITAssembler >> regFP [
 	^ backend regFP
 
@@ -1331,6 +1318,19 @@ JITAssembler >> regTrue [
 JITAssembler >> regV [
 	^ backend regV
 
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regX0 [
+	"IEEE 754 double register"
+	^ backend regX0
+
+]
+
+{ #category : #'registers - IR' }
+JITAssembler >> regX1 [
+	"IEEE 754 double register"
+	^ backend regX1
 ]
 
 { #category : #loading }

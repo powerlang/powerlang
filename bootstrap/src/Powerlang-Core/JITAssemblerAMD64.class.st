@@ -59,7 +59,7 @@ JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
 		base: backend regA.
 	self 
 		assemble: 'cmpsd'
-		with: backend regF0
+		with: backend regX0
 		with: pointer
 		with: 0
 ]
@@ -72,7 +72,7 @@ JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
 		base: backend regA.
 	self 
 		assemble: 'cmpsd'
-		with: backend regF0
+		with: backend regX0
 		with: pointer
 		with: 1
 ]
@@ -162,8 +162,8 @@ JITAssemblerAMD64 >> disassembledText64 [
 JITAssemblerAMD64 >> divideDoubleX0byX1 [
 	self 
 		assemble: 'divsd'
-		with: backend regF0
-		with: backend regF1
+		with: backend regX0
+		with: backend regX1
 
 ]
 
@@ -205,7 +205,7 @@ JITAssemblerAMD64 >> loadLargeX0withRindirect [
 		base: backend regR.
 	self 
 		assemble: 'movq'
-		with: backend regF0
+		with: backend regX0
 		with: pointer
 ]
 
@@ -217,7 +217,7 @@ JITAssemblerAMD64 >> loadLargeX1withAindirect [
 		base: backend regA.
 	self 
 		assemble: 'movq'
-		with: backend regF1
+		with: backend regX1
 		with: pointer
 ]
 
@@ -282,14 +282,14 @@ JITAssemblerAMD64 >> loadRwithX0 [
 	self 
 		assemble: mov
 		with: backend regR
-		with: backend regF0
+		with: backend regX0
 ]
 
 { #category : #loading }
 JITAssemblerAMD64 >> loadX0withRasDouble [
 	self 
 		assemble: 'cvtsi2sd'
-		with: backend regF0
+		with: backend regX0
 		with: backend regR
 ]
 
@@ -297,8 +297,8 @@ JITAssemblerAMD64 >> loadX0withRasDouble [
 JITAssemblerAMD64 >> loadX1roundingX0 [
 	self 
 		assemble: 'roundsd'
-		with: backend regF1
-		with: backend regF0
+		with: backend regX1
+		with: backend regX0
 		with: 3
 
 ]
@@ -330,8 +330,8 @@ JITAssemblerAMD64 >> moveTslots [
 JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
 	self 
 		assemble: 'mulsd'
-		with: backend regF0
-		with: backend regF1
+		with: backend regX0
+		with: backend regX1
 
 ]
 
@@ -388,8 +388,8 @@ JITAssemblerAMD64 >> scaleFloatOnRWithA [
 JITAssemblerAMD64 >> sqrtDoubleX0 [
 	self 
 		assemble: 'sqrtsd'
-		with: backend regF0
-		with: backend regF0
+		with: backend regX0
+		with: backend regX0
 ]
 
 { #category : #storing }
@@ -437,7 +437,7 @@ JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 		self 
 			assemble: 'movq'
 			with: pointer
-			with: backend regF0
+			with: backend regX0
 	] ifFalse: [
 		self assemble: 'fstp' with: pointer
 	]
@@ -452,7 +452,7 @@ JITAssemblerAMD64 >> storeLargeX0inA [
 	self 
 		assemble: 'movq'
 		with: pointer
-		with: backend regF0
+		with: backend regX0
 ]
 
 { #category : #loading }
@@ -464,7 +464,7 @@ JITAssemblerAMD64 >> storeLargeX0inT [
 	self 
 		assemble: 'movq'
 		with: pointer
-		with: backend regF0
+		with: backend regX0
 ]
 
 { #category : #storing }
@@ -530,8 +530,8 @@ JITAssemblerAMD64 >> storeTinRatOffsetA [
 JITAssemblerAMD64 >> subDoubleX1fromX0 [
 	self 
 		assemble: 'subsd'
-		with: backend regF0
-		with: backend regF1
+		with: backend regX0
+		with: backend regX1
 
 ]
 
