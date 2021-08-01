@@ -155,6 +155,13 @@ AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #memory }
+AssemblerBackend >> loadFP64: dstReg fromMem: srcMemRef [
+	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
+	^ self subclassResponsibility
+
+]
+
+{ #category : #memory }
 AssemblerBackend >> memRef [
 	self subclassResponsibility
 ]
@@ -211,6 +218,14 @@ AssemblerBackend >> memRef64 [
 
 	^ self memRef length: 64; yourself
 
+]
+
+{ #category : #memory }
+AssemblerBackend >> memRef64: baseReg indexImm: indexImm [
+	^ self memRef64
+		base: baseReg;
+		displacement: (indexImm - 1) * 8;
+		yourself
 ]
 
 { #category : #memory }

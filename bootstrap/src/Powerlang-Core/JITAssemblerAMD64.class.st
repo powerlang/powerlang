@@ -198,30 +198,6 @@ JITAssemblerAMD64 >> initialize [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadLargeX0withRindirect [
-	pointer
-		reset;
-		length: 64;
-		base: backend regR.
-	self 
-		assemble: 'movq'
-		with: backend regX0
-		with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadLargeX1withAindirect [
-	pointer
-		reset;
-		length: 64;
-		base: backend regA.
-	self 
-		assemble: 'movq'
-		with: backend regX1
-		with: pointer
-]
-
-{ #category : #loading }
 JITAssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
 	| instsize |
 	#dontOptimize.

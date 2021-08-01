@@ -339,6 +339,14 @@ AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 		with: srcMemRef
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> loadFP64: dstReg fromMem: srcMemRef [
+	self 
+		assemble: 'movq'
+		with: dstReg
+		with: srcMemRef
+]
+
 { #category : #storing }
 AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndex: index [
 	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
