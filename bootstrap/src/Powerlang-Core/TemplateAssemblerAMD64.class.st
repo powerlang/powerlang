@@ -741,12 +741,6 @@ TemplateAssemblerAMD64 >> loadX0withRasDouble [
 	
 ]
 
-{ #category : #loading }
-TemplateAssemblerAMD64 >> loadX1roundingX0 [
-	self assembleBytes: #[16r66 16rF 16r3A 16rB 16rC8 16r3].
-	
-]
-
 { #category : #integers }
 TemplateAssemblerAMD64 >> loadZeroExtendByteRwithRatA [
 	self assembleBytes: #[16r48 16rF 16rB6 16r44 16r10 16rFF].
@@ -927,6 +921,12 @@ TemplateAssemblerAMD64 >> restoreCallerM [
 { #category : #epilogue }
 TemplateAssemblerAMD64 >> restoreCallerSelf [
 	self assembleBytes: #[16r48 16r8B 16r75 16rF8].
+	
+]
+
+{ #category : #loading }
+TemplateAssemblerAMD64 >> roundDoubleX0intoX1 [
+	self assembleBytes: #[16r66 16rF 16r3A 16rB 16rC8 16r3].
 	
 ]
 

@@ -159,15 +159,6 @@ JITAssemblerAMD64 >> disassembledText64 [
 ]
 
 { #category : #arithmetic }
-JITAssemblerAMD64 >> divideDoubleX0byX1 [
-	self 
-		assemble: 'divsd'
-		with: backend regX0
-		with: backend regX1
-
-]
-
-{ #category : #arithmetic }
 JITAssemblerAMD64 >> divideRbyT [
 	| conversion |
 	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
@@ -175,14 +166,6 @@ JITAssemblerAMD64 >> divideRbyT [
 	self
 		assemble: conversion;
 		assemble: 'idiv' with: backend regT
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> dropTopOfFPU [
-	"
-	fstp st(0)
-	"
-	self assembleBytes: #[16rDD 16rD8]
 ]
 
 { #category : #loading }
@@ -269,16 +252,6 @@ JITAssemblerAMD64 >> loadX0withRasDouble [
 		with: backend regR
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> loadX1roundingX0 [
-	self 
-		assemble: 'roundsd'
-		with: backend regX1
-		with: backend regX0
-		with: 3
-
-]
-
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer
@@ -300,15 +273,6 @@ JITAssemblerAMD64 >> moveTslots [
 	rep := 16rF3.
 	mnemonic := wordSize = 8 ifTrue: ['movsq'] ifFalse: ['movsd'].
 	self assembleByte: rep; assemble: mnemonic
-]
-
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> multiplyDoubleX0byX1 [
-	self 
-		assemble: 'mulsd'
-		with: backend regX0
-		with: backend regX1
-
 ]
 
 { #category : #arithmetic }
@@ -358,14 +322,6 @@ JITAssemblerAMD64 >> scaleFloatOnRWithA [
 	self pushAOnFPUStack; pushROnFPUStack; assemble: 'fscale'.
 	pointer reset; length: 64; base: backend regR.
 	self assemble: 'fstp' with: pointer; dropTopOfFPU
-]
-
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> sqrtDoubleX0 [
-	self 
-		assemble: 'sqrtsd'
-		with: backend regX0
-		with: backend regX0
 ]
 
 { #category : #storing }
@@ -500,15 +456,6 @@ JITAssemblerAMD64 >> storeTinRatOffsetA [
 		base: backend regR;
 		index: backend regA.
 	self assemble: 'mov' with: pointer with: backend regT
-]
-
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> subDoubleX1fromX0 [
-	self 
-		assemble: 'subsd'
-		with: backend regX0
-		with: backend regX1
-
 ]
 
 { #category : #arithmetic }

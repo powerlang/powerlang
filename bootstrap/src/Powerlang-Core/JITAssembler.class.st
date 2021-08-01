@@ -241,6 +241,11 @@ JITAssembler >> discardArguments: anInteger [
 	backend addImm: anInteger * backend wordSize to: backend regSP
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> divideDoubleX0byX1 [
+	backend divFP64: backend regX0 by: backend regX1
+]
+
 { #category : #loading }
 JITAssembler >> doesNotUnderstand: aMessage [
 	(backend respondsTo: aMessage selector)
@@ -1053,6 +1058,11 @@ JITAssembler >> moveImm: imm to: dstReg [
 
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> multiplyDoubleX0byX1 [
+	backend mulFP64: backend regX0 by: backend regX1
+]
+
 { #category : #arithmetic }
 JITAssembler >> nativeCode [
 	^(NativeCode withAll: literals) code: backend memory bytes
@@ -1386,6 +1396,11 @@ JITAssembler >> restoreCallerSelf [
 	self loadSwithFPindex: 0
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> roundDoubleX0intoX1 [
+	backend roundFP64: backend regX0 into: backend regX1
+]
+
 { #category : #loading }
 JITAssembler >> saveCallerFrame [
 	self pushFP; loadFPwithSP
@@ -1491,6 +1506,11 @@ JITAssembler >> shortJumpIfZeroTo: label [
 { #category : #comparing }
 JITAssembler >> smallInteger: anInteger [
 	^(anInteger bitShift: 1) + 1
+]
+
+{ #category : #'floting point' }
+JITAssembler >> sqrtDoubleX0 [
+	backend sqrtFP64: backend regX0 into: backend regX0
 ]
 
 { #category : #'memory - load / store' }
@@ -1629,6 +1649,11 @@ JITAssembler >> subAfromR [
 JITAssembler >> subAfromT [
 	backend sub: backend regA from: backend regT    
 
+]
+
+{ #category : #'floting point' }
+JITAssembler >> subDoubleX1fromX0 [
+	backend subFP64: backend regX1 from: backend regX0
 ]
 
 { #category : #arithmetic }

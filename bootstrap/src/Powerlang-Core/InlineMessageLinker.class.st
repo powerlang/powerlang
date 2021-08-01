@@ -351,7 +351,7 @@ InlineMessageLinker >> assembleFloatFractionPartInto [
 	#_floatFractionPartInto:.
 	assembler
 		loadLargeX0withRindirect;
-		loadX1roundingX0;
+		roundDoubleX0intoX1;
 		subDoubleX1fromX0;
 		storeLargeX0inA.
 	self readFloatStatus

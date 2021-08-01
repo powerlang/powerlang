@@ -211,6 +211,23 @@ AssemblerAMD64 >> decMem: aMemRef [
 
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> divFP64: src1andDstReg by: src2reg [
+	self 
+		assemble: 'divsd'
+		with: src1andDstReg
+		with: src2reg
+
+]
+
+{ #category : #private }
+AssemblerAMD64 >> dropTopOfFPU [
+	"
+	fstp st(0)
+	"
+	self assembleBytes: #[16rDD 16rD8]
+]
+
 { #category : #services }
 AssemblerAMD64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
@@ -390,6 +407,15 @@ AssemblerAMD64 >> move: srcReg to: dstReg [
 AssemblerAMD64 >> moveImm: imm to: dstReg [
 	self ASSERT: (imm isInteger and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: imm
+
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> mulFP64: src1andDstReg by: src2reg [
+	self 
+		assemble: 'mulsd'
+		with: src1andDstReg
+		with: src2reg
 
 ]
 
@@ -661,6 +687,16 @@ AssemblerAMD64 >> return: anInteger [
 		ifFalse: [self assemble: 'ret' with: anInteger * self addressSize]
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> roundFP64: srcReg into:  dstReg [
+	self 
+		assemble: 'roundsd'
+		with: dstReg
+		with: srcReg
+		with: 3
+
+]
+
 { #category : #'operations - logical' }
 AssemblerAMD64 >> shiftLeft: srcAndDst by: countReg [
 	self ASSERT: countReg r = rcx.
@@ -732,6 +768,14 @@ AssemblerAMD64 >> shortJumpTo: label [
 	self shortJump: 'jmp' to: label
 ]
 
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> sqrtFP64: srcReg into: dstReg [
+	self 
+		assemble: 'sqrtsd'
+		with: srcReg
+		with: dstReg
+]
+
 { #category : #'memory - load / store' }
 AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
 	| adjusted |
@@ -764,6 +808,12 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> sub: src1 from: src2AndDst [
 	self assemble: 'sub' with: src2AndDst with:  src1
+
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> subFP64: src1 from: src2AndDst [
+	self assemble: 'subsd' with: src2AndDst with:  src1
 
 ]
 

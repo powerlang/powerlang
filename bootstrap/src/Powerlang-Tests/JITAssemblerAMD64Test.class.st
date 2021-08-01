@@ -4435,7 +4435,7 @@ JITAssemblerAMD64Test >> testLoadX0withRasDouble [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testLoadX1roundingX0 [
 	
-	assembler perform: #loadX1roundingX0 withArguments: #().
+	assembler perform: #roundDoubleX0intoX1 withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[102 15 58 11 200 3])

@@ -119,6 +119,11 @@ AssemblerBackend >> decMem: aMemRef [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> divFP64: src1andDstReg by: src2reg [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> inc: srcAndDstReg [ 
 	self subclassResponsibility
@@ -310,6 +315,11 @@ AssemblerBackend >> moveImm: imm to: dstReg [
 
 ]
 
+{ #category : #basic }
+AssemblerBackend >> mulFP64: src1andDstReg by: src2reg [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> nativeCode [
 	^ NativeCode new code: memory bytes
@@ -430,6 +440,12 @@ AssemblerBackend >> reset [
 	memory reset
 ]
 
+{ #category : #memory }
+AssemblerBackend >> roundFP64: srcReg into:  dstReg [
+	self subclassResponsibility
+
+]
+
 { #category : #basic }
 AssemblerBackend >> shiftLeft: srcAndDst byImm: count [
 	self subclassResponsibility
@@ -450,6 +466,11 @@ AssemblerBackend >> shiftRightArithmetic: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> sqrtFP64: srcReg into: dstReg [
+	self subclassResponsibility
+]
+
 { #category : #memory }
 AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 	^self subclassResponsibility
@@ -458,6 +479,16 @@ AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 { #category : #initialization }
 AssemblerBackend >> stream [
 	^memory stream
+]
+
+{ #category : #accessing }
+AssemblerBackend >> sub: src1 from: src2AndDst [
+	self subclassResponsibility
+]
+
+{ #category : #accessing }
+AssemblerBackend >> subFP64: src1 from: src2AndDst [
+	self subclassResponsibility
 ]
 
 { #category : #accessing }
