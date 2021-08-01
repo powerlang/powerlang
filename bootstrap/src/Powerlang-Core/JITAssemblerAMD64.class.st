@@ -287,12 +287,6 @@ JITAssemblerAMD64 >> popSPindirect [
 	self assemble: 'pop' with: pointer
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> pushAOnFPUStack [
-	pointer reset; length: 64; base: backend regA.
-	self assemble: 'fld' with: pointer
-]
-
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> pushAatToffset: offset [
 	pointer
@@ -303,12 +297,6 @@ JITAssemblerAMD64 >> pushAatToffset: offset [
 		scale: backend regSP sizeInBytes;
 		displacement: offset.
 	self assemble: 'push' with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> pushROnFPUStack [
-	pointer reset; length: 64; base: backend regR.
-	self assemble: 'fld' with: pointer
 ]
 
 { #category : #services }

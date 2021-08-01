@@ -519,6 +519,12 @@ AssemblerAMD64 >> push: srcReg [
 
 ]
 
+{ #category : #private }
+AssemblerAMD64 >> pushAOnFPUStack [
+	pointer reset; length: 64; base: self regA.
+	self assemble: 'fld' with: pointer
+]
+
 { #category : #'push/pop' }
 AssemblerAMD64 >> pushImm: imm [
 	#imm8.
@@ -529,6 +535,12 @@ AssemblerAMD64 >> pushImm: imm [
 { #category : #accessing }
 AssemblerAMD64 >> pushMem: aMemRef [
 	self push: aMemRef
+]
+
+{ #category : #private }
+AssemblerAMD64 >> pushROnFPUStack [
+	pointer reset; length: 64; base: self regR.
+	self assemble: 'fld' with: pointer
 ]
 
 { #category : #'registers - IR' }
