@@ -124,6 +124,11 @@ AssemblerBackend >> divFP64: src1andDstReg by: src2reg [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> exchange: srcAndDstReg withMem: aMemRef [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> inc: srcAndDstReg [ 
 	self subclassResponsibility

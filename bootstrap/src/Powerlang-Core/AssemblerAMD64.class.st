@@ -233,6 +233,11 @@ AssemblerAMD64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
 ]
 
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> exchange: srcAndDstReg withMem: aMemRef [
+	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
+]
+
 { #category : #private }
 AssemblerAMD64 >> inc: srcAndDstReg [
 	self assemble: 'inc' with: srcAndDstReg

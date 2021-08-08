@@ -168,12 +168,6 @@ JITAssemblerAMD64 >> divideRbyT [
 		assemble: 'idiv' with: backend regT
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> exchangeRindirectWithT [
-	pointer reset; length: self addressLength; base: backend regR.
-	self assemble: 'xchg' with: pointer with: backend regT
-]
-
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.

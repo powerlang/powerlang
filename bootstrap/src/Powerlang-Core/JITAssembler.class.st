@@ -261,6 +261,13 @@ JITAssembler >> dropTos: count [
 
 ]
 
+{ #category : #arithmetic }
+JITAssembler >> exchangeRindirectWithT [
+	| memref |
+	memref := backend memRef: backend regR indexImm: 1.
+	backend exchange: backend regT withMem: memref
+]
+
 { #category : #'push/pop' }
 JITAssembler >> inc: srcAndDstReg [
 	backend inc: srcAndDstReg
