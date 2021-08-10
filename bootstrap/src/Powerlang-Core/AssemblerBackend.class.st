@@ -170,7 +170,7 @@ AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #memory }
-AssemblerBackend >> loadFP64: dstReg fromMem: srcMemRef [
+AssemblerBackend >> loadLargeX: dstReg fromMem: srcMemRef [
 	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
 	^ self subclassResponsibility
 

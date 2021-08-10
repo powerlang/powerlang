@@ -576,14 +576,14 @@ JITAssembler >> loadGwithMindex: index [
 JITAssembler >> loadLargeX0withRindirect [
 	| memref |
 	memref := backend memRef64: backend regR indexImm: 1.
-	backend loadFP64: backend regX0 fromMem: memref
+	backend loadLargeX: backend regX0 fromMem: memref
 ]
 
 { #category : #'push/pop' }
 JITAssembler >> loadLargeX1withAindirect [
 	| memref |
 	memref := backend memRef64: backend regA indexImm: 1.
-	backend loadFP64: backend regX1 fromMem: memref
+	backend loadLargeX: backend regX1 fromMem: memref
 ]
 
 { #category : #'push/pop' }

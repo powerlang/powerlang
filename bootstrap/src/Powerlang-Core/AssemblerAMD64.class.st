@@ -367,7 +367,7 @@ AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> loadFP64: dstReg fromMem: srcMemRef [
+AssemblerAMD64 >> loadLargeX: dstReg fromMem: srcMemRef [
 	self 
 		assemble: 'movq'
 		with: dstReg
