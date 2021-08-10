@@ -238,14 +238,6 @@ JITAssemblerAMD64 >> loadRwithX0 [
 		with: backend regX0
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> loadX0withRasDouble [
-	self 
-		assemble: 'cvtsi2sd'
-		with: backend regX0
-		with: backend regR
-]
-
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer

@@ -200,6 +200,11 @@ AssemblerAMD64 >> compare: op1 with: op2 [
 	self assemble: 'cmp' with: op1 with: op2
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> convert: src toDouble: dst [
+	self assemble: 'cvtsi2sd' with: dst with: src
+]
+
 { #category : #private }
 AssemblerAMD64 >> dec: srcAndDstReg [
 	self assemble: 'dec' with: srcAndDstReg

@@ -974,6 +974,11 @@ JITAssembler >> loadWithTrue: register [
 	backend move: backend regTrue to: register
 ]
 
+{ #category : #'push/pop' }
+JITAssembler >> loadX0withRasDouble [
+	backend convert: backend regR toDouble: backend regX0
+]
+
 { #category : #integers }
 JITAssembler >> loadZeroExtendByteRwithRatA [
 	self loadZeroExtendByte: backend regR from: backend regR atIndexAt: backend regA

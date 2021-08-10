@@ -104,6 +104,11 @@ AssemblerBackend >> codeSize [
 	^memory codeSize
 ]
 
+{ #category : #basic }
+AssemblerBackend >> convert: src toDouble: dst [
+	self subclassResponsibility
+]
+
 { #category : #labels }
 AssemblerBackend >> currentAddress [
 	^memory currentAddress
