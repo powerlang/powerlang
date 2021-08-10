@@ -349,30 +349,6 @@ JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 	]
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> storeLargeX0inA [
-	pointer
-		reset;
-		length: 64;
-		base: backend regA.
-	self 
-		assemble: 'movq'
-		with: pointer
-		with: backend regX0
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> storeLargeX0inT [
-	pointer
-		reset;
-		length: 64;
-		base: backend regT.
-	self 
-		assemble: 'movq'
-		with: pointer
-		with: backend regX0
-]
-
 { #category : #storing }
 JITAssemblerAMD64 >> storeLongTinRatOffsetA [
 	pointer

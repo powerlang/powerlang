@@ -827,6 +827,14 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 
 ]
 
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> storeLargeX: srcReg intoMem: dstMemRef [
+	self
+		assemble: 'movq'
+		with: dstMemRef
+		with: srcReg
+]
+
 { #category : #'operations - arithmetic' }
 AssemblerAMD64 >> sub: src1 from: src2AndDst [
 	self assemble: 'sub' with: src2AndDst with:  src1

@@ -1565,6 +1565,24 @@ JITAssembler >> storeImm: imm intoMem: dstMemRef [
 ]
 
 { #category : #storing }
+JITAssembler >> storeLargeX0inA [
+	| memref |
+	memref := backend memRef64: backend regA indexImm: 1.
+	backend storeLargeX: backend regX0 intoMem: memref
+		
+
+]
+
+{ #category : #storing }
+JITAssembler >> storeLargeX0inT [
+	| memref |
+	memref := backend memRef64: backend regT indexImm: 1.
+	backend storeLargeX: backend regX0 intoMem: memref
+		
+
+]
+
+{ #category : #storing }
 JITAssembler >> storeLongTinRatA [
 	| memref |
 	memref := backend memRef32: backend regR index: backend regA.

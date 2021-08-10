@@ -486,6 +486,11 @@ AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 	^self subclassResponsibility
 ]
 
+{ #category : #memory }
+AssemblerBackend >> storeLargeX: srcReg intoMem: dstMemRef [
+	^self subclassResponsibility
+]
+
 { #category : #initialization }
 AssemblerBackend >> stream [
 	^memory stream
