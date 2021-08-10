@@ -791,7 +791,7 @@ AssemblerAMD64 >> shortJumpTo: label [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> sqrtFP64: srcReg into: dstReg [
+AssemblerAMD64 >> sqrtDouble: srcReg into: dstReg [
 	self 
 		assemble: 'sqrtsd'
 		with: srcReg

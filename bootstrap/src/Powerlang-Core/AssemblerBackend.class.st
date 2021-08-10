@@ -477,7 +477,7 @@ AssemblerBackend >> shiftRightArithmetic: srcAndDst byImm: count [
 ]
 
 { #category : #basic }
-AssemblerBackend >> sqrtFP64: srcReg into: dstReg [
+AssemblerBackend >> sqrtDouble: srcReg into: dstReg [
 	self subclassResponsibility
 ]
 

@@ -1522,7 +1522,7 @@ JITAssembler >> smallInteger: anInteger [
 
 { #category : #'floting point' }
 JITAssembler >> sqrtDoubleX0 [
-	backend sqrtFP64: backend regX0 into: backend regX0
+	backend sqrtDouble: backend regX0 into: backend regX0
 ]
 
 { #category : #'memory - load / store' }
