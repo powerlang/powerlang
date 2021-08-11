@@ -158,16 +158,6 @@ JITAssemblerAMD64 >> disassembledText64 [
 	^self nativeCode disassembledText64
 ]
 
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> extendRtoAandDividebyT [
-	| conversion |
-	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
-	conversion := wordSize = 8 ifTrue: ['cqo'] ifFalse: ['cdq'].
-	self
-		assemble: conversion;
-		assemble: 'idiv' with: backend regT
-]
-
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.
