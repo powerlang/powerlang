@@ -443,7 +443,7 @@ InlineMessageLinker >> assembleGetTIBValue [
 	#_getThreadInformationBlockValue.
 	nonInteger := assembler labeledIntegerNativizationOfR.
 	assembler
-		loadRwithTIBatIndexR;
+		loadRwithTIBatR;
 		@ nonInteger
 ]
 
@@ -454,7 +454,7 @@ InlineMessageLinker >> assembleGetThreadValue [
 	nonInteger := assembler labeledIntegerNativizationOfR.
 	uninitialized := assembler newLabel.
 	assembler
-		loadRwithThreadVariableAtIndexR;
+		loadRwithThreadVariableAtR;
 		compareRwithImmediate: 0;
 		shortJumpIfEqualTo: uninitialized.
 	assembler

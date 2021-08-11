@@ -199,32 +199,6 @@ JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
 	self assemble: 'cvttsd2si' with: backend regR with: pointer
 ]
 
-{ #category : #storing }
-JITAssemblerAMD64 >> loadRwithTIBatIndexR [
-	| seg |
-	seg := wordSize = 8 ifTrue: [gs] ifFalse: [fs].
-	pointer
-		reset;
-		length: self addressLength;
-		index: backend regR;
-		scale: wordSize;
-		segment: seg.
-	self assemble: 'mov' with: backend regR with: pointer
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> loadRwithThreadVariableAtIndexR [
-	pointer
-		reset;
-		length: self addressLength;
-		index: backend regR;
-		scale: wordSize.
-	wordSize = 8
-		ifTrue: [pointer segment: gs; displacement: 16r1480]
-		ifFalse: [pointer segment: fs; displacement: 16rE10].
-	self assemble: 'mov' with: backend regR with: pointer
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> loadRwithX0 [
 	| mov |

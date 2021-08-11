@@ -169,6 +169,16 @@ AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 
 ]
 
+{ #category : #basic }
+AssemblerBackend >> load: dstReg withTIBat: indexReg [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> load: dstReg withThreadVariableAt: indexReg [
+	self subclassResponsibility
+]
+
 { #category : #memory }
 AssemblerBackend >> loadLargeX: dstReg fromMem: srcMemRef [
 	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"

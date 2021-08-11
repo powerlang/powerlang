@@ -819,6 +819,16 @@ JITAssembler >> loadRwithT [
 	backend move: backend regT to: backend regR
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> loadRwithTIBatR [
+	backend load: backend regR withTIBat: backend regR
+]
+
+{ #category : #'floting point' }
+JITAssembler >> loadRwithThreadVariableAtR [
+	backend load: backend regR withThreadVariableAt: backend regR
+]
+
 { #category : #loading }
 JITAssembler >> loadRwithTrue [
 	backend move: backend regTrue to: backend regR

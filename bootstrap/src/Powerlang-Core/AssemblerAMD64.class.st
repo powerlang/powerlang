@@ -366,6 +366,38 @@ AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 		with: srcMemRef
 ]
 
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> load: dstReg withTIBat: indexReg [
+	| seg |
+	seg := wordSize = 8
+		ifTrue: [ gs ]
+		ifFalse: [ fs ].
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg; 
+		scale: wordSize;
+		segment: seg.
+	self assemble: 'mov' with: dstReg with: pointer
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> load: dstReg withThreadVariableAt: indexReg [
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize.
+	wordSize = 8
+		ifTrue: [ pointer
+				segment: gs;
+				displacement: 16r1480 ]
+		ifFalse: [ pointer
+				segment: fs;
+				displacement: 16rE10 ].
+	self assemble: 'mov' with: dstReg with: pointer
+]
+
 { #category : #basic }
 AssemblerAMD64 >> loadLargeX: dstReg fromMem: srcMemRef [
 	self 

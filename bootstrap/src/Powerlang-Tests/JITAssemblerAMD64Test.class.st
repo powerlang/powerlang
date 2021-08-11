@@ -4203,9 +4203,9 @@ JITAssemblerAMD64Test >> testLoadRwithT [
 ]
 
 { #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testLoadRwithTIBatIndexR [
+JITAssemblerAMD64Test >> testLoadRwithTIBatR [
 	
-	assembler loadRwithTIBatIndexR.
+	assembler loadRwithTIBatR.
 	self 
 		assert: (assembler bytes)
 		equals: (#[101 72 139 4 197 0 0 0 0])
@@ -4213,9 +4213,9 @@ JITAssemblerAMD64Test >> testLoadRwithTIBatIndexR [
 ]
 
 { #category : #'tests - generated 2' }
-JITAssemblerAMD64Test >> testLoadRwithThreadVariableAtIndexR [
+JITAssemblerAMD64Test >> testLoadRwithThreadVariableAtR [
 	
-	assembler perform: #loadRwithThreadVariableAtIndexR withArguments: #().
+	assembler perform: #loadRwithThreadVariableAtR withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[101 72 139 4 197 128 20 0 0])

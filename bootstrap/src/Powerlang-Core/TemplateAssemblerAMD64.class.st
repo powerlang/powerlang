@@ -582,13 +582,13 @@ TemplateAssemblerAMD64 >> loadRwithT [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> loadRwithTIBatIndexR [
+TemplateAssemblerAMD64 >> loadRwithTIBatR [
 	self assembleBytes: #[16r65 16r48 16r8B 16r4 16rC5 16r0 16r0 16r0 16r0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> loadRwithThreadVariableAtIndexR [
+TemplateAssemblerAMD64 >> loadRwithThreadVariableAtR [
 	self assembleBytes: #[16r65 16r48 16r8B 16r4 16rC5 16r80 16r14 16r0 16r0].
 	
 ]
