@@ -682,6 +682,13 @@ JITAssembler >> loadNilWithMindex: index [
 		fromMem: memref
 ]
 
+{ #category : #'push/pop' }
+JITAssembler >> loadRconvertingDoublePointedByR [
+	| memref |
+	memref := backend memRef64: backend regR indexImm: 1.
+	backend load: backend regR convertingDoubleToIntegerFromMem: memref
+]
+
 { #category : #loading }
 JITAssembler >> loadRwithA [
 	backend move: backend regA to: backend regR

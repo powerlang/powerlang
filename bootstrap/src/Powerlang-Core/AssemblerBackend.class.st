@@ -164,6 +164,11 @@ AssemblerBackend >> lea: dstReg withMem: srcMemRef [
 	^self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+	self subclassResponsibility
+]
+
 { #category : #memory }
 AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 	"Load `dstReg` from memory location `srcMemRef`. 

@@ -370,6 +370,11 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+	self assemble: 'cvttsd2si' with: dstReg with: srcMemRef
+]
+
 { #category : #'memory - load / store' }
 AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 	| adjusted |

@@ -184,12 +184,6 @@ JITAssemblerAMD64 >> loadMXCSRfromA [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> loadRconvertingDoublePointedByR [
-	pointer reset; length: 64; base: backend regR.
-	self assemble: 'cvttsd2si' with: backend regR with: pointer
-]
-
-{ #category : #loading }
 JITAssemblerAMD64 >> loadRwithX0 [
 	| mov |
 
