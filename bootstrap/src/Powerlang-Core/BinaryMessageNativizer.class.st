@@ -343,7 +343,7 @@ BinaryMessageNativizer >> inlineQuotient [
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
 		loadTwithA;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		convertRtoSmallInteger;
 		@ done.
 	nativizer
@@ -367,7 +367,7 @@ BinaryMessageNativizer >> inlineRemainder [
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
 		loadTwithA;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		loadRwithA;
 		convertRtoSmallInteger;
 		@ done.

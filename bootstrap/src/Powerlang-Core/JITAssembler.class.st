@@ -268,6 +268,11 @@ JITAssembler >> exchangeRindirectWithT [
 	backend exchange: backend regT withMem: memref
 ]
 
+{ #category : #storing }
+JITAssembler >> extendRtoAandDividebyT [
+	backend divide: backend regR extendingTo: backend regA by: backend regT
+]
+
 { #category : #'push/pop' }
 JITAssembler >> inc: srcAndDstReg [
 	backend inc: srcAndDstReg

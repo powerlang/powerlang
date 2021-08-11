@@ -130,6 +130,11 @@ AssemblerBackend >> divFP64: src1andDstReg by: src2reg [
 ]
 
 { #category : #basic }
+AssemblerBackend >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 AssemblerBackend >> exchange: srcAndDstReg withMem: aMemRef [
 	self subclassResponsibility
 ]

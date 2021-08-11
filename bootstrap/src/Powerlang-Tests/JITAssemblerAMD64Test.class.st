@@ -605,7 +605,7 @@ JITAssemblerAMD64Test >> testDivideDoubleX0byX1 [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testDivideRbyT [
 	
-	assembler perform: #divideRbyT withArguments: #().
+	assembler perform: #extendRtoAandDividebyT withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 153 72 247 249])

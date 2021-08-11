@@ -225,6 +225,20 @@ AssemblerAMD64 >> divFP64: src1andDstReg by: src2reg [
 
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+	| conversion |
+	self
+		ASSERT: srcAndDstReg == rax;
+		ASSERT: extReg == rdx.
+	conversion := wordSize = 8
+		ifTrue: [ 'cqo' ]
+		ifFalse: [ 'cdq' ].
+	self
+		assemble: conversion;
+		assemble: 'idiv' with: divisorReg
+]
+
 { #category : #private }
 AssemblerAMD64 >> dropTopOfFPU [
 	"

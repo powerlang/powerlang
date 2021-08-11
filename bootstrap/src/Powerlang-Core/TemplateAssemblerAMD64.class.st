@@ -205,12 +205,6 @@ TemplateAssemblerAMD64 >> divideDoubleX0byX1 [
 	
 ]
 
-{ #category : #arithmetic }
-TemplateAssemblerAMD64 >> divideRbyT [
-	self assembleBytes: #[16r48 16r99 16r48 16rF7 16rF9].
-	
-]
-
 { #category : #loading }
 TemplateAssemblerAMD64 >> dropTopOfFPU [
 	self assembleBytes: #[16rDD 16rD8].
@@ -220,6 +214,12 @@ TemplateAssemblerAMD64 >> dropTopOfFPU [
 { #category : #loading }
 TemplateAssemblerAMD64 >> exchangeRindirectWithT [
 	self assembleBytes: #[16r48 16r87 16r8].
+	
+]
+
+{ #category : #arithmetic }
+TemplateAssemblerAMD64 >> extendRtoAandDividebyT [
+	self assembleBytes: #[16r48 16r99 16r48 16rF7 16rF9].
 	
 ]
 

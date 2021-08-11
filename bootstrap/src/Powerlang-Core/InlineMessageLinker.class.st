@@ -598,7 +598,7 @@ InlineMessageLinker >> assembleQuotientTowardZero [
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
 		loadTwithA;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		convertRtoSmallInteger
 ]
 
@@ -622,11 +622,11 @@ InlineMessageLinker >> assembleRemainderTowardZero [
 		loadTwithA;
 		xorAwithR;
 		jumpIfSignTo: adapt;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		loadRwithA;
 		jumpTo: convert;
 		@ adapt;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		loadRwithA;
 		testRwithR;
 		jumpIfZeroTo: convert;
