@@ -1097,6 +1097,14 @@ JITAssembler >> multiplyDoubleX0byX1 [
 	backend mulFP64: backend regX0 by: backend regX1
 ]
 
+{ #category : #storing }
+JITAssembler >> multiplyRbyAwideningToA [
+	backend
+		multiply: backend regR
+		by: backend regA
+		wideningTo: backend regA
+]
+
 { #category : #arithmetic }
 JITAssembler >> nativeCode [
 	^(NativeCode withAll: literals) code: backend memory bytes

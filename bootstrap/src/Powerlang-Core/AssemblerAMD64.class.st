@@ -480,6 +480,14 @@ AssemblerAMD64 >> mulFP64: src1andDstReg by: src2reg [
 
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+	self
+		ASSERT: src1AndDstLoReg r == rax;
+		ASSERT: dstHiReg r == rdx.
+	self assemble: 'imul' with: src2reg
+]
+
 { #category : #'private - jumps' }
 AssemblerAMD64 >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4

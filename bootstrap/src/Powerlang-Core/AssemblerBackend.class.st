@@ -350,6 +350,11 @@ AssemblerBackend >> mulFP64: src1andDstReg by: src2reg [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 AssemblerBackend >> nativeCode [
 	^ NativeCode new code: memory bytes

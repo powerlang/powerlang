@@ -219,12 +219,6 @@ JITAssemblerAMD64 >> moveTslots [
 	self assembleByte: rep; assemble: mnemonic
 ]
 
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> multiplyRbyAwideningToA [
-	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
-	self assemble: 'imul' with: backend regA
-]
-
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> popSPindirect [
 	pointer reset; length: self addressLength; base: backend regSP.
