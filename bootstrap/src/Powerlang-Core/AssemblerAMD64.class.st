@@ -229,8 +229,8 @@ AssemblerAMD64 >> divFP64: src1andDstReg by: src2reg [
 AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 	| conversion |
 	self
-		ASSERT: srcAndDstReg == rax;
-		ASSERT: extReg == rdx.
+		ASSERT: srcAndDstReg r == rax;
+		ASSERT: extReg r == rdx.
 	conversion := wordSize = 8
 		ifTrue: [ 'cqo' ]
 		ifFalse: [ 'cdq' ].
