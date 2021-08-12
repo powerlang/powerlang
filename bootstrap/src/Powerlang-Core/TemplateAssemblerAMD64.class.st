@@ -110,13 +110,13 @@ TemplateAssemblerAMD64 >> clearSafeRintegerBit [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> compareEqualLargeX0withAindirect [
+TemplateAssemblerAMD64 >> compareEqualDoubleX0withAindirect [
 	self assembleBytes: #[16rF2 16rF 16rC2 16r2 16r0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
+TemplateAssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
 	self assembleBytes: #[16rF2 16rF 16rC2 16r2 16r1].
 	
 ]

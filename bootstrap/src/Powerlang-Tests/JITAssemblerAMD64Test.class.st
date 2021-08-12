@@ -303,9 +303,9 @@ JITAssemblerAMD64Test >> testCompareAwithTrue [
 ]
 
 { #category : #'tests - generated 2' }
-JITAssemblerAMD64Test >> testCompareEqualLargeX0withAindirect [
+JITAssemblerAMD64Test >> testCompareEqualDoubleX0withAindirect [
 	
-	assembler perform: #compareEqualLargeX0withAindirect withArguments: #().
+	assembler perform: #compareEqualDoubleX0withAindirect withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[242 15 194 2 0])
@@ -313,9 +313,9 @@ JITAssemblerAMD64Test >> testCompareEqualLargeX0withAindirect [
 ]
 
 { #category : #'tests - generated 2' }
-JITAssemblerAMD64Test >> testCompareLessThanLargeX0withAindirect [
+JITAssemblerAMD64Test >> testCompareLessThanDoubleX0withAindirect [
 	
-	assembler perform: #compareLessThanLargeX0withAindirect withArguments: #().
+	assembler perform: #compareLessThanDoubleX0withAindirect withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[242 15 194 2 1])

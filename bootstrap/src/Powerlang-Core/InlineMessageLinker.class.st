@@ -336,10 +336,10 @@ InlineMessageLinker >> assembleFloatEquals [
 	assembler
 		pushR;
 		loadLargeX0withRindirect;
-		compareLessThanLargeX0withAindirect;
+		compareLessThanDoubleX0withAindirect;
 		popR;
 		loadLargeX0withRindirect;
-		compareEqualLargeX0withAindirect;
+		compareEqualDoubleX0withAindirect;
 		loadRwithX0;
 		addRwithImmediate: 1;
 		convertRtoSmallInteger.
@@ -362,7 +362,7 @@ InlineMessageLinker >> assembleFloatLessThan [
 	#_floatLessThan:.
 	assembler
 		loadLargeX0withRindirect;
-		compareLessThanLargeX0withAindirect;
+		compareLessThanDoubleX0withAindirect;
 		loadRwithX0;
 		addRwithImmediate: 1;
 		convertRtoSmallInteger.

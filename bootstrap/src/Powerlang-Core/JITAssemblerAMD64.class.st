@@ -17,7 +17,7 @@ JITAssemblerAMD64 >> clearFPUFlags [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
+JITAssemblerAMD64 >> compareEqualDoubleX0withAindirect [
 	pointer
 		reset;
 		length: 64;
@@ -30,7 +30,7 @@ JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
 ]
 
 { #category : #loading }
-JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
+JITAssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
 	pointer
 		reset;
 		length: 64;
