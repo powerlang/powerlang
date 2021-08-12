@@ -189,6 +189,109 @@ JITAssembler >> clearSafeRintegerBit [
 	self clearSafeIntegerBit: backend regR8
 ]
 
+{ #category : #comparing }
+JITAssembler >> compare: register withBoolean: aBoolean [
+	aBoolean
+		ifTrue: [ self compareWithTrue: register ]
+		ifFalse: [ self compareWithFalse: register ]
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compare: register withLiteral: anObject [
+	| index memref |
+	index := self addLiteral: anObject.
+	memref := backend memRef: backend regM indexImm: index.
+	backend compare: register withMem: memref
+]
+
+{ #category : #comparing }
+JITAssembler >> compareAwithBoolean: aBoolean [
+	aBoolean
+		ifTrue: [ self compareAwithTrue ]
+		ifFalse: [ self compareAwithFalse ]
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareAwithFalse [
+	backend compare: backend regA with: backend regFalse
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareAwithTrue [
+	backend compare: backend regA with: backend regTrue
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareRwithA [
+	backend compare: backend regR with: backend regA
+]
+
+{ #category : #comparing }
+JITAssembler >> compareRwithBoolean: aBoolean [
+	aBoolean
+		ifTrue: [ self compareRwithTrue ]
+		ifFalse: [ self compareRwithFalse ]
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareRwithFalse [
+	backend compare: backend regR with: backend regFalse
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareRwithImmediate: imm [
+	backend compare: backend regR withImm: imm
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareRwithNil [
+	backend compare: backend regR with: backend regNil
+]
+
+{ #category : #comparing }
+JITAssembler >> compareRwithSmallInteger: anInteger [
+	| smi |
+	smi := self smallInteger: anInteger.
+	self compareRwithImmediate: smi
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareRwithTrue [
+	backend compare: backend regR with: backend regTrue
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareSwithTindex: index [
+	| memref |
+	memref := backend memRef: backend regT indexImm: index.
+	backend compare: backend regS withMem: memref
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareTwithA [
+	backend compare: backend regT with: backend regA
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareTwithImmediate: imm [
+	backend compare: backend regT withImm: imm
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareWithFalse: register [
+	backend compare: register with: backend regFalse
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareWithNil: register [
+	backend compare: register with: backend regNil
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compareWithTrue: register [
+	backend compare: register with: backend regTrue
+]
+
 { #category : #arithmetic }
 JITAssembler >> convertAtoNativeInteger [
 	self convertToNativeInteger: backend regA

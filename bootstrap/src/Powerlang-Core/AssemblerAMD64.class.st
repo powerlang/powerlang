@@ -196,8 +196,20 @@ AssemblerAMD64 >> clearHigh32: srcAndDstReg [
 ]
 
 { #category : #services }
-AssemblerAMD64 >> compare: op1 with: op2 [
-	self assemble: 'cmp' with: op1 with: op2
+AssemblerAMD64 >> compare: reg1 with: reg2 [
+	self assemble: 'cmp' with: reg1 with: reg2
+]
+
+{ #category : #services }
+AssemblerAMD64 >> compare: reg1 withImm: imm [
+	#imm8.
+	#imm32.
+	self assemble: 'cmp' with: reg1 withImm: imm
+]
+
+{ #category : #services }
+AssemblerAMD64 >> compare: reg1 withMem: aMemRef [
+	self assemble: 'cmp' with: reg1 with: aMemRef
 ]
 
 { #category : #basic }

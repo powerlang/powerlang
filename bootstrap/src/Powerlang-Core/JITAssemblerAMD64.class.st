@@ -16,41 +16,6 @@ JITAssemblerAMD64 >> clearFPUFlags [
 	self assemble: 'fnclex'
 ]
 
-{ #category : #comparing }
-JITAssemblerAMD64 >> compare: register withBoolean: aBoolean [
-	aBoolean
-		ifTrue: [ self compareWithTrue: register ]
-		ifFalse: [ self compareWithFalse: register ]
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compare: register withLiteral: anObject [
-	| index |
-	index := self addLiteral: anObject.
-	self
-		assemble: 'cmp'
-		withReg: register
-		withReg: backend regM
-		index: index
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareAwithBoolean: aBoolean [
-	aBoolean
-		ifTrue: [ self compareAwithTrue ]
-		ifFalse: [ self compareAwithFalse ]
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareAwithFalse [
-	self assemble: 'cmp' with: backend regA with: backend regFalse
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareAwithTrue [
-	self assemble: 'cmp' with: backend regA with: backend regTrue
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> compareEqualLargeX0withAindirect [
 	pointer
@@ -75,77 +40,6 @@ JITAssemblerAMD64 >> compareLessThanLargeX0withAindirect [
 		with: backend regX0
 		with: pointer
 		with: 1
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithA [
-	self assemble: 'cmp' with: backend regR with: backend regA
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithBoolean: aBoolean [
-	aBoolean
-		ifTrue: [ self compareRwithTrue ]
-		ifFalse: [ self compareRwithFalse ]
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithFalse [
-	self assemble: 'cmp' with: backend regR with: backend regFalse
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithImmediate: imm [
-	#imm8.
-	#imm32.
-	self assemble: 'cmp' with: backend regR withImm: imm
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithNil [
-	self assemble: 'cmp' with: backend regR with: backend regNil
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithSmallInteger: anInteger [
-	self compareRwithImmediate: (anInteger bitShift: 1) + 1
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareRwithTrue [
-	self assemble: 'cmp' with: backend regR with: backend regTrue
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareSwithTindex: index [
-	self assemble: 'cmp' withReg: backend regS withReg: backend regT index: index
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareTwithA [
-	self assemble: 'cmp' with: backend regT with: backend regA
-]
-
-{ #category : #comparing }
-JITAssemblerAMD64 >> compareTwithImmediate: imm [
-	#imm8.
-	#imm32.
-	self assemble: 'cmp' with: backend regT withImm: imm
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareWithFalse: register [
-	self assemble: 'cmp' with: register with: backend regFalse
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareWithNil: register [
-	self assemble: 'cmp' with: register with: backend regNil
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareWithTrue: register [
-	self assemble: 'cmp' with: register with: backend regTrue
 ]
 
 { #category : #services }

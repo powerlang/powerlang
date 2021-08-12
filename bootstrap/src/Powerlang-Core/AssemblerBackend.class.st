@@ -105,6 +105,21 @@ AssemblerBackend >> codeSize [
 ]
 
 { #category : #basic }
+AssemblerBackend >> compare: reg1 with: reg2 [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> compare: reg1 withImm: imm [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> compare: reg1 withMem: aMemRef [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 AssemblerBackend >> convert: src toDouble: dst [
 	self subclassResponsibility
 ]
