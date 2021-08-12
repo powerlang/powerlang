@@ -114,12 +114,6 @@ JITAssemblerAMD64 >> moveTslots [
 ]
 
 { #category : #'push/pop' }
-JITAssemblerAMD64 >> popSPindirect [
-	pointer reset; length: self addressLength; base: backend regSP.
-	self assemble: 'pop' with: pointer
-]
-
-{ #category : #'push/pop' }
 JITAssemblerAMD64 >> pushAatToffset: offset [
 	pointer
 		reset;

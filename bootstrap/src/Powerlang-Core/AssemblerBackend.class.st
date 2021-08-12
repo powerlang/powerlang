@@ -381,6 +381,11 @@ AssemblerBackend >> or: src1andDest withImm: imm [
 ]
 
 { #category : #basic }
+AssemblerBackend >> popIntoMem: dstMemRef [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 AssemblerBackend >> push: srcReg [
 	self subclassResponsibility
 ]

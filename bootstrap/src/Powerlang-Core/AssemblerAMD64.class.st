@@ -589,6 +589,11 @@ AssemblerAMD64 >> pop: dstReg [
 ]
 
 { #category : #private }
+AssemblerAMD64 >> popIntoMem: dstMemRef [
+	self assemble: 'pop' with: dstMemRef
+]
+
+{ #category : #private }
 AssemblerAMD64 >> printOn: aStream [
 	aStream print: self class; cr; cr;
 		nextPutAll: memory bytes disassembledAmd64

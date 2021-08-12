@@ -1289,6 +1289,13 @@ JITAssembler >> popS [
 	backend pop: backend regS
 ]
 
+{ #category : #'operations - arithmetic' }
+JITAssembler >> popSPindirect [
+	| memref |
+	memref := backend memRef: backend regSP indexImm: 1.
+	backend popIntoMem: memref
+]
+
 { #category : #'push/pop' }
 JITAssembler >> popT [
 	backend pop: backend regT
