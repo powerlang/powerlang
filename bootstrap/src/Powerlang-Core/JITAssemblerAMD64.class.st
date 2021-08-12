@@ -220,7 +220,7 @@ JITAssemblerAMD64 >> moveTslots [
 ]
 
 { #category : #arithmetic }
-JITAssemblerAMD64 >> multiplyRbyA [
+JITAssemblerAMD64 >> multiplyRbyAwideningToA [
 	self ASSERT: (backend regR r == rax and: [backend regA r == rdx]).
 	self assemble: 'imul' with: backend regA
 ]

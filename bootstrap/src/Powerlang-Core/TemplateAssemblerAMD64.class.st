@@ -778,7 +778,7 @@ TemplateAssemblerAMD64 >> multiplyDoubleX0byX1 [
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> multiplyRbyA [
+TemplateAssemblerAMD64 >> multiplyRbyAwideningToA [
 	self assembleBytes: #[16r48 16rF7 16rEA].
 	
 ]

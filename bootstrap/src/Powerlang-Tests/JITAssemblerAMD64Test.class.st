@@ -4515,7 +4515,7 @@ JITAssemblerAMD64Test >> testMultiplyDoubleX0byX1 [
 { #category : #'tests - generated 2' }
 JITAssemblerAMD64Test >> testMultiplyRbyA [
 	
-	assembler perform: #multiplyRbyA withArguments: #().
+	assembler perform: #multiplyRbyAwideningToA withArguments: #().
 	self 
 		assert: (assembler bytes)
 		equals: (#[72 247 234])

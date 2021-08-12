@@ -290,7 +290,7 @@ BinaryMessageNativizer >> inlineMultiply [
 		convertAtoNativeInteger;
 		loadTwithR;
 		clearRintegerBit;
-		multiplyRbyA;
+		multiplyRbyAwideningToA;
 		popA;
 		jumpIfOverflowTo: overflow;
 		setRintegerBit;

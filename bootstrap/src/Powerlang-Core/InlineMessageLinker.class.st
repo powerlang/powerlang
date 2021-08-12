@@ -498,7 +498,7 @@ InlineMessageLinker >> assembleIntegerMultiplyByInto [
 	assembler
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
-		multiplyRbyA;
+		multiplyRbyAwideningToA;
 		storeRinTindex: 1;
 		storeAinTindex: 2;
 		loadRwithT
