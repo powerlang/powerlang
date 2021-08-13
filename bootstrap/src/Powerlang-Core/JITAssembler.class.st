@@ -1880,6 +1880,21 @@ JITAssembler >> subImm: imm from: srcAndDst [
 
 ]
 
+{ #category : #loading }
+JITAssembler >> testIntegerBitOf: aRegister [
+	backend test: aRegister byte withImm: 1
+]
+
+{ #category : #loading }
+JITAssembler >> testRintegerBit [
+	backend test: backend regR byte withImm: 1
+]
+
+{ #category : #loading }
+JITAssembler >> testRwithR [
+	backend test: backend regR with: backend regR
+]
+
 { #category : #initialization }
 JITAssembler >> useAMD64 [
 	backend := JITAssemblerAMD64 new wordSize: 8.

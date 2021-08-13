@@ -190,21 +190,6 @@ JITAssemblerAMD64 >> subTslotsToSP [
 		assemble: 'neg' with: backend regT
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> testIntegerBitOf: aRegister [
-	self assemble: 'test' with: aRegister byte with: 1
-]
-
-{ #category : #integers }
-JITAssemblerAMD64 >> testRintegerBit [
-	self assemble: 'test' with: backend regR8 with: 1
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> testRwithR [
-	self assemble: 'test' with: backend regR with: backend regR
-]
-
 { #category : #'opcodes - integer related' }
 JITAssemblerAMD64 >> writeTslots [
 	| rep mnemonic |

@@ -581,6 +581,16 @@ AssemblerBackend >> subImm: imm from: srcAndDst [
 	self subclassResponsibility
 ]
 
+{ #category : #basic }
+AssemblerBackend >> test: src1Reg with: src2Reg [
+	self subclassResponsibility
+]
+
+{ #category : #basic }
+AssemblerBackend >> test: srcReg withImm: imm [
+	self subclassResponsibility
+]
+
 { #category : #services }
 AssemblerBackend >> wordSize [
 	^wordSize

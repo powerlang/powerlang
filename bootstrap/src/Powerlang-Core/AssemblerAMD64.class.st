@@ -944,6 +944,16 @@ AssemblerAMD64 >> subtract: op1 from: op2 [
 	self assemble: 'sub' with: op2 with: op1
 ]
 
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> test: src1Reg with: src2Reg [
+	self assemble: 'test' with: src1Reg with: src2Reg
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> test: srcReg withImm: imm [
+	self assemble: 'test' with: srcReg with: imm
+]
+
 { #category : #services }
 AssemblerAMD64 >> testIntegerBit: op1 [
 	| op |
