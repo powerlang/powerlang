@@ -1685,6 +1685,20 @@ JITAssembler >> storeAinTindex: index [
 ]
 
 { #category : #storing }
+JITAssembler >> storeByteAinRindex: index [
+	| memref |
+	memref := backend memRef8: backend regR indexImm: index.
+	backend store: backend regA byte intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeByteTinRatA [
+	| memref |
+	memref := backend memRef8: backend regR index: backend regA.
+	backend store: backend regT byte intoMem: memref
+]
+
+{ #category : #storing }
 JITAssembler >> storeEinRindex: index [
 	| memref |
 	memref := backend memRef: backend regR indexImm: index.
@@ -1729,6 +1743,13 @@ JITAssembler >> storeLongTinRatA [
 	backend
 		store: backend regT
 		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeLongTinRatOffsetA [
+	| memref |
+	memref := backend memRef32: backend regR offset: backend regA.
+	backend store: backend regT long intoMem: memref
 ]
 
 { #category : #storing }
@@ -1792,6 +1813,13 @@ JITAssembler >> storeTinRatA [
 	backend
 		store: backend regT
 		intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeTinRatOffsetA [
+	| memref |
+	memref := backend memRef: backend regR offset: backend regA.
+	backend store: backend regT intoMem: memref
 ]
 
 { #category : #storing }

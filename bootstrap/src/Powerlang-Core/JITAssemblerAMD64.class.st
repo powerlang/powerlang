@@ -141,28 +141,6 @@ JITAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
 	self assemble: 'mov' with: pointer with: backend regA
 ]
 
-{ #category : #storing }
-JITAssemblerAMD64 >> storeByteAinRindex: index [
-	#dontOptimize.
-	pointer
-		reset;
-		length: 8;
-		base: backend regR;
-		displacement: index - 1.
-	self assemble: 'mov' with: pointer with: backend regA b
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeByteTinRatA [
-	pointer
-		reset;
-		length: 8;
-		base: backend regR;
-		index: backend regA;
-		displacement: -1.
-	self assemble: 'mov' with: pointer with: backend regT b
-]
-
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 	pointer
@@ -177,16 +155,6 @@ JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 	] ifFalse: [
 		self assemble: 'fstp' with: pointer
 	]
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeLongTinRatOffsetA [
-	pointer
-		reset;
-		length: 32;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: pointer with: backend regT e
 ]
 
 { #category : #loading }
@@ -226,16 +194,6 @@ JITAssemblerAMD64 >> storeTIBwithAatIndexR [
 		scale: wordSize;
 		segment: seg.
 	self assemble: 'mov' with: pointer with: backend regA
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeTinRatOffsetA [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: pointer with: backend regT
 ]
 
 { #category : #arithmetic }

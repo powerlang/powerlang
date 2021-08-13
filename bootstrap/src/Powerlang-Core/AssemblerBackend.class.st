@@ -338,6 +338,15 @@ AssemblerBackend >> memRef: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
+AssemblerBackend >> memRef: baseReg offset: indexReg [
+	^ self memRef
+		base: baseReg;
+		index: indexReg;
+		scale: 1;
+		yourself
+]
+
+{ #category : #memory }
 AssemblerBackend >> memRefAatT [
 ^self memRef: self regA index: self regT
 ]

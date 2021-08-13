@@ -395,6 +395,11 @@ Register >> isTemplate [
 ]
 
 { #category : #accessing }
+Register >> long [
+	^ family at: 3
+]
+
+{ #category : #accessing }
 Register >> name [
 	^name
 ]
@@ -438,6 +443,11 @@ Register >> registerGroup [
 { #category : #encoding }
 Register >> rm [
 	^index
+]
+
+{ #category : #accessing }
+Register >> short [
+	^ family at: 2
 ]
 
 { #category : #accessing }
