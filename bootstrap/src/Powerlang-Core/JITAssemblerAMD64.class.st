@@ -42,16 +42,6 @@ JITAssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
 		with: 1
 ]
 
-{ #category : #services }
-JITAssemblerAMD64 >> disassembledText32 [
-	^self nativeCode disassembledText32
-]
-
-{ #category : #services }
-JITAssemblerAMD64 >> disassembledText64 [
-	^self nativeCode disassembledText64
-]
-
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.

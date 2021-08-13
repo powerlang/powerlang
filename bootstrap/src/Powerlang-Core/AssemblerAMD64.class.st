@@ -228,6 +228,16 @@ AssemblerAMD64 >> decMem: aMemRef [
 
 ]
 
+{ #category : #services }
+AssemblerAMD64 >> disassembledText32 [
+	^self nativeCode disassembledText32
+]
+
+{ #category : #services }
+AssemblerAMD64 >> disassembledText64 [
+	^self nativeCode disassembledText64
+]
+
 { #category : #basic }
 AssemblerAMD64 >> divFP64: src1andDstReg by: src2reg [
 	self 
