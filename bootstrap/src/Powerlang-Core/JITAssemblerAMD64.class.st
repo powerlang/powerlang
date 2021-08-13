@@ -163,26 +163,6 @@ JITAssemblerAMD64 >> storeMXCSRintoA [
 	self assemble: 'stmxcsr' with: pointer
 ]
 
-{ #category : #integers }
-JITAssemblerAMD64 >> storeShortAinRoffset: offset [
-	pointer
-		reset;
-		length: 16;
-		base: backend regR;
-		displacement: offset.
-	self assemble: 'mov' with: pointer with: backend regA w
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeShortTinRatOffsetA [
-	pointer
-		reset;
-		length: 16;
-		base: backend regR;
-		index: backend regA.
-	self assemble: 'mov' with: pointer with: backend regT w
-]
-
 { #category : #storing }
 JITAssemblerAMD64 >> storeTIBwithAatIndexR [
 	| seg |

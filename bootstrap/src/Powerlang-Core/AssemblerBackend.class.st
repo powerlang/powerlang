@@ -225,6 +225,23 @@ AssemblerBackend >> memRef16 [
 ]
 
 { #category : #memory }
+AssemblerBackend >> memRef16: baseReg offset: offsetReg [
+	^ self memRef16
+		base: baseReg;
+		index: offsetReg;
+		scale: 1;
+		yourself
+]
+
+{ #category : #memory }
+AssemblerBackend >> memRef16: baseReg offsetImm: offsetImm [
+	^ self memRef16
+		base: baseReg;
+		displacement: offsetImm;
+		yourself
+]
+
+{ #category : #memory }
 AssemblerBackend >> memRef32 [
 	"Return clean instance of memory reference."
 
@@ -253,13 +270,12 @@ AssemblerBackend >> memRef32: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef32: baseReg offset: indexReg [
-	^ self memRef32 
-		base: baseReg; 
-		index: indexReg;
+AssemblerBackend >> memRef32: baseReg offset: offsetReg [
+	^ self memRef32
+		base: baseReg;
+		index: offsetReg;
 		scale: 1;
 		yourself
-
 ]
 
 { #category : #memory }

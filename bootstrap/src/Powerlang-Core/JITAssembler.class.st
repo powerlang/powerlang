@@ -1798,6 +1798,20 @@ JITAssembler >> storeRinTindex: index [
 ]
 
 { #category : #storing }
+JITAssembler >> storeShortAinRoffset: offset [
+	|  memref |
+	memref := backend memRef16: backend regR offsetImm: offset.
+	backend store: backend regA short intoMem: memref
+]
+
+{ #category : #storing }
+JITAssembler >> storeShortTinRatOffsetA [
+	| memref |
+	memref := backend memRef16: backend regR offset: backend regA.
+	backend store: backend regT short intoMem: memref
+]
+
+{ #category : #storing }
 JITAssembler >> storeSinRindex: index [
 	| memref |
 	memref := backend memRef: backend regR indexImm: index.
