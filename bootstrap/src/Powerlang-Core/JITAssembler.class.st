@@ -1973,7 +1973,7 @@ JITAssembler >> testRwithR [
 
 { #category : #initialization }
 JITAssembler >> useAMD64 [
-	backend := JITAssemblerAMD64 new wordSize: 8.
+	backend := AssemblerAMD64 new wordSize: 8.
 	self reset
 ]
 

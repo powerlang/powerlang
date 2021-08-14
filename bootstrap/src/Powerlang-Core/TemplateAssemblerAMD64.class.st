@@ -1227,10 +1227,8 @@ TemplateAssemblerAMD64 >> testRwithR [
 { #category : #'opcodes - integer related' }
 TemplateAssemblerAMD64 >> useAMD64 [
 	wordSize := 8.
-	backend := JITAssemblerAMD64 new wordSize: 8.
-	self reset.
-
-
+	backend := AssemblerAMD64 new wordSize: 8.
+	self reset
 ]
 
 { #category : #'opcodes - integer related' }

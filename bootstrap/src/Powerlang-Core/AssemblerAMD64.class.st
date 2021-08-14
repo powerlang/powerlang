@@ -527,6 +527,16 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 ]
 
 { #category : #basic }
+AssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
+	pointer
+		reset;
+		length: 16;
+		base: self regR;
+		displacement: offset.
+	self assemble: 'movzx' with: self regR with: pointer
+]
+
+{ #category : #basic }
 AssemblerAMD64 >> lock [
 	self assembleByte: 16rF0
 ]
@@ -549,6 +559,18 @@ AssemblerAMD64 >> moveImm: imm to: dstReg [
 	self ASSERT: (imm isInteger and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: imm
 
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> moveTslots [
+	| rep mnemonic |
+	rep := 16rF3.
+	mnemonic := wordSize = 8
+		ifTrue: [ 'movsq' ]
+		ifFalse: [ 'movsd' ].
+	self
+		assembleByte: rep;
+		assemble: mnemonic
 ]
 
 { #category : #basic }
@@ -1080,6 +1102,20 @@ AssemblerAMD64 >> subImm: imm from: srcAndDst [
 
 ]
 
+{ #category : #basic }
+AssemblerAMD64 >> subTslotsToSP [
+	self assemble: 'neg' with: self regT.
+	pointer
+		reset;
+		length: self addressLength;
+		base: self regSP;
+		index: self regT;
+		scale: self regSP sizeInBytes.
+	self
+		assemble: 'lea' with: self regSP with: pointer;
+		assemble: 'neg' with: self regT
+]
+
 { #category : #services }
 AssemblerAMD64 >> subtract: op1 from: op2 [
 	self assemble: 'sub' with: op2 with: op1
@@ -1113,6 +1149,18 @@ AssemblerAMD64 >> wordSize: anInteger [
 { #category : #accessing }
 AssemblerAMD64 >> wordSizeShift [
 	^wordSize = 8 ifTrue: [3] ifFalse: [2]
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> writeTslots [
+	| rep mnemonic |
+	rep := 16rF3.
+	mnemonic := wordSize = 8
+		ifTrue: [ 'stosq' ]
+		ifFalse: [ 'stosd' ].
+	self
+		assembleByte: rep;
+		assemble: mnemonic
 ]
 
 { #category : #'operations - logical' }

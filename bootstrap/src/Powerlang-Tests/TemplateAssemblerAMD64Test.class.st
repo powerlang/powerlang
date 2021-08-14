@@ -1,6 +1,6 @@
 Class {
 	#name : #TemplateAssemblerAMD64Test,
-	#superclass : #JITAssemblerAMD64Test,
+	#superclass : #AssemblerAMD64Test,
 	#category : #'Powerlang-Tests-Assembler-JIT'
 }
 
