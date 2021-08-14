@@ -11,60 +11,10 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
-{ #category : #loading }
-JITAssemblerAMD64 >> clearFPUFlags [
-	self assemble: 'fnclex'
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareEqualDoubleX0withAindirect [
-	pointer
-		reset;
-		length: 64;
-		base: backend regA.
-	self 
-		assemble: 'cmpsd'
-		with: backend regX0
-		with: pointer
-		with: 0
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
-	pointer
-		reset;
-		length: 64;
-		base: backend regA.
-	self 
-		assemble: 'cmpsd'
-		with: backend regX0
-		with: pointer
-		with: 1
-]
-
 { #category : #private }
 JITAssemblerAMD64 >> initialize [
 	super initialize.
 	backend := self
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
-	| instsize |
-	#dontOptimize.
-	instsize := 6.
-	pointer
-		reset;
-		length: 32;
-		base: backend regIP;
-		displacement: anInteger - instsize.
-	self assemble: 'mov' with: backend regM e with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> loadMXCSRfromA [
-	pointer reset; length: 32; base: backend regA.
-	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #integers }
@@ -77,36 +27,12 @@ JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	self assemble: 'movzx' with: backend regR with: pointer
 ]
 
-{ #category : #arithmetic }
-JITAssemblerAMD64 >> lock [
-	self assembleByte: 16rF0
-]
-
 { #category : #'opcodes - integer related' }
 JITAssemblerAMD64 >> moveTslots [
 	| rep mnemonic |
 	rep := 16rF3.
 	mnemonic := wordSize = 8 ifTrue: ['movsq'] ifFalse: ['movsd'].
 	self assembleByte: rep; assemble: mnemonic
-]
-
-{ #category : #services }
-JITAssemblerAMD64 >> readFPUStatusOnA [
-	pointer reset; length: 16; base: backend regA.
-	self assemble: 'fstsw' with: pointer
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> scaleFloatOnRWithA [
-	self pushAOnFPUStack; pushROnFPUStack; assemble: 'fscale'.
-	pointer reset; length: 64; base: backend regR.
-	self assemble: 'fstp' with: pointer; dropTopOfFPU
-]
-
-{ #category : #loading }
-JITAssemblerAMD64 >> storeMXCSRintoA [
-	pointer reset; length: 32; base: backend regA.
-	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #arithmetic }

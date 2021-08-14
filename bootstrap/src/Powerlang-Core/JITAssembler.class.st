@@ -162,6 +162,11 @@ JITAssembler >> callR [
 	backend call: backend regR
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> clearFPUFlags [
+	backend clearFPUFlags
+]
+
 { #category : #'operations - arithmetic' }
 JITAssembler >> clearIntegerBit: srcAndDstReg [
 	self clearSafeIntegerBit: srcAndDstReg
@@ -219,6 +224,16 @@ JITAssembler >> compareAwithFalse [
 { #category : #'operations - arithmetic' }
 JITAssembler >> compareAwithTrue [
 	backend compare: backend regA with: backend regTrue
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> compareEqualDoubleX0withAindirect [
+	backend compareEqualDoubleX0withAindirect
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> compareLessThanDoubleX0withAindirect [
+	backend compareLessThanDoubleX0withAindirect
 ]
 
 { #category : #'operations - arithmetic' }
@@ -694,6 +709,11 @@ JITAssembler >> loadLargeX1withAindirect [
 	backend loadLargeX: backend regX1 fromMem: memref
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> loadLongMwithIPoffset: anInteger [
+	backend loadLongMwithIPoffset: anInteger
+]
+
 { #category : #'push/pop' }
 JITAssembler >> loadLongRwithRatOffsetA [
 	| memref |
@@ -710,6 +730,11 @@ JITAssembler >> loadLongSwithRindex: index [
 	| memref |
 	memref := backend memRef32: backend regR indexImm: index.
 	backend load: backend regS32 fromMem: memref
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> loadMXCSRfromA [
+	backend loadMXCSRfromA
 ]
 
 { #category : #'push/pop' }
@@ -1145,6 +1170,11 @@ JITAssembler >> loadZeroExtendLongRwithRindex: index [
 		fromMem: memref
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> lock [
+	backend lock
+]
+
 { #category : #jumps }
 JITAssembler >> loop: aBlock times: anInteger [
 	| loop |
@@ -1400,6 +1430,11 @@ JITAssembler >> pushTrue [
 	backend push: backend regTrue
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> readFPUStatusOnA [
+	backend readFPUStatusOnA
+]
+
 { #category : #'registers - IR' }
 JITAssembler >> regA [
 	^backend regA
@@ -1569,6 +1604,11 @@ JITAssembler >> roundDoubleX0intoX1 [
 { #category : #loading }
 JITAssembler >> saveCallerFrame [
 	self pushFP; loadFPwithSP
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> scaleFloatOnRWithA [
+	backend scaleFloatOnRWithA
 ]
 
 { #category : #arithmetic }
@@ -1775,6 +1815,12 @@ JITAssembler >> storeLongTinRatOffsetA [
 	| memref |
 	memref := backend memRef32: backend regR offset: backend regA.
 	backend store: backend regT long intoMem: memref
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> storeMXCSRintoA [
+	backend storeMXCSRintoA
+
 ]
 
 { #category : #storing }

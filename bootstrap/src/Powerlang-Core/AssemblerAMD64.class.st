@@ -190,6 +190,11 @@ AssemblerAMD64 >> callIndirect: aMemRef [
 	self assemble: 'call' with: aMemRef 
 ]
 
+{ #category : #accessing }
+AssemblerAMD64 >> clearFPUFlags [
+	self assemble: 'fnclex'
+]
+
 { #category : #'operations - logical' }
 AssemblerAMD64 >> clearHigh32: srcAndDstReg [
 	self assemble: 'mov' with: srcAndDstReg e with: srcAndDstReg e
@@ -210,6 +215,32 @@ AssemblerAMD64 >> compare: reg1 withImm: imm [
 { #category : #services }
 AssemblerAMD64 >> compare: reg1 withMem: aMemRef [
 	self assemble: 'cmp' with: reg1 with: aMemRef
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> compareEqualDoubleX0withAindirect [
+	pointer
+		reset;
+		length: 64;
+		base: self regA.
+	self 
+		assemble: 'cmpsd'
+		with: self regX0
+		with: pointer
+		with: 0
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
+	pointer
+		reset;
+		length: 64;
+		base: self regA.
+	self
+		assemble: 'cmpsd'
+		with: self regX0
+		with: pointer
+		with: 1
 ]
 
 { #category : #basic }
@@ -447,6 +478,28 @@ AssemblerAMD64 >> loadLargeX: dstReg fromMem: srcMemRef [
 		with: srcMemRef
 ]
 
+{ #category : #accessing }
+AssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
+	| instsize |
+	#dontOptimize.
+	instsize := 6.
+	pointer
+		reset;
+		length: 32;
+		base: self regIP;
+		displacement: anInteger - instsize.
+	self assemble: 'mov' with: self regM e with: pointer
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> loadMXCSRfromA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'ldmxcsr' with: pointer
+]
+
 { #category : #storing }
 AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndex: index [
 	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
@@ -471,6 +524,11 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 		base: reg2;
 		displacement: offset.
 	self assemble: 'movzx' with: reg1 with: pointer
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> lock [
+	self assembleByte: 16rF0
 ]
 
 { #category : #memory }
@@ -649,6 +707,15 @@ AssemblerAMD64 >> pushROnFPUStack [
 	self assemble: 'fld' with: pointer
 ]
 
+{ #category : #accessing }
+AssemblerAMD64 >> readFPUStatusOnA [
+	pointer
+		reset;
+		length: 16;
+		base: self regA.
+	self assemble: 'fstsw' with: pointer
+]
+
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regA [
 	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
@@ -815,6 +882,21 @@ AssemblerAMD64 >> roundFP64: srcReg into:  dstReg [
 
 ]
 
+{ #category : #accessing }
+AssemblerAMD64 >> scaleFloatOnRWithA [
+	self
+		pushAOnFPUStack;
+		pushROnFPUStack;
+		assemble: 'fscale'.
+	pointer
+		reset;
+		length: 64;
+		base: self regR.
+	self
+		assemble: 'fstp' with: pointer;
+		dropTopOfFPU
+]
+
 { #category : #'operations - logical' }
 AssemblerAMD64 >> shiftLeft: srcAndDst by: countReg [
 	self ASSERT: countReg r = rcx.
@@ -969,6 +1051,15 @@ AssemblerAMD64 >> storeLargeX: srcReg intoMem: dstMemRef [
 		assemble: 'movq'
 		with: dstMemRef
 		with: srcReg
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> storeMXCSRintoA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'stmxcsr' with: pointer
 ]
 
 { #category : #'operations - arithmetic' }
