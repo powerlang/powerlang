@@ -173,16 +173,6 @@ AssemblerAMD64Test >> testAddTtoR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAlignTo__16 [
-	
-	assembler perform: #alignTo: withArguments: #(16).
-	self 
-		assert: (assembler bytes)
-		equals: (#[144])
-	
-]
-
-{ #category : #'tests - generated 2' }
 AssemblerAMD64Test >> testAndRwithA [
 	
 	assembler perform: #andRwithA withArguments: #().

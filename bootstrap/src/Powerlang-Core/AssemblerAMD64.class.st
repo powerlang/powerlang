@@ -676,7 +676,8 @@ AssemblerAMD64 >> nop: count [
 	r = 4 ifTrue: [^self nop4].
 	r = 3 ifTrue: [^self nop3].
 	r = 2 ifTrue: [^self nop2].
-	^self nop
+	r = 1 ifTrue: [^self nop].
+
 ]
 
 { #category : #'operations - logical' }
