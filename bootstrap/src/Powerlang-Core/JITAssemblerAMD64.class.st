@@ -116,22 +116,6 @@ JITAssemblerAMD64 >> scaleFloatOnRWithA [
 	self assemble: 'fstp' with: pointer; dropTopOfFPU
 ]
 
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> storeDoubleResultInRindirect [
-	pointer
-		reset;
-		length: 64;
-		base: backend regR.
-	wordSize = 8 ifTrue: [
-		self 
-			assemble: 'movq'
-			with: pointer
-			with: backend regX0
-	] ifFalse: [
-		self assemble: 'fstp' with: pointer
-	]
-]
-
 { #category : #loading }
 JITAssemblerAMD64 >> storeMXCSRintoA [
 	pointer reset; length: 32; base: backend regA.

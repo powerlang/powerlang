@@ -1711,6 +1711,13 @@ JITAssembler >> storeByteTinRatA [
 	backend store: backend regT byte intoMem: memref
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> storeDoubleResultInRindirect [
+	| memref |
+	memref := backend memRef: backend regR indexImm: 1.
+	backend storeDoubleResultIntoMem:  memref
+]
+
 { #category : #storing }
 JITAssembler >> storeEinRindex: index [
 	| memref |

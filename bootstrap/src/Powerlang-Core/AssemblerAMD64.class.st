@@ -937,6 +937,14 @@ AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 ]
 
 { #category : #'memory - load / store' }
+AssemblerAMD64 >> storeDoubleResultIntoMem: dstMemRef [
+	wordSize = 8
+		ifTrue:
+			[ self assemble: 'movq' with: dstMemRef  with: self regX0 ]
+		ifFalse: [ self assemble: 'fstp' with: dstMemRef ]
+]
+
+{ #category : #'memory - load / store' }
 AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 	self
 		assemble: 'mov'
