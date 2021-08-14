@@ -599,12 +599,6 @@ TemplateAssemblerAMD64 >> loadRwithTrue [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithX0 [
-	self assembleBytes: #[16r66 16r48 16rF 16r7E 16rC0].
-	
-]
-
-{ #category : #loading }
 TemplateAssemblerAMD64 >> loadSPwithFP [
 	self assembleBytes: #[16r48 16r89 16rEC].
 	
@@ -768,6 +762,12 @@ TemplateAssemblerAMD64 >> lock [
 { #category : #'opcodes - integer related' }
 TemplateAssemblerAMD64 >> moveTslots [
 	self assembleBytes: #[16rF3 16r48 16rA5].
+	
+]
+
+{ #category : #loading }
+TemplateAssemblerAMD64 >> moveX0toR [
+	self assembleBytes: #[16r66 16r48 16rF 16r7E 16rC0].
 	
 ]
 

@@ -494,6 +494,16 @@ AssemblerAMD64 >> moveImm: imm to: dstReg [
 ]
 
 { #category : #basic }
+AssemblerAMD64 >> moveX: srcReg into: dstReg [
+	| mov |
+	mov := wordSize = 8
+		ifTrue: [ 'movq' ]
+		ifFalse: [ 'movd' ].
+
+	self assemble: mov with: dstReg with: srcReg
+]
+
+{ #category : #basic }
 AssemblerAMD64 >> mulFP64: src1andDstReg by: src2reg [
 	self 
 		assemble: 'mulsd'

@@ -1196,6 +1196,11 @@ JITAssembler >> moveImm: imm to: dstReg [
 ]
 
 { #category : #'floting point' }
+JITAssembler >> moveX0toR [
+	backend moveX: backend regX0 into: backend regR
+]
+
+{ #category : #'floting point' }
 JITAssembler >> multiplyDoubleX0byX1 [
 	backend mulFP64: backend regX0 by: backend regX1
 ]

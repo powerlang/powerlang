@@ -67,19 +67,6 @@ JITAssemblerAMD64 >> loadMXCSRfromA [
 	self assemble: 'ldmxcsr' with: pointer
 ]
 
-{ #category : #loading }
-JITAssemblerAMD64 >> loadRwithX0 [
-	| mov |
-
-	mov := wordSize = 8 ifTrue: [
-			'movq'
-		] ifFalse: [ 'movd' ].
-	self 
-		assemble: mov
-		with: backend regR
-		with: backend regX0
-]
-
 { #category : #integers }
 JITAssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 	pointer

@@ -4232,16 +4232,6 @@ JITAssemblerAMD64Test >> testLoadRwithTrue [
 	
 ]
 
-{ #category : #'tests - generated 2' }
-JITAssemblerAMD64Test >> testLoadRwithX0 [
-	
-	assembler perform: #loadRwithX0 withArguments: #().
-	self 
-		assert: (assembler bytes)
-		equals: (#[102 72 15 126 192])
-	
-]
-
 { #category : #'tests - generated' }
 JITAssemblerAMD64Test >> testLoadSPwithFP [
 	
@@ -4499,6 +4489,16 @@ JITAssemblerAMD64Test >> testMoveTslots [
 	self 
 		assert: (assembler bytes)
 		equals: (#[243 72 165])
+	
+]
+
+{ #category : #'tests - generated 2' }
+JITAssemblerAMD64Test >> testMoveX0toR [
+	
+	assembler perform: #moveX0toR withArguments: #().
+	self 
+		assert: (assembler bytes)
+		equals: (#[102 72 15 126 192])
 	
 ]
 

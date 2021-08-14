@@ -340,7 +340,7 @@ InlineMessageLinker >> assembleFloatEquals [
 		popR;
 		loadLargeX0withRindirect;
 		compareEqualDoubleX0withAindirect;
-		loadRwithX0;
+		moveX0toR;
 		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus
@@ -363,7 +363,7 @@ InlineMessageLinker >> assembleFloatLessThan [
 	assembler
 		loadLargeX0withRindirect;
 		compareLessThanDoubleX0withAindirect;
-		loadRwithX0;
+		moveX0toR;
 		addRwithImmediate: 1;
 		convertRtoSmallInteger.
 	self readFloatStatus

@@ -385,6 +385,12 @@ AssemblerBackend >> moveImm: imm to: dstReg [
 
 ]
 
+{ #category : #alignment }
+AssemblerBackend >> moveX: srcReg into: dstReg [
+	"move from X-type register srcReg into general purpose dstReg"
+	self subclassResponsibility
+]
+
 { #category : #basic }
 AssemblerBackend >> mulFP64: src1andDstReg by: src2reg [
 	self subclassResponsibility
