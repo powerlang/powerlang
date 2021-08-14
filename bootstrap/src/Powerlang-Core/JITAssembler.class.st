@@ -1317,6 +1317,14 @@ JITAssembler >> pushA [
 	backend push: backend regA
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> pushAatToffset: offset [
+	| memref |
+	memref := backend memRef: backend regA index: backend regT.
+	memref displacement: offset.
+	backend pushMem: memref
+]
+
 { #category : #'push/pop' }
 JITAssembler >> pushE [
 	backend push: backend regE

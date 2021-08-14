@@ -103,18 +103,6 @@ JITAssemblerAMD64 >> moveTslots [
 	self assembleByte: rep; assemble: mnemonic
 ]
 
-{ #category : #'push/pop' }
-JITAssemblerAMD64 >> pushAatToffset: offset [
-	pointer
-		reset;
-		length: self addressLength;
-		base: backend regA;
-		index: backend regT;
-		scale: backend regSP sizeInBytes;
-		displacement: offset.
-	self assemble: 'push' with: pointer
-]
-
 { #category : #services }
 JITAssemblerAMD64 >> readFPUStatusOnA [
 	pointer reset; length: 16; base: backend regA.
