@@ -386,15 +386,6 @@ JITAssembler >> divideDoubleX0byX1 [
 	backend divFP64: backend regX0 by: backend regX1
 ]
 
-{ #category : #loading }
-JITAssembler >> doesNotUnderstand: aMessage [
-	(backend respondsTo: aMessage selector)
-		ifFalse: [ ^ super doesNotUnderstand: aMessage ].
-	^ backend
-		perform: aMessage selector
-		withArguments: aMessage arguments
-]
-
 { #category : #'to-cleanup' }
 JITAssembler >> dropTopOfFPU [
 	backend dropTopOfFPU
@@ -1314,6 +1305,28 @@ JITAssembler >> memRef [
 
 	^ backend memRef
 
+]
+
+{ #category : #memory }
+JITAssembler >> memRef32: baseReg indexImm: indexImm [
+	^ backend memRef32: baseReg indexImm: indexImm
+]
+
+{ #category : #memory }
+JITAssembler >> memRef8 [
+	"Return clean instance of byte-sized memory reference"
+
+	^ backend memRef8
+]
+
+{ #category : #memory }
+JITAssembler >> memRef8: baseReg index: indexReg [
+	^ backend memRef8: baseReg index: indexReg
+]
+
+{ #category : #memory }
+JITAssembler >> memRef: baseReg index: indexReg [
+	^ backend memRef: baseReg index: indexReg
 ]
 
 { #category : #memory }
