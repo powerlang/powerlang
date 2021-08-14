@@ -403,7 +403,7 @@ SExpressionNativizer >> emitWriteBarrier [
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
-	ir wordSize: environment wordSize
+	environment abi assembler: ir
 ]
 
 { #category : #services }

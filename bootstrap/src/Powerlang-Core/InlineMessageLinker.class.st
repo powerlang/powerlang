@@ -316,7 +316,7 @@ InlineMessageLinker >> assembleExpandInStackSized [
 		loadTwithA;
 		loopTtimes: [ assembler
 				pushIndirectR;
-				addRwithImmediate: assembler addressSize ]
+				addRwithImmediate: assembler wordSize ]
 ]
 
 { #category : #'private - assemble' }

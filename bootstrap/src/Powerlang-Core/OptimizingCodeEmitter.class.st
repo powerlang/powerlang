@@ -32,7 +32,7 @@ OptimizingCodeEmitter class >> new [
 { #category : #accessing }
 OptimizingCodeEmitter >> abi: anAbi [
 	abi := anAbi.
-	assembler wordSize: anAbi wordSize
+	anAbi assembler: assembler
 ]
 
 { #category : #unclassified }
