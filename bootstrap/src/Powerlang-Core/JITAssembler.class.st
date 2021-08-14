@@ -1211,6 +1211,26 @@ JITAssembler >> loadX0withRasDouble [
 	backend convert: backend regR toDouble: backend regX0
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg [
+	backend loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg
+
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexImm: indexImm [
+
+	backend
+		loadZeroExtendByte: dstReg
+		from: srcBaseReg
+		atIndexImm: indexImm
+]
+
+{ #category : #jumps }
+JITAssembler >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
+	backend loadZeroExtendByte: reg1 from: reg2 atOffset: offset
+]
+
 { #category : #integers }
 JITAssembler >> loadZeroExtendByteRwithRatA [
 	self loadZeroExtendByte: backend regR from: backend regR atIndexAt: backend regA
@@ -1219,7 +1239,7 @@ JITAssembler >> loadZeroExtendByteRwithRatA [
 { #category : #integers }
 JITAssembler >> loadZeroExtendByteRwithRindex: index [
 	#dontOptimize.
-	self loadZeroExtendByte: backend regR from: backend regR atIndex: index
+	self loadZeroExtendByte: backend regR from: backend regR atIndexImm: index
 ]
 
 { #category : #integers }
@@ -1230,7 +1250,7 @@ JITAssembler >> loadZeroExtendByteRwithSPatA [
 { #category : #integers }
 JITAssembler >> loadZeroExtendByteTwithAindex: index [
 	#dontOptimize.
-	self loadZeroExtendByte: backend regT from: backend regA atIndex: index
+	self loadZeroExtendByte: backend regT from: backend regA atIndexImm: index
 ]
 
 { #category : #integers }
@@ -1250,6 +1270,12 @@ JITAssembler >> loadZeroExtendLongRwithRindex: index [
 	backend
 		load: backend regR e
 		fromMem: memref
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> loadZeroExtendShortRwithRoffset: offset [
+	backend
+		loadZeroExtendShortRwithRoffset: offset
 ]
 
 { #category : #'to-cleanup' }

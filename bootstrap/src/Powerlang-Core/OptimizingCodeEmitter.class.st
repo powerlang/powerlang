@@ -323,7 +323,7 @@ OptimizingCodeEmitter >> assembleByteAtConstant: instruction [
 	index := instruction right.
 	dst := allocation at: instruction.
 	assembler
-		loadZeroExtendByte: dst from: base atIndex: index;
+		loadZeroExtendByte: dst from: base atIndexImm: index;
 		convertToSmallInteger: dst
 ]
 

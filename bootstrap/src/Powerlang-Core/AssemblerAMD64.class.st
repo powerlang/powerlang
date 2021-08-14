@@ -510,11 +510,6 @@ AssemblerAMD64 >> loadMXCSRfromA [
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndex: index [
-	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
-]
-
-{ #category : #storing }
 AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
 	pointer
 		reset;
@@ -523,6 +518,11 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
 		index: reg3;
 		displacement: -1.
 	self assemble: 'movzx' with: reg1 with: pointer
+]
+
+{ #category : #storing }
+AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexImm: index [
+	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
 ]
 
 { #category : #storing }
