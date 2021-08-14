@@ -894,6 +894,38 @@ AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
 		with: adjusted
 ]
 
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> store: srcReg intoTIBat: indexReg [
+	| seg |
+	seg := wordSize = 8
+		ifTrue: [ gs ]
+		ifFalse: [ fs ].
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize;
+		segment: seg.
+	self assemble: 'mov' with: pointer with: srcReg
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> store: srcReg intoThreadVariableAt: indexReg [
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize.
+	wordSize = 8
+		ifTrue: [ pointer
+				segment: gs;
+				displacement: 16r1480 ]
+		ifFalse: [ pointer
+				segment: fs;
+				displacement: 16rE10 ].
+	self assemble: 'mov' with: pointer with: srcReg
+]
+
 { #category : #storing }
 AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 	pointer

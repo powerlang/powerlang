@@ -687,7 +687,7 @@ InlineMessageLinker >> assembleSetTIBValue [
 	#_setThreadInformationBlockValue:.
 	assembler
 		convertRtoNativeInteger;
-		storeTIBwithAatIndexR
+		storeTIBatRwithA
 ]
 
 { #category : #'private - assemble' }

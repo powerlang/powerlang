@@ -1155,7 +1155,7 @@ TemplateAssemblerAMD64 >> storeSinRindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeTIBwithAatIndexR [
+TemplateAssemblerAMD64 >> storeTIBatRwithA [
 	self assembleBytes: #[16r65 16r48 16r89 16r14 16rC5 16r0 16r0 16r0 16r0].
 	
 ]

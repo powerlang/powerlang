@@ -128,19 +128,6 @@ JITAssemblerAMD64 >> scaleFloatOnRWithA [
 	self assemble: 'fstp' with: pointer; dropTopOfFPU
 ]
 
-{ #category : #storing }
-JITAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
-	pointer
-		reset;
-		length: self addressLength;
-		index: backend regR;
-		scale: wordSize.
-	wordSize = 8
-		ifTrue: [pointer segment: gs; displacement: 16r1480]
-		ifFalse: [pointer segment: fs; displacement: 16rE10].
-	self assemble: 'mov' with: pointer with: backend regA
-]
-
 { #category : #'push/pop' }
 JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 	pointer
@@ -161,19 +148,6 @@ JITAssemblerAMD64 >> storeDoubleResultInRindirect [
 JITAssemblerAMD64 >> storeMXCSRintoA [
 	pointer reset; length: 32; base: backend regA.
 	self assemble: 'stmxcsr' with: pointer
-]
-
-{ #category : #storing }
-JITAssemblerAMD64 >> storeTIBwithAatIndexR [
-	| seg |
-	seg := wordSize = 8 ifTrue: [gs] ifFalse: [fs].
-	pointer
-		reset;
-		length: self addressLength;
-		index: backend regR;
-		scale: wordSize;
-		segment: seg.
-	self assemble: 'mov' with: pointer with: backend regA
 ]
 
 { #category : #arithmetic }

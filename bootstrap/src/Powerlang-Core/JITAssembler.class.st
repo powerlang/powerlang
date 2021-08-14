@@ -1675,6 +1675,11 @@ JITAssembler >> store: srcReg intoMem: dstMemRef [
 
 ]
 
+{ #category : #'floting point' }
+JITAssembler >> storeAinThreadVariableAtIndexR [
+	backend store: backend regA intoThreadVariableAt: backend regR
+]
+
 { #category : #storing }
 JITAssembler >> storeAinTindex: index [
 	| memref |
@@ -1818,6 +1823,11 @@ JITAssembler >> storeSinRindex: index [
 	backend
 		store: backend regS
 		intoMem: memref
+]
+
+{ #category : #'floting point' }
+JITAssembler >> storeTIBatRwithA [
+	backend store: backend regA intoTIBat: backend regR
 ]
 
 { #category : #storing }

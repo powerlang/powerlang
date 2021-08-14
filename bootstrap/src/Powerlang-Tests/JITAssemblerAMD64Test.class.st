@@ -5623,9 +5623,9 @@ JITAssemblerAMD64Test >> testStoreSinRindex__3 [
 ]
 
 { #category : #'tests - generated' }
-JITAssemblerAMD64Test >> testStoreTIBwithAatIndexR [
+JITAssemblerAMD64Test >> testStoreTIBatRwithA [
 	
-	assembler storeTIBwithAatIndexR.
+	assembler storeTIBatRwithA.
 	self 
 		assert: (assembler bytes)
 		equals: (#[101 72 137 20 197 0 0 0 0])
