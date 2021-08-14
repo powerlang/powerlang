@@ -33,6 +33,15 @@ AssemblerAMD64 >> add: src2 to: src1AndDst [
 ]
 
 { #category : #'operations - arithmetic' }
+AssemblerAMD64 >> addDouble: source1 to: source2andDest [
+	self 
+		assemble: 'addsd'
+		with: source2andDest
+		with: source1
+
+]
+
+{ #category : #'operations - arithmetic' }
 AssemblerAMD64 >> addImm: imm to: src2AndDst [
 	self assemble: 'add' with: src2AndDst withImm: imm
 ]

@@ -13,6 +13,11 @@ AssemblerBackend >> add: source1 to: source2andDest [
 	self subclassResponsibility
 ]
 
+{ #category : #'operations - arithmetic' }
+AssemblerBackend >> addDouble: source1 to: source2andDest [
+	self subclassResponsibility
+]
+
 { #category : #basic }
 AssemblerBackend >> addImm: imm to: dest [
 	self subclassResponsibility

@@ -58,10 +58,7 @@ JITAssembler >> addAtoR [
 
 { #category : #arithmetic }
 JITAssembler >> addDoubleX1toX0 [
-	self 
-		assemble: 'addsd'
-		with: backend regX0
-		with: backend regX1
+	backend addDouble: backend regX1 to: backend regX0
 
 ]
 
