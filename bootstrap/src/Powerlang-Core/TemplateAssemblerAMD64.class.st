@@ -67,6 +67,22 @@ TemplateAssemblerAMD64 >> andRwithImmediate: imm [
 		assembleBytes: #[16r4C 16r21 16rD8]
 ]
 
+{ #category : #arithmetic }
+TemplateAssemblerAMD64 >> assembleByte: anInteger [
+	backend assembleByte: anInteger
+]
+
+{ #category : #arithmetic }
+TemplateAssemblerAMD64 >> assembleBytes: aByteArray [
+	backend assembleBytes: aByteArray
+]
+
+{ #category : #arithmetic }
+TemplateAssemblerAMD64 >> assembleBytes: value count: count [
+	backend assembleBytes: value count: count
+
+]
+
 { #category : #private }
 TemplateAssemblerAMD64 >> buildFrame [
 	self assembleBytes: #[16r55 16r48 16r89 16rE5].

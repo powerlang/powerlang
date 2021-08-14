@@ -1112,7 +1112,7 @@ AssemblerAMD64 >> subImm: imm from: srcAndDst [
 
 ]
 
-{ #category : #basic }
+{ #category : #'to-cleanup' }
 AssemblerAMD64 >> subTslotsToSP [
 	self assemble: 'neg' with: self regT.
 	pointer
@@ -1161,7 +1161,7 @@ AssemblerAMD64 >> wordSizeShift [
 	^wordSize = 8 ifTrue: [3] ifFalse: [2]
 ]
 
-{ #category : #basic }
+{ #category : #'to-cleanup' }
 AssemblerAMD64 >> writeTslots [
 	| rep mnemonic |
 	rep := 16rF3.

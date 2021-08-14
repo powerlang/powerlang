@@ -108,6 +108,11 @@ JITAssembler >> addTwithImmediate: imm [
 	backend addImm: imm to: backend regT
 ]
 
+{ #category : #'operations - arithmetic' }
+JITAssembler >> alignTo: anInteger [
+	backend alignTo: anInteger
+]
+
 { #category : #'operations - logical' }
 JITAssembler >> and: source1andDest with: source2 [
 	backend and: source1andDest with: source2
@@ -133,11 +138,21 @@ JITAssembler >> applyFixups [
 	backend memory applyFixupsWith: self
 ]
 
+{ #category : #'operations - arithmetic' }
+JITAssembler >> breakpoint [
+	backend breakpoint
+]
+
 { #category : #private }
 JITAssembler >> buildFrame [
 	self
 		push: backend regFP;
 		move: backend regSP to: backend regFP
+]
+
+{ #category : #private }
+JITAssembler >> bytes [
+	^backend bytes
 ]
 
 { #category : #'operations - arithmetic' }
@@ -189,6 +204,11 @@ JITAssembler >> clearSafeIntegerBit: srcAndDstReg [
 { #category : #'operations - arithmetic' }
 JITAssembler >> clearSafeRintegerBit [
 	self clearSafeIntegerBit: backend regR8
+]
+
+{ #category : #'operations - arithmetic' }
+JITAssembler >> compare: reg1 with: reg2 [
+	backend compare: reg1 with: reg2
 ]
 
 { #category : #comparing }
@@ -337,6 +357,11 @@ JITAssembler >> convertTtoNativeInteger [
 	
 ]
 
+{ #category : #services }
+JITAssembler >> currentAddress [
+	^ backend currentAddress
+]
+
 { #category : #'push/pop' }
 JITAssembler >> dec: srcAndDstReg [
 	backend dec: srcAndDstReg
@@ -370,6 +395,11 @@ JITAssembler >> doesNotUnderstand: aMessage [
 		withArguments: aMessage arguments
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> dropTopOfFPU [
+	backend dropTopOfFPU
+]
+
 { #category : #'push/pop' }
 JITAssembler >> dropTos: count [
 	backend addImm: (count * backend addressSize) to: backend regSP
@@ -397,6 +427,11 @@ JITAssembler >> inc: srcAndDstReg [
 { #category : #'push/pop' }
 JITAssembler >> initializeS [
 	backend move: backend regR to: backend regS
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfEqualTo: label [
+	backend jumpIfEqualTo: label
 ]
 
 { #category : #jumps }
@@ -520,6 +555,11 @@ JITAssembler >> labeledNonIntegerBitTestOf: aRegister [
 { #category : #integers }
 JITAssembler >> labeledNonIntegerBitTestOfR [
 	^self labeledNonIntegerBitTestOf: backend regR8
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> leadingRzeroCount [
+	backend leadingRzeroCount
 ]
 
 { #category : #'memory - load / store' }
@@ -1267,6 +1307,11 @@ JITAssembler >> moveImm: imm to: dstReg [
 
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> moveTslots [
+	backend moveTslots
+]
+
 { #category : #'floting point' }
 JITAssembler >> moveX0toR [
 	backend moveX: backend regX0 into: backend regR
@@ -1597,6 +1642,16 @@ JITAssembler >> regX0 [
 JITAssembler >> regX1 [
 	"IEEE 754 double register"
 	^ backend regX1
+]
+
+{ #category : #jumps }
+JITAssembler >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
+	backend renameByteRegisterIfNeeded: register preserving: preserved during: aBlock
+]
+
+{ #category : #'floting point' }
+JITAssembler >> renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock [
+	backend renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock
 ]
 
 { #category : #loading }
@@ -2033,6 +2088,16 @@ JITAssembler >> subImm: imm from: srcAndDst [
 
 ]
 
+{ #category : #'to-cleanup' }
+JITAssembler >> subTslotsToSP [
+	backend subTslotsToSP
+]
+
+{ #category : #loading }
+JITAssembler >> testIntegerBit: aRegister [
+	backend testIntegerBit: aRegister
+]
+
 { #category : #loading }
 JITAssembler >> testIntegerBitOf: aRegister [
 	backend test: aRegister byte withImm: 1
@@ -2052,6 +2117,16 @@ JITAssembler >> testRwithR [
 JITAssembler >> useAMD64 [
 	backend := AssemblerAMD64 new wordSize: 8.
 	self reset
+]
+
+{ #category : #services }
+JITAssembler >> wordSize [
+	^backend wordSize
+]
+
+{ #category : #'to-cleanup' }
+JITAssembler >> writeTslots [
+	backend writeTslots
 ]
 
 { #category : #'operations - logical' }
