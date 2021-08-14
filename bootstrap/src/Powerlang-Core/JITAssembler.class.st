@@ -399,6 +399,51 @@ JITAssembler >> initializeS [
 	backend move: backend regR to: backend regS
 ]
 
+{ #category : #jumps }
+JITAssembler >> jumpIfGreaterOrEqualSignedTo: label [
+	backend jumpIfGreaterOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfGreaterSignedTo: label [
+	backend jumpIfGreaterSignedTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfLessOrEqualSignedTo: label [
+	backend jumpIfLessOrEqualSignedTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfLessSignedTo: label [
+	backend jumpIfLessSignedTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfNotEqualTo: label [
+	backend jumpIfNotEqualTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfNotZeroTo: label [
+	backend jumpIfNotZeroTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfOverflowTo: label [
+	backend jumpIfOverflowTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfSignTo: label [
+	backend jumpIfSignTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> jumpIfZeroTo: label [
+	backend jumpIfZeroTo: label
+]
+
 { #category : #accessing }
 JITAssembler >> jumpOver: aBlock [
 	| label |
@@ -1593,6 +1638,11 @@ JITAssembler >> restoreCallerSelf [
 	self loadSwithFPindex: 0
 ]
 
+{ #category : #jumps }
+JITAssembler >> return [
+	backend return
+]
+
 { #category : #'floting point' }
 JITAssembler >> roundDoubleX0intoX1 [
 	backend roundFP64: backend regX0 into: backend regX1
@@ -1696,13 +1746,43 @@ JITAssembler >> shiftTright: count [
 ]
 
 { #category : #jumps }
+JITAssembler >> shortJumpIfCarryTo: label [
+	backend shortJumpIfCarryTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpIfEqualTo: label [
+	backend shortJumpIfEqualTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpIfNotCarryTo: label [
+	backend shortJumpIfNotCarryTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpIfNotEqualTo: label [
+	backend shortJumpIfNotEqualTo: label
+]
+
+{ #category : #jumps }
 JITAssembler >> shortJumpIfNotZeroTo: label [
 	self shortJumpIfNotEqualTo: label
 ]
 
 { #category : #jumps }
+JITAssembler >> shortJumpIfSignTo: label [
+	backend shortJumpIfSignTo: label
+]
+
+{ #category : #jumps }
 JITAssembler >> shortJumpIfZeroTo: label [
 	self shortJumpIfEqualTo: label
+]
+
+{ #category : #jumps }
+JITAssembler >> shortJumpTo: label [
+	backend shortJumpTo: label
 ]
 
 { #category : #comparing }
