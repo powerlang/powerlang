@@ -503,17 +503,7 @@ AssemblerBackend >> regR [
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regR32 [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
 AssemblerBackend >> regS [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
-AssemblerBackend >> regS32 [
 	^self subclassResponsibility
 ]
 

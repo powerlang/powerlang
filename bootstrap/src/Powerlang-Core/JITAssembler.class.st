@@ -796,8 +796,7 @@ JITAssembler >> loadLongRwithRatOffsetA [
 	memref := backend
 		memRef32: backend regR
 		offset: backend regA.
-	backend load: backend regR32 fromMem: memref
-	
+	backend load: backend regR fromMem: memref
 
 ]
 
@@ -805,7 +804,8 @@ JITAssembler >> loadLongRwithRatOffsetA [
 JITAssembler >> loadLongSwithRindex: index [
 	| memref |
 	memref := backend memRef32: backend regR indexImm: index.
-	backend load: backend regS32 fromMem: memref
+	backend load: backend regS fromMem: memref
+
 ]
 
 { #category : #'to-cleanup' }

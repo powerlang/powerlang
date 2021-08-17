@@ -812,18 +812,8 @@ AssemblerAMD64 >> regR [
 ]
 
 { #category : #'registers - IR' }
-AssemblerAMD64 >> regR32 [
-	^eax
-]
-
-{ #category : #'registers - IR' }
 AssemblerAMD64 >> regS [
 	^wordSize = 8 ifTrue: [rsi] ifFalse: [esi]
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regS32 [
-	^esi
 ]
 
 { #category : #'registers - IR' }
