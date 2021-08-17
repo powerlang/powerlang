@@ -203,7 +203,8 @@ JITAssembler >> clearSafeIntegerBit: srcAndDstReg [
 
 { #category : #'operations - arithmetic' }
 JITAssembler >> clearSafeRintegerBit [
-	self clearSafeIntegerBit: backend regR8
+	self clearSafeIntegerBit: backend regR
+
 ]
 
 { #category : #'operations - arithmetic' }
@@ -502,7 +503,8 @@ JITAssembler >> labeledIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 JITAssembler >> labeledIntegerBitTestOfR [
-	^self labeledIntegerBitTestOf: backend regR8
+	^self labeledIntegerBitTestOf: backend regR
+
 ]
 
 { #category : #integers }
@@ -545,7 +547,8 @@ JITAssembler >> labeledNonIntegerBitTestOf: aRegister [
 
 { #category : #integers }
 JITAssembler >> labeledNonIntegerBitTestOfR [
-	^self labeledNonIntegerBitTestOf: backend regR8
+	^self labeledNonIntegerBitTestOf: backend regR
+
 ]
 
 { #category : #'to-cleanup' }
@@ -1759,7 +1762,8 @@ JITAssembler >> setIntegerBit: srcAndDstReg [
 
 { #category : #arithmetic }
 JITAssembler >> setRintegerBit [
-	self setIntegerBit: backend regR8
+	self setIntegerBit: backend regR
+
 ]
 
 { #category : #arithmetic }
@@ -1769,7 +1773,8 @@ JITAssembler >> setSafeIntegerBit: srcAndDstReg [
 
 { #category : #arithmetic }
 JITAssembler >> setSafeRintegerBit [
-	self setSafeIntegerBit: backend regR8
+	self setSafeIntegerBit: backend regR
+
 ]
 
 { #category : #'operations - logical' }

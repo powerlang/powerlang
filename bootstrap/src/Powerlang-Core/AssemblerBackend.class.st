@@ -456,11 +456,6 @@ AssemblerBackend >> regB [
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regBP [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
 AssemblerBackend >> regC [
 	^self subclassResponsibility
 ]
@@ -471,8 +466,20 @@ AssemblerBackend >> regE [
 ]
 
 { #category : #'registers - IR' }
+AssemblerBackend >> regFP [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
 AssemblerBackend >> regFalse [
 	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+AssemblerBackend >> regG [
+	^ self subclassResponsibility
+
 ]
 
 { #category : #'registers - IR' }
@@ -497,11 +504,6 @@ AssemblerBackend >> regR [
 
 { #category : #'registers - IR' }
 AssemblerBackend >> regR32 [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
-AssemblerBackend >> regR8 [
 	^self subclassResponsibility
 ]
 

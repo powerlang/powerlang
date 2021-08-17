@@ -54,7 +54,16 @@ AssemblerAMD64 >> and: src1AndDst with: source2 [
 
 { #category : #'operations - logical' }
 AssemblerAMD64 >> and: src1AndDst withImm: imm [
-	self assemble: 'and' with: src1AndDst withImm: imm
+
+	(imm between: -128 and: -1) ifTrue: [ 
+		"When `imm` is a small negative, we can safely
+		 and bits only in lower part of the 64 bit register
+		 since higher bits of immediate are all ones anyway.
+		 This helps to generate shorter code on x86."
+		self assemble: 'and' with: src1AndDst byte withImm: imm
+	] ifFalse: [
+		self assemble: 'and' with: src1AndDst withImm: imm
+	].
 
 ]
 
@@ -688,7 +697,16 @@ AssemblerAMD64 >> or: src1AndDst with: src2 [
 
 { #category : #'operations - logical' }
 AssemblerAMD64 >> or: src1AndDst withImm: imm [
-	self assemble: 'or' with: src1AndDst withImm: imm
+
+	(imm between: 0 and: 127) ifTrue: [ 
+		"When `imm` is a small POSITIVE, we can safely
+		 or bits only in lower part of the 64 bit register
+		 since higher bits of immediate are all zeros anyway.
+		 This helps to generate shorter code on x86."
+		self assemble: 'or' with: src1AndDst byte withImm: imm
+	] ifFalse: [
+		self assemble: 'or' with: src1AndDst withImm: imm
+	].
 
 ]
 
@@ -754,16 +772,6 @@ AssemblerAMD64 >> regA [
 ]
 
 { #category : #'registers - IR' }
-AssemblerAMD64 >> regA8 [
-	^dl
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regBP [
-	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
-]
-
-{ #category : #'registers - IR' }
 AssemblerAMD64 >> regE [
 	^wordSize = 8 ifTrue: [rdi] ifFalse: [edi]
 ]
@@ -806,11 +814,6 @@ AssemblerAMD64 >> regR [
 { #category : #'registers - IR' }
 AssemblerAMD64 >> regR32 [
 	^eax
-]
-
-{ #category : #'registers - IR' }
-AssemblerAMD64 >> regR8 [
-	^al
 ]
 
 { #category : #'registers - IR' }

@@ -314,7 +314,7 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 	assembler
 		alignTo: 16;
 		@ head;
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonInteger;
 		compareRwithSmallInteger: 0;
 		jumpIfLessOrEqualSignedTo: continue;
@@ -323,7 +323,7 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer loadRwithStack: current.
 	assembler
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonDecrementable;
 		subFromRconstant: 2.
 	nativizer storeRInStack: current.
@@ -347,6 +347,7 @@ InlinedMessageNativizer >> inlineTimesRepeat [
 				compareRwithTrue;
 				jumpIfEqualTo: block;
 				jumpTo: continue ]
+
 ]
 
 { #category : #nativizing }
@@ -368,9 +369,9 @@ InlinedMessageNativizer >> inlineToByDo [
 	assembler
 		alignTo: 16;
 		@ head;
-		testIntegerBitOf: assembler regA8;
+		testIntegerBitOf: assembler regA;
 		jumpIfZeroTo: nonInteger;
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonInteger;
 		compareRwithA.
 	by := message arguments second value.
@@ -383,7 +384,7 @@ InlinedMessageNativizer >> inlineToByDo [
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer temporaryInStackAt: current.
 	assembler
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonIncrementable;
 		addRwithImmediate: increment;
 		jumpIfOverflowTo: overflow.
@@ -412,6 +413,7 @@ InlinedMessageNativizer >> inlineToByDo [
 				compareRwithTrue;
 				jumpIfEqualTo: block;
 				jumpTo: continue ]
+
 ]
 
 { #category : #nativizing }
@@ -433,9 +435,9 @@ InlinedMessageNativizer >> inlineToDo [
 	assembler
 		alignTo: 16;
 		@ head;
-		testIntegerBitOf: assembler regA8;
+		testIntegerBitOf: assembler regA;
 		jumpIfZeroTo: nonInteger;
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonInteger;
 		compareRwithA;
 		jumpIfGreaterSignedTo: continue;
@@ -444,7 +446,7 @@ InlinedMessageNativizer >> inlineToDo [
 		do: [ :s | s acceptVisitor: nativizer ].
 	nativizer temporaryInStackAt: current.
 	assembler
-		testIntegerBitOf: assembler regR8;
+		testIntegerBitOf: assembler regR;
 		jumpIfZeroTo: nonIncrementable;
 		addRwithImmediate: 2;
 		jumpIfOverflowTo: overflow.
@@ -473,6 +475,7 @@ InlinedMessageNativizer >> inlineToDo [
 				compareRwithTrue;
 				jumpIfEqualTo: block;
 				jumpTo: continue ]
+
 ]
 
 { #category : #nativizing }
