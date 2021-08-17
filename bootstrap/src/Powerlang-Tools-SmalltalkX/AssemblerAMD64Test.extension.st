@@ -1,7 +1,7 @@
 Extension { #name : #JITAssemblerAMD64Test }
 
 { #category : '*Powerlang-Tools-SmalltalkX' }
-JITAssemblerAMD64Test >> assert: anObject equals: anotherObject [
+AssemblerAMD64Test >> assert: anObject equals: anotherObject [
 	| asm |
 
 	((anObject ~= anotherObject) and:[anObject isByteArray and:[anotherObject isByteArray]]) ifTrue: [ 
