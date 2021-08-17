@@ -191,9 +191,18 @@ AssemblerBackend >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
 
 { #category : #memory }
 AssemblerBackend >> load: dstReg fromMem: srcMemRef [
-	"Load `dstReg` from memory location `srcMemRef`. 
+	"Load `dstReg` from memory location `srcMemRef`.
+	 The size of data loaded is specified in `srcMemRef`.
 
-	 The size of data loaded is specified in `srcMemRef`"
+	 When loading 32bits into 64bit register, high 32bits must be
+	 cleared (in other words, 32bit value is *zero* extended to
+	 64bits and stored in `dstReg`.
+
+	 However, when loading 16bits or 8bits, high 48 or 56 bits
+	 are *left intact*.
+
+	 This somewhat weird behavior is heritage of x86.
+	"
 
 	^ self subclassResponsibility
 
