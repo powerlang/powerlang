@@ -383,7 +383,7 @@ JITAssembler >> discardArguments: anInteger [
 
 { #category : #'floting point' }
 JITAssembler >> divideDoubleX0byX1 [
-	backend divFP64: backend regX0 by: backend regX1
+	backend divDouble: backend regX0 by: backend regX1
 ]
 
 { #category : #'to-cleanup' }
@@ -772,14 +772,14 @@ JITAssembler >> loadGwithMindex: index [
 JITAssembler >> loadLargeX0withRindirect [
 	| memref |
 	memref := backend memRef64: backend regR indexImm: 1.
-	backend loadLargeX: backend regX0 fromMem: memref
+	backend loadDouble: backend regX0 fromMem: memref
 ]
 
 { #category : #'push/pop' }
 JITAssembler >> loadLargeX1withAindirect [
 	| memref |
 	memref := backend memRef64: backend regA indexImm: 1.
-	backend loadLargeX: backend regX1 fromMem: memref
+	backend loadDouble: backend regX1 fromMem: memref
 ]
 
 { #category : #'to-cleanup' }
@@ -1358,7 +1358,7 @@ JITAssembler >> moveX0toR [
 
 { #category : #'floting point' }
 JITAssembler >> multiplyDoubleX0byX1 [
-	backend mulFP64: backend regX0 by: backend regX1
+	backend mulDouble: backend regX0 by: backend regX1
 ]
 
 { #category : #storing }
@@ -1739,7 +1739,7 @@ JITAssembler >> return [
 
 { #category : #'floting point' }
 JITAssembler >> roundDoubleX0intoX1 [
-	backend roundFP64: backend regX0 into: backend regX1
+	backend roundDouble: backend regX0 into: backend regX1
 ]
 
 { #category : #loading }
@@ -1958,7 +1958,7 @@ JITAssembler >> storeImm: imm intoMem: dstMemRef [
 JITAssembler >> storeLargeX0inA [
 	| memref |
 	memref := backend memRef64: backend regA indexImm: 1.
-	backend storeLargeX: backend regX0 intoMem: memref
+	backend storeDouble: backend regX0 intoMem: memref
 		
 
 ]
@@ -1967,7 +1967,7 @@ JITAssembler >> storeLargeX0inA [
 JITAssembler >> storeLargeX0inT [
 	| memref |
 	memref := backend memRef64: backend regT indexImm: 1.
-	backend storeLargeX: backend regX0 intoMem: memref
+	backend storeDouble: backend regX0 intoMem: memref
 		
 
 ]
@@ -2112,7 +2112,7 @@ JITAssembler >> subAfromT [
 
 { #category : #'floting point' }
 JITAssembler >> subDoubleX1fromX0 [
-	backend subFP64: backend regX1 from: backend regX0
+	backend subDouble: backend regX1 from: backend regX0
 ]
 
 { #category : #arithmetic }

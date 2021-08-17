@@ -145,7 +145,7 @@ AssemblerBackend >> decMem: aMemRef [
 ]
 
 { #category : #basic }
-AssemblerBackend >> divFP64: src1andDstReg by: src2reg [
+AssemblerBackend >> divDouble: src1andDstReg by: src2reg [ 
 	self subclassResponsibility
 ]
 
@@ -210,10 +210,10 @@ AssemblerBackend >> load: dstReg withThreadVariableAt: indexReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> loadLargeX: dstReg fromMem: srcMemRef [
+AssemblerBackend >> loadDouble: dstReg fromMem: srcMemRef [ 
 	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
+	
 	^ self subclassResponsibility
-
 ]
 
 { #category : #memory }
@@ -397,7 +397,7 @@ AssemblerBackend >> moveX: srcReg into: dstReg [
 ]
 
 { #category : #basic }
-AssemblerBackend >> mulFP64: src1andDstReg by: src2reg [
+AssemblerBackend >> mulDouble: src1andDstReg by: src2reg [ 
 	self subclassResponsibility
 ]
 
@@ -526,15 +526,26 @@ AssemblerBackend >> regV [
 	^self subclassResponsibility
 ]
 
+{ #category : #'registers - IR' }
+AssemblerBackend >> regX0 [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'registers - IR' }
+AssemblerBackend >> regX1 [
+	^ self subclassResponsibility
+
+]
+
 { #category : #basic }
 AssemblerBackend >> reset [
 	memory reset
 ]
 
 { #category : #memory }
-AssemblerBackend >> roundFP64: srcReg into:  dstReg [
+AssemblerBackend >> roundDouble: srcReg into: dstReg [ 
 	self subclassResponsibility
-
 ]
 
 { #category : #basic }
@@ -568,8 +579,8 @@ AssemblerBackend >> store: srcReg intoMem: dstMemRef [
 ]
 
 { #category : #memory }
-AssemblerBackend >> storeLargeX: srcReg intoMem: dstMemRef [
-	^self subclassResponsibility
+AssemblerBackend >> storeDouble: srcReg intoMem: dstMemRef [ 
+	^ self subclassResponsibility
 ]
 
 { #category : #initialization }
@@ -583,7 +594,7 @@ AssemblerBackend >> sub: src1 from: src2AndDst [
 ]
 
 { #category : #accessing }
-AssemblerBackend >> subFP64: src1 from: src2AndDst [
+AssemblerBackend >> subDouble: src1 from: src2AndDst [ 
 	self subclassResponsibility
 ]
 

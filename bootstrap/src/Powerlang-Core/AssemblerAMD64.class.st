@@ -279,12 +279,11 @@ AssemblerAMD64 >> disassembledText64 [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> divFP64: src1andDstReg by: src2reg [
+AssemblerAMD64 >> divDouble: src1andDstReg by: src2reg [ 
 	self 
 		assemble: 'divsd'
 		with: src1andDstReg
 		with: src2reg
-
 ]
 
 { #category : #basic }
@@ -479,12 +478,14 @@ AssemblerAMD64 >> load: dstReg withThreadVariableAt: indexReg [
 	self assemble: 'mov' with: dstReg with: pointer
 ]
 
-{ #category : #basic }
-AssemblerAMD64 >> loadLargeX: dstReg fromMem: srcMemRef [
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> loadDouble: dstReg fromMem: srcMemRef [
+	self ASSERT: srcMemRef sizeInBits == 64.
 	self 
 		assemble: 'movq'
 		with: dstReg
 		with: srcMemRef
+
 ]
 
 { #category : #accessing }
@@ -593,12 +594,11 @@ AssemblerAMD64 >> moveX: srcReg into: dstReg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> mulFP64: src1andDstReg by: src2reg [
+AssemblerAMD64 >> mulDouble: src1andDstReg by: src2reg [ 
 	self 
 		assemble: 'mulsd'
 		with: src1andDstReg
 		with: src2reg
-
 ]
 
 { #category : #basic }
@@ -905,13 +905,12 @@ AssemblerAMD64 >> return: anInteger [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> roundFP64: srcReg into:  dstReg [
+AssemblerAMD64 >> roundDouble: srcReg into: dstReg [ 
 	self 
 		assemble: 'roundsd'
 		with: dstReg
 		with: srcReg
 		with: 3
-
 ]
 
 { #category : #accessing }
@@ -1061,6 +1060,16 @@ AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 ]
 
 { #category : #'memory - load / store' }
+AssemblerAMD64 >> storeDouble: srcReg intoMem: dstMemRef [
+	self ASSERT: dstMemRef sizeInBits == 64.
+	self 
+		assemble: 'movq'
+		with: dstMemRef
+		with: srcReg
+
+]
+
+{ #category : #'memory - load / store' }
 AssemblerAMD64 >> storeDoubleResultIntoMem: dstMemRef [
 	wordSize = 8
 		ifTrue:
@@ -1075,14 +1084,6 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 		with: dstMemRef
 		withImm: imm
 
-]
-
-{ #category : #'memory - load / store' }
-AssemblerAMD64 >> storeLargeX: srcReg intoMem: dstMemRef [
-	self
-		assemble: 'movq'
-		with: dstMemRef
-		with: srcReg
 ]
 
 { #category : #accessing }
@@ -1101,9 +1102,11 @@ AssemblerAMD64 >> sub: src1 from: src2AndDst [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> subFP64: src1 from: src2AndDst [
-	self assemble: 'subsd' with: src2AndDst with:  src1
-
+AssemblerAMD64 >> subDouble: src1 from: src2AndDst [ 
+	self 
+		assemble: 'subsd'
+		with: src2AndDst
+		with: src1
 ]
 
 { #category : #'operations - arithmetic' }

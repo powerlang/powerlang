@@ -105,6 +105,12 @@ ISAOperand >> regExtension [
 ]
 
 { #category : #accessing }
+ISAOperand >> sizeInBits [
+	^self length
+
+]
+
+{ #category : #accessing }
 ISAOperand >> sizeInBytes [
 	^length // 8
 ]
