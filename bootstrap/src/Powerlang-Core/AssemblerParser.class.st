@@ -5,7 +5,7 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #AssemblerParser,
 	#superclass : #AssemblerGrammar,
-	#category : #'Powerlang-Core-Assembler-Parser'
+	#category : #'Powerlang-Core-Assembler-Intel-Parser'
 }
 
 { #category : #accessing }
@@ -161,12 +161,15 @@ AssemblerParser >> sib1 [
 
 { #category : #accessing }
 AssemblerParser >> sib2 [
-	^super sib2 ==> [:nodes | 
-		MemoryOperand new
-			base: nodes first;
-			index: nodes second;
-			scale: nodes third;
-			displacement: nodes fourth]
+	| scale displacement |
+	^ super sib2
+		==> [ :nodes |  scale := nodes third ifNil: [ 1 ].
+			displacement := nodes fourth ifNil: [ 0 ].
+			MemoryOperand new
+				base: nodes first;
+				index: nodes second;
+				scale: scale;
+				displacement: displacement ]
 ]
 
 { #category : #accessing }

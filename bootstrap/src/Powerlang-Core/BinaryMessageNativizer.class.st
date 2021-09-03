@@ -85,7 +85,7 @@ BinaryMessageNativizer >> inlineBitXor [
 	nativizer saveContextSwitchPoint.
 	assembler
 		xorRwithA;
-		ensureRintegerBit;
+		setRintegerBit;
 		@ done.
 	nativizer
 		addFallback: [ assembler
@@ -265,7 +265,7 @@ BinaryMessageNativizer >> inlineMinus [
 	assembler
 		subAfromR;
 		jumpIfOverflowTo: overflow;
-		ensureRintegerBit;
+		setRintegerBit;
 		@ done.
 	nativizer addFallback: [
 		assembler
@@ -290,10 +290,10 @@ BinaryMessageNativizer >> inlineMultiply [
 		convertAtoNativeInteger;
 		loadTwithR;
 		clearRintegerBit;
-		multiplyRbyA;
+		multiplyRbyAwideningToA;
 		popA;
 		jumpIfOverflowTo: overflow;
-		ensureRintegerBit;
+		setRintegerBit;
 		@ done.
 	nativizer
 		addFallback: [ assembler
@@ -322,7 +322,7 @@ BinaryMessageNativizer >> inlinePlus [
 		assembler
 			@ overflow;
 			subAfromR;
-			ensureRintegerBit;
+			setRintegerBit;
 			@ failed;
 			pushA.
 		nativizer emitSend: #'+'.
@@ -343,7 +343,7 @@ BinaryMessageNativizer >> inlineQuotient [
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
 		loadTwithA;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		convertRtoSmallInteger;
 		@ done.
 	nativizer
@@ -367,7 +367,7 @@ BinaryMessageNativizer >> inlineRemainder [
 		convertRtoNativeInteger;
 		convertAtoNativeInteger;
 		loadTwithA;
-		divideRbyT;
+		extendRtoAandDividebyT;
 		loadRwithA;
 		convertRtoSmallInteger;
 		@ done.

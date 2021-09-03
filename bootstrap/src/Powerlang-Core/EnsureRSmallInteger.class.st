@@ -7,6 +7,7 @@ Class {
 { #category : #'as yet unclassified' }
 EnsureRSmallInteger >> nativizeUsing: anAssembler for: messageNativizer [
 	anAssembler
-		testIntegerBitOf: anAssembler regR8;
+		testIntegerBitOf: anAssembler regR;
 		jumpIfZeroTo: messageNativizer failLabel
+
 ]

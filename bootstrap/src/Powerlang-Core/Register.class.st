@@ -241,6 +241,17 @@ Register >> family: anArray [
 	family := anArray
 ]
 
+{ #category : #accessing }
+Register >> forLength: reglength [
+	self ASSERT: (#(8 16 32 64) includes: reglength).
+
+	reglength ==  8 ifTrue: [ ^ self b ].
+	reglength == 16 ifTrue: [ ^ self w ].
+	reglength == 32 ifTrue: [ ^ self e ].
+	reglength == 64 ifTrue: [ ^ self r ].
+
+]
+
 { #category : #private }
 Register >> getB [
 	self == rax ifTrue: [^al].
@@ -384,6 +395,11 @@ Register >> isTemplate [
 ]
 
 { #category : #accessing }
+Register >> long [
+	^ family at: 3
+]
+
+{ #category : #accessing }
 Register >> name [
 	^name
 ]
@@ -427,6 +443,11 @@ Register >> registerGroup [
 { #category : #encoding }
 Register >> rm [
 	^index
+]
+
+{ #category : #accessing }
+Register >> short [
+	^ family at: 2
 ]
 
 { #category : #accessing }

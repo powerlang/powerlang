@@ -39,7 +39,6 @@ SysVX64ABI >> restoreContext: anFFIDescriptor with: anAssembler [
 
 { #category : #'as yet unclassified' }
 SysVX64ABI >> storeArgumentsInStack: anFFIDescriptor with: anAssembler [
-
 	anAssembler pushS;
 		loadRwithArgPointer;
 		convertRtoSmallInteger;

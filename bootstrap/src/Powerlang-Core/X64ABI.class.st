@@ -12,6 +12,11 @@ Class {
 }
 
 { #category : #accessing }
+X64ABI >> assembler: aJITAssembler [
+	aJITAssembler useAMD64
+]
+
+{ #category : #accessing }
 X64ABI >> bits [
 	^64
 ]

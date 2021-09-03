@@ -229,7 +229,9 @@ class Object(__ObjectABC):
         Return this object's behavior as an (sub)instance
         of `_Object`.
         """
-        return self.__class__(self.small_header['behavior'].cast(Types.oop))
+        base = (int(self._oop) >> 32) << 32
+        offset = self.small_header['behavior']
+        return self.__class__((base+offset).cast(Types.oop))
 
     @property
     @cache

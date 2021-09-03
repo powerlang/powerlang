@@ -195,8 +195,8 @@ NativizationEnvironment >> methodNativizer [
 { #category : #services }
 NativizationEnvironment >> monomorphicCache [
 	| asm lookup next |
-	asm := TemplateAssemblerAMD64 new.
-	asm wordSize: abi wordSize.
+	asm := JITAssembler new.
+	abi assembler: asm.
 	lookup := asm newLabel.
 	asm
 		loadTwithAindex: 3;
@@ -214,6 +214,7 @@ NativizationEnvironment >> monomorphicCache [
 		jumpToMindex: 1;
 		applyFixups.
 	^ asm nativeCode code
+
 ]
 
 { #category : #services }
@@ -275,8 +276,8 @@ NativizationEnvironment >> optimizingNativizer [
 { #category : #services }
 NativizationEnvironment >> polymorphicCache [
 	| asm smi case2 case3 case4 case5 case6 case7 lookup |
-	asm := TemplateAssemblerAMD64 new.
-	asm wordSize: abi wordSize.
+	asm := JITAssembler new.
+	abi assembler: asm.
 	smi := asm newLabel.
 	case2 := asm newLabel.
 	case3 := asm newLabel.
@@ -331,6 +332,7 @@ NativizationEnvironment >> polymorphicCache [
 		jumpToMindex: 1;
 		applyFixups.
 	^ asm nativeCode code
+
 ]
 
 { #category : #accessing }

@@ -8,7 +8,7 @@ Class {
 	#instVars : [
 		'contents'
 	],
-	#category : #'Powerlang-Core-Assembler-Tools'
+	#category : #'Powerlang-Core-Assembler-Intel-Tools'
 }
 
 { #category : #accessing }

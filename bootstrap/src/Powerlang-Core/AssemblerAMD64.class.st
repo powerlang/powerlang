@@ -4,7 +4,7 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #AssemblerAMD64,
-	#superclass : #JITAssembler,
+	#superclass : #AssemblerBackend,
 	#instVars : [
 		'instruction',
 		'operands1',
@@ -12,12 +12,7 @@ Class {
 		'operands3',
 		'pointer',
 		'immediate',
-		'encoder',
-		'memory',
-		'labels'
-	],
-	#classVars : [
-		'IndexedLabels'
+		'encoder'
 	],
 	#pools : [
 		'Registers'
@@ -25,82 +20,51 @@ Class {
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
 
-{ #category : #initialization }
-AssemblerAMD64 class >> growIndexedLabelsTo: anInteger [
-	| new |
-	new := (IndexedLabels size + 1 to: anInteger)
-		collect: [:i | ('@' , i asString) asSymbol].
-	IndexedLabels := IndexedLabels , new
-]
-
-{ #category : #initialization }
-AssemblerAMD64 class >> initialize [
-	self initializeIndexedLabels
-	
-]
-
-{ #category : #initialization }
-AssemblerAMD64 class >> initializeIndexedLabels [
-	IndexedLabels := #().
-	self growIndexedLabelsTo: 100
-]
-
 { #category : #'instance creation' }
 AssemblerAMD64 class >> new [
-	^super new initialize
+	^ self basicNew initialize.
+
 ]
 
-{ #category : #labels }
-AssemblerAMD64 >> @ label [
-	self addLabel: label
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> add: src2 to: src1AndDst [
+	self assemble: 'add' with: src1AndDst with: src2
+
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> add: op1 to: op2 [
-	self assemble: 'add' with: op2 with: op1
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> addDouble: source1 to: source2andDest [
+	self 
+		assemble: 'addsd'
+		with: source2andDest
+		with: source1
+
 ]
 
-{ #category : #labels }
-AssemblerAMD64 >> addLabel: aString [
-	self addLabel: aString to: self currentAddress
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> addImm: imm to: src2AndDst [
+	self assemble: 'add' with: src2AndDst withImm: imm
 ]
 
-{ #category : #labels }
-AssemblerAMD64 >> addLabel: label to: location [
-	labels at: label put: location
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> and: src1AndDst with: source2 [
+	self assemble: 'and' with: src1AndDst with: source2
+
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> addressLength [
-	^wordSize * 8
-]
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> and: src1AndDst withImm: imm [
 
-{ #category : #accessing }
-AssemblerAMD64 >> addressSize [
-	^wordSize
-]
+	(imm between: -128 and: -1) ifTrue: [ 
+		"When `imm` is a small negative, we can safely
+		 and bits only in lower part of the 64 bit register
+		 since higher bits of immediate are all ones anyway.
+		 This helps to generate shorter code on x86."
+		self assemble: 'and' with: src1AndDst byte withImm: imm
+	] ifFalse: [
+		self assemble: 'and' with: src1AndDst withImm: imm
+	].
 
-{ #category : #alignment }
-AssemblerAMD64 >> alignTo: aNumber [
-	| current count |
-	current := memory position.
-	count := (current alignedTo: aNumber) - current.
-	self nop: count
-]
-
-{ #category : #services }
-AssemblerAMD64 >> and: op1 with: op2 [
-	self assemble: 'and' with: op1 with: op2
-]
-
-{ #category : #services }
-AssemblerAMD64 >> and: op1 withImm: op2 [
-	self assemble: 'and' with: op1 withImm: op2
-]
-
-{ #category : #relocation }
-AssemblerAMD64 >> applyFixups [
-	memory applyFixupsWith: self
 ]
 
 { #category : #basic }
@@ -207,17 +171,6 @@ index: index [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleAddress: mem [
-	| address |
-	address := mem isInteger ifTrue: [mem] ifFalse: [
-		memory addAbsoluteFixup: mem.
-		0].
-	wordSize = 8
-		ifTrue: [memory nextULargePut: address]
-		ifFalse: [memory nextULongPut: address]
-]
-
-{ #category : #basic }
 AssemblerAMD64 >> assembleByte: byte [
 	memory nextBytePut: byte
 ]
@@ -240,98 +193,143 @@ AssemblerAMD64 >> assembleBytes: value count: count [
 
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> assembly [
-	^memory bytes
-]
-
-{ #category : #storing }
-AssemblerAMD64 >> at: position putPointer: value [
-	| original |
-	original := memory position.
-	[
-		memory position: position.
-		wordSize = 8
-			ifTrue: [memory nextULargePut: value]
-			ifFalse: [memory nextULongPut: value]]
-		ensure: [memory position: original]
-]
-
-{ #category : #relocation }
-AssemblerAMD64 >> baseAddress [
-	^memory baseAddress
-]
-
-{ #category : #private }
-AssemblerAMD64 >> bitLengthOf: anInteger [
-	(anInteger between: -16r80 and: 16r7F) ifTrue: [^8].
-	(anInteger between: -16r8000 and: 16r7FFF) ifTrue: [^16].
-	(anInteger between: -16r80000000 and: 16r7FFFFFFF) ifTrue: [^32].
-	(anInteger between: -16r8000000000000000 and: 16r7FFFFFFFFFFFFFFF)
-		ifTrue: [^64].
-	(anInteger
-		between: -16r80000000000000000000000000000000
-		and: 16r7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
-		ifTrue: [^128].
-	^nil
-]
-
 { #category : #debugging }
 AssemblerAMD64 >> breakpoint [
 	self assemble: 'int' with: 3
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> bytes [
-	^memory bytes
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> call: srcReg [ 
+	self assemble: 'call' with: srcReg
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> callIndirect: aMemRef [
+	self assemble: 'call' with: aMemRef 
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> callIndirectReg: reg [
-	pointer reset; length: reg length; base: reg.
-	self assemble: 'call' with: pointer
+AssemblerAMD64 >> clearFPUFlags [
+	self assemble: 'fnclex'
 ]
 
-{ #category : #calls }
-AssemblerAMD64 >> callTo: label [
-	self jump: 'call' to: label size: 4
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> clearIntegerBit: op1 [
-	self and: op1 with: -2
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> codeSize [
-	^memory codeSize
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> clearHigh32: srcAndDstReg [
+	self assemble: 'mov' with: srcAndDstReg e with: srcAndDstReg e
 ]
 
 { #category : #services }
-AssemblerAMD64 >> compare: op1 with: op2 [
-	self assemble: 'cmp' with: op1 with: op2
+AssemblerAMD64 >> compare: reg1 with: reg2 [
+	self assemble: 'cmp' with: reg1 with: reg2
 ]
 
-{ #category : #integers }
-AssemblerAMD64 >> convertToNativeInteger: reg [
-	self assemble: 'sar' with: reg with: 1
+{ #category : #services }
+AssemblerAMD64 >> compare: reg1 withImm: imm [
+	#imm8.
+	#imm32.
+	self assemble: 'cmp' with: reg1 withImm: imm
 ]
 
-{ #category : #integers }
-AssemblerAMD64 >> convertToSmallInteger: reg [
+{ #category : #services }
+AssemblerAMD64 >> compare: reg1 withMem: aMemRef [
+	self assemble: 'cmp' with: reg1 with: aMemRef
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> compareEqualDoubleX0withAindirect [
+	pointer
+		reset;
+		length: 64;
+		base: self regA.
+	self 
+		assemble: 'cmpsd'
+		with: self regX0
+		with: pointer
+		with: 0
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
+	pointer
+		reset;
+		length: 64;
+		base: self regA.
 	self
-		assemble: 'sal' with: reg with: 1;
-		assemble: 'inc' with: reg
+		assemble: 'cmpsd'
+		with: self regX0
+		with: pointer
+		with: 1
 ]
 
-{ #category : #labels }
-AssemblerAMD64 >> currentAddress [
-	^memory currentAddress
+{ #category : #basic }
+AssemblerAMD64 >> convert: src toDouble: dst [
+	self assemble: 'cvtsi2sd' with: dst with: src
+]
+
+{ #category : #private }
+AssemblerAMD64 >> dec: srcAndDstReg [
+	self assemble: 'dec' with: srcAndDstReg
+]
+
+{ #category : #private }
+AssemblerAMD64 >> decMem: aMemRef [
+	self assemble: 'dec' with: aMemRef
+
+]
+
+{ #category : #services }
+AssemblerAMD64 >> disassembledText32 [
+	^self nativeCode disassembledText32
+]
+
+{ #category : #services }
+AssemblerAMD64 >> disassembledText64 [
+	^self nativeCode disassembledText64
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> divDouble: src1andDstReg by: src2reg [ 
+	self 
+		assemble: 'divsd'
+		with: src1andDstReg
+		with: src2reg
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+	| conversion |
+	self
+		ASSERT: srcAndDstReg r == rax;
+		ASSERT: extReg r == rdx.
+	conversion := wordSize = 8
+		ifTrue: [ 'cqo' ]
+		ifFalse: [ 'cdq' ].
+	self
+		assemble: conversion;
+		assemble: 'idiv' with: divisorReg
+]
+
+{ #category : #private }
+AssemblerAMD64 >> dropTopOfFPU [
+	"
+	fstp st(0)
+	"
+	self assembleBytes: #[16rDD 16rD8]
 ]
 
 { #category : #services }
 AssemblerAMD64 >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> exchange: srcAndDstReg withMem: aMemRef [
+	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
+]
+
+{ #category : #private }
+AssemblerAMD64 >> inc: srcAndDstReg [
+	self assemble: 'inc' with: srcAndDstReg
 ]
 
 { #category : #initialization }
@@ -344,8 +342,7 @@ AssemblerAMD64 >> initialize [
 	immediate := ISAImmediate new.
 	pointer := MemoryOperand new.
 	encoder := instruction encoder.
-	labels := Dictionary new: 100.
-	memory := RelocatableBuffer new
+
 ]
 
 { #category : #'private - jumps' }
@@ -360,11 +357,6 @@ AssemblerAMD64 >> jump: mnemonic to: label size: n [
 		skip: n negated;
 		addRelativeFixup: label size: n;
 		position: end
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> jumpIfBelowOrEqualTo: label [
-	self nearJump: 'jbe' to: label
 ]
 
 { #category : #jumps }
@@ -393,18 +385,8 @@ AssemblerAMD64 >> jumpIfLessSignedTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfNotCarryTo: label [
-	self nearJump: 'jnc' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> jumpIfNotEqualTo: label [
 	self nearJump: 'jnz' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> jumpIfNotOverflowTo: label [
-	self nearJump: 'jno' to: label
 ]
 
 { #category : #jumps }
@@ -427,30 +409,19 @@ AssemblerAMD64 >> jumpIfZeroTo: label [
 	self jumpIfEqualTo: label
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> jumpOver: aBlock [
-	| label |
-	label := self newLabel.
-	self jumpTo: label.
-	aBlock value.
-	self @ label
-]
-
 { #category : #jumps }
 AssemblerAMD64 >> jumpTo: label [
 	self nearJump: 'jmp' to: label
 ]
 
-{ #category : #jumps }
-AssemblerAMD64 >> jumpToReg: reg [
-	self assemble: 'jmp' with: reg
+{ #category : #loading }
+AssemblerAMD64 >> jumpToMem: aMemRef [ 
+	self assemble: 'jmp' with: aMemRef
 ]
 
-{ #category : #integers }
-AssemblerAMD64 >> lastEmittedPointer [
-	| patch |
-	patch := self currentAddress.
-	^patch - wordSize
+{ #category : #basic }
+AssemblerAMD64 >> lea: dstReg withMem: srcMemRef [
+	self assemble: 'lea' with: dstReg with: srcMemRef
 ]
 
 { #category : #integers }
@@ -469,38 +440,83 @@ AssemblerAMD64 >> leadingRzeroCount [
 		writeByte: 16r48 at: pos + 1
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> load: reg1 from: reg2 atIndex: index [
-	| offset |
-	offset := reg1 offsetOfIndex: index.
+{ #category : #basic }
+AssemblerAMD64 >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+	self assemble: 'cvttsd2si' with: dstReg with: srcMemRef
+]
+
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
+	| adjusted |
+	adjusted := dstReg forLength: srcMemRef length.
+	self
+		assemble: 'mov'
+		with: adjusted
+		with: srcMemRef
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> load: dstReg withTIBat: indexReg [
+	| seg |
+	seg := wordSize = 8
+		ifTrue: [ gs ]
+		ifFalse: [ fs ].
 	pointer
 		reset;
-		length: reg1 length;
-		base: reg2;
-		displacement: offset.
-	self assemble: 'mov' with: reg1 with: pointer
+		length: self addressLength;
+		index: indexReg; 
+		scale: wordSize;
+		segment: seg.
+	self assemble: 'mov' with: dstReg with: pointer
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> load: reg1 from: reg2 atIndexAt: reg3 [
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> load: dstReg withThreadVariableAt: indexReg [
 	pointer
 		reset;
-		length: reg1 length;
-		base: reg2;
-		index: reg3;
-		scale: reg1 sizeInBytes;
-		displacement: 0 - reg1 sizeInBytes.
-	self assemble: 'mov' with: reg1 with: pointer
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize.
+	wordSize = 8
+		ifTrue: [ pointer
+				segment: gs;
+				displacement: 16r1480 ]
+		ifFalse: [ pointer
+				segment: fs;
+				displacement: 16rE10 ].
+	self assemble: 'mov' with: dstReg with: pointer
 ]
 
-{ #category : #jumps }
-AssemblerAMD64 >> load: reg withImmediate: imm [
-	self assemble: 'mov' with: reg with: imm
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> loadDouble: dstReg fromMem: srcMemRef [
+	self ASSERT: srcMemRef sizeInBits == 64.
+	self 
+		assemble: 'movq'
+		with: dstReg
+		with: srcMemRef
+
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndex: index [
-	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
+{ #category : #accessing }
+AssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
+	| instsize |
+	#dontOptimize.
+	instsize := 6.
+	pointer
+		reset;
+		length: 32;
+		base: self regIP;
+		displacement: anInteger - instsize.
+	self assemble: 'mov' with: self regM e with: pointer
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> loadMXCSRfromA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'ldmxcsr' with: pointer
 ]
 
 { #category : #storing }
@@ -515,6 +531,11 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
 ]
 
 { #category : #storing }
+AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexImm: index [
+	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
+]
+
+{ #category : #storing }
 AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 	pointer
 		reset;
@@ -524,30 +545,82 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 	self assemble: 'movzx' with: reg1 with: pointer
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> move: reg2 to: reg1 [
-	self ASSERT: (reg2 class = Register and: [reg1 class = Register]).
-	self assemble: 'mov' with: reg1 with: reg2
+{ #category : #basic }
+AssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
+	pointer
+		reset;
+		length: 16;
+		base: self regR;
+		displacement: offset.
+	self assemble: 'movzx' with: self regR with: pointer
 ]
 
-{ #category : #'private - jumps' }
-AssemblerAMD64 >> nativeCode [
-	^ NativeCode new code: memory bytes
+{ #category : #basic }
+AssemblerAMD64 >> lock [
+	self assembleByte: 16rF0
+]
+
+{ #category : #memory }
+AssemblerAMD64 >> memRef [
+	^ MemoryOperand new
+		length: self addressBitSize
+]
+
+{ #category : #services }
+AssemblerAMD64 >> move: srcReg to: dstReg [
+	self ASSERT: (srcReg class = Register and: [dstReg class = Register]).
+	self assemble: 'mov' with: dstReg with: srcReg
+
+]
+
+{ #category : #services }
+AssemblerAMD64 >> moveImm: imm to: dstReg [
+	self ASSERT: (imm isInteger and: [dstReg class = Register]).
+	self assemble: 'mov' with: dstReg with: imm
+
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> moveTslots [
+	| rep mnemonic |
+	rep := 16rF3.
+	mnemonic := wordSize = 8
+		ifTrue: [ 'movsq' ]
+		ifFalse: [ 'movsd' ].
+	self
+		assembleByte: rep;
+		assemble: mnemonic
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> moveX: srcReg into: dstReg [
+	| mov |
+	mov := wordSize = 8
+		ifTrue: [ 'movq' ]
+		ifFalse: [ 'movd' ].
+
+	self assemble: mov with: dstReg with: srcReg
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> mulDouble: src1andDstReg by: src2reg [ 
+	self 
+		assemble: 'mulsd'
+		with: src1andDstReg
+		with: src2reg
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+	self
+		ASSERT: src1AndDstLoReg r == rax;
+		ASSERT: dstHiReg r == rdx.
+	self assemble: 'imul' with: src2reg
 ]
 
 { #category : #'private - jumps' }
 AssemblerAMD64 >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> newLabel [
-	| label next |
-	next := labels size + 1.
-	IndexedLabels size < next ifTrue: [self class growIndexedLabelsTo: next].
-	label := IndexedLabels at: next.
-	self addLabel: label to: nil.
-	^label
 ]
 
 { #category : #alignment }
@@ -612,22 +685,40 @@ AssemblerAMD64 >> nop: count [
 	r = 4 ifTrue: [^self nop4].
 	r = 3 ifTrue: [^self nop3].
 	r = 2 ifTrue: [^self nop2].
-	^self nop
+	r = 1 ifTrue: [^self nop].
+
 ]
 
-{ #category : #calls }
-AssemblerAMD64 >> offsetOfIndex: index [
-	^index - 1 * wordSize
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> or: src1AndDst with: src2 [
+	self assemble: 'or' with: src1AndDst with: src2
+
 ]
 
-{ #category : #services }
-AssemblerAMD64 >> or: op1 with: op2 [
-	self assemble: 'or' with: op1 with: op2
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> or: src1AndDst withImm: imm [
+
+	(imm between: 0 and: 127) ifTrue: [ 
+		"When `imm` is a small POSITIVE, we can safely
+		 or bits only in lower part of the 64 bit register
+		 since higher bits of immediate are all zeros anyway.
+		 This helps to generate shorter code on x86."
+		self assemble: 'or' with: src1AndDst byte withImm: imm
+	] ifFalse: [
+		self assemble: 'or' with: src1AndDst withImm: imm
+	].
+
 ]
 
 { #category : #private }
-AssemblerAMD64 >> pop: op1 [
-	self assemble: 'pop' with: op1
+AssemblerAMD64 >> pop: dstReg [
+	self assemble: 'pop' with: dstReg
+
+]
+
+{ #category : #private }
+AssemblerAMD64 >> popIntoMem: dstMemRef [
+	self assemble: 'pop' with: dstMemRef
 ]
 
 { #category : #private }
@@ -637,36 +728,124 @@ AssemblerAMD64 >> printOn: aStream [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> push: op1 [
-	self assemble: 'push' with: op1
-]
+AssemblerAMD64 >> push: srcReg [
+	self assemble: 'push' with: srcReg
 
-{ #category : #storing }
-AssemblerAMD64 >> putPointer: oop at: position [
-	| original |
-	original := memory position.
-	[
-		memory position: position.
-		wordSize = 8
-			ifTrue: [memory nextULargePut: oop]
-			ifFalse: [memory nextULongPut: oop]]
-		ensure: [memory position: original]
 ]
 
 { #category : #private }
+AssemblerAMD64 >> pushAOnFPUStack [
+	pointer reset; length: 64; base: self regA.
+	self assemble: 'fld' with: pointer
+]
+
+{ #category : #'push/pop' }
+AssemblerAMD64 >> pushImm: imm [
+	#imm8.
+	#imm32.
+	self assemble: 'push' withImm: imm
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> pushMem: aMemRef [
+	self push: aMemRef
+]
+
+{ #category : #private }
+AssemblerAMD64 >> pushROnFPUStack [
+	pointer reset; length: 64; base: self regR.
+	self assemble: 'fld' with: pointer
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> readFPUStatusOnA [
+	pointer
+		reset;
+		length: 16;
+		base: self regA.
+	self assemble: 'fstsw' with: pointer
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regA [
+	^wordSize = 8 ifTrue: [rdx] ifFalse: [edx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regE [
+	^wordSize = 8 ifTrue: [rdi] ifFalse: [edi]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regFP [
+	^wordSize = 8 ifTrue: [rbp] ifFalse: [ebp]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regFalse [
+	^ r14
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regG [
+	^r15
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regIP [
+	^ rip
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regM [
+	^rbx
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regNil [
+	^ r12
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regR [
+	^wordSize = 8 ifTrue: [rax] ifFalse: [eax]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regS [
+	^wordSize = 8 ifTrue: [rsi] ifFalse: [esi]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regSP [
+	^wordSize = 8 ifTrue: [rsp] ifFalse: [esp]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regT [
+	^wordSize = 8 ifTrue: [rcx] ifFalse: [ecx]
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regTrue [
+	^ r13
+]
+
+{ #category : #'registers - IR' }
 AssemblerAMD64 >> regV [
 	^r11
 ]
 
-{ #category : #relocation }
-AssemblerAMD64 >> relocateTo: address [
-	| delta |
-	delta := address - self baseAddress.
-	labels
-		keysAndValuesDo: [:label :location | labels
-			at: label
-			put: location + delta].
-	memory relocateTo: address with: self
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regX0 [
+	^xmm0
+
+]
+
+{ #category : #'registers - IR' }
+AssemblerAMD64 >> regX1 [
+	^xmm1
+
 ]
 
 { #category : #accessing }
@@ -706,17 +885,6 @@ AssemblerAMD64 >> renameRegisterPreserving: preserved1 preserving: preserved2 [
 	^self regR
 ]
 
-{ #category : #initialization }
-AssemblerAMD64 >> reset [
-	labels := Dictionary new: 100.
-	memory reset
-]
-
-{ #category : #labels }
-AssemblerAMD64 >> resolveLabel: aString [
-	^labels at: aString ifAbsent: [self addressOfExternal: aString]
-]
-
 { #category : #calls }
 AssemblerAMD64 >> return [
 	self assemble: 'ret'
@@ -729,33 +897,64 @@ AssemblerAMD64 >> return: anInteger [
 		ifFalse: [self assemble: 'ret' with: anInteger * self addressSize]
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> rotateLeft: op1 count: count [
-	self ASSERT: count < 32.
-	self assemble: 'rol' with: op1 with: count
+{ #category : #basic }
+AssemblerAMD64 >> roundDouble: srcReg into: dstReg [ 
+	self 
+		assemble: 'roundsd'
+		with: dstReg
+		with: srcReg
+		with: 3
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> rotateRight: op1 count: count [
-	self ASSERT: count < 32.
-	self assemble: 'ror' with: op1 with: count
+AssemblerAMD64 >> scaleFloatOnRWithA [
+	self
+		pushAOnFPUStack;
+		pushROnFPUStack;
+		assemble: 'fscale'.
+	pointer
+		reset;
+		length: 64;
+		base: self regR.
+	self
+		assemble: 'fstp' with: pointer;
+		dropTopOfFPU
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftLeft: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sal' with: srcAndDst with: countReg b
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftLeft: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'sal' with: srcAndDst withImm: count
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> setIntegerBit: op1 [
-	self assemble: 'or' with: op1 with: 1
+AssemblerAMD64 >> shiftRight: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sar' with: srcAndDst with: countReg b
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> shiftLeft: op1 by: count [
-	self ASSERT: count < 32.
-	self assemble: 'sal' with: op1 with: count
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRight: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'shr' with: srcAndDst withImm: count
 ]
 
-{ #category : #accessing }
-AssemblerAMD64 >> shiftRight: op1 by: op2 [
-	self ASSERT: (op2 isInteger not or: [op2 < op1 length]).
-	self assemble: 'sar' with: op1 with: op2
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRightArithmetic: srcAndDst by: countReg [
+	self ASSERT: countReg r = rcx.
+	self assemble: 'sar' with: srcAndDst with: countReg b
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> shiftRightArithmetic: srcAndDst byImm: count [
+	self ASSERT: (count between: 0 and: srcAndDst length - 1).
+	self assemble: 'sar' with: srcAndDst withImm: count
 ]
 
 { #category : #'private - jumps' }
@@ -774,16 +973,6 @@ AssemblerAMD64 >> shortJumpIfEqualTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfLessOrEqualSignedTo: label [
-	self shortJump: 'jle' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfLessSignedTo: label [
-	self shortJump: 'jl' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]
@@ -794,37 +983,8 @@ AssemblerAMD64 >> shortJumpIfNotEqualTo: label [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotOverflowTo: label [
-	self shortJump: 'jno' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotZeroTo: label [
-	self shortJumpIfNotEqualTo: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfOverflowTo: label [
-	self shortJump: 'jo' to: label
-]
-
-{ #category : #jumps }
 AssemblerAMD64 >> shortJumpIfSignTo: label [
 	self shortJump: 'js' to: label
-]
-
-{ #category : #jumps }
-AssemblerAMD64 >> shortJumpIfZeroTo: label [
-	self shortJumpIfEqualTo: label
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> shortJumpOver: aBlock [
-	| label |
-	label := self newLabel.
-	self shortJumpTo: label.
-	aBlock value.
-	self @ label
 ]
 
 { #category : #jumps }
@@ -832,33 +992,54 @@ AssemblerAMD64 >> shortJumpTo: label [
 	self shortJump: 'jmp' to: label
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> store: reg1 in: reg2 index: index [
-	| offset |
-	offset := reg1 offsetOfIndex: index.
-	pointer
-		reset;
-		length: reg1 length;
-		base: reg2;
-		displacement: offset.
-	self assemble: 'mov' with: pointer with: reg1
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> sqrtDouble: srcReg into: dstReg [
+	self 
+		assemble: 'sqrtsd'
+		with: srcReg
+		with: dstReg
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> store: op1 in: reg2 indexAt: reg3 [
-	pointer
-		reset;
-		length: op1 length;
-		base: reg2;
-		index: reg3;
-		scale: op1 sizeInBytes;
-		displacement: 0 - op1 sizeInBytes.
-	self assemble: 'mov' with: pointer with: op1
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
+	| adjusted |
+	adjusted := srcReg forLength: dstMemRef length.
+	self
+		assemble: 'mov'
+		with: dstMemRef
+		with: adjusted
 ]
 
-{ #category : #storing }
-AssemblerAMD64 >> storeByte: value in: reg2 index: index [
-	self storeByte: value in: reg2 offset: index - 1
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> store: srcReg intoTIBat: indexReg [
+	| seg |
+	seg := wordSize = 8
+		ifTrue: [ gs ]
+		ifFalse: [ fs ].
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize;
+		segment: seg.
+	self assemble: 'mov' with: pointer with: srcReg
+]
+
+{ #category : #basic }
+AssemblerAMD64 >> store: srcReg intoThreadVariableAt: indexReg [
+	pointer
+		reset;
+		length: self addressLength;
+		index: indexReg;
+		scale: wordSize.
+	wordSize = 8
+		ifTrue: [ pointer
+				segment: gs;
+				displacement: 16r1480 ]
+		ifFalse: [ pointer
+				segment: fs;
+				displacement: 16rE10 ].
+	self assemble: 'mov' with: pointer with: srcReg
 ]
 
 { #category : #storing }
@@ -871,14 +1052,89 @@ AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 	self assemble: 'mov' with: pointer with: byte
 ]
 
-{ #category : #initialization }
-AssemblerAMD64 >> stream [
-	^memory stream
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> storeDouble: srcReg intoMem: dstMemRef [
+	self ASSERT: dstMemRef sizeInBits == 64.
+	self 
+		assemble: 'movq'
+		with: dstMemRef
+		with: srcReg
+
+]
+
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> storeDoubleResultIntoMem: dstMemRef [
+	wordSize = 8
+		ifTrue:
+			[ self assemble: 'movq' with: dstMemRef  with: self regX0 ]
+		ifFalse: [ self assemble: 'fstp' with: dstMemRef ]
+]
+
+{ #category : #'memory - load / store' }
+AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
+	self
+		assemble: 'mov'
+		with: dstMemRef
+		withImm: imm
+
+]
+
+{ #category : #accessing }
+AssemblerAMD64 >> storeMXCSRintoA [
+	pointer
+		reset;
+		length: 32;
+		base: self regA.
+	self assemble: 'stmxcsr' with: pointer
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> sub: src1 from: src2AndDst [
+	self assemble: 'sub' with: src2AndDst with:  src1
+
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> subDouble: src1 from: src2AndDst [ 
+	self 
+		assemble: 'subsd'
+		with: src2AndDst
+		with: src1
+]
+
+{ #category : #'operations - arithmetic' }
+AssemblerAMD64 >> subImm: imm from: srcAndDst [
+	self assemble: 'sub' with: srcAndDst withImm: imm
+
+]
+
+{ #category : #'to-cleanup' }
+AssemblerAMD64 >> subTslotsToSP [
+	self assemble: 'neg' with: self regT.
+	pointer
+		reset;
+		length: self addressLength;
+		base: self regSP;
+		index: self regT;
+		scale: self regSP sizeInBytes.
+	self
+		assemble: 'lea' with: self regSP with: pointer;
+		assemble: 'neg' with: self regT
 ]
 
 { #category : #services }
 AssemblerAMD64 >> subtract: op1 from: op2 [
 	self assemble: 'sub' with: op2 with: op1
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> test: src1Reg with: src2Reg [
+	self assemble: 'test' with: src1Reg with: src2Reg
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> test: srcReg withImm: imm [
+	self assemble: 'test' with: srcReg with: imm
 ]
 
 { #category : #services }
@@ -899,4 +1155,22 @@ AssemblerAMD64 >> wordSize: anInteger [
 { #category : #accessing }
 AssemblerAMD64 >> wordSizeShift [
 	^wordSize = 8 ifTrue: [3] ifFalse: [2]
+]
+
+{ #category : #'to-cleanup' }
+AssemblerAMD64 >> writeTslots [
+	| rep mnemonic |
+	rep := 16rF3.
+	mnemonic := wordSize = 8
+		ifTrue: [ 'stosq' ]
+		ifFalse: [ 'stosd' ].
+	self
+		assembleByte: rep;
+		assemble: mnemonic
+]
+
+{ #category : #'operations - logical' }
+AssemblerAMD64 >> xor: src1AndDst with: src2 [
+	self assemble: 'xor' with: src1AndDst with: src2
+
 ]
