@@ -266,12 +266,12 @@ AssemblerAMD64 >> convert: src toDouble: dst [
 	self assemble: 'cvtsi2sd' with: dst with: src
 ]
 
-{ #category : #private }
+{ #category : #basic }
 AssemblerAMD64 >> dec: srcAndDstReg [
 	self assemble: 'dec' with: srcAndDstReg
 ]
 
-{ #category : #private }
+{ #category : #basic }
 AssemblerAMD64 >> decMem: aMemRef [
 	self assemble: 'dec' with: aMemRef
 
@@ -309,7 +309,7 @@ AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 		assemble: 'idiv' with: divisorReg
 ]
 
-{ #category : #private }
+{ #category : #basic }
 AssemblerAMD64 >> dropTopOfFPU [
 	"
 	fstp st(0)
@@ -327,7 +327,7 @@ AssemblerAMD64 >> exchange: srcAndDstReg withMem: aMemRef [
 	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
 ]
 
-{ #category : #private }
+{ #category : #basic }
 AssemblerAMD64 >> inc: srcAndDstReg [
 	self assemble: 'inc' with: srcAndDstReg
 ]
@@ -566,14 +566,27 @@ AssemblerAMD64 >> memRef [
 		length: self addressBitSize
 ]
 
-{ #category : #services }
+{ #category : #basic }
 AssemblerAMD64 >> move: srcReg to: dstReg [
 	self ASSERT: (srcReg class = Register and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: srcReg
 
 ]
 
-{ #category : #services }
+{ #category : #basic }
+AssemblerAMD64 >> moveDouble: srcReg into: dstReg [ 
+	| mov |
+
+	mov := wordSize = 8 ifTrue: [
+			'movq'
+		] ifFalse: [ 'movd' ].
+	self 
+		assemble: mov
+		with: dstReg
+		with: srcReg
+]
+
+{ #category : #basic }
 AssemblerAMD64 >> moveImm: imm to: dstReg [
 	self ASSERT: (imm isInteger and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: imm
@@ -590,16 +603,6 @@ AssemblerAMD64 >> moveTslots [
 	self
 		assembleByte: rep;
 		assemble: mnemonic
-]
-
-{ #category : #basic }
-AssemblerAMD64 >> moveX: srcReg into: dstReg [
-	| mov |
-	mov := wordSize = 8
-		ifTrue: [ 'movq' ]
-		ifFalse: [ 'movd' ].
-
-	self assemble: mov with: dstReg with: srcReg
 ]
 
 { #category : #basic }
@@ -710,30 +713,30 @@ AssemblerAMD64 >> or: src1AndDst withImm: imm [
 
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> pop: dstReg [
 	self assemble: 'pop' with: dstReg
 
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> popIntoMem: dstMemRef [
 	self assemble: 'pop' with: dstMemRef
 ]
 
-{ #category : #private }
+{ #category : #'printing & storing' }
 AssemblerAMD64 >> printOn: aStream [
 	aStream print: self class; cr; cr;
 		nextPutAll: memory bytes disassembledAmd64
 ]
 
-{ #category : #accessing }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> push: srcReg [
 	self assemble: 'push' with: srcReg
 
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> pushAOnFPUStack [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'fld' with: pointer
@@ -746,12 +749,12 @@ AssemblerAMD64 >> pushImm: imm [
 	self assemble: 'push' withImm: imm
 ]
 
-{ #category : #accessing }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> pushMem: aMemRef [
 	self push: aMemRef
 ]
 
-{ #category : #private }
+{ #category : #'push/pop' }
 AssemblerAMD64 >> pushROnFPUStack [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'fld' with: pointer
@@ -1120,11 +1123,6 @@ AssemblerAMD64 >> subTslotsToSP [
 	self
 		assemble: 'lea' with: self regSP with: pointer;
 		assemble: 'neg' with: self regT
-]
-
-{ #category : #services }
-AssemblerAMD64 >> subtract: op1 from: op2 [
-	self assemble: 'sub' with: op2 with: op1
 ]
 
 { #category : #'operations - logical' }

@@ -89,7 +89,7 @@ AssemblerBackend >> bytes [
 	^memory bytes
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> call: srcReg [ 
 	self subclassResponsibility
 ]
@@ -134,12 +134,12 @@ AssemblerBackend >> currentAddress [
 	^memory currentAddress
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> dec: srcAndDstReg [ 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> decMem: aMemRef [ 
 	self subclassResponsibility
 ]
@@ -159,7 +159,7 @@ AssemblerBackend >> exchange: srcAndDstReg withMem: aMemRef [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> inc: srcAndDstReg [ 
 	self subclassResponsibility
 ]
@@ -391,18 +391,25 @@ AssemblerBackend >> memory [
 	^memory
 ]
 
-{ #category : #alignment }
+{ #category : #services }
+AssemblerBackend >> move: srcReg to: dstReg [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #basic }
+AssemblerBackend >> moveDouble: srcReg into: dstReg [ 
+	"move from X-type register srcReg into general purpose dstReg"
+	
+	self subclassResponsibility
+]
+
+{ #category : #basic }
 AssemblerBackend >> moveImm: imm to: dstReg [
 	"Load constant to register `dstImm`"
 
 	self subclassResponsibility
 
-]
-
-{ #category : #alignment }
-AssemblerBackend >> moveX: srcReg into: dstReg [
-	"move from X-type register srcReg into general purpose dstReg"
-	self subclassResponsibility
 ]
 
 { #category : #basic }
@@ -425,24 +432,42 @@ AssemblerBackend >> or: src1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'push/pop' }
+AssemblerBackend >> pop: dstReg [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'push/pop' }
 AssemblerBackend >> popIntoMem: dstMemRef [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'push/pop' }
 AssemblerBackend >> push: srcReg [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'push/pop' }
+AssemblerBackend >> pushAOnFPUStack [
+	^ self subclassResponsibility
+
+]
+
+{ #category : #'push/pop' }
 AssemblerBackend >> pushImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #'push/pop' }
 AssemblerBackend >> pushMem: aMemRef [
 	self subclassResponsibility
+]
+
+{ #category : #'push/pop' }
+AssemblerBackend >> pushROnFPUStack [
+	^ self subclassResponsibility
+
 ]
 
 { #category : #'registers - IR' }
@@ -589,17 +614,17 @@ AssemblerBackend >> stream [
 	^memory stream
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> sub: src1 from: src2AndDst [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> subDouble: src1 from: src2AndDst [ 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : #basic }
 AssemblerBackend >> subImm: imm from: srcAndDst [
 	self subclassResponsibility
 ]

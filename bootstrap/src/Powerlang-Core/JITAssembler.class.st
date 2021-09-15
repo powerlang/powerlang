@@ -1356,7 +1356,7 @@ JITAssembler >> moveTslots [
 
 { #category : #'floting point' }
 JITAssembler >> moveX0toR [
-	backend moveX: backend regX0 into: backend regR
+	backend moveDouble: backend regX0 into: backend regR
 ]
 
 { #category : #'floting point' }
