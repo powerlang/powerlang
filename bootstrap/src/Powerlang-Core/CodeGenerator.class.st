@@ -1,5 +1,5 @@
 Class {
-	#name : #AssemblerBackend,
+	#name : #CodeGenerator,
 	#superclass : #Object,
 	#instVars : [
 		'wordSize',
@@ -9,33 +9,33 @@ Class {
 }
 
 { #category : #basic }
-AssemblerBackend >> add: source1 to: source2andDest [
+CodeGenerator >> add: source1 to: source2andDest [
 	self subclassResponsibility
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerBackend >> addDouble: source1 to: source2andDest [
+CodeGenerator >> addDouble: source1 to: source2andDest [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> addImm: imm to: dest [
+CodeGenerator >> addImm: imm to: dest [
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-AssemblerBackend >> addressBitSize [
+CodeGenerator >> addressBitSize [
 	^self addressSize * 8
 
 ]
 
 { #category : #accessing }
-AssemblerBackend >> addressLength [
+CodeGenerator >> addressLength [
 	^wordSize * 8
 ]
 
 { #category : #accessing }
-AssemblerBackend >> addressSize [
+CodeGenerator >> addressSize [
 	"Return the size of address in bytes, e.g, 4 for 32bit archs
 	 and 8 for 64bit archs"
 
@@ -43,7 +43,7 @@ AssemblerBackend >> addressSize [
 ]
 
 { #category : #alignment }
-AssemblerBackend >> alignTo: aNumber [
+CodeGenerator >> alignTo: aNumber [
 	| current count |
 	current := memory position.
 	count := (current alignedTo: aNumber) - current.
@@ -51,22 +51,22 @@ AssemblerBackend >> alignTo: aNumber [
 ]
 
 { #category : #basic }
-AssemblerBackend >> and: source1andDest with: source2 [
+CodeGenerator >> and: source1andDest with: source2 [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> and: source1andDest withImm: imm [
+CodeGenerator >> and: source1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
 { #category : #relocation }
-AssemblerBackend >> baseAddress [
+CodeGenerator >> baseAddress [
 	^memory baseAddress
 ]
 
 { #category : #private }
-AssemblerBackend >> bitLengthOf: anInteger [
+CodeGenerator >> bitLengthOf: anInteger [
 	(anInteger between: -16r80 and: 16r7F) ifTrue: [^8].
 	(anInteger between: -16r8000 and: 16r7FFF) ifTrue: [^16].
 	(anInteger between: -16r80000000 and: 16r7FFFFFFF) ifTrue: [^32].
@@ -80,117 +80,117 @@ AssemblerBackend >> bitLengthOf: anInteger [
 ]
 
 { #category : #basic }
-AssemblerBackend >> breakpoint [
+CodeGenerator >> breakpoint [
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-AssemblerBackend >> bytes [
+CodeGenerator >> bytes [
 	^memory bytes
 ]
 
 { #category : #basic }
-AssemblerBackend >> call: srcReg [ 
+CodeGenerator >> call: srcReg [ 
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-AssemblerBackend >> callIndirect: aMemRef [ 
+CodeGenerator >> callIndirect: aMemRef [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> clearHigh32: srcAndDstReg [
+CodeGenerator >> clearHigh32: srcAndDstReg [
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-AssemblerBackend >> codeSize [
+CodeGenerator >> codeSize [
 	^memory codeSize
 ]
 
 { #category : #basic }
-AssemblerBackend >> compare: reg1 with: reg2 [
+CodeGenerator >> compare: reg1 with: reg2 [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> compare: reg1 withImm: imm [
+CodeGenerator >> compare: reg1 withImm: imm [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> compare: reg1 withMem: aMemRef [
+CodeGenerator >> compare: reg1 withMem: aMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> convert: src toDouble: dst [
+CodeGenerator >> convert: src toDouble: dst [
 	self subclassResponsibility
 ]
 
 { #category : #labels }
-AssemblerBackend >> currentAddress [
+CodeGenerator >> currentAddress [
 	^memory currentAddress
 ]
 
 { #category : #basic }
-AssemblerBackend >> dec: srcAndDstReg [ 
+CodeGenerator >> dec: srcAndDstReg [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> decMem: aMemRef [ 
+CodeGenerator >> decMem: aMemRef [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> divDouble: src1andDstReg by: src2reg [ 
+CodeGenerator >> divDouble: src1andDstReg by: src2reg [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+CodeGenerator >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> exchange: srcAndDstReg withMem: aMemRef [
+CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> inc: srcAndDstReg [ 
+CodeGenerator >> inc: srcAndDstReg [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> initialize [
+CodeGenerator >> initialize [
 	memory := RelocatableBuffer new.
 ]
 
 { #category : #basic }
-AssemblerBackend >> jumpTo: label [
+CodeGenerator >> jumpTo: label [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> jumpToMem: aMemRef [
+CodeGenerator >> jumpToMem: aMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> lea: dstReg withMem: srcMemRef [
+CodeGenerator >> lea: dstReg withMem: srcMemRef [
 	^self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+CodeGenerator >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> load: dstReg fromMem: srcMemRef [
+CodeGenerator >> load: dstReg fromMem: srcMemRef [
 	"Load `dstReg` from memory location `srcMemRef`.
 	 The size of data loaded is specified in `srcMemRef`.
 
@@ -209,29 +209,29 @@ AssemblerBackend >> load: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #basic }
-AssemblerBackend >> load: dstReg withTIBat: indexReg [
+CodeGenerator >> load: dstReg withTIBat: indexReg [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> load: dstReg withThreadVariableAt: indexReg [
+CodeGenerator >> load: dstReg withThreadVariableAt: indexReg [
 	self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> loadDouble: dstReg fromMem: srcMemRef [ 
+CodeGenerator >> loadDouble: dstReg fromMem: srcMemRef [ 
 	"Load 64-bit floating point `dstReg` from memory location `srcMemRef`"
 	
 	^ self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef [
+CodeGenerator >> memRef [
 	self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef16 [
+CodeGenerator >> memRef16 [
 	"Return clean instance of memory reference."
 
 	^ self memRef length: 16; yourself
@@ -239,7 +239,7 @@ AssemblerBackend >> memRef16 [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef16: baseReg offset: offsetReg [
+CodeGenerator >> memRef16: baseReg offset: offsetReg [
 	^ self memRef16
 		base: baseReg;
 		index: offsetReg;
@@ -248,7 +248,7 @@ AssemblerBackend >> memRef16: baseReg offset: offsetReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef16: baseReg offsetImm: offsetImm [
+CodeGenerator >> memRef16: baseReg offsetImm: offsetImm [
 	^ self memRef16
 		base: baseReg;
 		displacement: offsetImm;
@@ -256,7 +256,7 @@ AssemblerBackend >> memRef16: baseReg offsetImm: offsetImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef32 [
+CodeGenerator >> memRef32 [
 	"Return clean instance of memory reference."
 
 	^ self memRef length: 32; yourself
@@ -264,7 +264,7 @@ AssemblerBackend >> memRef32 [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef32: baseReg index: indexReg [
+CodeGenerator >> memRef32: baseReg index: indexReg [
 	^ self memRef32 
 		base: baseReg; 
 		displacement: -4;
@@ -275,7 +275,7 @@ AssemblerBackend >> memRef32: baseReg index: indexReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef32: baseReg indexImm: indexImm [
+CodeGenerator >> memRef32: baseReg indexImm: indexImm [
 	^ self memRef32 
 		base: baseReg; 
 		displacement: (indexImm - 1) * 4;
@@ -284,7 +284,7 @@ AssemblerBackend >> memRef32: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef32: baseReg offset: offsetReg [
+CodeGenerator >> memRef32: baseReg offset: offsetReg [
 	^ self memRef32
 		base: baseReg;
 		index: offsetReg;
@@ -293,7 +293,7 @@ AssemblerBackend >> memRef32: baseReg offset: offsetReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef64 [
+CodeGenerator >> memRef64 [
 	"Return clean instance of memory reference."
 
 	^ self memRef length: 64; yourself
@@ -301,7 +301,7 @@ AssemblerBackend >> memRef64 [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef64: baseReg indexImm: indexImm [
+CodeGenerator >> memRef64: baseReg indexImm: indexImm [
 	^ self memRef64
 		base: baseReg;
 		displacement: (indexImm - 1) * 8;
@@ -309,7 +309,7 @@ AssemblerBackend >> memRef64: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef8 [
+CodeGenerator >> memRef8 [
 	"Return clean instance of memory reference."
 
 	^ self memRef length: 8; yourself
@@ -317,7 +317,7 @@ AssemblerBackend >> memRef8 [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef8: baseReg index: indexReg [
+CodeGenerator >> memRef8: baseReg index: indexReg [
 	^ self memRef8 
 		base: baseReg; 
 		displacement: -1;
@@ -328,7 +328,7 @@ AssemblerBackend >> memRef8: baseReg index: indexReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef8: baseReg indexImm: indexImm [
+CodeGenerator >> memRef8: baseReg indexImm: indexImm [
 	^ self memRef8
 		base: baseReg; 
 		displacement: (indexImm - 1);
@@ -337,7 +337,7 @@ AssemblerBackend >> memRef8: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef: baseReg index: indexRef [
+CodeGenerator >> memRef: baseReg index: indexRef [
 	^ self memRef 
 		base: baseReg; 
 		displacement: self addressSize negated;
@@ -348,7 +348,7 @@ AssemblerBackend >> memRef: baseReg index: indexRef [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef: baseReg index: indexRef offsetImm: anInteger [
+CodeGenerator >> memRef: baseReg index: indexRef offsetImm: anInteger [
 	^ self memRef 
 		base: baseReg; 
 		displacement: anInteger;
@@ -359,7 +359,7 @@ AssemblerBackend >> memRef: baseReg index: indexRef offsetImm: anInteger [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef: baseReg indexImm: indexImm [
+CodeGenerator >> memRef: baseReg indexImm: indexImm [
 	^ self memRef 
 		base: baseReg; 
 		displacement: (indexImm - 1) * self addressSize;
@@ -368,7 +368,7 @@ AssemblerBackend >> memRef: baseReg indexImm: indexImm [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRef: baseReg offset: indexReg [
+CodeGenerator >> memRef: baseReg offset: indexReg [
 	^ self memRef
 		base: baseReg;
 		index: indexReg;
@@ -377,35 +377,35 @@ AssemblerBackend >> memRef: baseReg offset: indexReg [
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRefAatT [
+CodeGenerator >> memRefAatT [
 ^self memRef: self regA index: self regT
 ]
 
 { #category : #memory }
-AssemblerBackend >> memRefSPatT [
+CodeGenerator >> memRefSPatT [
 	^ self memRef: self regSP index: self regT
 ]
 
 { #category : #memory }
-AssemblerBackend >> memory [
+CodeGenerator >> memory [
 	^memory
 ]
 
 { #category : #services }
-AssemblerBackend >> move: srcReg to: dstReg [
+CodeGenerator >> move: srcReg to: dstReg [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #basic }
-AssemblerBackend >> moveDouble: srcReg into: dstReg [ 
+CodeGenerator >> moveDouble: srcReg into: dstReg [ 
 	"move from X-type register srcReg into general purpose dstReg"
 	
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> moveImm: imm to: dstReg [
+CodeGenerator >> moveImm: imm to: dstReg [
 	"Load constant to register `dstImm`"
 
 	self subclassResponsibility
@@ -413,233 +413,233 @@ AssemblerBackend >> moveImm: imm to: dstReg [
 ]
 
 { #category : #basic }
-AssemblerBackend >> mulDouble: src1andDstReg by: src2reg [ 
+CodeGenerator >> mulDouble: src1andDstReg by: src2reg [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 	self subclassResponsibility
 ]
 
 { #category : #accessing }
-AssemblerBackend >> nativeCode [
+CodeGenerator >> nativeCode [
 	^ NativeCode new code: memory bytes
 ]
 
 { #category : #basic }
-AssemblerBackend >> or: src1andDest withImm: imm [
+CodeGenerator >> or: src1andDest withImm: imm [
 	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> pop: dstReg [
+CodeGenerator >> pop: dstReg [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> popIntoMem: dstMemRef [
+CodeGenerator >> popIntoMem: dstMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> push: srcReg [
+CodeGenerator >> push: srcReg [
 	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> pushAOnFPUStack [
+CodeGenerator >> pushAOnFPUStack [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> pushImm: imm [
+CodeGenerator >> pushImm: imm [
 	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> pushMem: aMemRef [
+CodeGenerator >> pushMem: aMemRef [
 	self subclassResponsibility
 ]
 
 { #category : #'push/pop' }
-AssemblerBackend >> pushROnFPUStack [
+CodeGenerator >> pushROnFPUStack [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regA [
+CodeGenerator >> regA [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regB [
+CodeGenerator >> regB [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regC [
+CodeGenerator >> regC [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regE [
+CodeGenerator >> regE [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regFP [
+CodeGenerator >> regFP [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regFalse [
+CodeGenerator >> regFalse [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regG [
+CodeGenerator >> regG [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regIP [
+CodeGenerator >> regIP [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regM [
+CodeGenerator >> regM [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regNil [
+CodeGenerator >> regNil [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regR [
+CodeGenerator >> regR [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regS [
+CodeGenerator >> regS [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regSP [
+CodeGenerator >> regSP [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regT [
+CodeGenerator >> regT [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regTrue [
+CodeGenerator >> regTrue [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regV [
+CodeGenerator >> regV [
 	^self subclassResponsibility
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regX0 [
+CodeGenerator >> regX0 [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #'registers - IR' }
-AssemblerBackend >> regX1 [
+CodeGenerator >> regX1 [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #basic }
-AssemblerBackend >> reset [
+CodeGenerator >> reset [
 	memory reset
 ]
 
 { #category : #memory }
-AssemblerBackend >> roundDouble: srcReg into: dstReg [ 
+CodeGenerator >> roundDouble: srcReg into: dstReg [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> shiftLeft: srcAndDst byImm: count [
+CodeGenerator >> shiftLeft: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> shiftRight: srcAndDst byImm: count [
+CodeGenerator >> shiftRight: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> shiftRightArithmetic: srcAndDst by: countReg [
+CodeGenerator >> shiftRightArithmetic: srcAndDst by: countReg [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> shiftRightArithmetic: srcAndDst byImm: count [
+CodeGenerator >> shiftRightArithmetic: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> sqrtDouble: srcReg into: dstReg [
+CodeGenerator >> sqrtDouble: srcReg into: dstReg [
 	self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> store: srcReg intoMem: dstMemRef [
+CodeGenerator >> store: srcReg intoMem: dstMemRef [
 	^self subclassResponsibility
 ]
 
 { #category : #memory }
-AssemblerBackend >> storeDouble: srcReg intoMem: dstMemRef [ 
+CodeGenerator >> storeDouble: srcReg intoMem: dstMemRef [ 
 	^ self subclassResponsibility
 ]
 
 { #category : #initialization }
-AssemblerBackend >> stream [
+CodeGenerator >> stream [
 	^memory stream
 ]
 
 { #category : #basic }
-AssemblerBackend >> sub: src1 from: src2AndDst [
+CodeGenerator >> sub: src1 from: src2AndDst [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> subDouble: src1 from: src2AndDst [ 
+CodeGenerator >> subDouble: src1 from: src2AndDst [ 
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> subImm: imm from: srcAndDst [
+CodeGenerator >> subImm: imm from: srcAndDst [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> test: src1Reg with: src2Reg [
+CodeGenerator >> test: src1Reg with: src2Reg [
 	self subclassResponsibility
 ]
 
 { #category : #basic }
-AssemblerBackend >> test: srcReg withImm: imm [
+CodeGenerator >> test: srcReg withImm: imm [
 	self subclassResponsibility
 ]
 
 { #category : #services }
-AssemblerBackend >> wordSize [
+CodeGenerator >> wordSize [
 	^wordSize
 ]

@@ -4,7 +4,7 @@ Copyright (c) 2020 Aucerna.
 "
 Class {
 	#name : #AssemblerAMD64,
-	#superclass : #AssemblerBackend,
+	#superclass : #CodeGenerator,
 	#instVars : [
 		'instruction',
 		'operands1',

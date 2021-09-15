@@ -1,6 +1,6 @@
 Class {
-	#name : #AssemblerRISCV,
-	#superclass : #RISCAssemblerBackend,
+	#name : #RV64CodeGenerator,
+	#superclass : #BaseCodeGenerator,
 	#pools : [
 		'RegistersRISCV'
 	],
