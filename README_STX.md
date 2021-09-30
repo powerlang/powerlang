@@ -49,6 +49,7 @@ Pharo (that is, @janvrany) and to allow experimentation with [libgdbs][4]
         Smalltalk loadPackage: 'Powerlang-Compatibility-SmalltalkX'.
         Smalltalk loadPackage: 'Powerlang-Core'.
         Smalltalk loadPackage: 'Powerlang-Tests'.
+        Smalltalk loadPackage: 'Powerlang-RISCV'.
 
 ## Saving & Committing Changes
 

@@ -11,7 +11,7 @@ Load current kernel smalltalk code and browse it.
 ## Other unsorted / uncommented  expressions
 
 "
-
+    NativizationTarget default: NativizationTarget riscv64_linux_gnu.
     Debugger new openWithSpec.
 
 
