@@ -8,6 +8,19 @@ Class {
 	#category : #'Powerlang-Core-Assembler'
 }
 
+{ #category : #'instance creation' }
+CodeGenerator class >> forTarget: aNativizationTarget [
+	^ self basicNew
+		initialize;
+		target: aNativizationTarget;
+		yourself
+]
+
+{ #category : #'instance creation' }
+CodeGenerator class >> new [
+	self shouldNotImplement."Use #forTarget: instead"
+]
+
 { #category : #basic }
 CodeGenerator >> add: source1 to: source2andDest [
 	self subclassResponsibility
@@ -164,7 +177,7 @@ CodeGenerator >> inc: srcAndDstReg [
 	self subclassResponsibility
 ]
 
-{ #category : #basic }
+{ #category : #initialization }
 CodeGenerator >> initialize [
 	memory := RelocatableBuffer new.
 ]
@@ -386,7 +399,7 @@ CodeGenerator >> memRefSPatT [
 	^ self memRef: self regSP index: self regT
 ]
 
-{ #category : #memory }
+{ #category : #accessing }
 CodeGenerator >> memory [
 	^memory
 ]
@@ -629,6 +642,11 @@ CodeGenerator >> subImm: imm from: srcAndDst [
 	self subclassResponsibility
 ]
 
+{ #category : #initialization }
+CodeGenerator >> target: aNativizationTarget [
+	wordSize := aNativizationTarget wordSize.
+]
+
 { #category : #basic }
 CodeGenerator >> test: src1Reg with: src2Reg [
 	self subclassResponsibility
@@ -639,7 +657,18 @@ CodeGenerator >> test: srcReg withImm: imm [
 	self subclassResponsibility
 ]
 
-{ #category : #services }
+{ #category : #accessing }
 CodeGenerator >> wordSize [
 	^wordSize
+]
+
+{ #category : #accessing }
+CodeGenerator >> wordSize: anInteger [
+	self ASSERT: anInteger == 8.
+	wordSize := anInteger.
+]
+
+{ #category : #accessing }
+CodeGenerator >> wordSizeShift [
+	^wordSize = 8 ifTrue: [3] ifFalse: [2]
 ]

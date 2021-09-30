@@ -50,7 +50,7 @@ DMRBootstrapper >> initializeKernelModule [
 
 { #category : #initialization }
 DMRBootstrapper >> initializeNativizer [
-	nativizer := NativizationEnvironment new.
+	nativizer := NativizationEnvironment forTarget: target.
 	self
 		initializeNativizerGlobals;
 		initializeInlinedMethods;
@@ -226,7 +226,7 @@ DMRBootstrapper >> nativizeWriteBarrier [
 	barrier := builder
 		compile: builder => #ProtoObject >> #holdRefererIfNeeded:.
 	dispatcher := LookupLinker new initializeFrom: nativizer.
-	NativizationEnvironment new
+	(NativizationEnvironment forTarget: target)
 		globals: nativizer globals;
 		inlinedMethods: inlined;
 		messageLinker: dispatcher;

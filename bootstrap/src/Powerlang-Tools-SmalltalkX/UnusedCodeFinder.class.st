@@ -141,7 +141,7 @@ UnusedCodeFinder >> shouldSearchInClass: aClass [
 	"Return `true`, if given class SHOULD be searched for
 	 unused code, `false` otherwise."
 
-	 (aClass inheritsFrom: JITAssembler) ifTrue: [ ^ true ].
+	 (aClass inheritsFrom: Nativizer) ifTrue: [ ^ true ].
 	 (aClass inheritsFrom: ABI) ifTrue: [ ^ true ].
 	 ^ false
 

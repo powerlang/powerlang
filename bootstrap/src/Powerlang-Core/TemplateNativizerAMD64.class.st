@@ -1,10 +1,10 @@
 "
 Copyright (c) 2020 Aucerna.
-    See (MIT) license in root directory.
+	See (MIT) license in root directory.
 "
 Class {
-	#name : #TemplateAssemblerAMD64,
-	#superclass : #JITAssembler,
+	#name : #TemplateNativizerAMD64,
+	#superclass : #Nativizer,
 	#instVars : [
 		'wordSize'
 	],
@@ -12,19 +12,19 @@ Class {
 }
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> addAtoR [
+TemplateNativizerAMD64 >> addAtoR [
 	self assembleBytes: #[16r48 16r1 16rD0].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> addDoubleX1toX0 [
+TemplateNativizerAMD64 >> addDoubleX1toX0 [
 	self assembleBytes: #[16rF2 16rF 16r58 16rC1].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> addSPwithImmediate: imm [
+TemplateNativizerAMD64 >> addSPwithImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r83 16rC4];
@@ -40,19 +40,19 @@ TemplateAssemblerAMD64 >> addSPwithImmediate: imm [
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> addTtoR [
+TemplateNativizerAMD64 >> addTtoR [
 	self assembleBytes: #[16r48 16r1 16rC8].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> andRwithA [
+TemplateNativizerAMD64 >> andRwithA [
 	self assembleBytes: #[16r48 16r21 16rD0].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> andRwithImmediate: imm [
+TemplateNativizerAMD64 >> andRwithImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r83 16rE0];
@@ -68,83 +68,83 @@ TemplateAssemblerAMD64 >> andRwithImmediate: imm [
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> assembleByte: anInteger [
-	backend assembleByte: anInteger
+TemplateNativizerAMD64 >> assembleByte: anInteger [
+	codegen assembleByte: anInteger
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> assembleBytes: aByteArray [
-	backend assembleBytes: aByteArray
+TemplateNativizerAMD64 >> assembleBytes: aByteArray [
+	codegen assembleBytes: aByteArray
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> assembleBytes: value count: count [
-	backend assembleBytes: value count: count
+TemplateNativizerAMD64 >> assembleBytes: value count: count [
+	codegen assembleBytes: value count: count
 
 ]
 
 { #category : #private }
-TemplateAssemblerAMD64 >> buildFrame [
+TemplateNativizerAMD64 >> buildFrame [
 	self assembleBytes: #[16r55 16r48 16r89 16rE5].
 	
 ]
 
 { #category : #private }
-TemplateAssemblerAMD64 >> callIndirectA [
+TemplateNativizerAMD64 >> callIndirectA [
 	self assembleBytes: #[16rFF 16r12].
 	
 ]
 
 { #category : #private }
-TemplateAssemblerAMD64 >> callR [
+TemplateNativizerAMD64 >> callR [
 	self assembleBytes: #[16rFF 16rD0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> clearFPUFlags [
+TemplateNativizerAMD64 >> clearFPUFlags [
 	self assembleBytes: #[16rDB 16rE2].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> clearRhigh32 [
+TemplateNativizerAMD64 >> clearRhigh32 [
 	self assembleBytes: #[16r89 16rC0].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> clearRintegerBit [
+TemplateNativizerAMD64 >> clearRintegerBit [
 	self assembleBytes: #[16r48 16rFF 16rC8].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> clearSafeRintegerBit [
+TemplateNativizerAMD64 >> clearSafeRintegerBit [
 	self assembleBytes: #[16r24 16rFE].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> compareEqualDoubleX0withAindirect [
+TemplateNativizerAMD64 >> compareEqualDoubleX0withAindirect [
 	self assembleBytes: #[16rF2 16rF 16rC2 16r2 16r0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
+TemplateNativizerAMD64 >> compareLessThanDoubleX0withAindirect [
 	self assembleBytes: #[16rF2 16rF 16rC2 16r2 16r1].
 	
 ]
 
 { #category : #comparing }
-TemplateAssemblerAMD64 >> compareRwithA [
+TemplateNativizerAMD64 >> compareRwithA [
 	self assembleBytes: #[16r48 16r39 16rD0].
 	
 ]
 
 { #category : #comparing }
-TemplateAssemblerAMD64 >> compareRwithImmediate: imm [
+TemplateNativizerAMD64 >> compareRwithImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r83 16rF8];
@@ -160,7 +160,7 @@ TemplateAssemblerAMD64 >> compareRwithImmediate: imm [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> compareSwithTindex: index [
+TemplateNativizerAMD64 >> compareSwithTindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r3B 16r31]].
@@ -176,7 +176,7 @@ TemplateAssemblerAMD64 >> compareSwithTindex: index [
 ]
 
 { #category : #comparing }
-TemplateAssemblerAMD64 >> compareTwithImmediate: imm [
+TemplateNativizerAMD64 >> compareTwithImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16r83 16rF9];
@@ -192,61 +192,61 @@ TemplateAssemblerAMD64 >> compareTwithImmediate: imm [
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> convertAtoNativeInteger [
+TemplateNativizerAMD64 >> convertAtoNativeInteger [
 	self assembleBytes: #[16r48 16rD1 16rFA].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> convertRtoNativeInteger [
+TemplateNativizerAMD64 >> convertRtoNativeInteger [
 	self assembleBytes: #[16r48 16rD1 16rF8].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> convertRtoSmallInteger [
+TemplateNativizerAMD64 >> convertRtoSmallInteger [
 	self assembleBytes: #[16r48 16rD1 16rE0 16r48 16rFF 16rC0].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> convertTtoNativeInteger [
+TemplateNativizerAMD64 >> convertTtoNativeInteger [
 	self assembleBytes: #[16r48 16rD1 16rF9].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> divideDoubleX0byX1 [
+TemplateNativizerAMD64 >> divideDoubleX0byX1 [
 	self assembleBytes: #[16rF2 16rF 16r5E 16rC1].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> dropTopOfFPU [
+TemplateNativizerAMD64 >> dropTopOfFPU [
 	self assembleBytes: #[16rDD 16rD8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> exchangeRindirectWithT [
+TemplateNativizerAMD64 >> exchangeRindirectWithT [
 	self assembleBytes: #[16r48 16r87 16r8].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> extendRtoAandDividebyT [
+TemplateNativizerAMD64 >> extendRtoAandDividebyT [
 	self assembleBytes: #[16r48 16r99 16r48 16rF7 16rF9].
 	
 ]
 
 { #category : #private }
-TemplateAssemblerAMD64 >> initializeS [
+TemplateNativizerAMD64 >> initializeS [
 	self assembleBytes: #[16r48 16r89 16rC6].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithAindex: index [
+TemplateNativizerAMD64 >> loadAwithAindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r12]].
@@ -262,7 +262,7 @@ TemplateAssemblerAMD64 >> loadAwithAindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithEindex: index [
+TemplateNativizerAMD64 >> loadAwithEindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r17]].
@@ -278,7 +278,7 @@ TemplateAssemblerAMD64 >> loadAwithEindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithFPindex: index [
+TemplateNativizerAMD64 >> loadAwithFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r55 16r0]].
@@ -294,12 +294,12 @@ TemplateAssemblerAMD64 >> loadAwithFPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithFalse [
+TemplateNativizerAMD64 >> loadAwithFalse [
 	self assembleBytes: #[16r4C 16r89 16rF2]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithImmediate: imm [
+TemplateNativizerAMD64 >> loadAwithImmediate: imm [
 	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC2];
@@ -310,30 +310,30 @@ TemplateAssemblerAMD64 >> loadAwithImmediate: imm [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithNil [
+TemplateNativizerAMD64 >> loadAwithNil [
 	self assembleBytes: #[16r4C 16r89 16rE2]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithR [
+TemplateNativizerAMD64 >> loadAwithR [
 	self assembleBytes: #[16r48 16r89 16rC2].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithRoffsetAtA [
+TemplateNativizerAMD64 >> loadAwithRoffsetAtA [
 	self assembleBytes: #[16r48 16r8B 16r14 16r10].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithS [
+TemplateNativizerAMD64 >> loadAwithS [
 	self assembleBytes: #[16r48 16r89 16rF2].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithSindex: index [
+TemplateNativizerAMD64 >> loadAwithSindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r16]].
@@ -349,18 +349,18 @@ TemplateAssemblerAMD64 >> loadAwithSindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadAwithTrue [
+TemplateNativizerAMD64 >> loadAwithTrue [
 	self assembleBytes: #[16r4C 16r89 16rEA]
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadEwithAddressOfRatA [
+TemplateNativizerAMD64 >> loadEwithAddressOfRatA [
 	self assembleBytes: #[16r48 16r8D 16r7C 16rD0 16rF8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadEwithFPindex: index [
+TemplateNativizerAMD64 >> loadEwithFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r7D 16r0]].
@@ -376,78 +376,78 @@ TemplateAssemblerAMD64 >> loadEwithFPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadEwithR [
+TemplateNativizerAMD64 >> loadEwithR [
 	self assembleBytes: #[16r48 16r89 16rC7].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadFPwithR [
+TemplateNativizerAMD64 >> loadFPwithR [
 	self assembleBytes: #[16r48 16r89 16rC5].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadFPwithSP [
+TemplateNativizerAMD64 >> loadFPwithSP [
 	self assembleBytes: #[16r48 16r89 16rE5].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadLargeX0withRindirect [
+TemplateNativizerAMD64 >> loadLargeX0withRindirect [
 	self assembleBytes: #[16r66 16r48 16rF 16r6E 16r0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadLargeX1withAindirect [
+TemplateNativizerAMD64 >> loadLargeX1withAindirect [
 	self assembleBytes: #[16r66 16r48 16rF 16r6E 16rA].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadLongRwithRatOffsetA [
+TemplateNativizerAMD64 >> loadLongRwithRatOffsetA [
 	self assembleBytes: #[16r8B 16r4 16r10].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadMXCSRfromA [
+TemplateNativizerAMD64 >> loadMXCSRfromA [
 	self assembleBytes: #[16rF 16rAE 16r12].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> loadMwithA [
+TemplateNativizerAMD64 >> loadMwithA [
 	self assembleBytes: #[16r48 16r89 16rD3]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRconvertingDoublePointedByR [
+TemplateNativizerAMD64 >> loadRconvertingDoublePointedByR [
 	self assembleBytes: #[16rF2 16r48 16rF 16r2C 16r0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithA [
+TemplateNativizerAMD64 >> loadRwithA [
 	self assembleBytes: #[16r48 16r89 16rD0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithArgPointer [
+TemplateNativizerAMD64 >> loadRwithArgPointer [
 	self assembleBytes: #[16r48 16r8D 16r45 16r10].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithE [
+TemplateNativizerAMD64 >> loadRwithE [
 	self assembleBytes: #[16r48 16r89 16rF8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithEindex: index [
+TemplateNativizerAMD64 >> loadRwithEindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r7]].
@@ -463,13 +463,13 @@ TemplateAssemblerAMD64 >> loadRwithEindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithFP [
+TemplateNativizerAMD64 >> loadRwithFP [
 	self assembleBytes: #[16r48 16r89 16rE8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithFPindex: index [
+TemplateNativizerAMD64 >> loadRwithFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r45 16r0]].
@@ -485,12 +485,12 @@ TemplateAssemblerAMD64 >> loadRwithFPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithFalse [
+TemplateNativizerAMD64 >> loadRwithFalse [
 	self assembleBytes: #[16r4C 16r89 16rF0]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithImmediate: imm [
+TemplateNativizerAMD64 >> loadRwithImmediate: imm [
 	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC0];
@@ -501,12 +501,12 @@ TemplateAssemblerAMD64 >> loadRwithImmediate: imm [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithM [
+TemplateNativizerAMD64 >> loadRwithM [
 	self assembleBytes: #[16r48 16r89 16rD8]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithMindex: index [
+TemplateNativizerAMD64 >> loadRwithMindex: index [
 	| offset |
 	offset := (index - 1) * wordSize.
 	offset = 0
@@ -521,24 +521,24 @@ TemplateAssemblerAMD64 >> loadRwithMindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithNil [
+TemplateNativizerAMD64 >> loadRwithNil [
 	self assembleBytes: #[16r4C 16r89 16rE0]
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadRwithRatA [
+TemplateNativizerAMD64 >> loadRwithRatA [
 	self assembleBytes: #[16r48 16r8B 16r44 16rD0 16rF8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithRatOffsetA [
+TemplateNativizerAMD64 >> loadRwithRatOffsetA [
 	self assembleBytes: #[16r48 16r8B 16r4 16r10].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithRindex: index [
+TemplateNativizerAMD64 >> loadRwithRindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r0]].
@@ -554,13 +554,13 @@ TemplateAssemblerAMD64 >> loadRwithRindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithS [
+TemplateNativizerAMD64 >> loadRwithS [
 	self assembleBytes: #[16r48 16r89 16rF0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithSPindex: index [
+TemplateNativizerAMD64 >> loadRwithSPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r4 16r24]].
@@ -576,7 +576,7 @@ TemplateAssemblerAMD64 >> loadRwithSPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithSindex: index [
+TemplateNativizerAMD64 >> loadRwithSindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r6]].
@@ -592,42 +592,42 @@ TemplateAssemblerAMD64 >> loadRwithSindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithT [
+TemplateNativizerAMD64 >> loadRwithT [
 	self assembleBytes: #[16r48 16r89 16rC8].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> loadRwithTIBatR [
+TemplateNativizerAMD64 >> loadRwithTIBatR [
 	self assembleBytes: #[16r65 16r48 16r8B 16r4 16rC5 16r0 16r0 16r0 16r0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> loadRwithThreadVariableAtR [
+TemplateNativizerAMD64 >> loadRwithThreadVariableAtR [
 	self assembleBytes: #[16r65 16r48 16r8B 16r4 16rC5 16r80 16r14 16r0 16r0].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadRwithTrue [
+TemplateNativizerAMD64 >> loadRwithTrue [
 	self assembleBytes: #[16r4C 16r89 16rE8]
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadSPwithFP [
+TemplateNativizerAMD64 >> loadSPwithFP [
 	self assembleBytes: #[16r48 16r89 16rEC].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadSwithAddressOfSatA [
+TemplateNativizerAMD64 >> loadSwithAddressOfSatA [
 	self assembleBytes: #[16r48 16r8D 16r74 16rD6 16rF8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadSwithFPindex: index [
+TemplateNativizerAMD64 >> loadSwithFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r75 16r0]].
@@ -643,7 +643,7 @@ TemplateAssemblerAMD64 >> loadSwithFPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadSwithRindex: index [
+TemplateNativizerAMD64 >> loadSwithRindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r30]].
@@ -659,13 +659,13 @@ TemplateAssemblerAMD64 >> loadSwithRindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithA [
+TemplateNativizerAMD64 >> loadTwithA [
 	self assembleBytes: #[16r48 16r89 16rD1].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithAindex: index [
+TemplateNativizerAMD64 >> loadTwithAindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16rA]].
@@ -681,7 +681,7 @@ TemplateAssemblerAMD64 >> loadTwithAindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithEindex: index [
+TemplateNativizerAMD64 >> loadTwithEindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16rF]].
@@ -697,7 +697,7 @@ TemplateAssemblerAMD64 >> loadTwithEindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithFPindex: index [
+TemplateNativizerAMD64 >> loadTwithFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r4D 16r0]].
@@ -713,7 +713,7 @@ TemplateAssemblerAMD64 >> loadTwithFPindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithImmediate: imm [
+TemplateNativizerAMD64 >> loadTwithImmediate: imm [
 	(-16r80000000 <= imm and: [ imm < 16r80000000 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r48 16rC7 16rC1];
@@ -724,13 +724,13 @@ TemplateAssemblerAMD64 >> loadTwithImmediate: imm [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithR [
+TemplateNativizerAMD64 >> loadTwithR [
 	self assembleBytes: #[16r48 16r89 16rC1].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadTwithTindex: index [
+TemplateNativizerAMD64 >> loadTwithTindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r8B 16r9]].
@@ -746,133 +746,133 @@ TemplateAssemblerAMD64 >> loadTwithTindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> loadX0withRasDouble [
+TemplateNativizerAMD64 >> loadX0withRasDouble [
 	self assembleBytes: #[16rF2 16r48 16rF 16r2A 16rC0].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadZeroExtendByteRwithRatA [
+TemplateNativizerAMD64 >> loadZeroExtendByteRwithRatA [
 	self assembleBytes: #[16r48 16rF 16rB6 16r44 16r10 16rFF].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadZeroExtendByteRwithSPatA [
+TemplateNativizerAMD64 >> loadZeroExtendByteRwithSPatA [
 	self assembleBytes: #[16r48 16rF 16rB6 16r44 16r14 16rFF].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> loadZeroExtendLongRwithRatA [
+TemplateNativizerAMD64 >> loadZeroExtendLongRwithRatA [
 	self assembleBytes: #[16r8B 16r44 16r90 16rFC].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> lock [
+TemplateNativizerAMD64 >> lock [
 	self assembleBytes: #[16rF0].
 	
 ]
 
 { #category : #'opcodes - integer related' }
-TemplateAssemblerAMD64 >> moveTslots [
+TemplateNativizerAMD64 >> moveTslots [
 	self assembleBytes: #[16rF3 16r48 16rA5].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> moveX0toR [
+TemplateNativizerAMD64 >> moveX0toR [
 	self assembleBytes: #[16r66 16r48 16rF 16r7E 16rC0].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> multiplyDoubleX0byX1 [
+TemplateNativizerAMD64 >> multiplyDoubleX0byX1 [
 	self assembleBytes: #[16rF2 16rF 16r59 16rC1].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> multiplyRbyAwideningToA [
+TemplateNativizerAMD64 >> multiplyRbyAwideningToA [
 	self assembleBytes: #[16r48 16rF7 16rEA].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> orRwithA [
+TemplateNativizerAMD64 >> orRwithA [
 	self assembleBytes: #[16r48 16r9 16rD0].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popA [
+TemplateNativizerAMD64 >> popA [
 	self assembleBytes: #[16r5A].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popE [
+TemplateNativizerAMD64 >> popE [
 	self assembleBytes: #[16r5F].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popFP [
+TemplateNativizerAMD64 >> popFP [
 	self assembleBytes: #[16r5D].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popR [
+TemplateNativizerAMD64 >> popR [
 	self assembleBytes: #[16r58].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popS [
+TemplateNativizerAMD64 >> popS [
 	self assembleBytes: #[16r5E].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popSPindirect [
+TemplateNativizerAMD64 >> popSPindirect [
 	self assembleBytes: #[16r8F 16r4 16r24].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> popT [
+TemplateNativizerAMD64 >> popT [
 	self assembleBytes: #[16r59].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushA [
+TemplateNativizerAMD64 >> pushA [
 	self assembleBytes: #[16r52].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> pushAOnFPUStack [
+TemplateNativizerAMD64 >> pushAOnFPUStack [
 	self assembleBytes: #[16rDD 16r2].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushE [
+TemplateNativizerAMD64 >> pushE [
 	self assembleBytes: #[16r57].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushFP [
+TemplateNativizerAMD64 >> pushFP [
 	self assembleBytes: #[16r55].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushImmediate: imm [
+TemplateNativizerAMD64 >> pushImmediate: imm [
 	(-128 <= imm and: [ imm < 128 ])
 		ifTrue: [ ^ self
 				assembleBytes: #[16r6A];
@@ -888,114 +888,114 @@ TemplateAssemblerAMD64 >> pushImmediate: imm [
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushIndirectR [
+TemplateNativizerAMD64 >> pushIndirectR [
 	self assembleBytes: #[16rFF 16r30].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushR [
+TemplateNativizerAMD64 >> pushR [
 	self assembleBytes: #[16r50].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> pushROnFPUStack [
+TemplateNativizerAMD64 >> pushROnFPUStack [
 	self assembleBytes: #[16rDD 16r0].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushS [
+TemplateNativizerAMD64 >> pushS [
 	self assembleBytes: #[16r56].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> pushT [
+TemplateNativizerAMD64 >> pushT [
 	self assembleBytes: #[16r51].
 	
 ]
 
 { #category : #epilogue }
-TemplateAssemblerAMD64 >> restoreCallerEnvironment [
+TemplateNativizerAMD64 >> restoreCallerEnvironment [
 	self assembleBytes: #[16r48 16r8B 16r7D 16rE8].
 	
 ]
 
 { #category : #epilogue }
-TemplateAssemblerAMD64 >> restoreCallerFrame [
+TemplateNativizerAMD64 >> restoreCallerFrame [
 	self assembleBytes: #[16r48 16r89 16rEC 16r5D].
 	
 ]
 
 { #category : #epilogue }
-TemplateAssemblerAMD64 >> restoreCallerM [
+TemplateNativizerAMD64 >> restoreCallerM [
 	self assembleBytes: #[16r48 16r8B 16r5D 16rF0]
 ]
 
 { #category : #epilogue }
-TemplateAssemblerAMD64 >> restoreCallerSelf [
+TemplateNativizerAMD64 >> restoreCallerSelf [
 	self assembleBytes: #[16r48 16r8B 16r75 16rF8].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> roundDoubleX0intoX1 [
+TemplateNativizerAMD64 >> roundDoubleX0intoX1 [
 	self assembleBytes: #[16r66 16rF 16r3A 16rB 16rC8 16r3].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> saveCallerFrame [
+TemplateNativizerAMD64 >> saveCallerFrame [
 	self assembleBytes: #[16r55 16r48 16r89 16rE5].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> scaleFloatOnRWithA [
+TemplateNativizerAMD64 >> scaleFloatOnRWithA [
 	self assembleBytes: #[16rDD 16r2 16rDD 16r0 16rD9 16rFD 16rDD 16r18 16rDD 16rD8].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> setRintegerBit [
+TemplateNativizerAMD64 >> setRintegerBit [
 	self assembleBytes: #[16rC 16r1].
 	
 ]
 
 { #category : #integers }
-TemplateAssemblerAMD64 >> setSafeRintegerBit [
+TemplateNativizerAMD64 >> setSafeRintegerBit [
 	self assembleBytes: #[16rC 16r1].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> shiftLeftRwithT [
+TemplateNativizerAMD64 >> shiftLeftRwithT [
 	self assembleBytes: #[16r48 16rD3 16rE0].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> shiftRightRwithT [
+TemplateNativizerAMD64 >> shiftRightRwithT [
 	self assembleBytes: #[16r48 16rD3 16rF8].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> sqrtDoubleX0 [
+TemplateNativizerAMD64 >> sqrtDoubleX0 [
 	self assembleBytes: #[16rF2 16rF 16r51 16rC0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeAinThreadVariableAtIndexR [
+TemplateNativizerAMD64 >> storeAinThreadVariableAtIndexR [
 	self assembleBytes: #[16r65 16r48 16r89 16r14 16rC5 16r80 16r14 16r0 16r0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeAinTindex: index [
+TemplateNativizerAMD64 >> storeAinTindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r11]].
@@ -1011,19 +1011,19 @@ TemplateAssemblerAMD64 >> storeAinTindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeByteTinRatA [
+TemplateNativizerAMD64 >> storeByteTinRatA [
 	self assembleBytes: #[16r88 16r4C 16r10 16rFF].
 	
 ]
 
 { #category : #'push/pop' }
-TemplateAssemblerAMD64 >> storeDoubleResultInRindirect [
+TemplateNativizerAMD64 >> storeDoubleResultInRindirect [
 	self assembleBytes: #[16r66 16r48 16rF 16r7E 16r0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeEinRindex: index [
+TemplateNativizerAMD64 >> storeEinRindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r38]].
@@ -1039,37 +1039,37 @@ TemplateAssemblerAMD64 >> storeEinRindex: index [
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> storeLargeX0inA [
+TemplateNativizerAMD64 >> storeLargeX0inA [
 	self assembleBytes: #[16r66 16r48 16rF 16r7E 16r2].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> storeLargeX0inT [
+TemplateNativizerAMD64 >> storeLargeX0inT [
 	self assembleBytes: #[16r66 16r48 16rF 16r7E 16r1].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeLongTinRatA [
+TemplateNativizerAMD64 >> storeLongTinRatA [
 	self assembleBytes: #[16r89 16r4C 16r90 16rFC].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeLongTinRatOffsetA [
+TemplateNativizerAMD64 >> storeLongTinRatOffsetA [
 	self assembleBytes: #[16r89 16rC 16r10].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> storeMXCSRintoA [
+TemplateNativizerAMD64 >> storeMXCSRintoA [
 	self assembleBytes: #[16rF 16rAE 16r1A].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeRinAindex: index [
+TemplateNativizerAMD64 >> storeRinAindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r2]].
@@ -1085,7 +1085,7 @@ TemplateAssemblerAMD64 >> storeRinAindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeRinEindex: index [
+TemplateNativizerAMD64 >> storeRinEindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r7]].
@@ -1101,7 +1101,7 @@ TemplateAssemblerAMD64 >> storeRinEindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeRinFPindex: index [
+TemplateNativizerAMD64 >> storeRinFPindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r45 16r0]].
@@ -1117,7 +1117,7 @@ TemplateAssemblerAMD64 >> storeRinFPindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeRinSindex: index [
+TemplateNativizerAMD64 >> storeRinSindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r6]].
@@ -1133,7 +1133,7 @@ TemplateAssemblerAMD64 >> storeRinSindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeRinTindex: index [
+TemplateNativizerAMD64 >> storeRinTindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r1]].
@@ -1149,13 +1149,13 @@ TemplateAssemblerAMD64 >> storeRinTindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeShortTinRatOffsetA [
+TemplateNativizerAMD64 >> storeShortTinRatOffsetA [
 	self assembleBytes: #[16r66 16r89 16rC 16r10].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeSinRindex: index [
+TemplateNativizerAMD64 >> storeSinRindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r30]].
@@ -1171,25 +1171,25 @@ TemplateAssemblerAMD64 >> storeSinRindex: index [
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeTIBatRwithA [
+TemplateNativizerAMD64 >> storeTIBatRwithA [
 	self assembleBytes: #[16r65 16r48 16r89 16r14 16rC5 16r0 16r0 16r0 16r0].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeTinRatA [
+TemplateNativizerAMD64 >> storeTinRatA [
 	self assembleBytes: #[16r48 16r89 16r4C 16rD0 16rF8].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeTinRatOffsetA [
+TemplateNativizerAMD64 >> storeTinRatOffsetA [
 	self assembleBytes: #[16r48 16r89 16rC 16r10].
 	
 ]
 
 { #category : #storing }
-TemplateAssemblerAMD64 >> storeTinRindex: index [
+TemplateNativizerAMD64 >> storeTinRindex: index [
 	| offset |
 	offset := index - 1 * wordSize.
 	offset = 0 ifTrue: [^self assembleBytes: #[16r48 16r89 16r8]].
@@ -1205,68 +1205,67 @@ TemplateAssemblerAMD64 >> storeTinRindex: index [
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> subAfromR [
+TemplateNativizerAMD64 >> subAfromR [
 	self assembleBytes: #[16r48 16r29 16rD0].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> subAfromT [
+TemplateNativizerAMD64 >> subAfromT [
 	self assembleBytes: #[16r48 16r29 16rD1].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> subDoubleX1fromX0 [
+TemplateNativizerAMD64 >> subDoubleX1fromX0 [
 	self assembleBytes: #[16rF2 16rF 16r5C 16rC1].
 	
 ]
 
 { #category : #arithmetic }
-TemplateAssemblerAMD64 >> subTslotsToSP [
+TemplateNativizerAMD64 >> subTslotsToSP [
 	self assembleBytes: #[16r48 16rF7 16rD9 16r48 16r8D 16r24 16rCC 16r48 16rF7 16rD9].
 	
 ]
 
+{ #category : #initialization }
+TemplateNativizerAMD64 >> target: aNativizationTarget [
+	super target: aNativizationTarget.
+	wordSize := aNativizationTarget wordSize.
+]
+
 { #category : #integers }
-TemplateAssemblerAMD64 >> testRintegerBit [
+TemplateNativizerAMD64 >> testRintegerBit [
 	self assembleBytes: #[16rA8 16r1].
 	
 ]
 
 { #category : #loading }
-TemplateAssemblerAMD64 >> testRwithR [
+TemplateNativizerAMD64 >> testRwithR [
 	self assembleBytes: #[16r48 16r85 16rC0].
 	
 ]
 
 { #category : #'opcodes - integer related' }
-TemplateAssemblerAMD64 >> useAMD64 [
-	wordSize := 8.
-	backend := AssemblerAMD64 new wordSize: 8.
-	self reset
-]
-
-{ #category : #'opcodes - integer related' }
-TemplateAssemblerAMD64 >> writeTslots [
+TemplateNativizerAMD64 >> writeTslots [
 	self assembleBytes: #[16rF3 16r48 16rAB].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> xorAwithR [
+TemplateNativizerAMD64 >> xorAwithR [
 	self assembleBytes: #[16r48 16r31 16rC2].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> xorFPwithFP [
+TemplateNativizerAMD64 >> xorFPwithFP [
 	self assembleBytes: #[16r48 16r31 16rED].
 	
 ]
 
 { #category : #logic }
-TemplateAssemblerAMD64 >> xorRwithA [
+TemplateNativizerAMD64 >> xorRwithA [
 	self assembleBytes: #[16r48 16r31 16rD0].
 	
 ]

@@ -7,6 +7,6 @@ Class {
 { #category : #running }
 TemplateAssemblerAMD64Test >> setUp [
 	super setUp.
-	assembler := TemplateAssemblerAMD64 new useAMD64.
+	assembler := TemplateNativizerAMD64 forTarget: NativizationTarget x86_64_linux_gnu.
 	
 ]

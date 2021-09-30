@@ -107,7 +107,7 @@ SExpressionTest >> nativize: aSymbol [
 	| method smethod environment linker |
 	method := self class >> aSymbol.
 	smethod := SCompiler compile: method sourceCode in: self class.
-	environment := NativizationEnvironment new.
+	environment := NativizationEnvironment forTarget: NativizationTarget default.
 	environment globalNamed: #Lookup put: (NativeCode new);
 	globalNamed: #LookupSuper put: (NativeCode new).
 	linker := LookupLinker new initializeFrom: environment.

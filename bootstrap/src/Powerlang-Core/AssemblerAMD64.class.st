@@ -1,6 +1,6 @@
 "
 Copyright (c) 2020 Aucerna.
-    See (MIT) license in root directory.
+	See (MIT) license in root directory.
 "
 Class {
 	#name : #AssemblerAMD64,
@@ -1146,13 +1146,8 @@ AssemblerAMD64 >> testIntegerBit: op1 [
 
 { #category : #accessing }
 AssemblerAMD64 >> wordSize: anInteger [
-	wordSize := anInteger.
+	super wordSize: anInteger.
 	encoder wordSize: anInteger
-]
-
-{ #category : #accessing }
-AssemblerAMD64 >> wordSizeShift [
-	^wordSize = 8 ifTrue: [3] ifFalse: [2]
 ]
 
 { #category : #'to-cleanup' }

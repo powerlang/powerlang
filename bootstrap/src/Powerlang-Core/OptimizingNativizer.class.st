@@ -24,9 +24,8 @@ OptimizingNativizer >> allocate [
 
 { #category : #unclassified }
 OptimizingNativizer >> assembleUsing: allocation [
-	^OptimizingCodeEmitter new
+	^(OptimizingCodeEmitter forTarget: environment target)
 		method: method;
-		abi: environment abi;
 		allocation: allocation;
 		messageLinker: environment messageLinker;
 		assembleFrom: firstBlock

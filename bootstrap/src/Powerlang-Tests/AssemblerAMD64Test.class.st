@@ -14,7 +14,7 @@ AssemblerAMD64Test class >> generateTest: aMessage [
 	"  For now, only handle messages with zero or more INTEGER arguments"
 	(aMessage arguments allSatisfy: [:e | e isInteger ]) ifFalse: [ ^ self ].
 
-	assembler := JITAssembler new useAMD64.
+	assembler := NativizationTarget x86_64_linux_gnu newNativizer.
 	[ 
 		aMessage sendTo: assembler.
 		bytes := assembler bytes.
@@ -57,7 +57,7 @@ AssemblerAMD64Test class >> generateTests [
 
 	| messages |
 
-	JITAssembler class 
+	Nativizer class 
 			compile: 'new ^ MessageCollector for: super new useAMD64 wordSize: 8' 
 			classified: #'temporary'.
 	[ 
@@ -67,7 +67,7 @@ AssemblerAMD64Test class >> generateTests [
 		MessageCollector messages copy.
 	] ensure: [ 
 		MessageCollector messages removeAll.
-		JITAssembler class removeSelector: #new.
+		Nativizer class removeSelector: #new.
 	].
 
 	self halt.    
@@ -78,7 +78,7 @@ AssemblerAMD64Test class >> generateTests [
 { #category : #running }
 AssemblerAMD64Test >> setUp [
 	super setUp.
-	assembler := JITAssembler new useAMD64.
+	assembler := NativizationTarget x86_64_linux_gnu newNativizer.
 	
 ]
 

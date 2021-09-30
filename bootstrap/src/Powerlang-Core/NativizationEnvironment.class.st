@@ -2,19 +2,28 @@ Class {
 	#name : #NativizationEnvironment,
 	#superclass : #Object,
 	#instVars : [
+		'target',
 		'optimizedMethods',
 		'invokedMethods',
 		'inlinedMethods',
 		'messageLinker',
 		'globals',
 		'writeBarrier',
-		'abi',
 		'safepointCheck',
 		'cachedNativizer',
 		'busy'
 	],
 	#category : #'Powerlang-Core-Nativization'
 }
+
+{ #category : #'instance creation' }
+NativizationEnvironment class >> forTarget: aNativizationTarget [
+	| env |
+
+	env := self basicNew initialize.
+	env target: aNativizationTarget.
+	^ env
+]
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
@@ -23,7 +32,9 @@ NativizationEnvironment class >> forTesting [
 
 { #category : #private }
 NativizationEnvironment class >> forTesting: anRGEnvironment [ 
-	^ self new spec: anRGEnvironment
+	^ (self forTarget: NativizationTarget default)
+		 spec: anRGEnvironment;
+		 yourself.
 ]
 
 { #category : #accessing }
@@ -40,30 +51,17 @@ NativizationEnvironment class >> indexOfGlobal: aSymbol [
 
 { #category : #'instance creation' }
 NativizationEnvironment class >> new [
-	"return an initialized instance"
-
-	^ self basicNew initialize.
-
+	self shouldNotImplement. "Use forTarget: instead"
 ]
 
-{ #category : #initialization }
+{ #category : #accessing }
 NativizationEnvironment >> abi [
-	^ abi 
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> abi: anAbi [
-	abi := anAbi 
+	^ target abi
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> addLinker: aLinker [
 	messageLinker add: aLinker
-]
-
-{ #category : #initialization }
-NativizationEnvironment >> be32bits [
-	abi := X86ABI new 
 ]
 
 { #category : #initialization }
@@ -98,14 +96,12 @@ NativizationEnvironment >> globals: anArray [
 { #category : #initialization }
 NativizationEnvironment >> initialize [
 	busy := false.
-	abi := ABI forCurrent.
 	optimizedMethods := OrderedCollection new.
 	invokedMethods := OrderedCollection new.
 	inlinedMethods := OrderedCollection new.
-	messageLinker := CompositeMessageLinker new
-		add: InlineMessageLinker new.
+	messageLinker := CompositeMessageLinker new.
+	messageLinker add: InlineMessageLinker new.
 	globals := Array new: self class globalNames size.
-
 ]
 
 { #category : #initialization }
@@ -195,8 +191,7 @@ NativizationEnvironment >> methodNativizer [
 { #category : #services }
 NativizationEnvironment >> monomorphicCache [
 	| asm lookup next |
-	asm := JITAssembler new.
-	abi assembler: asm.
+	asm := target newNativizer.
 	lookup := asm newLabel.
 	asm
 		loadTwithAindex: 3;
@@ -214,7 +209,6 @@ NativizationEnvironment >> monomorphicCache [
 		jumpToMindex: 1;
 		applyFixups.
 	^ asm nativeCode code
-
 ]
 
 { #category : #services }
@@ -226,9 +220,9 @@ NativizationEnvironment >> nativize: aCompiledMethod [
 
 { #category : #services }
 NativizationEnvironment >> nativizeOptimizing: anSCompiledMethod [
-	^self optimizingNativizer
+	self optimizingNativizer
 		method: anSCompiledMethod;
-		nativize 
+		nativize
 ]
 
 { #category : #services }
@@ -276,8 +270,7 @@ NativizationEnvironment >> optimizingNativizer [
 { #category : #services }
 NativizationEnvironment >> polymorphicCache [
 	| asm smi case2 case3 case4 case5 case6 case7 lookup |
-	asm := JITAssembler new.
-	abi assembler: asm.
+	asm := target newNativizer.
 	smi := asm newLabel.
 	case2 := asm newLabel.
 	case3 := asm newLabel.
@@ -332,7 +325,16 @@ NativizationEnvironment >> polymorphicCache [
 		jumpToMindex: 1;
 		applyFixups.
 	^ asm nativeCode code
+]
 
+{ #category : #'printing & storing' }
+NativizationEnvironment >> printOn:aStream [
+	"append a printed representation of the receiver to the argument, aStream"
+
+	super printOn:aStream.
+	aStream nextPutAll:'(target: '.
+	target name printOn:aStream.
+	aStream nextPut:$)
 ]
 
 { #category : #accessing }
@@ -371,14 +373,24 @@ NativizationEnvironment >> shouldOptimize: method [
 	^ optimizedMethods anySatisfy: [:m | m selector = selector and: [ m classBinding name = classname ]  ]
 ]
 
+{ #category : #accessing }
+NativizationEnvironment >> target [
+	^ target
+]
+
+{ #category : #accessing }
+NativizationEnvironment >> target:aNativizationTarget [
+	target := aNativizationTarget.
+]
+
 { #category : #initialization }
 NativizationEnvironment >> wordSize [
-	^ abi wordSize 
+	^ self abi wordSize 
 ]
 
 { #category : #initialization }
 NativizationEnvironment >> wordSizeShift [
-	^ abi wordSizeShift 
+	^ self abi wordSizeShift 
 ]
 
 { #category : #initialization }

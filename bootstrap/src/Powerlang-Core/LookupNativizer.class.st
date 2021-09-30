@@ -64,7 +64,7 @@ LookupNativizer >> nativizeMethods [
 { #category : #'instance creation' }
 LookupNativizer >> newNativizationEnvironment [
 	| environment ignored lookup invoke |
-	environment := NativizationEnvironment new
+	environment := (NativizationEnvironment forTarget: bootstrapper target)
 		globals: bootstrapper nativizer globals;
 		optimizedMethods: bootstrapper nativizer optimizedMethods.
 	ignored := HaltingSend new

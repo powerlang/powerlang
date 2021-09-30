@@ -1,6 +1,6 @@
 "
 Copyright (c) 2020 Aucerna.
-    See (MIT) license in root directory.
+	See (MIT) license in root directory.
 "
 Class {
 	#name : #X64ABI,
@@ -10,11 +10,6 @@ Class {
 	],
 	#category : #'Powerlang-Core-Assembler-Intel'
 }
-
-{ #category : #accessing }
-X64ABI >> assembler: aJITAssembler [
-	aJITAssembler useAMD64
-]
 
 { #category : #accessing }
 X64ABI >> bits [

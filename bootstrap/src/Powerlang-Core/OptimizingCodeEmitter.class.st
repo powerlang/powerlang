@@ -1,6 +1,6 @@
 "
 Copyright (c) 2020 Aucerna.
-    See (MIT) license in root directory.
+	See (MIT) license in root directory.
 "
 Class {
 	#name : #OptimizingCodeEmitter,
@@ -8,7 +8,6 @@ Class {
 	#instVars : [
 		'allocation',
 		'assembler',
-		'abi',
 		'jumpDestinations',
 		'assemblers',
 		'method',
@@ -24,15 +23,17 @@ Class {
 	#category : #'Powerlang-Core-OCompiler'
 }
 
-{ #category : #unclassified }
-OptimizingCodeEmitter class >> new [
-	^self basicNew initialize
+{ #category : #'instance creation' }
+OptimizingCodeEmitter class >> forTarget: aNativizationTarget [
+	^ self basicNew
+		initialize;
+		target: aNativizationTarget;
+		yourself
 ]
 
-{ #category : #accessing }
-OptimizingCodeEmitter >> abi: anAbi [
-	abi := anAbi.
-	anAbi assembler: assembler
+{ #category : #'instance creation' }
+OptimizingCodeEmitter class >> new [
+	self shouldNotImplement."Use #forTarget: instead"
 ]
 
 { #category : #unclassified }
@@ -411,7 +412,7 @@ OptimizingCodeEmitter >> assembleCopyIfNeeded: source to: dest [
 OptimizingCodeEmitter >> assembleCopyResult: instruction [
 	| dest |
 	dest := allocation at: instruction ifAbsent: [^self].
-	self assembleCopyIfNeeded: abi regR to: dest
+	self assembleCopyIfNeeded: assembler regR to: dest
 ]
 
 { #category : #unclassified }
@@ -741,13 +742,13 @@ OptimizingCodeEmitter >> doAssemble [
 	assembler applyFixups
 ]
 
-{ #category : #unclassified }
+{ #category : #initialization }
 OptimizingCodeEmitter >> initialize [
 	jumpDestinations := Dictionary new.
-	self initializeLowLevelAssembler; initializeAssemblers
+	self initializeAssemblers
 ]
 
-{ #category : #unclassified }
+{ #category : #initialization }
 OptimizingCodeEmitter >> initializeAssemblers [
 	assemblers := Dictionary new
 		at: #'+' put: #Plus;
@@ -790,12 +791,6 @@ OptimizingCodeEmitter >> initializeAssemblers [
 		at: #copy put: #Copy;
 		at: #copyResult put: #CopyResult;
 		yourself
-]
-
-{ #category : #initialization }
-OptimizingCodeEmitter >> initializeLowLevelAssembler [
-	assembler := JITAssembler new useAMD64
-
 ]
 
 { #category : #unclassified }
@@ -858,6 +853,11 @@ OptimizingCodeEmitter >> savesPreviousSelf [
 { #category : #unclassified }
 OptimizingCodeEmitter >> selectorFor: instruction [
 	^assemblers at: instruction name
+]
+
+{ #category : #initialization }
+OptimizingCodeEmitter >> target: aNativizationTarget [
+	assembler := aNativizationTarget newNativizer
 ]
 
 { #category : #unclassified }

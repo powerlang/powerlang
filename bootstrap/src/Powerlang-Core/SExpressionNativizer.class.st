@@ -403,7 +403,7 @@ SExpressionNativizer >> emitWriteBarrier [
 { #category : #accessing }
 SExpressionNativizer >> environment: aNativizationEnvironment [
 	environment := aNativizationEnvironment.
-	environment abi assembler: ir
+	ir := environment target newNativizer
 ]
 
 { #category : #services }
@@ -414,8 +414,6 @@ SExpressionNativizer >> falseLiteral [
 { #category : #initialization }
 SExpressionNativizer >> initialize [
 	super initialize.
-	ir := JITAssembler new useAMD64
-
 ]
 
 { #category : #services }

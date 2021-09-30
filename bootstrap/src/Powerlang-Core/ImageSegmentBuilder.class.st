@@ -184,7 +184,13 @@ ImageSegmentBuilder >> module [
 
 { #category : #initialization }
 ImageSegmentBuilder >> nativizeForDMR [
+	self nativizeForDMR: NativizationTarget default
+]
+
+{ #category : #initialization }
+ImageSegmentBuilder >> nativizeForDMR: target [
 	DMRBootstrapper new
+		target: target;
 		image: image;
 		builder: self;
 		nativize;
