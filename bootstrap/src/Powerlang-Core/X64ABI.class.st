@@ -16,44 +16,84 @@ X64ABI >> bits [
 	^64
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regA [
 	^rdx
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regE [
 	^rdi
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regFP [
 	^rbp
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
+X64ABI >> regFalse [
+	^ r14
+]
+
+{ #category : #'registers - IR' }
 X64ABI >> regG [
 	^r15
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
+X64ABI >> regIP [
+	^ rip
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regM [
+	^rbx
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regNil [
+	^ r12
+]
+
+{ #category : #'registers - IR' }
 X64ABI >> regR [
 	^rax
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regS [
 	^rsi
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regSP [
 	^rsp
 ]
 
-{ #category : #private }
+{ #category : #'registers - IR' }
 X64ABI >> regT [
 	^rcx
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regTrue [
+	^ r13
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regV [
+	^r11
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regX0 [
+	^xmm0
+]
+
+{ #category : #'registers - IR' }
+X64ABI >> regX1 [
+	^xmm1
 ]
 
 { #category : #accessing }
