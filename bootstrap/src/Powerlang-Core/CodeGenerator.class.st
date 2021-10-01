@@ -183,6 +183,21 @@ CodeGenerator >> initialize [
 	memory := RelocatableBuffer new.
 ]
 
+{ #category : #jumps }
+CodeGenerator >> jumpIfEqualTo: label [
+	^ self subclassResponsibility
+]
+
+{ #category : #jumps }
+CodeGenerator >> jumpIfNotEqualTo: label [
+	^ self subclassResponsibility
+]
+
+{ #category : #jumps }
+CodeGenerator >> jumpIfOverflowTo: label [
+	^ self subclassResponsibility
+]
+
 { #category : #basic }
 CodeGenerator >> jumpTo: label [
 	self subclassResponsibility
