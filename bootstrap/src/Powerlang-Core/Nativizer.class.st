@@ -1585,17 +1585,6 @@ Nativizer >> regA8 [
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regB [
-	^ codegen regB
-
-]
-
-{ #category : #'registers - IR' }
-Nativizer >> regC [
-	^ codegen regC
-]
-
-{ #category : #'registers - IR' }
 Nativizer >> regE [
 	^ codegen regE
 ]
