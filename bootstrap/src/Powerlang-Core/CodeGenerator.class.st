@@ -601,6 +601,9 @@ CodeGenerator >> sqrtDouble: srcReg into: dstReg [
 
 { #category : #memory }
 CodeGenerator >> store: srcReg intoMem: dstMemRef [
+	"Store `srcReg` into memory location `dstMemRef`. 
+
+	 The size of data loaded is specified in `dstMemRef`"
 	^self subclassResponsibility
 ]
 
