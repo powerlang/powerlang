@@ -1,6 +1,6 @@
 Extension { #name : #NativizationTarget }
 
-{ #category : '*Powerlang-RISCV' }
+{ #category : #'*Powerlang-RISCV' }
 NativizationTarget class >> riscv64_linux_gnu [
 	^ self new
 		name:'riscv64-linux-gnu';
