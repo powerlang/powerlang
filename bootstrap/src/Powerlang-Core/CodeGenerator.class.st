@@ -489,16 +489,6 @@ CodeGenerator >> regA [
 ]
 
 { #category : #'registers - IR' }
-CodeGenerator >> regB [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
-CodeGenerator >> regC [
-	^self subclassResponsibility
-]
-
-{ #category : #'registers - IR' }
 CodeGenerator >> regE [
 	^self subclassResponsibility
 ]
