@@ -1893,12 +1893,7 @@ Nativizer >> sqrtDoubleX0 [
 
 { #category : #'memory - load / store' }
 Nativizer >> store: srcReg intoMem: dstMemRef [
-	"Store `srcReg` into memory location `dstMemRef`. 
-
-	 The size of data loaded is specified in `dstMemRef`"
-
-	^ codegen store: srcReg intoMem: dstMemRef 
-
+	^ codegen store: srcReg intoMem: dstMemRef
 ]
 
 { #category : #'floting point' }
