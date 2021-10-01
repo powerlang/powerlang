@@ -1,6 +1,6 @@
 "
 Copyright (c) 2020 Aucerna.
-    See (MIT) license in root directory.
+	See (MIT) license in root directory.
 "
 Class {
 	#name : #OptimizingRegisterAllocator,
