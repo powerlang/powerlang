@@ -2,6 +2,7 @@ Class {
 	#name : #CodeGenerator,
 	#superclass : #Object,
 	#instVars : [
+		'abi',
 		'wordSize',
 		'memory'
 	],
@@ -485,86 +486,82 @@ CodeGenerator >> pushROnFPUStack [
 
 { #category : #'registers - IR' }
 CodeGenerator >> regA [
-	^self subclassResponsibility
+	^abi regA
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regE [
-	^self subclassResponsibility
+	^abi regE
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regFP [
-	^ self subclassResponsibility
-
+	^abi regFP
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regFalse [
-	^self subclassResponsibility
+	^abi regFalse
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regG [
-	^ self subclassResponsibility
-
+	^ abi regG
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regIP [
-	^self subclassResponsibility
+	^abi regIP
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regM [
-	^self subclassResponsibility
+	^abi regM
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regNil [
-	^self subclassResponsibility
+	^abi regNil
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regR [
-	^self subclassResponsibility
+	^abi regR
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regS [
-	^self subclassResponsibility
+	^abi regS
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regSP [
-	^self subclassResponsibility
+	^abi regSP
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regT [
-	^self subclassResponsibility
+	^abi regT
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regTrue [
-	^self subclassResponsibility
+	^abi regTrue
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regV [
-	^self subclassResponsibility
+	^abi regV
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regX0 [
-	^ self subclassResponsibility
-
+	^ abi regX0
 ]
 
 { #category : #'registers - IR' }
 CodeGenerator >> regX1 [
-	^ self subclassResponsibility
-
+	^ abi regX1
 ]
 
 { #category : #basic }
@@ -634,6 +631,7 @@ CodeGenerator >> subImm: imm from: srcAndDst [
 
 { #category : #initialization }
 CodeGenerator >> target: aNativizationTarget [
+	abi := aNativizationTarget abi.
 	wordSize := aNativizationTarget wordSize.
 ]
 

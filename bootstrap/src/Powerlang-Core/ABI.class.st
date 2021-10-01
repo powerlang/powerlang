@@ -7,13 +7,8 @@ Copyright (c) 2020 Aucerna.
  i) provide support for calling (native) function with system
 	calling convention for given architecture and OS combination
 
-ii) provide mapping for real machine registers to 'IR' registers
-	(such as A, R, M and so on).
-
-However, the (ii) mapping is also (!) defined in CodeGenerator class.
-So I (JV) think we need to model calling convention separately from
-machone to IR register mapping and, perhaps, have two calling 
-conventions for system and nativized code.
+ii) provide fixed mapping from 'IR' registers (such as A, R, M and so on)
+	to real machine registers
 
 "
 Class {
@@ -30,4 +25,84 @@ ABI >> is32bits [
 { #category : #unclassified }
 ABI >> is64bits [
 	^self bits = 64
+]
+
+{ #category : #'registers - IR' }
+ABI >> regA [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regE [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regFP [
+	^ self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regFalse [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regG [
+	^ self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regIP [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regM [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regNil [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regR [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regS [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regSP [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regT [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regTrue [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regV [
+	^self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regX0 [
+	^ self subclassResponsibility
+]
+
+{ #category : #'registers - IR' }
+ABI >> regX1 [
+	^ self subclassResponsibility
 ]
