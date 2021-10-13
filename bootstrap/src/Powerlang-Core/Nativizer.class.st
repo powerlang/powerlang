@@ -559,6 +559,11 @@ Nativizer >> labeledNonIntegerBitTestOfR [
 
 ]
 
+{ #category : #accessing }
+Nativizer >> labels [
+	^ labels
+]
+
 { #category : #'to-cleanup' }
 Nativizer >> leadingRzeroCount [
 	codegen leadingRzeroCount

@@ -584,6 +584,12 @@ CodeGenerator >> reset [
 	memory reset
 ]
 
+{ #category : #basic }
+CodeGenerator >> return [
+	"Return from subroutine"  
+	^ self subclassResponsibility
+]
+
 { #category : #memory }
 CodeGenerator >> roundDouble: srcReg into: dstReg [ 
 	self subclassResponsibility

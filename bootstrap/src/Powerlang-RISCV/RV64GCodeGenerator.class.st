@@ -19,10 +19,17 @@ RV64GCodeGenerator class >> new [
 ]
 
 { #category : #basic }
-RV64GCodeGenerator >> add: source1 to: source2andDest [
-	"superclass CodeGenerator says that I am responsible to implement this method"
+RV64GCodeGenerator >> add: src1Reg to: src2andDstReg [
+	"Here we have to emulate X86 behavior and in addition to addition
+	 we have to set artificial flags register to indicate overflow
+	"
 
-	^ self shouldImplement
+	generate
+		slti: tmp1Reg,       src2andDstReg, 0;             "set tmp1Reg to 1 if src2andDstReg (operand 2) is negative"
+		add:  src2andDstReg, src1Reg,       src2andDstReg; "perform the addition that may overflow"
+		slt:  flagsReg,      src2andDstReg, src1Reg;       "set flagsReg to 1 if result is smaller than src1Ref (operand 1)"
+		sub:  flagsReg,      tmp1Reg,       flagsReg.      "set flagsReg to 0 if both operand 2 is negative and result is
+															smaller than operand 2."
 ]
 
 { #category : #'operations - arithmetic' }
@@ -34,9 +41,8 @@ RV64GCodeGenerator >> addDouble: source1 to: source2andDest [
 
 { #category : #basic }
 RV64GCodeGenerator >> addImm: imm to: dest [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+	generate
+		addi: dest, dest, imm
 ]
 
 { #category : #basic }
@@ -57,7 +63,7 @@ RV64GCodeGenerator >> and: source1andDest withImm: imm [
 RV64GCodeGenerator >> breakpoint [
 	"superclass CodeGenerator says that I am responsible to implement this method"
 
-	^ self shouldImplement
+	^ generate ebreak
 ]
 
 { #category : #basic }
@@ -68,17 +74,17 @@ RV64GCodeGenerator >> call: srcReg [
 ]
 
 { #category : #accessing }
-RV64GCodeGenerator >> callIndirect: aMemRef [
-	"superclass CodeGenerator says that I am responsible to implement this method"
+RV64GCodeGenerator >> callIndirect: memRef [
+	self load: tmp1Reg fromMem: memRef.
 
-	^ self shouldImplement
+	generate
+		jalr: linkReg, tmp1Reg, 0
 ]
 
 { #category : #basic }
 RV64GCodeGenerator >> compare: reg1 with: reg2 [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+	generate
+		sub: flagsReg, reg1, reg2
 ]
 
 { #category : #basic }
@@ -126,14 +132,40 @@ RV64GCodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 { #category : #initialization }
 RV64GCodeGenerator >> initialize [
 	super initialize.
-	cpu := AcProcessorDescriptions riscv.
+	generate := AcDSLRV64GAssembler new.
+	memory := generate memory
+]
+
+{ #category : #private }
+RV64GCodeGenerator >> isValidITypeImm: anInteger [
+	"Return true, if given integer value fits into I-type instruction immediate"
+
+	^ (-2048 <= anInteger  "((2 raisedTo:12) // 2) * -1")
+		& (anInteger <= 2047"((2 raisedTo:12) // 2) - 1")
+]
+
+{ #category : #jumps }
+RV64GCodeGenerator >> jumpIfEqualTo: label [
+	generate
+		beq: flagsReg, zeroReg, label
+]
+
+{ #category : #jumps }
+RV64GCodeGenerator >> jumpIfNotEqualTo: label [
+	generate
+		bne: flagsReg, zeroReg, label
+]
+
+{ #category : #jumps }
+RV64GCodeGenerator >> jumpIfOverflowTo: label [
+	generate
+		bne: flagsReg, zeroReg, label
 ]
 
 { #category : #basic }
 RV64GCodeGenerator >> jumpTo: label [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+	generate
+		jal: zeroReg, label.
 ]
 
 { #category : #basic }
@@ -171,7 +203,14 @@ RV64GCodeGenerator >> load: dstReg fromMem: srcMemRef [
 	 
 	 This somewhat weird behavior is heritage of x86."
 
-	^ self shouldImplement
+	srcMemRef length == 64 ifTrue: [ 
+		generate 
+			ld: dstReg, srcMemRef base, srcMemRef displacement.
+		^ self.
+	].
+
+	self error: 'Not yet implemented'  
+
 ]
 
 { #category : #basic }
@@ -205,9 +244,9 @@ RV64GCodeGenerator >> memRef [
 
 { #category : #services }
 RV64GCodeGenerator >> move: srcReg to: dstReg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
 
-	^ self shouldImplement
+	generate
+		addi: dstReg , srcReg, 0
 ]
 
 { #category : #basic }
@@ -221,39 +260,28 @@ RV64GCodeGenerator >> moveDouble: srcReg into: dstReg [
 RV64GCodeGenerator >> moveImm: imm to: dstReg [
 	"Load constant to register `dstImm`"
 
-	^ self shouldImplement
-]
-
-{ #category : #basic }
-RV64GCodeGenerator >> mulDouble: src1andDstReg by: src2reg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
-{ #category : #basic }
-RV64GCodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+	(self isValidITypeImm: imm) ifTrue: [
+		generate
+			addi: dstReg, zeroReg, imm
+	] ifFalse: [ 
+		self shouldImplement
+	].
 ]
 
 { #category : #basic }
 RV64GCodeGenerator >> or: src1andDest withImm: imm [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+	(self isValidITypeImm: imm) ifTrue: [ 
+		generate
+			ori: src1andDest, src1andDest, imm
+	] ifFalse: [ 
+		self moveImm: imm to: tmp1Reg.
+		generate
+			or: src1andDest, src1andDest, tmp1Reg.
+	].
 ]
 
 { #category : #'push/pop' }
 RV64GCodeGenerator >> popIntoMem: dstMemRef [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
-{ #category : #'push/pop' }
-RV64GCodeGenerator >> pushAOnFPUStack [
 	"superclass CodeGenerator says that I am responsible to implement this method"
 
 	^ self shouldImplement
@@ -273,29 +301,21 @@ RV64GCodeGenerator >> pushROnFPUStack [
 	^ self shouldImplement
 ]
 
+{ #category : #'registers - internal use only' }
+RV64GCodeGenerator >> regFlags [
+	^ flagsReg
+]
+
+{ #category : #basic }
+RV64GCodeGenerator >> return [
+	"Return from subroutine"
+
+	generate
+		jalr: zeroReg, linkReg, 0
+]
+
 { #category : #memory }
 RV64GCodeGenerator >> roundDouble: srcReg into: dstReg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
-{ #category : #basic }
-RV64GCodeGenerator >> shiftLeft: srcAndDst byImm: count [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
-{ #category : #basic }
-RV64GCodeGenerator >> shiftRight: srcAndDst byImm: count [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
-{ #category : #basic }
-RV64GCodeGenerator >> shiftRightArithmetic: srcAndDst by: countReg [
 	"superclass CodeGenerator says that I am responsible to implement this method"
 
 	^ self shouldImplement
@@ -329,18 +349,16 @@ RV64GCodeGenerator >> shiftRightArithmetic: srcAndDst byImm: count [
 	^ self shouldImplement
 ]
 
-{ #category : #basic }
-RV64GCodeGenerator >> sqrtDouble: srcReg into: dstReg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
-]
-
 { #category : #memory }
 RV64GCodeGenerator >> store: srcReg intoMem: dstMemRef [
-	"superclass CodeGenerator says that I am responsible to implement this method"
+	dstMemRef length == 64 ifTrue: [ 
+		generate 
+			sd: dstMemRef base, srcReg, dstMemRef displacement.
+		^ self.
+	].
 
-	^ self shouldImplement
+	self error: 'Not yet implemented'
+
 ]
 
 { #category : #memory }
@@ -352,9 +370,8 @@ RV64GCodeGenerator >> storeDouble: srcReg intoMem: dstMemRef [
 
 { #category : #basic }
 RV64GCodeGenerator >> sub: src1 from: src2AndDst [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+   generate
+		sub: src2AndDst, src1, src2AndDst
 ]
 
 { #category : #basic }

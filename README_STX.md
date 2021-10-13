@@ -28,13 +28,15 @@ Pharo (that is, @janvrany) and to allow experimentation with [libgdbs][4]
 
 ## Loading
 
-1.  Clone Powerlang:
+1.  Clone MachineArithmetic, ArchC and Powerlang:
 
+        git clone https://github.com/shingarov/MachineArithmetic
+        git clone https://github.com/shingarov/Pharo-ArchC
         git clone https://github.com/powerlang/powerlang.git
 
 2.  In Smalltalk/X workspace, execute:
 
-		"Load PetitParser"
+        "Load PetitParser"
         Smalltalk loadPackage: 'stx:goodies/petitparser'.
 
         "Load RING "
@@ -42,6 +44,21 @@ Pharo (that is, @janvrany) and to allow experimentation with [libgdbs][4]
         Smalltalk loadPackage:'stx:goodies/ring/core/tests'.
         Smalltalk loadPackage:'stx:goodies/ring/monticello'.
         Smalltalk loadPackage:'stx:goodies/ring/tooling'.
+
+        "Load MachineArithmetic "
+        Smalltalk packagePath add: '/where/you/cloned/MachineArithmetic'.
+        Smalltalk loadPackage: 'MachineArithmetic-FFI-SmalltalkX'.
+        Smalltalk loadPackage: 'MachineArithmetic'.
+        Smalltalk loadPackage: 'MachineArithmetic-Tests'.
+
+        "Load ArchC "
+        Smalltalk packagePath add: '/where/you/cloned/Pharo-ArchC'.
+        Smalltalk loadPackage: 'ArchC-Core'.
+        Smalltalk loadPackage: 'ArchC-RISCV'.
+        Smalltalk loadPackage: 'ArchC-Core-Tests'.
+        Smalltalk loadPackage: 'ArchC-RISCV-Tests'.
+        Smalltalk loadPackage: 'ArchC-DSL'.
+        Smalltalk loadPackage: 'ArchC-Extras-SmalltalkX'.
 
         "Load Powerlang"
         ParserFlags allowInheritedPools: true.
