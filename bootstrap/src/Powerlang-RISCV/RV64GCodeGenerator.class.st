@@ -2,10 +2,11 @@ Class {
 	#name : #RV64GCodeGenerator,
 	#superclass : #BaseCodeGenerator,
 	#instVars : [
-		'cpu'
-	],
-	#pools : [
-		'RVRegisters'
+		'generate',
+		'zeroReg',
+		'flagsReg',
+		'tmp1Reg',
+		'linkReg'
 	],
 	#category : #'Powerlang-RISCV-Code Generator'
 }
@@ -363,15 +364,17 @@ RV64GCodeGenerator >> subDouble: src1 from: src2AndDst [
 	^ self shouldImplement
 ]
 
-{ #category : #basic }
-RV64GCodeGenerator >> test: src1Reg with: src2Reg [
-	"superclass CodeGenerator says that I am responsible to implement this method"
-
-	^ self shouldImplement
+{ #category : #initialization }
+RV64GCodeGenerator >> target: aNativizationTarget [
+	super target: aNativizationTarget.
+	zeroReg := abi regZero.
+	flagsReg := abi regFlags.
+	tmp1Reg := abi regTmp1.
+	linkReg := abi regLink.
 ]
 
 { #category : #basic }
-RV64GCodeGenerator >> test: srcReg withImm: imm [
+RV64GCodeGenerator >> test: src1Reg with: src2Reg [
 	"superclass CodeGenerator says that I am responsible to implement this method"
 
 	^ self shouldImplement

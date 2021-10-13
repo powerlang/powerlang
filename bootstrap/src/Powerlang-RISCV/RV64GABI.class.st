@@ -6,17 +6,21 @@ Class {
 		'RegE',
 		'RegFP',
 		'RegFalse',
+		'RegFlags',
 		'RegG',
+		'RegLink',
 		'RegM',
 		'RegNil',
 		'RegR',
 		'RegS',
 		'RegSP',
 		'RegT',
+		'RegTmp1',
 		'RegTrue',
 		'RegV',
 		'RegX0',
-		'RegX1'
+		'RegX1',
+		'RegZero'
 	],
 	#category : #'Powerlang-RISCV-Code Generator'
 }
@@ -27,28 +31,33 @@ RV64GABI class >> initialize [
 
 	| gprs fprs |
 
-	gprs := AcProcessorDescriptions riscv maps at: 'gpr'.
-	fprs := AcProcessorDescriptions riscv maps at: 'fpr'.
+	gprs := AcProcessorDescriptions riscv64 maps at: 'gpr'.
+	fprs := AcProcessorDescriptions riscv64 maps at: 'fpr'.
 
 	"RegIP does not exists in RISC-V"
-	RegSP   := gprs lookup: 'sp'.
-	RegFP   := gprs lookup: 's0'."The presence of a frame pointer is optional. If a frame pointer exists it must reside in x8 (s0), the register remains callee-saved."
+	RegSP   := AcDSLRegister value: (gprs lookup: 'sp').
+	RegFP   := AcDSLRegister value: (gprs lookup: 's0')."The presence of a frame pointer is optional. If a frame pointer exists it must reside in x8 (s0), the register remains callee-saved."
 
-	RegR    := gprs lookup: 't0'.
-	RegM    := gprs lookup: 's1'.
-	RegS    := gprs lookup: 's2'.
-	RegE    := gprs lookup: 's3'.
-	RegA    := gprs lookup: 't1'.
-	RegT    := gprs lookup: 't2'. 
-	RegV    := gprs lookup: 't3'.
+	RegR    := AcDSLRegister value: (gprs lookup: 't0').
+	RegM    := AcDSLRegister value: (gprs lookup: 's1').
+	RegS    := AcDSLRegister value: (gprs lookup: 's2').
+	RegE    := AcDSLRegister value: (gprs lookup: 's3').
+	RegA    := AcDSLRegister value: (gprs lookup: 't1').
+	RegT    := AcDSLRegister value: (gprs lookup: 't2'). 
+	RegV    := AcDSLRegister value: (gprs lookup: 't3').
 
-	RegNil  := gprs lookup: 's4'.
-	RegTrue := gprs lookup: 's5'.
-	RegFalse:= gprs lookup: 's6'.
-	RegG    := gprs lookup: 's7'.
+	RegNil  := AcDSLRegister value: (gprs lookup: 's4').
+	RegTrue := AcDSLRegister value: (gprs lookup: 's5').
+	RegFalse:= AcDSLRegister value: (gprs lookup: 's6').
+	RegG    := AcDSLRegister value: (gprs lookup: 's7').
 
-	RegX0   := fprs lookup: 'ft0'.
-	RegX1   := fprs lookup: 'ft1'.
+	RegX0   := AcDSLRegister value: (fprs lookup: 'ft0').
+	RegX1   := AcDSLRegister value: (fprs lookup: 'ft1').
+
+	RegZero := AcDSLRegister value: (gprs lookup: 'zero').
+	RegFlags:= AcDSLRegister value: (gprs lookup: 't5').
+	RegTmp1 := AcDSLRegister value: (gprs lookup: 't6').
+	RegLink := AcDSLRegister value: (gprs lookup: 'ra').
 ]
 
 { #category : #'registers - IR' }
@@ -71,6 +80,11 @@ RV64GABI >> regFalse [
 	^ RegFalse
 ]
 
+{ #category : #'registers - internal use only' }
+RV64GABI >> regFlags [
+	^ RegFlags
+]
+
 { #category : #'registers - IR' }
 RV64GABI >> regG [
 	^ RegG
@@ -79,6 +93,11 @@ RV64GABI >> regG [
 { #category : #'registers - IR' }
 RV64GABI >> regIP [
 	^ self error: 'Oops, on RISC-V PC is not a visible register. Use auipc instruction!'.
+]
+
+{ #category : #'registers - internal use only' }
+RV64GABI >> regLink [
+	^ RegLink
 ]
 
 { #category : #'registers - IR' }
@@ -111,6 +130,11 @@ RV64GABI >> regT [
 	^ RegT
 ]
 
+{ #category : #'registers - internal use only' }
+RV64GABI >> regTmp1 [
+	^ RegTmp1
+]
+
 { #category : #'registers - IR' }
 RV64GABI >> regTrue [
 	^ RegTrue
@@ -129,4 +153,9 @@ RV64GABI >> regX0 [
 { #category : #'registers - IR' }
 RV64GABI >> regX1 [
 	^ RegX1
+]
+
+{ #category : #'registers - internal use only' }
+RV64GABI >> regZero [
+	^ RegZero
 ]
