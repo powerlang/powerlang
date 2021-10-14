@@ -1,6 +1,6 @@
 Extension { #name : #AcDSLCodeBuffer }
 
-{ #category : '*Powerlang-RISCV' }
+{ #category : #'*Powerlang-RISCV' }
 AcDSLCodeBuffer >> applyFixupsWith: aNativizer [
 	| env cur |
 
@@ -22,6 +22,6 @@ AcDSLCodeBuffer >> currentAddress [
 	^ instructions inject: address into: [ :cursor :nextInsn | cursor + (nextInsn width // 8) ]
 ]
 
-{ #category : '*Powerlang-RISCV' }
+{ #category : #'*Powerlang-RISCV' }
 AcDSLCodeBuffer >> reset [
 ]

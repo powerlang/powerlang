@@ -63,8 +63,12 @@ SExpressionTest >> assertCorrectExecutionOfLibrary: filename [
 { #category : #support }
 SExpressionTest >> assertCorrectExecutionOfTest: aSelector [
 	| method |
-	method := self nativize: aSelector
-	"code halt disassembledAmd64"
+	method := self nativize: aSelector.
+	"
+	method nativeCode disassembledAmd64
+	method nativeCode disassembledRV64	
+	"
+	method yourself. "Usefull only yo place breakpoint on"
 ]
 
 { #category : #support }

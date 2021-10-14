@@ -33,6 +33,7 @@ BaselineOfPowerlang >> baseline: spec [
 		].
 
 		spec package: 'Powerlang-Tests'.
+		spec package: 'Powerlang-RISCV-Tests'.
 		spec	package: 'Powerlang-TestsFailing'.
 		spec	package: 'Powerlang-UI' with:[
 			spec requires: 'Roassal3'
