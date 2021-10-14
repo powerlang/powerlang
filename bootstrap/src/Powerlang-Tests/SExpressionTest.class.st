@@ -125,6 +125,11 @@ SExpressionTest >> performTest [
 ]
 
 { #category : #templates }
+SExpressionTest >> test000_meaningOfLife [
+	^42
+]
+
+{ #category : #templates }
 SExpressionTest >> test010_message [
 	^1 yourself 
 ]
@@ -202,4 +207,12 @@ SExpressionTest >> test151_blockEnvironmentTemps [
 	^[| four |
 		four := 4.
 		four - three] value 
+]
+
+{ #category : #templates }
+SExpressionTest >> test60_ifTrue [
+	testSelector ifTrue: [ 
+		^ 1
+	].
+	^ 2
 ]
