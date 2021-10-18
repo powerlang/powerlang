@@ -27,6 +27,7 @@ will contain all the tools you need to generate your new language.
 
 ```
 git clone git@github.com:powerlang/powerlang.git
+hg clone https://swing.fit.cvut.cz/hg/jv-vdb powerlang/debug/jv-vdb
 ```
 
 Also you will need the sources of your language, that have to be placed
