@@ -145,3 +145,22 @@ SIdentifierNode >> resolveAssigning: aBoolean [
 	^binding
 
 ]
+
+{ #category : #testing }
+SIdentifierNode >> sourceIntervals [
+	| stretchs declaration ast string code index |
+	stretchs := OrderedCollection new.
+	declaration := binding declaration.
+	ast := self ast.
+	ast allNodesDo: [:node | 
+		(node class == self class and: [node binding declaration == declaration])
+			ifTrue: [stretchs add: node stretch]].
+	string := self source.
+	code := compiler sourceCode.
+	index := ast stretch end.
+	[
+		index := code indexOfString: string startingAt: index + 1.
+		index > 0]
+		whileTrue: [stretchs add: (index to: index + string size - 1)].
+	^stretchs
+]

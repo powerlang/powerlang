@@ -21,11 +21,12 @@ HeapModel class >> defaultSpec [
 { #category : #specs }
 HeapModel class >> forSimulatedPst [
 	<example>
-	| builder writer labels |
-	builder := KernelSegmentBuilder new
-		initialize64BitImage;
-		generateModule;
-		bootstrapModule;
+	| vimage builder writer labels |
+	vimage := VirtualSmalltalkImage fromSpec
+		wordSize: 8;
+		genesis.
+	builder := vimage bootstrap.
+	builder
 		fillClasses;
 		nativizeForDMR;
 		addGenesisObjects.
