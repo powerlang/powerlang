@@ -143,8 +143,9 @@ VirtualSmalltalkRuntimeTest >> test141sendToDo [
 VirtualSmalltalkRuntimeTest >> test150compute20dividedBy5 [
 	| result |
 	result := runtime send: #/ to: self ==> 20 with: {(self ==> 5)}.
-	self assert: result equals: self ==> 4;
-	assertNoLeftoverFrames
+	self 
+		assert: result equals: self ==> 4;
+		assertNoLeftoverFrames
 ]
 
 { #category : #tests }

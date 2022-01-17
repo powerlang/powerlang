@@ -15,15 +15,14 @@ PstBridge >> findFalseObject [
 ]
 
 { #category : #initialization }
-PstBridge >> findGlobalNamed: name [
-	| globals array |
-	globals := self smalltalk slotOf: #SmalltalkSystem named: #globals.
-	array := globals slotOf: #Dictionary named: 'table'.
-	array do: [:slot | | assoc |
-		assoc :=  slot asAssociationMirror.
-		assoc reflectsNil
-			ifFalse: [assoc key asLocalString = name ifTrue: [^assoc value]]].
-	self error: 'global not found'
+PstBridge >> findKernelModule [
+	| handle |
+	handle := nilObj.
+	[ handle getClass localName != 'Kernel' ]
+		whileTrue: [ handle := handle nextObjectHandle ].
+
+	self name: handle mirror as: #kernel.
+
 ]
 
 { #category : #initialization }
@@ -34,14 +33,30 @@ PstBridge >> findNilObject [
 ]
 
 { #category : #initialization }
+PstBridge >> findObjectNamed: name [
+	| namespace array |
+	namespace := self kernel slotOf: #Kernel named: #namespace.
+	array := namespace slotOf: #Namespace named: 'table'.
+	array
+		do: [ :slot | 
+			| assoc |
+			assoc := slot asAssociationMirror.
+			assoc reflectsNil
+				ifFalse: [ assoc key asLocalString = name
+						ifTrue: [ ^ assoc value ] ] ].
+	self error: 'object not found'
+]
+
+{ #category : #initialization }
 PstBridge >> findRootClasses [
 	| object subclasses |
-	object := self globalNamed: 'Object'.
+	object := self objectNamed: 'Object'.
 	subclasses := object asSpeciesMirror subclasses.
-	1 to: subclasses size do: [:i | | subclass name |
+	1 to: subclasses size do: [ :i | 
+		| subclass name |
 		subclass := (subclasses slotAt: i) asSpeciesMirror.
 		name := subclass name asLocalString.
-		self name: subclass as: name]
+		self name: subclass as: name ]
 ]
 
 { #category : #initialization }
@@ -54,18 +69,7 @@ PstBridge >> findRootObjects [
 			name := class name asLocalString.
 			self name: class as: name.
 			class := class superclass ].
-	self findRootClasses; findSmalltalk
-]
-
-{ #category : #initialization }
-PstBridge >> findSmalltalk [
-	| handle |
-	handle := nilObj.
-	[ handle getClass localName != 'SmalltalkSystem' ]
-		whileTrue: [ handle := handle nextObjectHandle ].
-
-	self name: handle mirror as: #Smalltalk.
-
+	self findRootClasses; findKernelModule
 ]
 
 { #category : #initialization }

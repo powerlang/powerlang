@@ -11,38 +11,38 @@ Class {
 { #category : #tests }
 MirrorTest >> maneuvererForObjects [
 	| mirror |
-	mirror := runtime globalNamed: 'Object'.
+	mirror := runtime objectNamed: 'Object'.
 	^ mirror handle maneuverer
 ]
 
 { #category : #tests }
 MirrorTest >> mirageForObject [
 	| mirror |
-	mirror := runtime globalNamed: 'Object'.
-	^mirror handle mirage
+	mirror := runtime objectNamed: 'Object'.
+	^ mirror handle mirage
 ]
 
 { #category : #tests }
 MirrorTest >> mirrorForObject [
 	| address |
-	address := runtime globalNamed: 'Object'.
-	^address asClassMirror
+	address := runtime objectNamed: 'Object'.
+	^ address asClassMirror
 ]
 
-{ #category : #tests }
+{ #category : #running }
 MirrorTest >> setUp [
-	| image |
+	| vimage image |
 	super setUp.
-	builder := KernelSegmentBuilder new
-		initialize64BitImage;
-		generateModule;
-		bootstrapModule;
+	vimage := VirtualSmalltalkImage fromSpec
+		wordSize: 8;
+		genesis.
+	builder := vimage bootstrap.
+	builder
 		addGenesisObjects.
-	image := builder writer write; image.
+	image := builder writer write image.
 	runtime := Runtime
 		forSimulating: VirtualSmalltalkImage kernelSpec
 		memory: image
-
 ]
 
 { #category : #tests }

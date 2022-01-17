@@ -23,13 +23,8 @@ Bridge class >> new [
 ]
 
 { #category : #initialization }
-Bridge >> globalNamed: aSymbol [
-	^objects at: aSymbol ifAbsentPut: [self findGlobalNamed: aSymbol]
-]
-
-{ #category : #initialization }
-Bridge >> globalNamed: aSymbol ifAbsent: aBlock [
-	^objects at: aSymbol ifAbsent: aBlock
+Bridge >> findObjectNamed: aSymbol [
+	^self subclassResponsibility
 ]
 
 { #category : #initialization }
@@ -46,6 +41,16 @@ Bridge >> mirrorOn: address [
 { #category : #initialization }
 Bridge >> name: object as: name [
 	^objects at: name put: object
+]
+
+{ #category : #initialization }
+Bridge >> objectNamed: aSymbol [
+	^ objects at: aSymbol ifAbsentPut: [ self findObjectNamed: aSymbol ]
+]
+
+{ #category : #initialization }
+Bridge >> objectNamed: aSymbol ifAbsent: aBlock [
+	^ objects at: aSymbol ifAbsent: aBlock
 ]
 
 { #category : #initialization }

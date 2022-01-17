@@ -9,17 +9,15 @@ Class {
 
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
-	| builder writer |
-	builder := KernelSegmentBuilder new
-		initialize64BitImage;
-		generateModule;
-		bootstrapModule;
-		addGenesisObjects.
-	writer := builder writer write.
-	^Runtime
+	| vimage builder |
+	vimage := VirtualSmalltalkImage fromSpec
+		wordSize: 8;
+		genesis.
+	builder := vimage bootstrap.
+	builder addGenesisObjects.
+	^ Runtime
 		forSimulating: VirtualSmalltalkImage kernelSpec
-		memory: writer image.
-
+		memory: builder writer write image
 ]
 
 { #category : #private }
@@ -60,10 +58,10 @@ ObjectMirrorTest >> test040UndefinedObjectMirror [
 ]
 
 { #category : #private }
-ObjectMirrorTest >> test100findSmalltalk [
+ObjectMirrorTest >> test100findKernel [
 	| smalltalk |
-	smalltalk := self runtime globalNamed: 'Smalltalk'.
+	smalltalk := self runtime objectNamed: 'kernel'.
 	self
 		assert: smalltalk reflectedClass localName
-		equals: 'SmalltalkSystem'
+		equals: 'Kernel'
 ]

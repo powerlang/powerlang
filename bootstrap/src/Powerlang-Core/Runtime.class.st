@@ -89,21 +89,9 @@ Runtime >> false [
 	^ bridge false
 ]
 
-{ #category : #accessing }
-Runtime >> globalNamed: name [
-	^bridge globalNamed: name
-]
-
 { #category : #'meta accessing' }
 Runtime >> handleOn: oid [
 	^ ObjectHandle on: oid within: self
-]
-
-{ #category : #'meta accessing' }
-Runtime >> handleOnGlobal: aString [
-	| oid |
-	oid := self globalNamed: aString.
-	^self handleOn: oid
 ]
 
 { #category : #shapes }
@@ -225,6 +213,11 @@ Runtime >> objectModel [
 { #category : #initialization }
 Runtime >> objectModel: aModuleSpec [
 	^objectModel := aModuleSpec
+]
+
+{ #category : #accessing }
+Runtime >> objectNamed: name [
+	^ bridge objectNamed: name
 ]
 
 { #category : #storage }
