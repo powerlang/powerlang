@@ -3,9 +3,11 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'method',
-		'stream',
-		'nodeTypes',
-		'bindingTypes'
+		'stream'
+	],
+	#classVars : [
+		'BindingTypes',
+		'NodeTypes'
 	],
 	#pools : [
 		'AstBindingTypes',
@@ -13,6 +15,63 @@ Class {
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
+
+{ #category : #'class initialization' }
+AstcodeDecoder class >> initialize [
+	NodeTypes := Dictionary new.
+	BindingTypes := Dictionary new.
+	NodeTypes
+		at: AssignmentId put: SAssignment;
+		at: BlockId put: SBlock;
+		at: CascadeId put: SCascade;
+		at: LiteralId put: SLiteral;
+		at: IdentifierId put: SIdentifier;
+		at: MessageId put: SMessage;
+		at: ReturnId put: SReturn;
+		at: LoadRwithSelfId put: LoadRwithSelf;
+		at: LoadAwithSelfId put: LoadAwithSelf;
+		at: LoadRwithNilId put: LoadRwithNil;
+		at: LoadAwithNilId put: LoadAwithNil;
+		at: LoadRwithFalseId put: LoadRwithFalse;
+		at: LoadAwithFalseId put: LoadAwithFalse;
+		at: LoadRwithTrueId put: LoadRwithTrue;
+		at: LoadAwithTrueId put: LoadAwithTrue;
+		at: LoadRwithArgumentId put: LoadRwithArgument;
+		at: LoadAwithArgumentId put: LoadAwithArgument;
+		at: LoadRwithTemporaryId put: LoadRwithTemporary;
+		at: LoadAwithTemporaryId put: LoadAwithTemporary;
+		at: LoadRwithInstVarId put: LoadRwithInstVar;
+		at: LoadAwithInstVarId put: LoadAwithInstVar;
+		at: LoadAwithGlobalId put: LoadAwithGlobal;
+		at: LoadAwithClassVarId put: LoadAwithClassVar;
+		at: LoadAwithPoolVarId put: LoadAwithPoolVar;
+		at: LoadAwithConstPoolId put: LoadAwithConstPoolVar;
+		at: LoadRwithDynamicVarId put: LoadRwithDynamicVar;
+		at: LoadAwithDynamicVarId put: LoadAwithDynamicVar;
+		at: LoadRvisitingReceiverId put: LoadRvisitingReceiver;
+		at: LoadAvisitingArgumentId put: LoadAvisitingArgument;
+		"		at: LoadRwithLiteralId put: LoadRwithLiteral;"
+			at: LoadAwithLiteralId put: LoadAwithLiteral;
+		at: EnsureRisSmallIntegerId put: EnsureRSmallInteger;
+		at: EnsureAisSmallIntegerId put: EnsureASmallInteger;
+		at: PushRid put: PushRopcode;
+		at: PopRid put: PopRopcode.
+	BindingTypes
+		at: NilId put: SNilBinding;
+		at: TrueId put: STrueBinding;
+		at: FalseId put: SFalseBinding;
+		at: ArgumentId put: SArgumentBinding;
+		at: TemporaryId put: STemporaryBinding;
+		at: SelfId put: SSelfBinding;
+		at: SuperId put: SSuperBinding;
+		at: InstVarId put: SInstVarBinding;
+		at: DynamicVarId put: SDynamicBinding;
+		at: ClassVarId put: SClassVarBinding;
+		at: GlobalValueId put: SGlobalBinding;
+		at: GlobalClassId put: SClassBinding;
+		at: PoolVarId put: SPoolVarBinding;
+		at: ConstantPoolId put: SConstantPoolBinding
+]
 
 { #category : #'instance creation' }
 AstcodeDecoder class >> new [
@@ -24,7 +83,7 @@ AstcodeDecoder class >> new [
 
 { #category : #public }
 AstcodeDecoder >> bindingTypeOf: id [
-	^bindingTypes at: id
+	^ BindingTypes at: id
 ]
 
 { #category : #public }
@@ -257,63 +316,6 @@ AstcodeDecoder >> decodeTemporary [
 		environment: self nextInteger
 ]
 
-{ #category : #initialization }
-AstcodeDecoder >> initialize [
-	nodeTypes := Dictionary new: 40.
-	bindingTypes := Dictionary new: 20.
-	nodeTypes
-		at: AssignmentId put: SAssignment;
-		at: BlockId put: SBlock;
-		at: CascadeId put: SCascade;
-		at: LiteralId put: SLiteral;
-		at: IdentifierId put: SIdentifier;
-		at: MessageId put: SMessage;
-		at: ReturnId put: SReturn;
-		at: LoadRwithSelfId put: LoadRwithSelf;
-		at: LoadAwithSelfId put: LoadAwithSelf;
-		at: LoadRwithNilId put: LoadRwithNil;
-		at: LoadAwithNilId put: LoadAwithNil;
-		at: LoadRwithFalseId put: LoadRwithFalse;
-		at: LoadAwithFalseId put: LoadAwithFalse;
-		at: LoadRwithTrueId put: LoadRwithTrue;
-		at: LoadAwithTrueId put: LoadAwithTrue;
-		at: LoadRwithArgumentId put: LoadRwithArgument;
-		at: LoadAwithArgumentId put: LoadAwithArgument;
-		at: LoadRwithTemporaryId put: LoadRwithTemporary;
-		at: LoadAwithTemporaryId put: LoadAwithTemporary;
-		at: LoadRwithInstVarId put: LoadRwithInstVar;
-		at: LoadAwithInstVarId put: LoadAwithInstVar;
-		at: LoadAwithGlobalId put: LoadAwithGlobal;
-		at: LoadAwithClassVarId put: LoadAwithClassVar;
-		at: LoadAwithPoolVarId put: LoadAwithPoolVar;
-		at: LoadAwithConstPoolId put: LoadAwithConstPoolVar;
-		at: LoadRwithDynamicVarId put: LoadRwithDynamicVar;
-		at: LoadAwithDynamicVarId put: LoadAwithDynamicVar;
-		at: LoadRvisitingReceiverId put: LoadRvisitingReceiver;
-		at: LoadAvisitingArgumentId put: LoadAvisitingArgument;
-		"		at: LoadRwithLiteralId put: LoadRwithLiteral;"
-			at: LoadAwithLiteralId put: LoadAwithLiteral;
-		at: EnsureRisSmallIntegerId put: EnsureRSmallInteger;
-		at: EnsureAisSmallIntegerId put: EnsureASmallInteger;
-		at: PushRid put: PushRopcode;
-		at: PopRid put: PopRopcode.
-	bindingTypes
-		at: NilId put: SNilBinding;
-		at: TrueId put: STrueBinding;
-		at: FalseId put: SFalseBinding;
-		at: ArgumentId put: SArgumentBinding;
-		at: TemporaryId put: STemporaryBinding;
-		at: SelfId put: SSelfBinding;
-		at: SuperId put: SSuperBinding;
-		at: InstVarId put: SInstVarBinding;
-		at: DynamicVarId put: SDynamicBinding;
-		at: ClassVarId put: SClassVarBinding;
-		at: GlobalValueId put: SGlobalBinding;
-		at: GlobalClassId put: SClassBinding;
-		at: PoolVarId put: SPoolVarBinding;
-		at: ConstantPoolId put: SConstantPoolBinding
-]
-
 { #category : #unclassified }
 AstcodeDecoder >> literalAt: anInteger [
 	^method at: anInteger
@@ -336,7 +338,7 @@ AstcodeDecoder >> nextInteger [
 
 { #category : #public }
 AstcodeDecoder >> nodeTypeOf: id [
-	^nodeTypes at: id
+	^NodeTypes at: id
 ]
 
 { #category : #accessing }
