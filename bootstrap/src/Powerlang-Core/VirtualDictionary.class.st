@@ -5,7 +5,8 @@ Class {
 		'constant',
 		'cache',
 		'nilObj',
-		'dictionary'
+		'dictionary',
+		'image'
 	],
 	#category : #'Powerlang-Core-Emulation'
 }
@@ -76,10 +77,21 @@ VirtualDictionary >> at: aSymbol ifAbsent: aBlock [
 ]
 
 { #category : #accessing }
+VirtualDictionary >> at: aSymbol ifPresent: aBlock [
+	cache at: aSymbol ifPresent: [ :assoc | ^ aBlock value: assoc value ].
+	^ nil
+]
+
+{ #category : #accessing }
 VirtualDictionary >> at: aSymbol put: anObjectMap [
-	| assoc |
-	assoc := self associationAt: aSymbol.
-	^ assoc value: anObjectMap
+	| existing new |
+	existing := self
+		associationAt: aSymbol
+		ifAbsent: [ new := image newAssociation: aSymbol -> nil.
+			self
+				add: new. ^anObjectMap 
+				 ].
+	^existing value: anObjectMap
 ]
 
 { #category : #accessing }
@@ -90,6 +102,17 @@ VirtualDictionary >> constant: aBoolean [
 { #category : #accessing }
 VirtualDictionary >> do: aBlock [
 	^ cache do: aBlock halt
+]
+
+{ #category : #accessing }
+VirtualDictionary >> image: aVirtualSmalltalkImage [
+	image := aVirtualSmalltalkImage
+]
+
+{ #category : #accessing }
+VirtualDictionary >> includesKey: aSymbol [
+	self associationAt: aSymbol ifAbsent: [ ^ false ].
+	^ true
 ]
 
 { #category : #accessing }

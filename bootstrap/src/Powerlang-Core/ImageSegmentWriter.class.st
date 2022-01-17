@@ -52,13 +52,15 @@ ImageSegmentWriter class >> objectsOffset [
 ImageSegmentWriter >> addClosure [
 	| remaining obj b |
 	remaining := OrderedCollection withAll: roots.
+	remaining removeAllSuchThat: [ :o | o isImmediate ]; removeDuplicates.
 	remaining do: [ :s | offsets at: s put: nil ].
 	[ remaining isEmpty ]
 		whileFalse: [ obj := remaining removeFirst.
 			objects add: obj.
 			b := obj behavior.
 			(offsets includesKey: b)
-				ifFalse: [ offsets at: b put: nil. remaining add: b ].
+				ifFalse: [ offsets at: b put: nil.
+					remaining add: b ].
 			obj
 				slotsDo: [ :s | 
 					(s isImmediate or: [ offsets includesKey: s ])

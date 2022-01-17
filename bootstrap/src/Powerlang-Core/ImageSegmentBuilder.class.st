@@ -1,3 +1,8 @@
+"
+A base instance of VirtualSmalltalkImage only contains empty classes, nil, true, false,
+and barely anything else. I am in charge of adding the Kernel module object to it and the
+methods to the classes.
+"
 Class {
 	#name : #ImageSegmentBuilder,
 	#superclass : #Object,
@@ -5,11 +10,10 @@ Class {
 		'index',
 		'classes',
 		'methods',
-		'globals',
 		'runtime',
 		'image',
-		'module',
-		'objects'
+		'objects',
+		'smalltalk'
 	],
 	#category : #'Powerlang-Core-Building'
 }
@@ -24,7 +28,18 @@ ImageSegmentBuilder class >> new [
 
 { #category : #initialization }
 ImageSegmentBuilder >> => aSymbol [
-	^ self spec at: aSymbol
+	^ self specs at: aSymbol
+]
+
+{ #category : #building }
+ImageSegmentBuilder >> addGenesisObjects [
+	objects
+		add: image nil;
+		add: image false;
+		add: image true;
+		add: image kernel.
+	runtime namespace valuesDo: [ :obj | objects add: obj ].
+	smalltalk ifNotNil: [ objects add: smalltalk value ]
 ]
 
 { #category : #services }
@@ -42,13 +57,8 @@ ImageSegmentBuilder >> addObjectDeep: anObject [
 ]
 
 { #category : #initialization }
-ImageSegmentBuilder >> bootstrapModule [
-	runtime send: #bootstrap to: module
-]
-
-{ #category : #initialization }
 ImageSegmentBuilder >> classSpecs [
-	^ self spec allClasses
+	^ self specs allClasses
 ]
 
 { #category : #initialization }
@@ -114,28 +124,15 @@ ImageSegmentBuilder >> fillSpecies: species with: classDefinition [
 					transferred} ]
 ]
 
-{ #category : #validating }
-ImageSegmentBuilder >> generateModule [
-	| class dictionary exports array assocs |
-	class := image classNamed: self moduleName.
-	dictionary := image classNamed: #Dictionary.
-	module := runtime send: #basicNew to: class.
-	exports := runtime send: #new to: dictionary.
-	array := runtime send: #declaredGlobals to: module.
-	assocs := runtime declareGlobals: array.
-	assocs := image newArray: assocs.
-	runtime send: #addAll: to: exports with: {assocs}.
-	module exports: exports.
-	"self classes
-		do: [ :c | | args |
-			args := Array with: c name with: c.
-			runtime send: #at:put: to: exports with: args ]."
-
-]
-
 { #category : #accessing }
 ImageSegmentBuilder >> image [
 	^ image
+]
+
+{ #category : #initialization }
+ImageSegmentBuilder >> image: aVirtualSmalltalkImage [
+	image := aVirtualSmalltalkImage.
+	runtime image: image
 ]
 
 { #category : #initialization }
@@ -143,8 +140,8 @@ ImageSegmentBuilder >> initialize [
 	index := OrderedDictionary new.
 	classes := OrderedDictionary new.
 	methods := OrderedDictionary new.
-	globals := VirtualDictionary new.
-		objects := OrderedCollection new.
+	objects := OrderedCollection new.
+	runtime := VirtualSmalltalkRuntime new
 ]
 
 { #category : #initialization }
@@ -173,13 +170,22 @@ ImageSegmentBuilder >> log: aString [
 ]
 
 { #category : #initialization }
-ImageSegmentBuilder >> methods [
-	^methods
+ImageSegmentBuilder >> methodSubset: aDictionary [
+	| all species m |
+	all := aDictionary
+		flatCollect: [ :assoc | 
+			species := self => assoc key.
+			assoc value
+				collect: [ :sel | 
+					m := species >> sel.
+					self ASSERT: m notNil.
+					m ] ].
+	^ all asOrderedCollection
 ]
 
-{ #category : #accessing }
-ImageSegmentBuilder >> module [
-	^ module
+{ #category : #initialization }
+ImageSegmentBuilder >> methods [
+	^methods
 ]
 
 { #category : #initialization }
@@ -208,14 +214,6 @@ ImageSegmentBuilder >> newCallback: aNativeCode bytesFrom: aByteArray [
 ]
 
 { #category : #initialization }
-ImageSegmentBuilder >> newClassVarDictionary: anArray [
-	| dict |
-	dict := runtime newDictionary.
-	anArray do: [ :assoc | runtime send: #add: to: dict with: {assoc} ].
-
-]
-
-{ #category : #initialization }
 ImageSegmentBuilder >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
 	| method astcodes class selector format |
 	method := image newSlots: 'CompiledMethod'.
@@ -233,12 +231,6 @@ ImageSegmentBuilder >> newMethod: anAstcode selector: aSymbol in: classname form
 	^ method
 ]
 
-{ #category : #building }
-ImageSegmentBuilder >> newSymbol: aSymbol [
-	^runtime newSymbol: aSymbol
-
-]
-
 { #category : #accessing }
 ImageSegmentBuilder >> objects [
 	^objects
@@ -247,6 +239,11 @@ ImageSegmentBuilder >> objects [
 { #category : #accessing }
 ImageSegmentBuilder >> runtime [
 	^ runtime
+]
+
+{ #category : #initialization }
+ImageSegmentBuilder >> specs [
+	^ image specs
 ]
 
 { #category : #initialization }
@@ -316,6 +313,12 @@ ImageSegmentBuilder >> transferSimpleLiterals: method [
 	^ method
 ]
 
+{ #category : #initialization }
+ImageSegmentBuilder >> undermethods [
+	^ (self => #ProtoObject) methods
+		select: [ :m | m category = 'header access' ]
+]
+
 { #category : #validating }
 ImageSegmentBuilder >> validate [
 	objects do:[:obj | obj validate]
@@ -323,9 +326,10 @@ ImageSegmentBuilder >> validate [
 
 { #category : #validating }
 ImageSegmentBuilder >> writer [
-	^ ImageSegmentWriter new roots:
-		objects;
-		module: module;
+	^ ImageSegmentWriter new
+		roots: objects;
+		module: image kernel;
 		wordSize: image wordSize;
+		space: image kernel memory edenSpace;
 		yourself
 ]

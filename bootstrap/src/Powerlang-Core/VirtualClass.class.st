@@ -2,7 +2,8 @@ Class {
 	#name : #VirtualClass,
 	#superclass : #VirtualSpecies,
 	#instVars : [
-		'cvars'
+		'cvars',
+		'names'
 	],
 	#category : #'Powerlang-Core-Emulation'
 }
@@ -19,10 +20,15 @@ VirtualClass >> classPool [
 
 { #category : #accessing }
 VirtualClass >> createClassAssociationsWith: aVirtualSmalltalkImage [
-	|  assocs |
+	| assocs |
 	assocs := spec classVariables
 		collect: [ :cvar | aVirtualSmalltalkImage newAssociation: cvar name -> nil ].
 	cvars := VirtualDictionary withAll: assocs
+]
+
+{ #category : #accessing }
+VirtualClass >> cvars [
+	^cvars
 ]
 
 { #category : #accessing }

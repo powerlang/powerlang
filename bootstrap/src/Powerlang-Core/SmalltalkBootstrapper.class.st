@@ -18,6 +18,6 @@ SmalltalkBootstrapper >> compile: anRGMethod [
 ]
 
 { #category : #accessing }
-SmalltalkBootstrapper >> spec [
-	^builder image kernel
+SmalltalkBootstrapper >> specs [
+	^ builder image specs
 ]

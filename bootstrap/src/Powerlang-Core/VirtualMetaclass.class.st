@@ -28,6 +28,11 @@ VirtualMetaclass >> createClassAssociationsWith: aVirtualSmalltalkImage [
 ]
 
 { #category : #'accessing - parallel hierarchy' }
+VirtualMetaclass >> cvars [
+	^ class cvars
+]
+
+{ #category : #'accessing - parallel hierarchy' }
 VirtualMetaclass >> instanceSide [
 	^class
 ]
@@ -35,6 +40,11 @@ VirtualMetaclass >> instanceSide [
 { #category : #'accessing - parallel hierarchy' }
 VirtualMetaclass >> localPools [
 	^ class localPools
+]
+
+{ #category : #'accessing - parallel hierarchy' }
+VirtualMetaclass >> module [
+	^class module
 ]
 
 { #category : #'accessing - parallel hierarchy' }

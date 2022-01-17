@@ -1,3 +1,11 @@
+"
+I'm in charge of creating and managing the objects of an image. I'm created from a spec,
+and I know how to bootstrap and connect an initial graph of objects and classes.
+
+I do not add the spec methods to classes, as it requires some emulation done by
+the `VirtualSmalltalkRuntime`. That step is left to the VirtualSmalltalkBootstrapper
+that also creates the Kernel module.
+"
 Class {
 	#name : #VirtualSmalltalkImage,
 	#superclass : #Object,
@@ -10,8 +18,9 @@ Class {
 		'maxSMI',
 		'classes',
 		'metaclasses',
-		'kernel',
-		'identityMap'
+		'identityMap',
+		'specs',
+		'kernel'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -24,7 +33,7 @@ Class {
 
 { #category : #accessing }
 VirtualSmalltalkImage class >> fromSpec [
-	^ self new kernel: self kernelSpec
+	^ self new specs: self kernelSpec
 ]
 
 { #category : #accessing }
@@ -55,7 +64,7 @@ VirtualSmalltalkImage class >> newKernelSpec [
 
 { #category : #initialization }
 VirtualSmalltalkImage >> => aSymbol [
-	^ kernel at: aSymbol
+	^ specs at: aSymbol
 ]
 
 { #category : #services }
@@ -87,12 +96,20 @@ VirtualSmalltalkImage >> basicNewSlots: classname in: spec sized: size [
 
 { #category : #accessing }
 VirtualSmalltalkImage >> basicNewSlots: classname sized: size [
-	^ self basicNewSlots: classname in: kernel sized: size
+	^ self basicNewSlots: classname in: specs sized: size
 ]
 
 { #category : #accessing }
 VirtualSmalltalkImage >> basicNewSlotsOf: anRGBehavior sized: size [
 	^ SlotObjectMap new: anRGBehavior size: size withAll: nilObj
+]
+
+{ #category : #'own services' }
+VirtualSmalltalkImage >> bootstrap [
+	| bootstrapper |
+	bootstrapper := ImageSegmentBuilder new image: self.
+	bootstrapper runtime send: #initialize to: kernel.
+	^ bootstrapper
 ]
 
 { #category : #'own services' }
@@ -153,10 +170,11 @@ VirtualSmalltalkImage >> false [
 
 { #category : #building }
 VirtualSmalltalkImage >> fixBehaviors [
-self
-				initializeBehavior: nilObj;
-				initializeBehavior: trueObj;
-				initializeBehavior: falseObj.
+	self
+		initializeBehavior: nilObj;
+		initializeBehavior: trueObj;
+		initializeBehavior: falseObj;
+		initializeBehavior: kernel.
 	classes
 		do: [ :c | 
 			| m |
@@ -187,9 +205,10 @@ VirtualSmalltalkImage >> genesis [
 	nilObj := self basicNewSlots: #UndefinedObject.
 	trueObj := self basicNewSlots: #True.
 	falseObj := self basicNewSlots: #False.
-	kernel allClasses do: [ :def | self createSpecies: def ].
-	self fixBehaviors. 
-	kernel allClasses do: [ :def | self buildSpecies: def ]
+	kernel := self basicNewSlots: #Kernel.
+	specs allClasses do: [ :def | self createSpecies: def ].
+	self fixBehaviors.
+	specs allClasses do: [ :def | self buildSpecies: def ]
 ]
 
 { #category : #accessing }
@@ -230,6 +249,7 @@ VirtualSmalltalkImage >> initializeClass: definition superclass: superclass supe
 		superclass: superclass;
 		format: format;
 		instanceVariables: ivars;
+		classVariables: nilObj;
 		organization: nilObj;
 		name: name;
 		subclasses: subclasses;
@@ -254,14 +274,9 @@ VirtualSmalltalkImage >> initializeMetaclass: definition superclass: superclass 
 		organization: nilObj
 ]
 
-{ #category : #accessing }
+{ #category : #building }
 VirtualSmalltalkImage >> kernel [
 	^kernel
-]
-
-{ #category : #accessing }
-VirtualSmalltalkImage >> kernel: anRGEnvironment [
-	kernel := anRGEnvironment 
 ]
 
 { #category : #accessing }
@@ -432,6 +447,16 @@ VirtualSmalltalkImage >> nil [
 { #category : #accessing }
 VirtualSmalltalkImage >> speciesFor: anRGBehavior [
 	^classes at: anRGBehavior ifAbsent: [ metaclasses at: anRGBehavior]
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> specs [
+	^specs
+]
+
+{ #category : #accessing }
+VirtualSmalltalkImage >> specs: anRGEnvironment [
+	specs := anRGEnvironment 
 ]
 
 { #category : #testing }

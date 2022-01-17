@@ -20,7 +20,7 @@ EmulationLookup class >> new [
 { #category : #accessing }
 EmulationLookup >> compile: anRGMethod [
 	| compiler method |
-	compiler := SCompiler namespace: globals.
+	compiler := SCompiler new.
 	method := compiler
 		forClass: anRGMethod parent;
 		compile: anRGMethod sourceCode.

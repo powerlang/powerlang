@@ -152,7 +152,7 @@ DMRBootstrapper >> mapNativizerGlobal: name to: transferred [
 	image
 		map: placeholder to: transferred;
 		map: placeholder code to: transferred machineCode.
-	builder export: transferred as: name
+	builder name: transferred as: name
 ]
 
 { #category : #initialization }
