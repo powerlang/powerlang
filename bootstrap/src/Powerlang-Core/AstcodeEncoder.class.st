@@ -74,6 +74,15 @@ AstcodeEncoder >> encodeClosureElements: aBlockNode [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> encodeDynamicVar: name [
+	| index |
+	index := method indexOf: name asSymbol ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: DynamicVarId;
+		nextPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> encodeFalse [
 	stream nextPut: FalseId
 ]
@@ -122,6 +131,15 @@ AstcodeEncoder >> encodeLoadAwithConstPoolVar: value [
 	index := method indexOf: value ifAbsent: [ self ASSERT: false ].
 	stream
 		nextPut: LoadAwithConstPoolId;
+		nextPut: index
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeLoadAwithDynamicVar: name [
+	| index |
+	index := method indexOf: name ifAbsent: [ self ASSERT: false ].
+	stream
+		nextPut: LoadAwithDynamicVarId;
 		nextPut: index
 ]
 
@@ -221,12 +239,12 @@ AstcodeEncoder >> encodePoolVar: association [
 
 { #category : #visiting }
 AstcodeEncoder >> encodePopR [
-	stream nextPut: PopRid
+	stream nextPut: PopRid 
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> encodePushR [
-	stream nextPut: PushRid
+	stream nextPut: PushRid 
 ]
 
 { #category : #visiting }

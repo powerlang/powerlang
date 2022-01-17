@@ -111,6 +111,14 @@ AstcodeDecoder >> decodeConstantPoolVar [
 		association: assoc
 ]
 
+{ #category : #public }
+AstcodeDecoder >> decodeDynamicVar [
+	| index name |
+	index := self nextInteger.
+	name := method at: index.
+	^ SDynamicBinding new name: name
+]
+
 { #category : #initialization }
 AstcodeDecoder >> decodeGlobalBinding [
 	| index assoc |
@@ -279,6 +287,8 @@ AstcodeDecoder >> initialize [
 		at: LoadAwithClassVarId put: LoadAwithClassVar;
 		at: LoadAwithPoolVarId put: LoadAwithPoolVar;
 		at: LoadAwithConstPoolId put: LoadAwithConstPoolVar;
+		at: LoadRwithDynamicVarId put: LoadRwithDynamicVar;
+		at: LoadAwithDynamicVarId put: LoadAwithDynamicVar;
 		at: LoadRvisitingReceiverId put: LoadRvisitingReceiver;
 		at: LoadAvisitingArgumentId put: LoadAvisitingArgument;
 		"		at: LoadRwithLiteralId put: LoadRwithLiteral;"
@@ -296,6 +306,7 @@ AstcodeDecoder >> initialize [
 		at: SelfId put: SSelfBinding;
 		at: SuperId put: SSuperBinding;
 		at: InstVarId put: SInstVarBinding;
+		at: DynamicVarId put: SDynamicBinding;
 		at: ClassVarId put: SClassVarBinding;
 		at: GlobalValueId put: SGlobalBinding;
 		at: GlobalClassId put: SClassBinding;

@@ -13,8 +13,8 @@ InstVarBinding >> beReferencedFrom: aScriptNode [
 ]
 
 { #category : #private }
-InstVarBinding >> emitLoadAusing: anSExpressionNativizer [
-	anSExpressionNativizer encodeLoadAwithInstVar: index
+InstVarBinding >> emitLoadAusing: anAstcodeEncoder [
+	anAstcodeEncoder encodeLoadAwithInstVar: index
 ]
 
 { #category : #actions }

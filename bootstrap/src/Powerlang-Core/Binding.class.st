@@ -48,6 +48,11 @@ Binding >> isConstantBinding [
 ]
 
 { #category : #testing }
+Binding >> isDynamic [
+	^false
+]
+
+{ #category : #testing }
 Binding >> isGlobal [
 	^false
 ]

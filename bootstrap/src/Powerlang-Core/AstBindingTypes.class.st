@@ -5,6 +5,7 @@ Class {
 		'ArgumentId',
 		'ClassVarId',
 		'ConstantPoolId',
+		'DynamicVarId',
 		'EnsureAisSmallIntegerId',
 		'EnsureRisSmallIntegerId',
 		'FalseId',
@@ -15,6 +16,7 @@ Class {
 		'LoadAwithArgumentId',
 		'LoadAwithClassVarId',
 		'LoadAwithConstPoolId',
+		'LoadAwithDynamicVarId',
 		'LoadAwithFalseId',
 		'LoadAwithGlobalId',
 		'LoadAwithInstVarId',
@@ -28,6 +30,7 @@ Class {
 		'LoadRwithArgumentId',
 		'LoadRwithClassVarId',
 		'LoadRwithConstPoolId',
+		'LoadRwithDynamicVarId',
 		'LoadRwithFalseId',
 		'LoadRwithGlobalId',
 		'LoadRwithInstVarId',
@@ -64,6 +67,7 @@ AstBindingTypes class >> initialize [
 	GlobalClassId := 11.
 	PoolVarId := 12.
 	ConstantPoolId := 13.
+	DynamicVarId := 14.
 	LoadRwithSelfId := 20.
 	LoadAwithSelfId := 21.
 	LoadRwithInstVarId := 22.
@@ -92,6 +96,8 @@ AstBindingTypes class >> initialize [
 	LoadAwithPoolVarId := 45.
 	LoadRwithConstPoolId := 46.
 	LoadAwithConstPoolId := 47.
-	PushRid := 48.
-	PopRid := 49
+	LoadRwithDynamicVarId := 48.
+	LoadAwithDynamicVarId := 49.
+	PushRid := 50.
+	PopRid := 51
 ]
