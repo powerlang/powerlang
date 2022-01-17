@@ -7,6 +7,11 @@ Class {
 	#category : #'Powerlang-Core-SCompiler-Bindings'
 }
 
+{ #category : #accessing }
+DynamicBinding class >> default [
+	^Default ifNil: [Default := self new name: '<unresolved>']
+]
+
 { #category : #testing }
 DynamicBinding >> emitLoadAusing: anAstcodeEncoder [
 	anAstcodeEncoder encodeLoadAwithDynamicVar: name

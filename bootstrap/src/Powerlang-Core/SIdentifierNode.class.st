@@ -66,7 +66,7 @@ SIdentifierNode >> emitLoadAusing: anAstcodeEncoder [
 { #category : #accessing }
 SIdentifierNode >> initialize [
 	super initialize.
-	binding := UnresolvedBinding default
+	binding := DynamicBinding default
 ]
 
 { #category : #testing }
@@ -81,7 +81,7 @@ SIdentifierNode >> isIdentifier [
 
 { #category : #testing }
 SIdentifierNode >> isIdentifierLiteral [
-	binding isUnresolved ifFalse: [^binding isLiteral].
+	binding isDynamic ifFalse: [^binding isLiteral].
 	^self ast ifNil: [false] ifNotNil: [:ast | | b |
 		b := ast scope resolve: name.
 		b isLiteral]
@@ -90,6 +90,11 @@ SIdentifierNode >> isIdentifierLiteral [
 { #category : #testing }
 SIdentifierNode >> isImmediate [
 	^true
+]
+
+{ #category : #testing }
+SIdentifierNode >> isLocal [
+	^binding isLocal
 ]
 
 { #category : #testing }
@@ -125,14 +130,18 @@ SIdentifierNode >> name: aString [
 	name := aString reduced
 ]
 
+{ #category : #private }
+SIdentifierNode >> printOn: aStream [
+	aStream nextPut: $<;
+	nextPutAll: name;
+	nextPutAll: '> ('.
+	super printOn: aStream.
+	aStream nextPut: $)
+]
+
 { #category : #binding }
 SIdentifierNode >> resolveAssigning: aBoolean [
-	| scope |
-	scope := compiler activeScope.
-	binding := scope resolve: name.
-	binding isUnresolved ifFalse: [^binding].
-	(scope hasMultipleBindingsFor: name)
-		ifTrue: [self compileError: 'variable belongs in multiple pools'].
-	compiler undeclaredErrorAt: self stretch assignment: aBoolean.
-	^binding := scope resolve: name
+	binding := compiler activeScope resolve: name.
+	^binding
+
 ]

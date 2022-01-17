@@ -103,11 +103,6 @@ Binding >> isTemporary [
 ]
 
 { #category : #testing }
-Binding >> isUnresolved [
-	^false
-]
-
-{ #category : #testing }
 Binding >> literal [
 	^nil
 ]

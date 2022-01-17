@@ -5,8 +5,7 @@ Class {
 		'errorHandler',
 		'result',
 		'class',
-		'pools',
-		'namespace'
+		'pools'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -21,16 +20,6 @@ SCompiler class >> compile: aString in: aClass [
 { #category : #'instance creation' }
 SCompiler class >> forClass: aClass [
 	^self new forClass: aClass
-]
-
-{ #category : #services }
-SCompiler class >> namespace: aDictionary [
-	^self basicNew initialize: aDictionary
-]
-
-{ #category : #'instance creation' }
-SCompiler class >> new [
-	^self namespace: Smalltalk globals
 ]
 
 { #category : #services }
@@ -66,6 +55,11 @@ SCompiler >> canStartIdentifier: aCharacter [
 ]
 
 { #category : #initialization }
+SCompiler >> classBinding [
+	 ^class
+]
+
+{ #category : #initialization }
 SCompiler >> classBinding: aSpecies [
 	| instance |
 	class := aSpecies.
@@ -89,23 +83,8 @@ SCompiler >> forClass: aClass [
 
 { #category : #initialization }
 SCompiler >> initialize: aDictionary [
-	namespace := aDictionary.
 	class := aDictionary at: #UndefinedObject ifAbsent: nil.
 	pools := OrderedCollection new
-]
-
-{ #category : #initialization }
-SCompiler >> namespace: aDictionary [
-	namespace := aDictionary
-]
-
-{ #category : #initialization }
-SCompiler >> newScope [
-	^MethodScope new
-		namespace: namespace;
-		species: class;
-		addPoolBinders: pools
-
 ]
 
 { #category : #services }

@@ -472,6 +472,11 @@ MethodEvaluator >> literal: anObject [
 ]
 
 { #category : #visiting }
+MethodEvaluator >> loadNamed: aSymbol [
+	^method classBinding loadNamed: aSymbol in: receiver
+]
+
+{ #category : #visiting }
 MethodEvaluator >> method [
 	^method
 ]
@@ -580,6 +585,11 @@ MethodEvaluator >> staticSend: selector to: recv with: args [
 			recv bytes unsignedShortAt: args first value + 1 put: result value.
 			^ result ].
 	self ASSERT: false
+]
+
+{ #category : #visiting }
+MethodEvaluator >> storeNamed: aSymbol with: anObject [
+	^ method classBinding storeNamed: aSymbol in: receiver with: anObject
 ]
 
 { #category : #visiting }

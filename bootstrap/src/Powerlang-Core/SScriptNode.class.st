@@ -55,6 +55,14 @@ SScriptNode >> hasAssign [
 ]
 
 { #category : #initialization }
+SScriptNode >> identifiers [
+	| result |
+	result := OrderedCollection new.
+	self nodesDo: [:node | node isIdentifier ifTrue: [result add: node]].
+	^result removeDuplicates
+]
+
+{ #category : #initialization }
 SScriptNode >> initialize [
 	super initialize.
 	statements := OrderedCollection new.

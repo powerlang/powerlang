@@ -107,6 +107,11 @@ SCompiledMethod >> copyWithLiterals: aCollection [
 ]
 
 { #category : #constants }
+SCompiledMethod >> dynamicVariableNamed: aSymbol [
+	^class dynamicVariableNamed: aSymbol
+]
+
+{ #category : #constants }
 SCompiledMethod >> environmentCount [
 	^format bitsAt: EnvCount
 ]

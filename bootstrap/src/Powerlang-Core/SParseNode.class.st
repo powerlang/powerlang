@@ -120,3 +120,11 @@ SParseNode >> nodesDo: aBlock [
 SParseNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	aBlock evaluateWith: self
 ]
+
+{ #category : #printing }
+SParseNode >> variableNamed: aString [
+	self
+		allNodesDo: [:node | (node isIdentifier and: [node name = aString])
+			ifTrue: [^node]].
+	^nil
+]

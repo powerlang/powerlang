@@ -186,11 +186,6 @@ SSmalltalkCompiler >> methodNode [
 	^SMethodNode new compiler: self
 ]
 
-{ #category : #accessing }
-SSmalltalkCompiler >> newScope [
-	^frontend newScope
-]
-
 { #category : #nodes }
 SSmalltalkCompiler >> noticeSend [
 	leaf := false
@@ -296,16 +291,6 @@ SSmalltalkCompiler >> stringToken [
 { #category : #testing }
 SSmalltalkCompiler >> supportsBraceNodes [
 	^true
-]
-
-{ #category : #nodes }
-SSmalltalkCompiler >> undeclaredErrorAt: aStretch assignment: aBoolean [
-	^SUndeclaredIdentifierError new
-		compiler: self;
-		stretch: aStretch;
-		assignment: aBoolean;
-		beResumable;
-		signal
 ]
 
 { #category : #errors }

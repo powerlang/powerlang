@@ -27,7 +27,7 @@ SMethodNode >> buildMethod [
 		hasFrame: self needsFrame;
 		selector: self selector;
 		source: compiler sourceCode;
-		classBinding: scope classBinding.
+		classBinding: compiler frontend classBinding.
 	cm pragma: pragma.
 	cm blocks do: [ :block | block method: cm ].
 	encoder := AstcodeEncoder new method: cm.
@@ -43,7 +43,7 @@ SMethodNode >> captureHome [
 { #category : #accessing }
 SMethodNode >> compiler: aSmalltalkCompiler [
 	super compiler: aSmalltalkCompiler.
-	scope := aSmalltalkCompiler newScope script: self.
+	scope := MethodScope new script: self.
 	pragma := aSmalltalkCompiler pragmaNode
 ]
 
@@ -89,7 +89,7 @@ SMethodNode >> literals [
 			n isBraceNode
 				ifTrue: [ n isLiteral
 						ifTrue: [ self halt ]
-						ifFalse: [ binding := scope resolve: #Array. literals add: binding association ] ].
+						ifFalse: [ literals add: #Array ] ].
 			(n isIdentifier
 				and: [ l := n binding literal.
 					l notNil ])

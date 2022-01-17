@@ -128,14 +128,6 @@ BlockScope >> environments [
 	^first isMethod ifTrue: [environments allButFirst] ifFalse: [environments]
 ]
 
-{ #category : #testing }
-BlockScope >> hasMultipleBindingsFor: aString [
-	"
-	temporal compatibility
-	"
-	^self parent hasMultipleBindingsFor: aString
-]
-
 { #category : #services }
 BlockScope >> home [
 	| first |
