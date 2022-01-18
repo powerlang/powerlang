@@ -1,5 +1,5 @@
 Class {
-	#name : #VirtualSmalltalkImageTest,
+	#name : #VirtualImageTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'image'
@@ -8,12 +8,12 @@ Class {
 }
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> setUp [
+VirtualImageTest >> setUp [
 	image := VirtualImage fromSpec wordSize: 8; genesis
 ]
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> test010nil [
+VirtualImageTest >> test010nil [
 	| nilObj class behavior |
 	nilObj := image nil.
 	class := image classNamed: #UndefinedObject.
@@ -29,7 +29,7 @@ VirtualSmalltalkImageTest >> test010nil [
 ]
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> test020true [
+VirtualImageTest >> test020true [
 	| trueObj  class behavior |
 	trueObj := image true.
 	class := image classNamed: #True.
@@ -44,7 +44,7 @@ VirtualSmalltalkImageTest >> test020true [
 ]
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> test030false [
+VirtualImageTest >> test030false [
 	| falseObj class behavior |
 	falseObj := image false.
 	class := image classNamed: #False.
@@ -59,7 +59,7 @@ VirtualSmalltalkImageTest >> test030false [
 ]
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> test040superclasses [
+VirtualImageTest >> test040superclasses [
 	|  proto object collection class metaproto |
 	proto := image classNamed: #ProtoObject.
 	object := image classNamed: #Object.
@@ -74,7 +74,7 @@ VirtualSmalltalkImageTest >> test040superclasses [
 ]
 
 { #category : #tests }
-VirtualSmalltalkImageTest >> test100behaviors [
+VirtualImageTest >> test100behaviors [
 	| proto object coll class mproto mobject |
 	proto := image classNamed: #ProtoObject.
 	object := image classNamed: #Object.

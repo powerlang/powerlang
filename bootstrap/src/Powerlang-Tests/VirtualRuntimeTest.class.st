@@ -1,5 +1,5 @@
 Class {
-	#name : #VirtualSmalltalkRuntimeTest,
+	#name : #VirtualRuntimeTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'image',
@@ -9,17 +9,17 @@ Class {
 }
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> ==> anObject [
+VirtualRuntimeTest >> ==> anObject [
 	^image transferLiteralDeep: anObject
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> assertNoLeftoverFrames [
+VirtualRuntimeTest >> assertNoLeftoverFrames [
 	self assert: runtime frames isEmpty
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> compile: aString in: classname during: aBlock [
+VirtualRuntimeTest >> compile: aString in: classname during: aBlock [
 	| class selector method |
 	class := image => classname.
 	selector := class compile: aString notifying: nil.
@@ -29,7 +29,7 @@ VirtualSmalltalkRuntimeTest >> compile: aString in: classname during: aBlock [
 ]
 
 { #category : #running }
-VirtualSmalltalkRuntimeTest >> setUp [
+VirtualRuntimeTest >> setUp [
 	image := VirtualImage fromSpec
 		wordSize: 8;
 		genesis.
@@ -37,14 +37,14 @@ VirtualSmalltalkRuntimeTest >> setUp [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test100yourself [
+VirtualRuntimeTest >> test100yourself [
 	| result |
 	result := runtime send: #yourself to: image nil.
 	self assert: result equals: image nil
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test110compute1plus1 [
+VirtualRuntimeTest >> test110compute1plus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime send: #+ to: one with: {one}.
@@ -52,7 +52,7 @@ VirtualSmalltalkRuntimeTest >> test110compute1plus1 [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test111compute1minus1 [
+VirtualRuntimeTest >> test111compute1minus1 [
 	| one result |
 	one := self ==> 1.
 	result := runtime send: #- to: one with: {one}.
@@ -60,14 +60,14 @@ VirtualSmalltalkRuntimeTest >> test111compute1minus1 [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test112compute3times4 [
+VirtualRuntimeTest >> test112compute3times4 [
 	| result |
 	result := runtime send: #* to: self ==> 3 with: {self ==> 4}.
 	self assert: result equals: self ==> 12
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test113compute20quotient5 [
+VirtualRuntimeTest >> test113compute20quotient5 [
 	|  result |
 
 	result := runtime send: #// to: self ==>20 with: {self ==>5}.
@@ -75,7 +75,7 @@ VirtualSmalltalkRuntimeTest >> test113compute20quotient5 [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test130sendIfTrueToFalse [
+VirtualRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
 		compile: 'foo ^false ifTrue: [#failed]'
@@ -87,7 +87,7 @@ VirtualSmalltalkRuntimeTest >> test130sendIfTrueToFalse [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test131sendIfFalseToTrue [
+VirtualRuntimeTest >> test131sendIfFalseToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifFalse: [#failed]'
@@ -98,7 +98,7 @@ VirtualSmalltalkRuntimeTest >> test131sendIfFalseToTrue [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test132sendIfTrueToTrue [
+VirtualRuntimeTest >> test132sendIfTrueToTrue [
 	| result |
 	self
 		compile: 'foo ^true ifTrue: [5]'
@@ -109,7 +109,7 @@ VirtualSmalltalkRuntimeTest >> test132sendIfTrueToTrue [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test140sendWhileTrue [
+VirtualRuntimeTest >> test140sendWhileTrue [
 	| result |
 	self
 		compile: 'foo
@@ -124,7 +124,7 @@ VirtualSmalltalkRuntimeTest >> test140sendWhileTrue [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test141sendToDo [
+VirtualRuntimeTest >> test141sendToDo [
 	| result |
 	self
 		compile:
@@ -140,7 +140,7 @@ VirtualSmalltalkRuntimeTest >> test141sendToDo [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test150compute20dividedBy5 [
+VirtualRuntimeTest >> test150compute20dividedBy5 [
 	| result |
 	result := runtime send: #/ to: self ==> 20 with: {(self ==> 5)}.
 	self 
@@ -149,7 +149,7 @@ VirtualSmalltalkRuntimeTest >> test150compute20dividedBy5 [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test160evaluateClosure [
+VirtualRuntimeTest >> test160evaluateClosure [
 	| result |
 	self
 		compile: 'foo ^[5] value'
@@ -160,7 +160,7 @@ VirtualSmalltalkRuntimeTest >> test160evaluateClosure [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test160evaluateClosureFrames [
+VirtualRuntimeTest >> test160evaluateClosureFrames [
 	| result |
 	self
 		compile: 'foo [5] value'
@@ -171,7 +171,7 @@ VirtualSmalltalkRuntimeTest >> test160evaluateClosureFrames [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test161evaluateClosureWithArgs [
+VirtualRuntimeTest >> test161evaluateClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a :b | a + b] value: 3 value: 4'
@@ -181,7 +181,7 @@ VirtualSmalltalkRuntimeTest >> test161evaluateClosureWithArgs [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
+VirtualRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 	| result |
 	self
 		compile: 'foo ^[:a :b | | t | t := a + b. t] value: 3 value: 4'
@@ -191,7 +191,7 @@ VirtualSmalltalkRuntimeTest >> test162evaluateClosureWithArgsAndTemps [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
+VirtualRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	| result |
 	self
 		compile: 'foo | t | ^[:a :b | t := a + b. t] value: 3 value: 4'
@@ -201,7 +201,7 @@ VirtualSmalltalkRuntimeTest >> test163evaluateClosureWithArgsAndMethodTemps [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
+VirtualRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 	| result |
 	self
 		compile:
@@ -218,7 +218,7 @@ VirtualSmalltalkRuntimeTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test165evaluateClosureNonLocalReturn [
+VirtualRuntimeTest >> test165evaluateClosureNonLocalReturn [
 	| result |
 	self
 		compile:
@@ -233,7 +233,7 @@ VirtualSmalltalkRuntimeTest >> test165evaluateClosureNonLocalReturn [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test166evaluateNestedClosure [
+VirtualRuntimeTest >> test166evaluateNestedClosure [
 	| result |
 	self
 		compile: 'foo ^[ [ 7 ] value ] value'
@@ -243,7 +243,7 @@ VirtualSmalltalkRuntimeTest >> test166evaluateNestedClosure [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test167evaluateNestedClosureWithArgs [
+VirtualRuntimeTest >> test167evaluateNestedClosureWithArgs [
 	| result |
 	self
 		compile: 'foo ^[:a | [:b | a + b ] value: 4 ] value: 3'
@@ -253,7 +253,7 @@ VirtualSmalltalkRuntimeTest >> test167evaluateNestedClosureWithArgs [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test168evaluateNestedClosureWithTemps [
+VirtualRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self
 		compile:
@@ -271,7 +271,7 @@ VirtualSmalltalkRuntimeTest >> test168evaluateNestedClosureWithTemps [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
+VirtualRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 	| result |
 	self
 		compile:
@@ -286,7 +286,7 @@ VirtualSmalltalkRuntimeTest >> test169evaluateInlinedClosureInClosureWithMethodT
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test200createDictionary [
+VirtualRuntimeTest >> test200createDictionary [
 	| class d |
 	class := image classNamed: #Dictionary.
 	d := runtime send: #new to: class with: {}.
@@ -294,7 +294,7 @@ VirtualSmalltalkRuntimeTest >> test200createDictionary [
 ]
 
 { #category : #tests }
-VirtualSmalltalkRuntimeTest >> test210addAssociationToDictionary [
+VirtualRuntimeTest >> test210addAssociationToDictionary [
 	| class d assoc |
 	class := image classNamed: #Dictionary.
 	assoc := image newAssociation: #foo -> nil.

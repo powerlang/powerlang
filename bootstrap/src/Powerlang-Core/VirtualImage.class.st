@@ -451,6 +451,11 @@ VirtualImage >> nil [
 ]
 
 { #category : #accessing }
+VirtualImage >> runtime [
+	^ runtime
+]
+
+{ #category : #accessing }
 VirtualImage >> speciesFor: anRGBehavior [
 	^classes at: anRGBehavior ifAbsent: [ metaclasses at: anRGBehavior]
 ]
