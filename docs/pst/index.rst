@@ -53,15 +53,15 @@ we define :code:`Time>>#currentTime` (Time corresponds to the module not the cla
 Powertalk allows modules to define a kind of extension methods. These methods are
 added to the method dictionary of the class being extended, but are bound to the
 module in which they are defined. 
-The extension methods are accessible only with special syntax, by code that previously
-imported the module of the extension method.
+The module methods are accessible only with special syntax, by code that previously
+imported the module of the module method.
 
 For example, :code:`anObject js::asJson` sends :code:`asJson` to :code:`anObject`
 filtering lookup through :code:`js` module. :code:`anObject asJson` results in a
 :code:`doesNotUnderstand` (unless :code:`asJson` was also defined in the class of :code:`anObject`).
 
 Extensions methods could allow for some interesting features not available in ST-80.
-In Powertalk, reflection could be implemented in terms of extension methods. To access
+In Powertalk, reflection could be implemented in terms of module methods. To access
 the class of an object, you will need to import :code:`meta` module, and then
 send ``anObject meta::class``. :: 
 
@@ -76,7 +76,7 @@ to make the module itself be dynamic (for example, fetching the module that impl
     aRemoteArray module::class    "will send class to the module variable"
 
 This could be used to implement some form of safety: as reflection is accessible
-through extension methods, accessing metaobjects could be disabled by prohibiting
+through module methods, accessing metaobjects could be disabled by prohibiting
 access to :code:`meta` module (and to unsafe modules that could leak metaobjects).
 
 It can also be used to stratify runtime implementation level and application level: ::
