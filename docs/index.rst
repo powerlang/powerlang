@@ -111,6 +111,7 @@ Indices and tables
    :maxdepth: 2
    :includehidden:
    
+   pst/index
    bootstrap/index
    dmr/dmr
 ..   :caption: Contents:
