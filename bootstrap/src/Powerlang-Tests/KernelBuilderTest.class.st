@@ -14,10 +14,11 @@ KernelBuilderTest class >> defaultTimeLimit [
 
 { #category : #running }
 KernelBuilderTest >> setUp [
-	builder := VirtualSmalltalkImage fromSpec
+	builder := VirtualImage fromSpec
 		wordSize: 8;
 		genesis;
-		bootstrap
+		bootstrap;
+		builder
 ]
 
 { #category : #tests }

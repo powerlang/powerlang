@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #accessing }
-DMRBootstrapper >> image: aVirtualSmalltalkImage [
-	image := aVirtualSmalltalkImage
+DMRBootstrapper >> image: aVirtualImage [
+	image := aVirtualImage
 ]
 
 { #category : #initialization }

@@ -3,11 +3,11 @@ I'm in charge of creating and managing the objects of an image. I'm created from
 and I know how to bootstrap and connect an initial graph of objects and classes.
 
 I do not add the spec methods to classes, as it requires some emulation done by
-the `VirtualSmalltalkRuntime`. That step is left to the VirtualSmalltalkBootstrapper
+the `VirtualRuntime`. That step is left to the `VirtualImage`
 that also creates the Kernel module.
 "
 Class {
-	#name : #VirtualSmalltalkImage,
+	#name : #VirtualImage,
 	#superclass : #Object,
 	#instVars : [
 		'nilObj',
@@ -20,7 +20,8 @@ Class {
 		'metaclasses',
 		'identityMap',
 		'specs',
-		'kernel'
+		'kernel',
+		'runtime'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -32,17 +33,17 @@ Class {
 }
 
 { #category : #accessing }
-VirtualSmalltalkImage class >> fromSpec [
+VirtualImage class >> fromSpec [
 	^ self new specs: self kernelSpec
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage class >> kernelSpec [
+VirtualImage class >> kernelSpec [
 	^ KernelSpec ifNil: [ KernelSpec := self newKernelSpec ]
 ]
 
 { #category : #'instance creation' }
-VirtualSmalltalkImage class >> new [
+VirtualImage class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -50,7 +51,7 @@ VirtualSmalltalkImage class >> new [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage class >> newKernelSpec [
+VirtualImage class >> newKernelSpec [
 	| root current repo spec |
 
 	root := (Smalltalk getPackageDirectoryForPackage: self package) / '..' / '..'.	
@@ -63,57 +64,57 @@ VirtualSmalltalkImage class >> newKernelSpec [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> => aSymbol [
+VirtualImage >> => aSymbol [
 	^ specs at: aSymbol
 ]
 
 { #category : #services }
-VirtualSmalltalkImage >> basicNewBytes: classname contents: aByteObject [
+VirtualImage >> basicNewBytes: classname contents: aByteObject [
 	^ self basicNewBytesOf: self => classname contents: aByteObject
 ]
 
 { #category : #services }
-VirtualSmalltalkImage >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
+VirtualImage >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
 	^ ByteObjectMap new: anRGBehavior valued: aByteObject
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> basicNewSlots: classname [
+VirtualImage >> basicNewSlots: classname [
 	^ self basicNewSlots: classname sized: 0
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> basicNewSlots: classname in: spec [
+VirtualImage >> basicNewSlots: classname in: spec [
 	^ self basicNewSlots: classname in: spec sized: 0
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> basicNewSlots: classname in: spec sized: size [
+VirtualImage >> basicNewSlots: classname in: spec sized: size [
 	| species |
 	species := spec at: classname.
 	^self basicNewSlotsOf: species sized: size
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> basicNewSlots: classname sized: size [
+VirtualImage >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: specs sized: size
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> basicNewSlotsOf: anRGBehavior sized: size [
+VirtualImage >> basicNewSlotsOf: anRGBehavior sized: size [
 	^ SlotObjectMap new: anRGBehavior size: size withAll: nilObj
 ]
 
 { #category : #'own services' }
-VirtualSmalltalkImage >> bootstrap [
-	| bootstrapper |
-	bootstrapper := ImageSegmentBuilder new image: self.
-	bootstrapper runtime send: #initialize to: kernel.
-	^ bootstrapper
+VirtualImage >> bootstrap [
+	runtime := VirtualRuntime new.
+	runtime
+		image: self;
+		send: #initialize to: kernel
 ]
 
 { #category : #'own services' }
-VirtualSmalltalkImage >> buildSpecies: spec [
+VirtualImage >> buildSpecies: spec [
 	| sspec sclass sbehavior metasuper  |
 	sspec := spec superclass.
 	sspec
@@ -128,23 +129,28 @@ VirtualSmalltalkImage >> buildSpecies: spec [
 		initializeMetaclass: spec metaclass superclass: metasuper
 ]
 
+{ #category : #'own services' }
+VirtualImage >> builder [
+	^	ImageSegmentBuilder new image: self.
+]
+
 { #category : #accessing }
-VirtualSmalltalkImage >> classFor: anRGBehavior [
+VirtualImage >> classFor: anRGBehavior [
 	^classes at: anRGBehavior
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> classNamed: aString [
+VirtualImage >> classNamed: aString [
 	^self classFor: self => aString
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> classes [
+VirtualImage >> classes [
 	^ classes
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> createSpecies: definition [
+VirtualImage >> createSpecies: definition [
 	| class meta ibehavior cbehavior |
 	class := self basicNewSlots: #Class.
 	class initializeAs: definition metaclass sized: 0.
@@ -164,12 +170,12 @@ VirtualSmalltalkImage >> createSpecies: definition [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> false [
+VirtualImage >> false [
 	^ falseObj
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> fixBehaviors [
+VirtualImage >> fixBehaviors [
 	self
 		initializeBehavior: nilObj;
 		initializeBehavior: trueObj;
@@ -186,7 +192,7 @@ VirtualSmalltalkImage >> fixBehaviors [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> formatOfClass: definition [
+VirtualImage >> formatOfClass: definition [
 	| variable pointers |
 	variable := definition isVariable ifTrue: [ 16r2000 ] ifFalse: [ 0 ].
 	pointers := definition isBytes ifTrue: [ 0 ] ifFalse: [16r4000 ].
@@ -194,7 +200,7 @@ VirtualSmalltalkImage >> formatOfClass: definition [
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> genesis [
+VirtualImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
 	done this (and much more) before us. Namely SELF people. I (JV) would like to use this opportunity and point you to
@@ -212,19 +218,19 @@ VirtualSmalltalkImage >> genesis [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> includes: anObject [
+VirtualImage >> includes: anObject [
 	^identityMap includesKey: anObject
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> initialize [
+VirtualImage >> initialize [
 	classes := OrderedDictionary new.
 	metaclasses := OrderedDictionary new.
 		identityMap := IdentityDictionary new
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> initializeBehavior: anObjectMap [
+VirtualImage >> initializeBehavior: anObjectMap [
 	| class |
 	class := classes at: anObjectMap spec.
 	anObjectMap behavior: class instanceBehavior.
@@ -232,7 +238,7 @@ VirtualSmalltalkImage >> initializeBehavior: anObjectMap [
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
+VirtualImage >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
 	| class name flag ivars poolnames pools subclasses format |
 	class := classes at: definition.
 	class instanceBehavior next: superbehavior.
@@ -259,7 +265,7 @@ VirtualSmalltalkImage >> initializeClass: definition superclass: superclass supe
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> initializeMetaclass: definition superclass: superclass [
+VirtualImage >> initializeMetaclass: definition superclass: superclass [
 	| meta ivars flags format superbehavior |
 	meta := metaclasses at: definition.
 	superbehavior := superclass instanceBehavior.
@@ -275,22 +281,22 @@ VirtualSmalltalkImage >> initializeMetaclass: definition superclass: superclass 
 ]
 
 { #category : #building }
-VirtualSmalltalkImage >> kernel [
+VirtualImage >> kernel [
 	^kernel
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> map: anObject to: anObjectMap [
+VirtualImage >> map: anObject to: anObjectMap [
 	identityMap at: anObject put: anObjectMap
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> metaclassFor: anRGBehavior [
+VirtualImage >> metaclassFor: anRGBehavior [
 	^ metaclasses at: anRGBehavior
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newArray: anArray [
+VirtualImage >> newArray: anArray [
 	| assoc |
 	assoc := self newSlots: 'Array' sized: anArray size.
 	anArray withIndexDo: [ :obj :i | assoc at: i put: obj ].
@@ -298,7 +304,7 @@ VirtualSmalltalkImage >> newArray: anArray [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newAssociation: anAssociation [
+VirtualImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
 	key := self transferLiteralDeep: anAssociation key.
@@ -309,7 +315,7 @@ VirtualSmalltalkImage >> newAssociation: anAssociation [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newBytes: classname contents: aByteObject [
+VirtualImage >> newBytes: classname contents: aByteObject [
 	| obj |
 	obj := self basicNewBytes: classname contents: aByteObject.
 	self initializeBehavior: obj.
@@ -317,12 +323,12 @@ VirtualSmalltalkImage >> newBytes: classname contents: aByteObject [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newBytesFrom: aByteObject [
+VirtualImage >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newBytesOf: anRGBehavior contents: aByteObject [
+VirtualImage >> newBytesOf: anRGBehavior contents: aByteObject [
 	| obj |
 	obj := self basicNewBytesOf: anRGBehavior contents: aByteObject.
 	self initializeBehavior: obj.
@@ -330,19 +336,19 @@ VirtualSmalltalkImage >> newBytesOf: anRGBehavior contents: aByteObject [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newBytesOf: anRGBehavior sized: anInteger [
+VirtualImage >> newBytesOf: anRGBehavior sized: anInteger [
 	| contents |
 	contents := ByteArray new: anInteger.
 	^ self newBytesOf: anRGBehavior contents: contents
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> newFloatFrom: aFloat [
+VirtualImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newInteger: anInteger [
+VirtualImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
@@ -351,7 +357,7 @@ VirtualSmalltalkImage >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newLargeNegativeInteger: anInteger [
+VirtualImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := ByteArray new: size withAll: 16rFF.
@@ -364,7 +370,7 @@ VirtualSmalltalkImage >> newLargeNegativeInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newLargePositiveInteger: anInteger [
+VirtualImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
@@ -372,12 +378,12 @@ VirtualSmalltalkImage >> newLargePositiveInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newSlots: classname [
+VirtualImage >> newSlots: classname [
 	^self newSlots: classname sized: 0
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newSlots: classname sized: size [
+VirtualImage >> newSlots: classname sized: size [
 "
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
@@ -391,7 +397,7 @@ VirtualSmalltalkImage >> newSlots: classname sized: size [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newSlotsOf: anRGBehavior sized: size [
+VirtualImage >> newSlotsOf: anRGBehavior sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
@@ -405,7 +411,7 @@ VirtualSmalltalkImage >> newSlotsOf: anRGBehavior sized: size [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newSmallInteger: anInteger [
+VirtualImage >> newSmallInteger: anInteger [
 	self ASSERT: (anInteger between: minSMI and: maxSMI).
 	^ SmallintObjectMap
 		new: self => #SmallInteger
@@ -413,14 +419,14 @@ VirtualSmalltalkImage >> newSmallInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newString: aString [
+VirtualImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
 { #category : #initialization }
-VirtualSmalltalkImage >> newStringArray: strings [
+VirtualImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
 	strings
@@ -431,7 +437,7 @@ VirtualSmalltalkImage >> newStringArray: strings [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> newSymbol: aSymbol [
+VirtualImage >> newSymbol: aSymbol [
 	| new bytes |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
 	bytes := aSymbol copyWith: Character null.
@@ -440,32 +446,32 @@ VirtualSmalltalkImage >> newSymbol: aSymbol [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> nil [
+VirtualImage >> nil [
 	^ nilObj
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> speciesFor: anRGBehavior [
+VirtualImage >> speciesFor: anRGBehavior [
 	^classes at: anRGBehavior ifAbsent: [ metaclasses at: anRGBehavior]
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> specs [
+VirtualImage >> specs [
 	^specs
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> specs: anRGEnvironment [
+VirtualImage >> specs: anRGEnvironment [
 	specs := anRGEnvironment 
 ]
 
 { #category : #testing }
-VirtualSmalltalkImage >> surrogateFor: anObject [
+VirtualImage >> surrogateFor: anObject [
 	^ identityMap at: anObject ifAbsent: nil
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> transferBlock: anSCompiledBlock [
+VirtualImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
 		ifPresent: [ :b | ^ b ].
@@ -481,7 +487,7 @@ VirtualSmalltalkImage >> transferBlock: anSCompiledBlock [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> transferLiteral: anObject [
+VirtualImage >> transferLiteral: anObject [
 	| class transferred slot |
 	class := anObject class.
 	(class inheritsFrom: ObjectMap)
@@ -503,7 +509,7 @@ VirtualSmalltalkImage >> transferLiteral: anObject [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> transferLiteralDeep: anObject [
+VirtualImage >> transferLiteralDeep: anObject [
 	| class transferred slot size ivar |
 	class := anObject class.
 	anObject isInteger
@@ -544,17 +550,17 @@ VirtualSmalltalkImage >> transferLiteralDeep: anObject [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> true [
+VirtualImage >> true [
 	^ trueObj
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> wordSize [
+VirtualImage >> wordSize [
 	^ wordSize
 ]
 
 { #category : #accessing }
-VirtualSmalltalkImage >> wordSize: anInteger [
+VirtualImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1

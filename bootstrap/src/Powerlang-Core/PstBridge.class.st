@@ -8,7 +8,7 @@ Class {
 PstBridge >> findFalseObject [
 	| s handle |
 	s := runtime storage.
-	handle := s class = VirtualSmalltalkImage
+	handle := s class = VirtualImage
 		ifTrue: [ s false ]
 		ifFalse: [ self ASSERT: false ].
 	^ falseObj := ObjectHandle on: handle within: runtime

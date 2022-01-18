@@ -19,10 +19,10 @@ VirtualClass >> classPool [
 ]
 
 { #category : #accessing }
-VirtualClass >> createClassAssociationsWith: aVirtualSmalltalkImage [
+VirtualClass >> createClassAssociationsWith: aVirtualImage [
 	| assocs |
 	assocs := spec classVariables
-		collect: [ :cvar | aVirtualSmalltalkImage newAssociation: cvar name -> nil ].
+		collect: [ :cvar | aVirtualImage newAssociation: cvar name -> nil ].
 	cvars := VirtualDictionary withAll: assocs
 ]
 

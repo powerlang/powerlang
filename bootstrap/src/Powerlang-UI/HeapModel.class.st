@@ -22,10 +22,10 @@ HeapModel class >> defaultSpec [
 HeapModel class >> forSimulatedPst [
 	<example>
 	| vimage builder writer labels |
-	vimage := VirtualSmalltalkImage fromSpec
+	vimage := VirtualImage fromSpec
 		wordSize: 8;
-		genesis.
-	builder := vimage bootstrap.
+		genesis; bootstrap.
+	builder := vimage builder.
 	builder
 		fillClasses;
 		nativizeForDMR;

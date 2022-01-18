@@ -10,13 +10,14 @@ Class {
 { #category : #accessing }
 ObjectMirrorTest >> runtime [
 	| vimage builder |
-	vimage := VirtualSmalltalkImage fromSpec
+	vimage := VirtualImage fromSpec
 		wordSize: 8;
-		genesis.
-	builder := vimage bootstrap.
+		genesis;
+		bootstrap.
+	builder := vimage builder.
 	builder addGenesisObjects.
 	^ Runtime
-		forSimulating: VirtualSmalltalkImage kernelSpec
+		forSimulating: VirtualImage kernelSpec
 		memory: builder writer write image
 ]
 

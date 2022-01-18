@@ -18,7 +18,7 @@ Class {
 
 { #category : #private }
 NativizationEnvironment class >> forTesting [
-	^ self forTesting: VirtualSmalltalkImage kernelSpec
+	^ self forTesting: VirtualImage kernelSpec
 ]
 
 { #category : #private }

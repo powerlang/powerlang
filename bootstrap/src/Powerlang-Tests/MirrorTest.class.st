@@ -33,15 +33,15 @@ MirrorTest >> mirrorForObject [
 MirrorTest >> setUp [
 	| vimage image |
 	super setUp.
-	vimage := VirtualSmalltalkImage fromSpec
+	vimage := VirtualImage fromSpec
 		wordSize: 8;
-		genesis.
-	builder := vimage bootstrap.
-	builder
-		addGenesisObjects.
+		genesis;
+		bootstrap.
+	builder := vimage builder.
+	builder addGenesisObjects.
 	image := builder writer write image.
 	runtime := Runtime
-		forSimulating: VirtualSmalltalkImage kernelSpec
+		forSimulating: VirtualImage kernelSpec
 		memory: image
 ]
 

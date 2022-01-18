@@ -5,7 +5,7 @@ that virtual image, and our semantics tries to mimic as much as possible
 the one of the final system.
 "
 Class {
-	#name : #VirtualSmalltalkRuntime,
+	#name : #VirtualRuntime,
 	#superclass : #Object,
 	#instVars : [
 		'image',
@@ -27,7 +27,7 @@ Class {
 }
 
 { #category : #'class initialization' }
-VirtualSmalltalkRuntime class >> initialize [
+VirtualRuntime class >> initialize [
 	"
 	self initialize
 	"
@@ -35,7 +35,7 @@ VirtualSmalltalkRuntime class >> initialize [
 ]
 
 { #category : #'instance creation' }
-VirtualSmalltalkRuntime class >> new [
+VirtualRuntime class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -43,7 +43,7 @@ VirtualSmalltalkRuntime class >> new [
 ]
 
 { #category : #services }
-VirtualSmalltalkRuntime >> booleanFrom: anObject [
+VirtualRuntime >> booleanFrom: anObject [
 	anObject == image false
 		ifTrue: [ ^ false ].
 	anObject == image true
@@ -52,7 +52,7 @@ VirtualSmalltalkRuntime >> booleanFrom: anObject [
 ]
 
 { #category : #testing }
-VirtualSmalltalkRuntime >> builderOf: closure [
+VirtualRuntime >> builderOf: closure [
 	frames
 		reverseDo: [ :frame | 
 			(frame built: closure)
@@ -61,7 +61,7 @@ VirtualSmalltalkRuntime >> builderOf: closure [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> compile: anRGMethod [
+VirtualRuntime >> compile: anRGMethod [
 	| compiler spec class |
 	compiler := SCompiler new.
 	spec := anRGMethod parent.
@@ -72,7 +72,7 @@ VirtualSmalltalkRuntime >> compile: anRGMethod [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> doLookup: aSymbol startingAt: aBehavior [
+VirtualRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	| behavior m c smethod |
 	behavior := aBehavior.
 	[ m := self methodFor: aSymbol in: behavior.
@@ -87,18 +87,18 @@ VirtualSmalltalkRuntime >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> false [
+VirtualRuntime >> false [
 	^ image false
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> frames [
+VirtualRuntime >> frames [
 	^ frames
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> image: aVirtualSmalltalkImage [
-	image := aVirtualSmalltalkImage.
+VirtualRuntime >> image: aVirtualImage [
+	image := aVirtualImage.
 	namespace image: image.
 	smallintBehavior := (image classNamed: #SmallInteger)
 		instanceBehavior.
@@ -108,7 +108,7 @@ VirtualSmalltalkRuntime >> image: aVirtualSmalltalkImage [
 ]
 
 { #category : #initialization }
-VirtualSmalltalkRuntime >> initialize [
+VirtualRuntime >> initialize [
 	frames := OrderedCollection new.
 	methodCache := Dictionary new.
 	symbolCache := IdentityDictionary new.
@@ -118,7 +118,7 @@ VirtualSmalltalkRuntime >> initialize [
 ]
 
 { #category : #'own services' }
-VirtualSmalltalkRuntime >> initializeClassPools [
+VirtualRuntime >> initializeClassPools [
 	| dictionary virtual cvars |
 	dictionary := image classNamed: #Dictionary.
 	image classes
@@ -131,7 +131,7 @@ VirtualSmalltalkRuntime >> initializeClassPools [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> initializeEmulationOverrides [
+VirtualRuntime >> initializeEmulationOverrides [
 	self
 		override: #Species -> #basicNew with: 'basicNew <primitive: New>';
 		override: #Species -> #basicNew:
@@ -210,7 +210,7 @@ VirtualSmalltalkRuntime >> initializeEmulationOverrides [
 ]
 
 { #category : #'own services' }
-VirtualSmalltalkRuntime >> initializeNamespace [
+VirtualRuntime >> initializeNamespace [
 	| assoc |
 	assoc := image newAssociation: #WordSize -> image wordSize.
 	namespace add: assoc.
@@ -228,65 +228,65 @@ VirtualSmalltalkRuntime >> initializeNamespace [
 ]
 
 { #category : #testing }
-VirtualSmalltalkRuntime >> isUndermessage: selector [
+VirtualRuntime >> isUndermessage: selector [
 	^ Undermessages includes: selector
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> lookup: aSymbol startingAt: aBehavior [
+VirtualRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> methodFor: aSymbol in: anRGBehavior [
+VirtualRuntime >> methodFor: aSymbol in: anRGBehavior [
 	overrides at: anRGBehavior->aSymbol ifPresent: [:m | ^m].
 	^anRGBehavior methodNamed: aSymbol
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> namespace [
+VirtualRuntime >> namespace [
 	^ namespace
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> newBytesOf: anRGBehavior  sized: anInteger [
+VirtualRuntime >> newBytesOf: anRGBehavior  sized: anInteger [
 	^ image newBytesOf: anRGBehavior  sized: anInteger
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> newClosure: anInteger [
+VirtualRuntime >> newClosure: anInteger [
 	^image newSlots: #Closure sized: anInteger
 ]
 
 { #category : #services }
-VirtualSmalltalkRuntime >> newInteger: anInteger [ 
+VirtualRuntime >> newInteger: anInteger [ 
 	^image newInteger: anInteger 
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> newOf: anRGBehavior [ 
+VirtualRuntime >> newOf: anRGBehavior [ 
 	^ image newSlotsOf: anRGBehavior sized: 0
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> newOf: anRGBehavior sized: anInteger [
+VirtualRuntime >> newOf: anRGBehavior sized: anInteger [
 	^ anRGBehavior isBytes
 		ifTrue: [ image newBytesOf: anRGBehavior sized: anInteger ]
 		ifFalse: [ image newSlotsOf: anRGBehavior sized: anInteger ]
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> newSlotsOf: anRGBehavior sized: anInteger [
+VirtualRuntime >> newSlotsOf: anRGBehavior sized: anInteger [
 	^ image newSlotsOf: anRGBehavior sized: anInteger
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> nil [
+VirtualRuntime >> nil [
 	^ image nil
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> override: assoc with: source [
+VirtualRuntime >> override: assoc with: source [
 	| species selector method override |
 	species := image specs at: assoc key.
 	selector := assoc value.
@@ -296,27 +296,27 @@ VirtualSmalltalkRuntime >> override: assoc with: source [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> popFrame [
+VirtualRuntime >> popFrame [
 	frames removeLast
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> pushFrame: aMethodEvaluator [
+VirtualRuntime >> pushFrame: aMethodEvaluator [
 	frames addLast: aMethodEvaluator
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> send: aSymbol to: receiver [
+VirtualRuntime >> send: aSymbol to: receiver [
 	^ self send: aSymbol to: receiver with: {}
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> send: aSymbol to: receiver with: anArray [
+VirtualRuntime >> send: aSymbol to: receiver with: anArray [
 	^ self send: aSymbol to: receiver with: anArray super: false
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean [
+VirtualRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean [
 	| behavior method environment frame |
 	(self isUndermessage: aSymbol)
 		ifTrue: [ ^ frames last staticSend: aSymbol to: receiver with: arguments ].
@@ -336,24 +336,24 @@ VirtualSmalltalkRuntime >> send: aSymbol to: receiver with: arguments super: aBo
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> smallintBehavior [
+VirtualRuntime >> smallintBehavior [
 	^smallintBehavior
 ]
 
 { #category : #services }
-VirtualSmalltalkRuntime >> symbolFrom: anObjectMap [
+VirtualRuntime >> symbolFrom: anObjectMap [
 	^ symbolCache
 		at: anObjectMap
 		ifAbsentPut: [ anObjectMap asString asSymbol ]
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> transferLiteral: anObject [
+VirtualRuntime >> transferLiteral: anObject [
 	^image transferLiteral: anObject
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> transferMethodLiterals: method [
+VirtualRuntime >> transferMethodLiterals: method [
 	| class |
 	method withIndexDo: [:literal :i | 
 		class := literal class.
@@ -364,12 +364,12 @@ VirtualSmalltalkRuntime >> transferMethodLiterals: method [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> true [
+VirtualRuntime >> true [
 	^image true
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> unwindUpTo: environment returning: value [
+VirtualRuntime >> unwindUpTo: environment returning: value [
 	| frame |
 	frames size to: 1 by: -1 do: [ :i | 
 		frame := frames at: i.
@@ -380,7 +380,7 @@ VirtualSmalltalkRuntime >> unwindUpTo: environment returning: value [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> virtualClassFor: spec [
+VirtualRuntime >> virtualClassFor: spec [
 	| superclass supervirtual virtual map |
 	superclass := spec superclass.
 	map := image classFor: spec.
@@ -396,7 +396,7 @@ VirtualSmalltalkRuntime >> virtualClassFor: spec [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> virtualMetaclassFor: spec [
+VirtualRuntime >> virtualMetaclassFor: spec [
 	| superclass supervirtual class virtual map |
 	class := self virtualSpeciesFor: spec instanceSide.
 	map := 	image speciesFor: spec.
@@ -411,7 +411,7 @@ VirtualSmalltalkRuntime >> virtualMetaclassFor: spec [
 ]
 
 { #category : #accessing }
-VirtualSmalltalkRuntime >> virtualSpeciesFor: spec [
+VirtualRuntime >> virtualSpeciesFor: spec [
 
 	virtualSpecies at: spec ifPresent: [ :existing | ^ existing ].
 ^	spec isMeta ifTrue: [self virtualMetaclassFor: spec] ifFalse: [self virtualClassFor: spec]

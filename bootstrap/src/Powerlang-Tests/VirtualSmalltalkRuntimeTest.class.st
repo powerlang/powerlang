@@ -30,10 +30,10 @@ VirtualSmalltalkRuntimeTest >> compile: aString in: classname during: aBlock [
 
 { #category : #running }
 VirtualSmalltalkRuntimeTest >> setUp [
-	image := VirtualSmalltalkImage fromSpec
+	image := VirtualImage fromSpec
 		wordSize: 8;
 		genesis.
-	runtime := VirtualSmalltalkRuntime new image: image.
+	runtime := VirtualRuntime new image: image.
 ]
 
 { #category : #tests }

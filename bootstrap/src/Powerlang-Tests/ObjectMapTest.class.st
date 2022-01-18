@@ -10,7 +10,7 @@ Class {
 { #category : #running }
 ObjectMapTest >> setUp [
 	super setUp.
-	kernel := VirtualSmalltalkImage kernelSpec
+	kernel := VirtualImage kernelSpec
 ]
 
 { #category : #running }

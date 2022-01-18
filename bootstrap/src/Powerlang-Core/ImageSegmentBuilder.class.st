@@ -130,9 +130,9 @@ ImageSegmentBuilder >> image [
 ]
 
 { #category : #initialization }
-ImageSegmentBuilder >> image: aVirtualSmalltalkImage [
-	image := aVirtualSmalltalkImage.
-	runtime image: image
+ImageSegmentBuilder >> image: aVirtualImage [
+	image := aVirtualImage.
+	runtime := image runtime 
 ]
 
 { #category : #initialization }
@@ -141,23 +141,23 @@ ImageSegmentBuilder >> initialize [
 	classes := OrderedDictionary new.
 	methods := OrderedDictionary new.
 	objects := OrderedCollection new.
-	runtime := VirtualSmalltalkRuntime new
+	runtime := VirtualRuntime new
 ]
 
 { #category : #initialization }
 ImageSegmentBuilder >> initialize32BitImage [
-	image := VirtualSmalltalkImage fromSpec
+	image := VirtualImage fromSpec
 		wordSize: 4;
 		genesis.
-	runtime := VirtualSmalltalkRuntime new image: image; initializeClassPools
+	runtime := VirtualRuntime new image: image; initializeClassPools
 ]
 
 { #category : #initialization }
 ImageSegmentBuilder >> initialize64BitImage [
-	image := VirtualSmalltalkImage fromSpec
+	image := VirtualImage fromSpec
 		wordSize: 8;
 		genesis.
-	runtime := VirtualSmalltalkRuntime new
+	runtime := VirtualRuntime new
 		image: image;
 		initializeClassPools
 ]

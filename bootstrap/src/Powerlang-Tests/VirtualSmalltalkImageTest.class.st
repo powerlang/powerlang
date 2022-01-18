@@ -9,7 +9,7 @@ Class {
 
 { #category : #tests }
 VirtualSmalltalkImageTest >> setUp [
-	image := VirtualSmalltalkImage fromSpec wordSize: 8; genesis
+	image := VirtualImage fromSpec wordSize: 8; genesis
 ]
 
 { #category : #tests }

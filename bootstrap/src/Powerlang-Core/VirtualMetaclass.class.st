@@ -23,8 +23,8 @@ VirtualMetaclass >> classPool [
 ]
 
 { #category : #'accessing - parallel hierarchy' }
-VirtualMetaclass >> createClassAssociationsWith: aVirtualSmalltalkImage [
-
+VirtualMetaclass >> createClassAssociationsWith: aVirtualImage [
+	
 ]
 
 { #category : #'accessing - parallel hierarchy' }

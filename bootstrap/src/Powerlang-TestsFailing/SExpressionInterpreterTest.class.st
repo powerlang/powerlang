@@ -48,7 +48,7 @@ SExpressionInterpreterTest >> invoke: method with: object [
 { #category : #running }
 SExpressionInterpreterTest >> setUp [
 	super setUp.
-	builder := VirtualSmalltalkImage kernelSpec build
+	builder := VirtualImage kernelSpec build
 ]
 
 { #category : #tests }
@@ -69,6 +69,6 @@ SExpressionInterpreterTest >> test100empty [
 SExpressionInterpreterTest >> write [
 	writer := builder writer write.
 	runtime := Runtime
-		forSimulating: VirtualSmalltalkImage kernelSpec
+		forSimulating: VirtualImage kernelSpec
 		memory: writer image
 ]

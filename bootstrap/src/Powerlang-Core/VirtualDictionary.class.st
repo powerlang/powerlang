@@ -105,8 +105,8 @@ VirtualDictionary >> do: aBlock [
 ]
 
 { #category : #accessing }
-VirtualDictionary >> image: aVirtualSmalltalkImage [
-	image := aVirtualSmalltalkImage
+VirtualDictionary >> image: aVirtualImage [
+	image := aVirtualImage
 ]
 
 { #category : #accessing }
