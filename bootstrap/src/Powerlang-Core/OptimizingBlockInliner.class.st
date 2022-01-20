@@ -43,34 +43,48 @@ OptimizingBlockInliner >> inlineAnd: message in: block [
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineIfFalse: message in: block [
-	| closure firstSkipped lastSkipped join |
+	| closure firstSkipped lastSkipped join nilval |
 	closure := message arguments first.
 	firstSkipped := closure firstBlock.
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
-	block endWithJumpTrueTo: join skipping: firstSkipped if: message receiver.
+	nilval := OLoadConstant valued: nil.
+	message afterInsert: nilval.
+	join insertPhiOf: lastSkipped and: block replacing: message.
+	block
+		endWithJumpTrueTo: join
+		skipping: firstSkipped
+		if: message receiver.
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
-	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
-	^join
+	join
+		addPredecessor: lastSkipped;
+		addPredecessor: block.
+	^ join
 ]
 
 { #category : #unclassified }
 OptimizingBlockInliner >> inlineIfTrue: message in: block [
-	| closure firstSkipped lastSkipped join |
+	| closure firstSkipped lastSkipped join nilval |
 	closure := message arguments first.
 	firstSkipped := closure firstBlock.
 	self inlineInnerBlocksOf: firstSkipped.
 	lastSkipped := firstSkipped lastBlock.
 	join := block splitAfter: message.
-	block endWithJumpFalseTo: join skipping: firstSkipped if: message receiver.
+	nilval := OLoadConstant valued: nil.
+	message afterInsert: nilval.
+	join insertPhiOf: lastSkipped and: block replacing: message.
+	block
+		endWithJumpFalseTo: join
+		skipping: firstSkipped
+		if: message receiver.
 	lastSkipped endWithJumpTo: join.
 	firstSkipped addPredecessor: block.
-	join addPredecessor: lastSkipped; addPredecessor: block.
-	message dissolve.
-	^join
+	join
+		addPredecessor: lastSkipped;
+		addPredecessor: block.
+	^ join
 ]
 
 { #category : #unclassified }
