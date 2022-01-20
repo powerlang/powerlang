@@ -13,7 +13,8 @@ Class {
 		'dominanceFrontiers',
 		'pendingReads',
 		'pendingPhis',
-		'abi'
+		'abi',
+		'method'
 	],
 	#category : #'Powerlang-Core-OCompiler'
 }
@@ -122,67 +123,14 @@ OptimizingVariableBinder >> insertPhiOf: name at: block [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> instructionsForWriting: aWriteVariable [
-	| binding |
-	binding := aWriteVariable binding.
-	binding isTemporary
-		ifTrue: [^self instructionsForWriting: aWriteVariable toTemporary: binding].
-	binding isInstVar
-		ifTrue: [^self
-			instructionsForWriting: aWriteVariable
-			toInstanceVariable: binding].
-	binding isAssociation
-		ifTrue: [^self
-			instructionsForWriting: aWriteVariable
-			toAssociation: binding].
-	self halt
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toAssociation: binding [
-	| global write |
-	global := OLoadConstant valued: binding association.
-	write := OTernaryOperation
-		receiver: global
-		left: 1
-		right: aWriteVariable source
-		name: #_basicAt:put:.
-	global addUse: write at: #receiver.
-	aWriteVariable source addUse: write at: #right.
-	aWriteVariable beforeInsert: global; dissolveReplacingWith: write
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toInstanceVariable: binding [
-	| this write |
-	this := self definitionOf: #self.
-	write := OTernaryOperation
-		receiver: this
-		left: binding index
-		right: aWriteVariable source
-		name: #_basicAt:put:.
-	this addUse: write at: #receiver.
-	aWriteVariable source addUse: write at: #right.
-	aWriteVariable dissolveReplacingWith: write
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> instructionsForWriting: aWriteVariable toTemporary: binding [
-	self define: aWriteVariable source as: binding name asSymbol.
-	aWriteVariable dissolve.
-	(dominanceFrontiers at: currentBlock)
-		do: [:block | self insertPhiOf: binding name asSymbol at: block]
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> resolve: aReadVariable asArgument: binding [
+OptimizingVariableBinder >> lowerReadArgument: aReadVariable binding: binding [
 	| source |
 	source := self definitionOf: binding index asString asSymbol.
 	aReadVariable replaceAllUsesWith: source; dissolve
 ]
 
 { #category : #private }
-OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
+OptimizingVariableBinder >> lowerReadAssociaion: aReadVariable binding: binding [
   | global read value name load | 
   binding isPoolVar ifTrue: [ load := OLoadConstant valued: binding value.
 		^aReadVariable dissolveReplacingWith: load ].
@@ -199,7 +147,7 @@ OptimizingVariableBinder >> resolve: aReadVariable asAssociationValue: binding [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
+OptimizingVariableBinder >> lowerReadInstanceVar: aReadVariable binding: binding [
 	| receiver index load |
 	receiver := self definitionOf: #self.
 	"	index := method classField indexOfSlot: name."
@@ -213,19 +161,62 @@ OptimizingVariableBinder >> resolve: aReadVariable asInstanceVar: binding [
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> resolve: aReadVariable asLiteral: binding [
+OptimizingVariableBinder >> lowerReadLiteral: aReadVariable binding: binding [
 	| constant |
 	constant := OLoadConstant valued: binding value.
 	aReadVariable dissolveReplacingWith: constant
 ]
 
 { #category : #unclassified }
-OptimizingVariableBinder >> resolve: aReadVariable asTemporary: binding [
+OptimizingVariableBinder >> lowerReadSelf: aReadVariable [
+	| receiver |
+	receiver := self definitionOf: #self.
+	^aReadVariable replaceAllUsesWith: receiver; dissolve
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> lowerReadTemporary: aReadVariable binding: binding [
 	| source |
 	source := self definitionOf: binding name asSymbol in: currentBlock.
 	source
 		ifNil: [pendingReads add: aReadVariable -> currentBlock]
 		ifNotNil: [aReadVariable replaceAllUsesWith: source; dissolve]
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> lowerWriteAssociation: aWriteVariable binding: binding [
+	| global write |
+	global := OLoadConstant valued: binding association.
+	write := OTernaryOperation
+		receiver: global
+		left: 1
+		right: aWriteVariable source
+		name: #_basicAt:put:.
+	global addUse: write at: #receiver.
+	aWriteVariable source addUse: write at: #right.
+	aWriteVariable beforeInsert: global; dissolveReplacingWith: write
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> lowerWriteInstanceVar: aWriteVariable binding: binding [
+	| this write |
+	this := self definitionOf: #self.
+	write := OTernaryOperation
+		receiver: this
+		left: binding index
+		right: aWriteVariable source
+		name: #_basicAt:put:.
+	this addUse: write at: #receiver.
+	aWriteVariable source addUse: write at: #right.
+	aWriteVariable dissolveReplacingWith: write
+]
+
+{ #category : #unclassified }
+OptimizingVariableBinder >> lowerWriteTemporary: aWriteVariable binding: binding [
+	self define: aWriteVariable source as: binding name asSymbol.
+	aWriteVariable dissolve.
+	(dominanceFrontiers at: currentBlock)
+		do: [:block | self insertPhiOf: binding name asSymbol at: block]
 ]
 
 { #category : #unclassified }
@@ -235,13 +226,6 @@ OptimizingVariableBinder >> resolvePendingReads [
 		block := association value.
 		source := self definitionOf: read binding name asSymbol before: block.
 		read replaceWithCopyOf: source]
-]
-
-{ #category : #unclassified }
-OptimizingVariableBinder >> resolveSelf: aReadVariable [
-	| receiver |
-	receiver := self definitionOf: #self.
-	^aReadVariable replaceAllUsesWith: receiver; dissolve
 ]
 
 { #category : #unclassified }
@@ -310,15 +294,17 @@ OptimizingVariableBinder >> visitReadVariable: aReadVariable [
 	self ASSERT: (aReadVariable binding isKindOf: SBinding).
 	binding := aReadVariable binding.
 	binding isTemporary
-		ifTrue: [^self resolve: aReadVariable asTemporary: binding].
+		ifTrue: [ ^ self lowerReadTemporary: aReadVariable binding: binding ].
 	binding isArgument
-		ifTrue: [^self resolve: aReadVariable asArgument: binding].
-	binding isSelf ifTrue: [^self resolveSelf: aReadVariable].
-	binding isLiteral ifTrue: [^self resolve: aReadVariable asLiteral: binding].
+		ifTrue: [ ^ self lowerReadArgument: aReadVariable binding: binding ].
+	binding isSelf
+		ifTrue: [ ^ self lowerReadSelf: aReadVariable ].
+	binding isLiteral
+		ifTrue: [ ^ self lowerReadLiteral: aReadVariable binding: binding ].
 	binding isInstVar
-		ifTrue: [^self resolve: aReadVariable asInstanceVar: binding].
+		ifTrue: [ ^ self lowerReadInstanceVar: aReadVariable binding: binding ].
 	binding isAssociation
-		ifTrue: [^self resolve: aReadVariable asAssociationValue: binding].
+		ifTrue: [ ^ self lowerReadAssociaion: aReadVariable binding: binding ].
 	self ASSERT: false
 ]
 
@@ -339,8 +325,19 @@ OptimizingVariableBinder >> visitUnary: instruction [
 
 { #category : #unclassified }
 OptimizingVariableBinder >> visitWriteVariable: aWriteVariable [
-	self ASSERT: (aWriteVariable binding isKindOf: SBinding).
-	self instructionsForWriting: aWriteVariable
+	| binding |
+	binding := aWriteVariable binding.
+	self ASSERT: (binding isKindOf: SBinding).
+	binding isTemporary
+		ifTrue: [ ^ self lowerWriteTemporary: aWriteVariable binding: binding ].
+	binding isInstVar
+		ifTrue: [ ^ self
+				lowerWriteInstanceVar: aWriteVariable
+				binding: binding ].
+	binding isAssociation
+		ifTrue:
+			[ ^ self lowerWriteAssociation: aWriteVariable binding: binding ].
+	self halt
 ]
 
 { #category : #accessing }
