@@ -9,7 +9,7 @@ Class {
 
 { #category : #unclassified }
 SDynamicBinding class >> decodeUsing: anAstcodeDecoder [
-	^anAstcodeDecoder decodeDynamicVar
+	^ anAstcodeDecoder decodeDynamicVar
 ]
 
 { #category : #accessing }
@@ -18,8 +18,25 @@ SDynamicBinding >> assign: value within: evaluator [
 ]
 
 { #category : #accessing }
+SDynamicBinding >> isDynamic [
+	^true
+]
+
+{ #category : #accessing }
+SDynamicBinding >> name [ ^
+	name
+]
+
+{ #category : #accessing }
 SDynamicBinding >> name: aSymbol [
 	name := aSymbol
+]
+
+{ #category : #accessing }
+SDynamicBinding >> printOn: aStream [
+	aStream
+		nextPutAll: 'DinamicVarId. ';
+		nextPutAll: name printString
 ]
 
 { #category : #accessing }

@@ -35,6 +35,11 @@ SBinding >> isClassVar [
 ]
 
 { #category : #testing }
+SBinding >> isDynamic [
+	^ false
+]
+
+{ #category : #testing }
 SBinding >> isInstVar [
 	^false
 ]

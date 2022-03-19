@@ -45,7 +45,7 @@ SClosure >> isSelfEvaluating [
 
 { #category : #accessing }
 SClosure >> value [
-	^home evaluateClosure: self
+	^ home evaluateClosure: self
 ]
 
 { #category : #accessing }

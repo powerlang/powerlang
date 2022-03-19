@@ -4,8 +4,7 @@ Class {
 	#instVars : [
 		'errorHandler',
 		'result',
-		'class',
-		'pools'
+		'class'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -27,21 +26,6 @@ SCompiler class >> parse: aString in: aClass [
 	| compiler |
 	compiler := self forClass: aClass.
 	^compiler parse: aString
-]
-
-{ #category : #initialization }
-SCompiler >> addPool: aPoolDictionary [
-	| dict |
-	dict := DynamicBinder on: aPoolDictionary.
-	pools add: dict
-
-]
-
-{ #category : #initialization }
-SCompiler >> addPool: aDictionary of: type [
-	| dict |
-	dict := DynamicBinder on: aDictionary of: type.
-	pools add: dict
 ]
 
 { #category : #testing }
@@ -83,8 +67,7 @@ SCompiler >> forClass: aClass [
 
 { #category : #initialization }
 SCompiler >> initialize: aDictionary [
-	class := aDictionary at: #UndefinedObject ifAbsent: nil.
-	pools := OrderedCollection new
+	class := aDictionary at: #UndefinedObject ifAbsent: nil
 ]
 
 { #category : #services }

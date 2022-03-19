@@ -216,7 +216,11 @@ SCompiledMethod >> pragma: aPragmaNode [
 
 { #category : #printing }
 SCompiledMethod >> printOn: aStream [
-	aStream nextPutAll: self classBinding name; nextPutAll: '>>'; print: selector; cr.
+	aStream
+		print: self classBinding;
+		nextPutAll: '>>';
+		print: selector;
+		cr.
 	source
 		ifNotNil: [ aStream
 				cr;
