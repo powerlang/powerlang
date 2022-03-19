@@ -1,0 +1,150 @@
+Class {
+	#name : #SpeciesMap,
+	#superclass : #SlotObjectMap,
+	#instVars : [
+		'instanceSpec',
+		'slotNames'
+	],
+	#category : #'Powerlang-Core-Emulation-Ring'
+}
+
+{ #category : #'instance creation' }
+SpeciesMap class >> classFor: anRGBehavior [
+	^self
+]
+
+{ #category : #accessing }
+SpeciesMap >> allInstVarNames [
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
+SpeciesMap >> allSlotNames [
+	^ slotNames ifNil: [ self computeAllSlotNames ]
+]
+
+{ #category : #accessing }
+SpeciesMap >> instanceSpec [
+	^instanceSpec
+]
+
+{ #category : #accessing }
+SpeciesMap >> instanceSpec: anRGBehavior [
+	instanceSpec := anRGBehavior
+]
+
+{ #category : #accessing }
+SpeciesMap >> loadCvar: aSymbol [
+	| species vars |
+	species := self.
+	[ vars := species classVariables.
+	vars isNil ifFalse: [vars at: aSymbol ifPresent: [ :value | ^ value ].
+	species localPools
+		do: [ :pool | pool at: aSymbol ifPresent: [ :value | ^ value ] ]].
+	species := species superclass.
+	species isNil ] whileFalse.
+	^ nil
+]
+
+{ #category : #accessing }
+SpeciesMap >> loadNamed: aSymbol [
+	(self loadCvar: aSymbol) ifNotNil: [ :value | ^ value ].
+	^ self module namespace
+		at: aSymbol
+		ifAbsent: [ self error: 'unbound variable: ' , aSymbol ]
+]
+
+{ #category : #accessing }
+SpeciesMap >> localPools [
+	^self subclassResponsibility
+]
+
+{ #category : #accessing }
+SpeciesMap >> lookupInModule: aSymbol [
+	| species |
+	species := self.
+	[ (species spec module includesKey: aSymbol)
+		ifTrue: [ ^SGlobalBinding new name: aSymbol; dictionary: species ].
+	species := species superclass.
+	species notNil ] whileTrue.
+	^nil
+]
+
+{ #category : #accessing }
+SpeciesMap >> staticBindingFor: aSymbol [
+	(self staticBindingForIvar: aSymbol) ifNotNil: [ :value | ^ value ].
+	(self staticBindingForCvar: aSymbol) ifNotNil: [ :value | ^ value ].
+	^(self staticBindingForMvar: aSymbol)
+
+]
+
+{ #category : #accessing }
+SpeciesMap >> staticBindingForCvar: aSymbol [
+	| species cvars assoc class |
+	species := self.
+	[ cvars := species cvars.
+	(cvars includesKey: aSymbol)
+		ifTrue: [ assoc := cvars associationAt: aSymbol.
+			^ SAssociationBinding new association: assoc ].
+	species localPools
+		do: [ :pool | 
+			(pool includesKey: aSymbol)
+				ifTrue: [ assoc := pool associationAt: aSymbol.
+					class := pool isConstant ifTrue: [ SConstantPoolBinding ] ifFalse: [ 					 SAssociationBinding].
+										^class new association: assoc ] ].
+	species := species superclass.
+	species notNil ] whileTrue.
+	^ nil
+]
+
+{ #category : #accessing }
+SpeciesMap >> staticBindingForIvar: aSymbol [
+	| ivar |
+	ivar := self allInstVarNames indexOf: aSymbol.
+	^ivar > 0
+		ifTrue: [ SInstVarBinding new index: ivar ]
+]
+
+{ #category : #accessing }
+SpeciesMap >> staticBindingForMvar: aSymbol [
+	| assoc |
+	assoc := self module
+		associationAt: aSymbol
+		ifAbsent: [ self error: 'unbound variable: ' , aSymbol ].
+	^SAssociationBinding new association: assoc
+]
+
+{ #category : #accessing }
+SpeciesMap >> storeCvar: aSymbol with: anObject [
+	| species cvars |
+	species := self. 
+	[ cvars := species classVariables.
+	cvars isNil ifFalse: [ 
+	(cvars includesKey: aSymbol)
+		ifTrue: [ ^ cvars at: aSymbol put: anObject ].
+	species localPools
+		do: [ :pool | pool at: aSymbol ifPresent: [ :value | ^ value ] ]].
+	species := species superclass.
+	species isNil ] whileFalse.
+	^ nil
+
+
+]
+
+{ #category : #accessing }
+SpeciesMap >> storeNamed: aSymbol with: anObjectMap [
+	(self storeCvar: aSymbol with: anObjectMap) ifNotNil: [ :value | ^ value ].
+	^ self module namespace
+		at: aSymbol
+		put: anObjectMap
+]
+
+{ #category : #accessing }
+SpeciesMap >> superclass [
+	^ self slotNamed: #superclass
+]
+
+{ #category : #accessing }
+SpeciesMap >> superclass: aSpeciesMap [
+	^ self slotNamed: #superclass put: aSpeciesMap
+]

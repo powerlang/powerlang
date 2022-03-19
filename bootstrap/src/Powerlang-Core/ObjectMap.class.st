@@ -2,10 +2,9 @@ Class {
 	#name : #ObjectMap,
 	#superclass : #Object,
 	#instVars : [
-		'behavior',
 		'spec'
 	],
-	#category : #'Powerlang-Core-Building'
+	#category : #'Powerlang-Core-Emulation-Ring'
 }
 
 { #category : #'instance creation' }
@@ -50,16 +49,6 @@ ObjectMap >> at: index put: value [
 	 #instVarAt:put:"
 	
 	self subclassResponsibility  
-]
-
-{ #category : #accessing }
-ObjectMap >> behavior [
-	^behavior
-]
-
-{ #category : #accessing }
-ObjectMap >> behavior: anObjectMap [
-	behavior := anObjectMap.
 ]
 
 { #category : #accessing }
@@ -192,11 +181,6 @@ ObjectMap >> slotsDo: aBlock [
 { #category : #accessing }
 ObjectMap >> spec [
 	^ spec
-]
-
-{ #category : #validation }
-ObjectMap >> validate [
-	self assert: behavior notNil
 ]
 
 { #category : #accessing }
