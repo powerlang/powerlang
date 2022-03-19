@@ -84,6 +84,11 @@ Stretch >> length [
 ]
 
 { #category : #arithmetic }
+Stretch >> mask [
+	^(2 raisedTo: end) - (2 raisedTo: start - 1)
+]
+
+{ #category : #arithmetic }
 Stretch >> max [
 	^start max: end
 ]
@@ -109,6 +114,11 @@ Stretch >> printOn: aStream [
 		nextPutAll: start asString;
 		nextPutAll: ' thru: ';
 		nextPutAll: end asString
+]
+
+{ #category : #arithmetic }
+Stretch >> shift [
+	^(start - 1) negated
 ]
 
 { #category : #accessing }
