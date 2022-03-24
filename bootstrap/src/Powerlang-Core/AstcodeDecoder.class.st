@@ -27,35 +27,7 @@ AstcodeDecoder class >> initialize [
 		at: LiteralId put: SLiteral;
 		at: IdentifierId put: SIdentifier;
 		at: MessageId put: SMessage;
-		at: ReturnId put: SReturn;
-		at: LoadRwithSelfId put: LoadRwithSelf;
-		at: LoadAwithSelfId put: LoadAwithSelf;
-		at: LoadRwithNilId put: LoadRwithNil;
-		at: LoadAwithNilId put: LoadAwithNil;
-		at: LoadRwithFalseId put: LoadRwithFalse;
-		at: LoadAwithFalseId put: LoadAwithFalse;
-		at: LoadRwithTrueId put: LoadRwithTrue;
-		at: LoadAwithTrueId put: LoadAwithTrue;
-		at: LoadRwithArgumentId put: LoadRwithArgument;
-		at: LoadAwithArgumentId put: LoadAwithArgument;
-		at: LoadRwithTemporaryId put: LoadRwithTemporary;
-		at: LoadAwithTemporaryId put: LoadAwithTemporary;
-		at: LoadRwithInstVarId put: LoadRwithInstVar;
-		at: LoadAwithInstVarId put: LoadAwithInstVar;
-		at: LoadAwithGlobalId put: LoadAwithGlobal;
-		at: LoadAwithClassVarId put: LoadAwithClassVar;
-		at: LoadAwithPoolVarId put: LoadAwithPoolVar;
-		at: LoadAwithConstPoolId put: LoadAwithConstPoolVar;
-		at: LoadRwithDynamicVarId put: LoadRwithDynamicVar;
-		at: LoadAwithDynamicVarId put: LoadAwithDynamicVar;
-		at: LoadRvisitingReceiverId put: LoadRvisitingReceiver;
-		at: LoadAvisitingArgumentId put: LoadAvisitingArgument;
-		"		at: LoadRwithLiteralId put: LoadRwithLiteral;"
-			at: LoadAwithLiteralId put: LoadAwithLiteral;
-		at: EnsureRisSmallIntegerId put: EnsureRSmallInteger;
-		at: EnsureAisSmallIntegerId put: EnsureASmallInteger;
-		at: PushRid put: PushRopcode;
-		at: PopRid put: PopRopcode.
+		at: ReturnId put: SReturn.
 	BindingTypes
 		at: NilId put: SNilBinding;
 		at: TrueId put: STrueBinding;

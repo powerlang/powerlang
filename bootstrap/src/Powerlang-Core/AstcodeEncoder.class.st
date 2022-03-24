@@ -42,20 +42,6 @@ AstcodeEncoder >> encodeArgument: anInteger env: environment [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> encodeClassBinding: association [
-	| index |
-	index := method indexOf: association ifAbsent: [self ASSERT: false].
-	stream nextPut: GlobalClassId; nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeClassVar: association [
-	| index |
-	index := method indexOf: association ifAbsent: [self ASSERT: false].
-	stream nextPut: ClassVarId; nextPut: index
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> encodeClosureElements: aBlockNode [
 	| scope parent |
 	scope := aBlockNode scope.
@@ -88,22 +74,8 @@ AstcodeEncoder >> encodeFalse [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> encodeGlobalVar: association [
-	| index |
-	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: GlobalValueId;
-		nextPut: index
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> encodeInlinedMessage: aMessageNode [
 	self nextTypePut: 0
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeInstVar: index [
-	stream nextPut: InstVarId; nextPut: index
 ]
 
 { #category : #visiting }
@@ -117,44 +89,12 @@ AstcodeEncoder >> encodeLoadAwithArg: anInteger env: environment [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithClassVar: association [
-	| index |
-	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: LoadAwithClassVarId;
-		nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithConstPoolVar: value [
-	| index |
-	index := method indexOf: value ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: LoadAwithConstPoolId;
-		nextPut: index
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> encodeLoadAwithDynamicVar: name [
 	| index |
 	index := method indexOf: name ifAbsent: [ self ASSERT: false ].
 	stream
 		nextPut: LoadAwithDynamicVarId;
 		nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithGlobal: association [
-	| index |
-	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: LoadAwithGlobalId;
-		nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithInstVar: anInteger [
-	stream nextPut: LoadAwithInstVarId; nextPut: anInteger
 ]
 
 { #category : #visiting }
@@ -168,15 +108,6 @@ AstcodeEncoder >> encodeLoadAwithLiteral: value [
 { #category : #visiting }
 AstcodeEncoder >> encodeLoadAwithNil [
 	stream nextPut: LoadAwithNilId
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithPoolVar: association [
-	| index |
-	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: LoadAwithPoolVarId;
-		nextPut: index
 ]
 
 { #category : #visiting }
@@ -219,22 +150,6 @@ AstcodeEncoder >> encodeOptimizedMessage: aMessageNode [
 	(BinaryMessageOptimizer optimizesMessage: selector value) ifFalse: [^self].
 	aMessageNode arguments size = 1
 		ifTrue: [^self encodeOptimizedBinary: aMessageNode]
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodePoolConst: association [
-	| index |
-	index := method indexOf: association ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: ConstantPoolId;
-		nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodePoolVar: association [
-	| index |
-	index := method indexOf: association ifAbsent: [self ASSERT: false].
-	stream nextPut: PoolVarId; nextPut: index
 ]
 
 { #category : #visiting }

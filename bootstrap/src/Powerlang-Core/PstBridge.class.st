@@ -8,7 +8,7 @@ Class {
 PstBridge >> findFalseObject [
 	| s handle |
 	s := runtime storage.
-	handle := s class = VirtualImage
+	handle := s class = PowertalkRingImage
 		ifTrue: [ s false ]
 		ifFalse: [ self ASSERT: false ].
 	^ falseObj := ObjectHandle on: handle within: runtime
@@ -28,7 +28,7 @@ PstBridge >> findKernelModule [
 { #category : #initialization }
 PstBridge >> findNilObject [
 	^ nilObj := ObjectHandle
-		on: ImageSegmentWriter nilOffset
+		on: #ImageSegmentWriter nilOffset
 		within: runtime
 ]
 
