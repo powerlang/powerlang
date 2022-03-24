@@ -7,7 +7,7 @@ Class {
 		'realSpec',
 		'constant'
 	],
-	#category : #'Powerlang-Core-Emulation-Ring'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #accessing }

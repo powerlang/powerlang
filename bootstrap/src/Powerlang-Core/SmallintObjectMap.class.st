@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : #'Powerlang-Core-Building'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }

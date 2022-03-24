@@ -5,7 +5,7 @@ Class {
 		'slots',
 		'hash'
 	],
-	#category : #'Powerlang-Core-Building'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }
@@ -25,14 +25,10 @@ SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
 ]
 
 { #category : #accessing }
-SlotObjectMap >> allInstVarNames [
-	| c |
+SlotObjectMap >> allSlotNames [
 	^ spec properties
-		at: #allInstVarNames
-		ifAbsentPut: [ spec isMeta
-				ifTrue: [ c := spec environment at: #Class.
-					c allInstVarNames , spec allInstVarNames ]
-				ifFalse: [ spec allInstVarNames ] ]
+		at: #allSlotNames
+		ifAbsentPut: [ self computeAllSlotNames ]
 ]
 
 { #category : #accessing }
@@ -92,10 +88,15 @@ SlotObjectMap >> bodySizeInBytes [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> computeAllSlotNames [
+	^spec allInstVarNames
+]
+
+{ #category : #accessing }
 SlotObjectMap >> doesNotUnderstand: aMessage [
 	| sel ivars |
 	sel := aMessage selector.
-	ivars := self allInstVarNames.
+	ivars := self allSlotNames.
 	sel isUnary
 		ifTrue: [ (ivars includes: sel)
 				ifTrue: [ ^ self slotNamed: sel ] ].
@@ -155,6 +156,14 @@ SlotObjectMap >> isPointers [
 ]
 
 { #category : #accessing }
+SlotObjectMap >> loadIvar: aSymbol [
+	| ivar |
+	ivar := self allSlotNames indexOf: aSymbol.
+	^ ivar > 0
+		ifTrue: [ self slotAt: ivar ]
+]
+
+{ #category : #accessing }
 SlotObjectMap >> printOn: aStream [
 	aStream
 		nextPutAll: '<<';
@@ -210,6 +219,14 @@ SlotObjectMap >> slotsDo: aBlock [
 	slots do: aBlock
 ]
 
+{ #category : #accessing }
+SlotObjectMap >> storeIvar: aSymbol with: anObject [
+	| ivar |
+	ivar := self allSlotNames indexOf: aSymbol.
+	^ ivar > 0
+		ifTrue: [ self slotAt: ivar put: anObject ]
+]
+
 { #category : #validation }
 SlotObjectMap >> validate [
 	super validate.
@@ -219,7 +236,8 @@ SlotObjectMap >> validate [
 { #category : #accessing }
 SlotObjectMap >> value [
 	| message |
-	(self allInstVarNames includes: #value) ifFalse: [ ^super value ].
+	(self allSlotNames includes: #value)
+		ifFalse: [ ^ super value ].
 	message := Message selector: #value.
 	^ self doesNotUnderstand: message
 ]

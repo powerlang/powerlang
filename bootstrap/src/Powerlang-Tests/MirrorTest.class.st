@@ -33,7 +33,7 @@ MirrorTest >> mirrorForObject [
 MirrorTest >> setUp [
 	| vimage image |
 	super setUp.
-	vimage := VirtualImage fromSpec
+	vimage := PowertalkRingImage fromSpec
 		wordSize: 8;
 		genesis;
 		bootstrap.
@@ -41,7 +41,7 @@ MirrorTest >> setUp [
 	builder addGenesisObjects.
 	image := builder writer write image.
 	runtime := Runtime
-		forSimulating: VirtualImage kernelSpec
+		forSimulating: PowertalkRingImage kernelSpec
 		memory: image
 ]
 

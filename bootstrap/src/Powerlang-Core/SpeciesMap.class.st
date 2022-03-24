@@ -5,7 +5,7 @@ Class {
 		'instanceSpec',
 		'slotNames'
 	],
-	#category : #'Powerlang-Core-Emulation-Ring'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }

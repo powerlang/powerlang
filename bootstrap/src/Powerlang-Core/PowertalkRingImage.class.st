@@ -7,43 +7,42 @@ the `VirtualRuntime`. That step is left to the `VirtualImage`
 that also creates the Kernel module.
 "
 Class {
-	#name : #VirtualImage,
+	#name : #PowertalkRingImage,
 	#superclass : #Object,
 	#instVars : [
 		'nilObj',
 		'falseObj',
 		'trueObj',
+		'kernel',
 		'wordSize',
 		'minSMI',
 		'maxSMI',
 		'classes',
 		'metaclasses',
+		'runtime',
+		'symbols',
+		'bootstrapDicts',
 		'identityMap',
-		'specs',
-		'kernel',
-		'runtime'
-	],
-	#pools : [
-		'ClosureElementTypes'
+		'specs'
 	],
 	#classInstVars : [
 		'KernelSpec'
 	],
-	#category : #'Powerlang-Core-Emulation'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #accessing }
-VirtualImage class >> fromSpec [
+PowertalkRingImage class >> fromSpec [
 	^ self new specs: self kernelSpec
 ]
 
 { #category : #accessing }
-VirtualImage class >> kernelSpec [
+PowertalkRingImage class >> kernelSpec [
 	^ KernelSpec ifNil: [ KernelSpec := self newKernelSpec ]
 ]
 
 { #category : #'instance creation' }
-VirtualImage class >> new [
+PowertalkRingImage class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -51,7 +50,7 @@ VirtualImage class >> new [
 ]
 
 { #category : #accessing }
-VirtualImage class >> newKernelSpec [
+PowertalkRingImage class >> newKernelSpec [
 	| root current repo spec |
 
 	root := (Smalltalk getPackageDirectoryForPackage: self package) / '..' / '..'.	
@@ -64,57 +63,61 @@ VirtualImage class >> newKernelSpec [
 ]
 
 { #category : #initialization }
-VirtualImage >> => aSymbol [
+PowertalkRingImage >> => aSymbol [
 	^ specs at: aSymbol
 ]
 
 { #category : #services }
-VirtualImage >> basicNewBytes: classname contents: aByteObject [
+PowertalkRingImage >> basicNewBytes: classname contents: aByteObject [
 	^ self basicNewBytesOf: self => classname contents: aByteObject
 ]
 
 { #category : #services }
-VirtualImage >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
+PowertalkRingImage >> basicNewBytesOf: anRGBehavior  contents: aByteObject [
 	^ ByteObjectMap new: anRGBehavior valued: aByteObject
 ]
 
 { #category : #accessing }
-VirtualImage >> basicNewSlots: classname [
+PowertalkRingImage >> basicNewSlots: classname [
 	^ self basicNewSlots: classname sized: 0
 ]
 
 { #category : #accessing }
-VirtualImage >> basicNewSlots: classname in: spec [
+PowertalkRingImage >> basicNewSlots: classname in: spec [
 	^ self basicNewSlots: classname in: spec sized: 0
 ]
 
 { #category : #accessing }
-VirtualImage >> basicNewSlots: classname in: spec sized: size [
+PowertalkRingImage >> basicNewSlots: classname in: spec sized: size [
 	| species |
 	species := spec at: classname.
 	^self basicNewSlotsOf: species sized: size
 ]
 
 { #category : #accessing }
-VirtualImage >> basicNewSlots: classname sized: size [
+PowertalkRingImage >> basicNewSlots: classname sized: size [
 	^ self basicNewSlots: classname in: specs sized: size
 ]
 
 { #category : #accessing }
-VirtualImage >> basicNewSlotsOf: anRGBehavior sized: size [
+PowertalkRingImage >> basicNewSlotsOf: anRGBehavior sized: size [
 	^ SlotObjectMap new: anRGBehavior size: size withAll: nilObj
 ]
 
 { #category : #'own services' }
-VirtualImage >> bootstrap [
-	runtime := VirtualRuntime new.
+PowertalkRingImage >> bootstrap [
 	runtime
-		image: self;
-		send: #initialize to: kernel
+		sendLocal: #bootstrap to: kernel;
+		removeBootstrapDictionaryOverrides
 ]
 
 { #category : #'own services' }
-VirtualImage >> buildSpecies: spec [
+PowertalkRingImage >> bootstrapDictionaries [
+	^bootstrapDicts
+]
+
+{ #category : #'own services' }
+PowertalkRingImage >> buildSpecies: spec [
 	| sspec sclass sbehavior metasuper  |
 	sspec := spec superclass.
 	sspec
@@ -130,31 +133,86 @@ VirtualImage >> buildSpecies: spec [
 ]
 
 { #category : #'own services' }
-VirtualImage >> builder [
-	^	ImageSegmentBuilder new image: self.
+PowertalkRingImage >> builder [
+	^	RingBasedLMRBootstrapper new image: self.
 ]
 
 { #category : #accessing }
-VirtualImage >> classFor: anRGBehavior [
+PowertalkRingImage >> classFor: anRGBehavior [
 	^classes at: anRGBehavior
 ]
 
 { #category : #building }
-VirtualImage >> classNamed: aString [
+PowertalkRingImage >> classNamed: aString [
 	^self classFor: self => aString
 ]
 
 { #category : #accessing }
-VirtualImage >> classes [
+PowertalkRingImage >> classes [
 	^ classes
 ]
 
 { #category : #accessing }
-VirtualImage >> createSpecies: definition [
+PowertalkRingImage >> createBootstrapCVars: spec [
+	| names cvars |
+	names := spec classVariables.
+	names isEmpty
+		ifTrue: [ ^ nilObj ].
+	cvars := self newBootstrapDictionaryOf: self => #Dictionary.
+	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
+	^ cvars
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> createBootstrapNamespace [
+	| namespace |
+	namespace := self newBootstrapDictionaryOf: self => #Namespace.
+	kernel namespace: namespace.
+	namespace
+		at: #WordSize put: wordSize;
+		at: #LastHash put: 1.
+	classes do: [ :c | namespace at: c name asSymbol put: c ]
+]
+
+{ #category : #'own services' }
+PowertalkRingImage >> createFinalNamespace [
+	| namespace bootstrapped final |
+	namespace := self classNamed: #Namespace.
+	bootstrapped := kernel namespace.
+	final := runtime sendLocal: #new to: namespace.
+	bootstrapped
+		associationsDo: [ :assoc | runtime sendLocal: #add: to: final with: assoc ].
+	classes
+		do: [ :class | 
+			runtime
+				sendLocal: #at:put:
+				to: final
+				with:
+					{class name.
+					class} ]
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> createMethodDictionary: species sized: anInteger [
+	| behavior md size dictionary |
+	behavior := species instanceBehavior.
+	md := self classNamed: #MethodDictionary.
+	size := self newInteger: anInteger.
+	dictionary := runtime sendLocal: #new: to: md with: {size}.
+	behavior methods: dictionary.
+	^ dictionary
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> createSpecies: definition [
 	| class meta ibehavior cbehavior |
-	class := self basicNewSlots: #Class.
-	class initializeAs: definition metaclass sized: 0.
-	meta := self basicNewSlots: #Metaclass.
+	class := ClassMap new: definition metaclass size: 0 withAll: nilObj.
+	class instanceSpec: definition.
+	meta := MetaclassMap
+		new: (self => #Metaclass) metaclass
+		size: 0
+		withAll: nilObj.
+	meta instanceSpec: definition metaclass.
 	ibehavior := self basicNewSlots: #Behavior.
 	cbehavior := self basicNewSlots: #Behavior.
 	ibehavior class: class.
@@ -162,37 +220,56 @@ VirtualImage >> createSpecies: definition [
 	meta
 		class: class;
 		instanceBehavior: cbehavior.
-	class
-		instanceBehavior: ibehavior;
-		behavior: cbehavior.
+	class instanceBehavior: ibehavior.
 	classes at: definition put: class.
 	metaclasses at: definition metaclass put: meta
 ]
 
 { #category : #accessing }
-VirtualImage >> false [
+PowertalkRingImage >> false [
 	^ falseObj
 ]
 
-{ #category : #building }
-VirtualImage >> fixBehaviors [
-	self
-		initializeBehavior: nilObj;
-		initializeBehavior: trueObj;
-		initializeBehavior: falseObj;
-		initializeBehavior: kernel.
-	classes
-		do: [ :c | 
-			| m |
-			m := c behavior slotNamed: 'class'.
+{ #category : #initialization }
+PowertalkRingImage >> fillClasses [
+	| class meta |
+	specs allClasses	do: [ :def | 
+			self log: 'filling ' , def name , '...'.
+			class := self classFor: def.
+			meta := self metaclassFor: def metaclass.
 			self
-				initializeBehavior: c instanceBehavior;
-				initializeBehavior: c behavior;
-				initializeBehavior: m ]
+				fillSpecies: meta with: def metaclass;
+				fillSpecies: class with: def ]
 ]
 
 { #category : #initialization }
-VirtualImage >> formatOfClass: definition [
+PowertalkRingImage >> fillSpecies: species with: classDefinition [
+	| dictionary smethod transferred |
+	dictionary := self
+		createMethodDictionary: species
+		sized: classDefinition methods size.
+	classDefinition methods
+		do: [ :methodDefinition | 
+			smethod := runtime compile: methodDefinition.
+			transferred := self transferMethod: smethod in: species.
+			runtime
+				sendLocal: #basicAt:put:
+				to: dictionary
+				with:
+					{transferred selector.
+					transferred} ]
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> fillSymbols [
+	| table |
+	table := (self classNamed: #Symbol) classVariables at: 'SymbolTable'.
+	symbols
+		do: [ :sym | runtime sendLocal: #add: to: table with: {sym} ]
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> formatOfClass: definition [
 	| variable pointers |
 	variable := definition isVariable ifTrue: [ 16r2000 ] ifFalse: [ 0 ].
 	pointers := definition isBytes ifTrue: [ 0 ] ifFalse: [16r4000 ].
@@ -200,7 +277,12 @@ VirtualImage >> formatOfClass: definition [
 ]
 
 { #category : #building }
-VirtualImage >> genesis [
+PowertalkRingImage >> generateLMR [
+	^(RingBasedLMRBootstrapper new image: self) convert
+]
+
+{ #category : #building }
+PowertalkRingImage >> genesis [
 	"
 	Create the world (should take less than 6 days). This is named 'genesis' to remind us those who had
 	done this (and much more) before us. Namely SELF people. I (JV) would like to use this opportunity and point you to
@@ -213,24 +295,23 @@ VirtualImage >> genesis [
 	falseObj := self basicNewSlots: #False.
 	kernel := self basicNewSlots: #Kernel.
 	specs allClasses do: [ :def | self createSpecies: def ].
-	self fixBehaviors.
-	specs allClasses do: [ :def | self buildSpecies: def ]
-]
-
-{ #category : #accessing }
-VirtualImage >> includes: anObject [
-	^identityMap includesKey: anObject
-]
-
-{ #category : #accessing }
-VirtualImage >> initialize [
-	classes := OrderedDictionary new.
-	metaclasses := OrderedDictionary new.
-		identityMap := IdentityDictionary new
+	specs allClasses do: [ :def | self buildSpecies: def ].
+	self createBootstrapNamespace.
+	runtime := PowertalkRingRuntime new.
+	runtime image: self
 ]
 
 { #category : #initialization }
-VirtualImage >> initializeBehavior: anObjectMap [
+PowertalkRingImage >> initialize [
+	classes := OrderedDictionary new.
+	metaclasses := OrderedDictionary new.
+		identityMap := IdentityDictionary new.
+	bootstrapDicts := OrderedCollection new.
+	symbols := OrderedCollection new
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> initializeBehavior: anObjectMap [
 	| class |
 	class := classes at: anObjectMap spec.
 	anObjectMap behavior: class instanceBehavior.
@@ -238,8 +319,8 @@ VirtualImage >> initializeBehavior: anObjectMap [
 ]
 
 { #category : #building }
-VirtualImage >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
-	| class name flag ivars poolnames pools subclasses format |
+PowertalkRingImage >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
+	| class name flag ivars cvars poolnames pools subclasses format |
 	class := classes at: definition.
 	class instanceBehavior next: superbehavior.
 	subclasses := definition subclasses
@@ -249,23 +330,25 @@ VirtualImage >> initializeClass: definition superclass: superclass superbehavior
 	flag := self formatOfClass: definition.
 	format := self newInteger: flag.
 	ivars := self newStringArray: definition instVarNames.
+	cvars := self createBootstrapCVars: definition.
 	poolnames := definition sharedPools collect: #name.
 	pools := self newStringArray: poolnames.
 	class
 		superclass: superclass;
 		format: format;
 		instanceVariables: ivars;
-		classVariables: nilObj;
+		classVariables: cvars;
 		organization: nilObj;
 		name: name;
 		subclasses: subclasses;
-		sharedPools: pools.
+		sharedPools: pools;
+		module: kernel.
 	definition metaclass allInstVarNames
 		do: [ :ivar | class slotNamed: ivar put: nilObj ]
 ]
 
 { #category : #building }
-VirtualImage >> initializeMetaclass: definition superclass: superclass [
+PowertalkRingImage >> initializeMetaclass: definition superclass: superclass [
 	| meta ivars flags format superbehavior |
 	meta := metaclasses at: definition.
 	superbehavior := superclass instanceBehavior.
@@ -281,22 +364,29 @@ VirtualImage >> initializeMetaclass: definition superclass: superclass [
 ]
 
 { #category : #building }
-VirtualImage >> kernel [
+PowertalkRingImage >> kernel [
 	^kernel
 ]
 
-{ #category : #accessing }
-VirtualImage >> map: anObject to: anObjectMap [
-	identityMap at: anObject put: anObjectMap
+{ #category : #initialization }
+PowertalkRingImage >> log: aString [
+	Transcript
+		show: aString;
+		cr
 ]
 
 { #category : #accessing }
-VirtualImage >> metaclassFor: anRGBehavior [
+PowertalkRingImage >> metaclassFor: anRGBehavior [
 	^ metaclasses at: anRGBehavior
 ]
 
 { #category : #initialization }
-VirtualImage >> newArray: anArray [
+PowertalkRingImage >> metaclasses [
+	^metaclasses
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> newArray: anArray [
 	| assoc |
 	assoc := self newSlots: 'Array' sized: anArray size.
 	anArray withIndexDo: [ :obj :i | assoc at: i put: obj ].
@@ -304,7 +394,7 @@ VirtualImage >> newArray: anArray [
 ]
 
 { #category : #initialization }
-VirtualImage >> newAssociation: anAssociation [
+PowertalkRingImage >> newAssociation: anAssociation [
 	| assoc key value |
 	assoc := self newSlots: 'Association'.
 	key := self transferLiteralDeep: anAssociation key.
@@ -314,41 +404,60 @@ VirtualImage >> newAssociation: anAssociation [
 		value: value; yourself
 ]
 
-{ #category : #initialization }
-VirtualImage >> newBytes: classname contents: aByteObject [
-	| obj |
-	obj := self basicNewBytes: classname contents: aByteObject.
-	self initializeBehavior: obj.
-	^ obj
+{ #category : #accessing }
+PowertalkRingImage >> newBootstrapDictionaryOf: anRGBehavior [
+	"
+	Allocate a bootstrap dictionary object. Its contents is managed by the
+	mother image, but in the baby smalltalk can do	at: and at:put:, via primitives.
+	It is used to replace PoolDictionaries and Namespaces until the baby has been
+	initialized and is ready to become a fully working image. At that point, the
+	BootstrapDictionaries are converted to the corresponding types and discarded.
+	"
+
+	| result |
+	result := BootstrapDictionaryMap new
+		initializeAs: self => #BootstrapDictionary.
+	bootstrapDicts add: result.
+	^ result
+		realSpec: anRGBehavior;
+		image: self
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> newBytes: classname contents: aByteObject [
+	^self basicNewBytes: classname contents: aByteObject
 ]
 
 { #category : #initialization }
-VirtualImage >> newBytesFrom: aByteObject [
+PowertalkRingImage >> newBytesFrom: aByteObject [
 	^self newBytes: aByteObject class name contents: aByteObject
 ]
 
-{ #category : #initialization }
-VirtualImage >> newBytesOf: anRGBehavior contents: aByteObject [
-	| obj |
-	obj := self basicNewBytesOf: anRGBehavior contents: aByteObject.
-	self initializeBehavior: obj.
-	^ obj
+{ #category : #accessing }
+PowertalkRingImage >> newBytesOf: anRGBehavior contents: aByteObject [
+^ self basicNewBytesOf: anRGBehavior contents: aByteObject
+
 ]
 
 { #category : #initialization }
-VirtualImage >> newBytesOf: anRGBehavior sized: anInteger [
+PowertalkRingImage >> newBytesOf: anRGBehavior sized: anInteger [
 	| contents |
 	contents := ByteArray new: anInteger.
 	^ self newBytesOf: anRGBehavior contents: contents
 ]
 
 { #category : #accessing }
-VirtualImage >> newFloatFrom: aFloat [
+PowertalkRingImage >> newClosure: anInteger [
+	^ ClosureMap new: self => #Closure size: anInteger withAll: nilObj
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> newFloatFrom: aFloat [
 	^ self newBytes: 'Float' contents: aFloat pointerDouble
 ]
 
 { #category : #initialization }
-VirtualImage >> newInteger: anInteger [
+PowertalkRingImage >> newInteger: anInteger [
 	anInteger > maxSMI
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
@@ -357,7 +466,7 @@ VirtualImage >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualImage >> newLargeNegativeInteger: anInteger [
+PowertalkRingImage >> newLargeNegativeInteger: anInteger [
 	| size bytes byte |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := ByteArray new: size withAll: 16rFF.
@@ -370,48 +479,50 @@ VirtualImage >> newLargeNegativeInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualImage >> newLargePositiveInteger: anInteger [
+PowertalkRingImage >> newLargePositiveInteger: anInteger [
 	| size bytes |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
 	^ self newBytes: #LargePositiveInteger contents: bytes reversed
 ]
 
+{ #category : #accessing }
+PowertalkRingImage >> newOf: anRGBehavior sized: anInteger [
+	^ anRGBehavior isBytes
+		ifTrue: [ self newBytesOf: anRGBehavior sized: anInteger ]
+		ifFalse: [ self newSlotsOf: anRGBehavior sized: anInteger ]
+]
+
 { #category : #initialization }
-VirtualImage >> newSlots: classname [
+PowertalkRingImage >> newSlots: classname [
 	^self newSlots: classname sized: 0
 ]
 
-{ #category : #initialization }
-VirtualImage >> newSlots: classname sized: size [
-"
-	Allocate an object of pointer type (as SlotObjectMap).
-	It is niled-out, and 	`size` is the size of indexed part (i.e.,
-	shall not include named slots)
-	"
-
-	| obj |
-	obj := self basicNewSlots: classname sized: size.
-	self initializeBehavior: obj.
-	^ obj
-]
-
-{ #category : #initialization }
-VirtualImage >> newSlotsOf: anRGBehavior sized: size [
+{ #category : #accessing }
+PowertalkRingImage >> newSlots: classname sized: size [
 	"
 	Allocate an object of pointer type (as SlotObjectMap).
 	It is niled-out, and 	`size` is the size of indexed part (i.e.,
 	shall not include named slots)
 	"
+^ self basicNewSlots: classname sized: size.
 
-	| obj |
-	obj := self basicNewSlotsOf: anRGBehavior sized: size.
-	self initializeBehavior: obj.
-	^ obj
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> newSlotsOf: anRGBehavior sized: size [
+	"
+	Allocate an object of pointer type (as SlotObjectMap).
+	It is niled-out, and 	`size` is the size of indexed part (i.e.,
+	shall not include named slots)
+	"
+
+^ self basicNewSlotsOf: anRGBehavior sized: size
+
 ]
 
 { #category : #initialization }
-VirtualImage >> newSmallInteger: anInteger [
+PowertalkRingImage >> newSmallInteger: anInteger [
 	self ASSERT: (anInteger between: minSMI and: maxSMI).
 	^ SmallintObjectMap
 		new: self => #SmallInteger
@@ -419,14 +530,14 @@ VirtualImage >> newSmallInteger: anInteger [
 ]
 
 { #category : #initialization }
-VirtualImage >> newString: aString [
+PowertalkRingImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
 	^self newBytes: 'String' contents: bytes
 ]
 
 { #category : #initialization }
-VirtualImage >> newStringArray: strings [
+PowertalkRingImage >> newStringArray: strings [
 	| array bytes |
 	array := self newSlots: 'Array' sized: strings size.
 	strings
@@ -437,46 +548,42 @@ VirtualImage >> newStringArray: strings [
 ]
 
 { #category : #accessing }
-VirtualImage >> newSymbol: aSymbol [
+PowertalkRingImage >> newSymbol: aSymbol [
 	| new bytes |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
 	bytes := aSymbol copyWith: Character null.
 	new := self newBytes: 'Symbol' contents: bytes.
+	symbols add: new.
 	^ identityMap at: aSymbol put: new
 ]
 
 { #category : #accessing }
-VirtualImage >> nil [
+PowertalkRingImage >> nil [
 	^ nilObj
 ]
 
 { #category : #accessing }
-VirtualImage >> runtime [
+PowertalkRingImage >> runtime [
 	^ runtime
 ]
 
 { #category : #accessing }
-VirtualImage >> speciesFor: anRGBehavior [
-	^classes at: anRGBehavior ifAbsent: [ metaclasses at: anRGBehavior]
+PowertalkRingImage >> speciesFor: anRGBehavior [
+	^ anRGBehavior isMeta ifTrue: [metaclasses at: anRGBehavior] ifFalse: [ classes at: anRGBehavior ]
 ]
 
 { #category : #accessing }
-VirtualImage >> specs [
+PowertalkRingImage >> specs [
 	^specs
 ]
 
 { #category : #accessing }
-VirtualImage >> specs: anRGEnvironment [
+PowertalkRingImage >> specs: anRGEnvironment [
 	specs := anRGEnvironment 
 ]
 
-{ #category : #testing }
-VirtualImage >> surrogateFor: anObject [
-	^ identityMap at: anObject ifAbsent: nil
-]
-
 { #category : #accessing }
-VirtualImage >> transferBlock: anSCompiledBlock [
+PowertalkRingImage >> transferBlock: anSCompiledBlock [
 	| transferred method format |
 	identityMap at: anSCompiledBlock
 		ifPresent: [ :b | ^ b ].
@@ -492,7 +599,7 @@ VirtualImage >> transferBlock: anSCompiledBlock [
 ]
 
 { #category : #accessing }
-VirtualImage >> transferLiteral: anObject [
+PowertalkRingImage >> transferLiteral: anObject [
 	| class transferred slot |
 	class := anObject class.
 	(class inheritsFrom: ObjectMap)
@@ -514,7 +621,7 @@ VirtualImage >> transferLiteral: anObject [
 ]
 
 { #category : #accessing }
-VirtualImage >> transferLiteralDeep: anObject [
+PowertalkRingImage >> transferLiteralDeep: anObject [
 	| class transferred slot size ivar |
 	class := anObject class.
 	anObject isInteger
@@ -554,18 +661,45 @@ VirtualImage >> transferLiteralDeep: anObject [
 	^ transferred
 ]
 
+{ #category : #initialization }
+PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
+	| size classname transferred astcodes selector format literal tliteral |
+	(identityMap includesKey: anSCompiledMethod)
+		ifTrue: [ self ASSERT: false ].
+	size := anSCompiledMethod size.
+	classname := anSCompiledMethod isCallback
+		ifTrue: [ 'CallbackMethod' ]
+		ifFalse: [ 'CompiledMethod' ].
+	transferred := self newSlots: classname sized: size.
+	identityMap at: anSCompiledMethod put: transferred.
+	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
+	selector := self newSymbol: anSCompiledMethod selector.
+	format := self newInteger: anSCompiledMethod format.
+	transferred
+		astcodes: astcodes;
+		class: species;
+		selector: selector;
+		format: format;
+		source: nilObj.
+	1 to: size do: [ :i | 
+		literal := anSCompiledMethod at: i.
+		tliteral := self transferLiteralDeep: literal.
+		transferred at: i put: tliteral ].
+	^ transferred
+]
+
 { #category : #accessing }
-VirtualImage >> true [
+PowertalkRingImage >> true [
 	^ trueObj
 ]
 
 { #category : #accessing }
-VirtualImage >> wordSize [
+PowertalkRingImage >> wordSize [
 	^ wordSize
 ]
 
 { #category : #accessing }
-VirtualImage >> wordSize: anInteger [
+PowertalkRingImage >> wordSize: anInteger [
 	wordSize := anInteger.
 	maxSMI := (1 bitShift: wordSize * 8 - 2) - 1.
 	minSMI := maxSMI negated - 1

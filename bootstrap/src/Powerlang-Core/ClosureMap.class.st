@@ -6,7 +6,7 @@ Class {
 		'builder',
 		'astcodes'
 	],
-	#category : #'Powerlang-Core-Emulation-Ring'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }

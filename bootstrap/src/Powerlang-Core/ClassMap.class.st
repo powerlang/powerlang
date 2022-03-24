@@ -1,7 +1,7 @@
 Class {
 	#name : #ClassMap,
 	#superclass : #SpeciesMap,
-	#category : #'Powerlang-Core-Emulation-Ring'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #accessing }
