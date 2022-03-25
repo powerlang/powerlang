@@ -420,7 +420,7 @@ PowertalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean [
 	self ASSERT: method notNil.
 	size := self methodEnvironmentSize: method.
 	environment := self newEnvironmentSized: size.
-	frame := MethodEvaluator new
+	frame := EvaluationContext new
 		receiver: receiver;
 		arguments: arguments;
 		environment: environment;

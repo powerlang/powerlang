@@ -1,5 +1,5 @@
 Class {
-	#name : #MethodEvaluator,
+	#name : #EvaluationContext,
 	#superclass : #Object,
 	#instVars : [
 		'parent',
@@ -22,7 +22,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-MethodEvaluator class >> initialize [
+EvaluationContext class >> initialize [
 	"
 	self initialize
 	"
@@ -31,7 +31,7 @@ MethodEvaluator class >> initialize [
 ]
 
 { #category : #'instance creation' }
-MethodEvaluator class >> new [
+EvaluationContext class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -39,7 +39,7 @@ MethodEvaluator class >> new [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> argumentAt: index in: anInteger [
+EvaluationContext >> argumentAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^arguments at: index ].
 	env := self environmentFor: anInteger.
@@ -47,29 +47,29 @@ MethodEvaluator >> argumentAt: index in: anInteger [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> arguments [
+EvaluationContext >> arguments [
 	^arguments
 ]
 
 { #category : #visiting }
-MethodEvaluator >> arguments: aCollection [
+EvaluationContext >> arguments: aCollection [
 	arguments := aCollection
 ]
 
 { #category : #visiting }
-MethodEvaluator >> associationValueAt: anInteger [
+EvaluationContext >> associationValueAt: anInteger [
 	^ (method at: anInteger) value
 ]
 
 { #category : #visiting }
-MethodEvaluator >> associationValueAt: anInteger put: value [
+EvaluationContext >> associationValueAt: anInteger put: value [
 	| association |
 	association := (method at: anInteger).
 	^association value: value
 ]
 
 { #category : #visiting }
-MethodEvaluator >> backtrace [
+EvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
 	next := self.
@@ -83,19 +83,19 @@ MethodEvaluator >> backtrace [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> beBlock [
+EvaluationContext >> beBlock [
 	isBlock := true
 ]
 
 { #category : #visiting }
-MethodEvaluator >> booleanFor: aBoolean [
+EvaluationContext >> booleanFor: aBoolean [
 	^ aBoolean
 		ifTrue: [ system true ]
 		ifFalse: [ system false ]
 ]
 
 { #category : #visiting }
-MethodEvaluator >> captureClosure: anSBlock with: block [
+EvaluationContext >> captureClosure: anSBlock with: block [
 	| closure s i type env arg |
 	closure := system image newClosure: block environmentCount.
 	closure
@@ -121,22 +121,22 @@ MethodEvaluator >> captureClosure: anSBlock with: block [
 ]
 
 { #category : #services }
-MethodEvaluator >> classBinding [
+EvaluationContext >> classBinding [
 	^method classBinding
 ]
 
 { #category : #visiting }
-MethodEvaluator >> constPoolValueAt: anInteger [
+EvaluationContext >> constPoolValueAt: anInteger [
 	^ method at: anInteger
 ]
 
 { #category : #visiting }
-MethodEvaluator >> environment: anObjectMap [
+EvaluationContext >> environment: anObjectMap [
 	environment := anObjectMap
 ]
 
 { #category : #visiting }
-MethodEvaluator >> environmentFor: anInteger [
+EvaluationContext >> environmentFor: anInteger [
 	"
 	-1: inlined argument.
 	 0: current env.
@@ -150,7 +150,7 @@ MethodEvaluator >> environmentFor: anInteger [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluate [
+EvaluationContext >> evaluate [
 	| result sexpressions |
 	nonLocalReturn := [ :value |
 		 ^ system unwind: environment returning: value ].
@@ -163,7 +163,7 @@ MethodEvaluator >> evaluate [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluateBlock: sblock args: anArray [
+EvaluationContext >> evaluateBlock: sblock args: anArray [
 	" as this block is inlined, we didn't capture parent environment.
 	Thus, we don't know if environment is a closure or a method home.
 	We unwind to that environment and clean up later if it was a closure. "
@@ -175,7 +175,7 @@ MethodEvaluator >> evaluateBlock: sblock args: anArray [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> evaluateBlock: sblock args: anArray closure: closure [
+EvaluationContext >> evaluateBlock: sblock args: anArray closure: closure [
 	" inlined blocks can only return to their real parent environment.
 	Here we complete the non-local return process for them, unwinding
 	to the real home environment "
@@ -187,68 +187,68 @@ MethodEvaluator >> evaluateBlock: sblock args: anArray closure: closure [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> falseLiteral [
+EvaluationContext >> falseLiteral [
 	^ system false
 ]
 
 { #category : #visiting }
-MethodEvaluator >> initialize [
+EvaluationContext >> initialize [
 	isBlock := false
 ]
 
 { #category : #visiting }
-MethodEvaluator >> instanceVarAt: anInteger [
+EvaluationContext >> instanceVarAt: anInteger [
 	^ receiver slotAt: anInteger
 ]
 
 { #category : #visiting }
-MethodEvaluator >> instanceVarAt: index put: aValue [
+EvaluationContext >> instanceVarAt: index put: aValue [
 	^ receiver slotAt: index put: aValue
 ]
 
 { #category : #visiting }
-MethodEvaluator >> isHomeOf: env [
+EvaluationContext >> isHomeOf: env [
 	^ environment == env andNot: [ isBlock ]
 ]
 
 { #category : #visiting }
-MethodEvaluator >> literal: anObject [
+EvaluationContext >> literal: anObject [
 	^anObject
 ]
 
 { #category : #visiting }
-MethodEvaluator >> loadNamed: aSymbol [
+EvaluationContext >> loadNamed: aSymbol [
 	^system loadNamed: aSymbol in: receiver
 ]
 
 { #category : #visiting }
-MethodEvaluator >> method [
+EvaluationContext >> method [
 	^method
 ]
 
 { #category : #accessing }
-MethodEvaluator >> method: anSCompiledMethod [
+EvaluationContext >> method: anSCompiledMethod [
 	method := anSCompiledMethod.
 	temporaries := Array new: anSCompiledMethod tempCount
 ]
 
 { #category : #visiting }
-MethodEvaluator >> nilLiteral [
+EvaluationContext >> nilLiteral [
 	^ system nil
 ]
 
 { #category : #visiting }
-MethodEvaluator >> parent [
+EvaluationContext >> parent [
 	^parent
 ]
 
 { #category : #visiting }
-MethodEvaluator >> parent: anInterpreter [
+EvaluationContext >> parent: anInterpreter [
 	parent := anInterpreter
 ]
 
 { #category : #printing }
-MethodEvaluator >> printOn: aStream [
+EvaluationContext >> printOn: aStream [
  self backtrace
 				do: [ :frame | 
 					frame
@@ -258,33 +258,33 @@ MethodEvaluator >> printOn: aStream [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> receiver [
+EvaluationContext >> receiver [
 	^receiver
 ]
 
 { #category : #visiting }
-MethodEvaluator >> receiver: anObject [
+EvaluationContext >> receiver: anObject [
 	receiver := anObject
 ]
 
 { #category : #visiting }
-MethodEvaluator >> return: anObject [
+EvaluationContext >> return: anObject [
 	self isBlock ifTrue: [ ^environment builder return: anObject ].
 	nonLocalReturn value: anObject
 ]
 
 { #category : #visiting }
-MethodEvaluator >> storeNamed: aSymbol with: anObject [
+EvaluationContext >> storeNamed: aSymbol with: anObject [
 	^ system storeNamed: aSymbol in: receiver with: anObject
 ]
 
 { #category : #visiting }
-MethodEvaluator >> system: anEmulator [
+EvaluationContext >> system: anEmulator [
 	system := anEmulator
 ]
 
 { #category : #visiting }
-MethodEvaluator >> temporaryAt: index in: anInteger [
+EvaluationContext >> temporaryAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^ temporaries at: index ].
 	env := self environmentFor: anInteger.
@@ -292,7 +292,7 @@ MethodEvaluator >> temporaryAt: index in: anInteger [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> temporaryAt: index in: anInteger put: aValue [
+EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 	| env |
 	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
 	env := self environmentFor: anInteger.
@@ -300,17 +300,17 @@ MethodEvaluator >> temporaryAt: index in: anInteger put: aValue [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> trueLiteral [
+EvaluationContext >> trueLiteral [
 	^system true
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitArgument: anSIdentifier [
+EvaluationContext >> visitArgument: anSIdentifier [
 	^arguments at: anSIdentifier binding index
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitAssignment: anSAssignment [
+EvaluationContext >> visitAssignment: anSAssignment [
 	| result |
 	result := anSAssignment expression acceptVisitor: self.
 	anSAssignment assignees
@@ -319,7 +319,7 @@ MethodEvaluator >> visitAssignment: anSAssignment [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitBlock: anSBlock [
+EvaluationContext >> visitBlock: anSBlock [
 	| block |
 	block := anSBlock isInlined
 		ifTrue: [ SCompiledBlock new ]
@@ -328,7 +328,7 @@ MethodEvaluator >> visitBlock: anSBlock [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitCascade: anSCascade [
+EvaluationContext >> visitCascade: anSCascade [
 	| recv args selector last |
 	recv := anSCascade receiver acceptVisitor: self.
 	anSCascade messages
@@ -344,18 +344,18 @@ MethodEvaluator >> visitCascade: anSCascade [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitIdentifier: anSIdentifier [
+EvaluationContext >> visitIdentifier: anSIdentifier [
 	^anSIdentifier binding valueWithin: self.
 
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitLiteral: anSLiteral [
+EvaluationContext >> visitLiteral: anSLiteral [
 	^ system transferLiteral: anSLiteral value
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitMessage: anSMessage [
+EvaluationContext >> visitMessage: anSMessage [
 	| recv args selector |
 	recv := anSMessage receiver acceptVisitor: self.
 	args := anSMessage arguments
@@ -370,7 +370,7 @@ MethodEvaluator >> visitMessage: anSMessage [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitMethod: anSMethod [
+EvaluationContext >> visitMethod: anSMethod [
 	| primitive |
 	primitive := anSMethod primitive.
 	^ primitive
@@ -379,14 +379,14 @@ MethodEvaluator >> visitMethod: anSMethod [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitReturn: anSReturn [
+EvaluationContext >> visitReturn: anSReturn [
 	| value |
 	value := anSReturn expression acceptVisitor: self.
 	^self return: value
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitScript: anSScript [
+EvaluationContext >> visitScript: anSScript [
 	| result |
 	result := system nil.
 	anSScript statements
@@ -395,6 +395,6 @@ MethodEvaluator >> visitScript: anSScript [
 ]
 
 { #category : #visiting }
-MethodEvaluator >> visitTemporary: anSIdentifier [
+EvaluationContext >> visitTemporary: anSIdentifier [
 	^temporaries at: anSIdentifier binding index
 ]
