@@ -549,10 +549,9 @@ PowertalkRingImage >> newStringArray: strings [
 
 { #category : #accessing }
 PowertalkRingImage >> newSymbol: aSymbol [
-	| new bytes |
+	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
-	bytes := aSymbol copyWith: Character null.
-	new := self newBytes: 'Symbol' contents: bytes.
+	new := SymbolMap new: self => 'Symbol' symbol: aSymbol.
 	symbols add: new.
 	^ identityMap at: aSymbol put: new
 ]

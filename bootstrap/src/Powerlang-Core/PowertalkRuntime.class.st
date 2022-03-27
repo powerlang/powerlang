@@ -5,7 +5,6 @@ Class {
 		'frames',
 		'undermessages',
 		'methodCache',
-		'symbolCache',
 		'overrides',
 		'falseObj',
 		'trueObj',
@@ -274,9 +273,7 @@ PowertalkRuntime >> frames [
 PowertalkRuntime >> initialize [
 	frames := OrderedCollection new.
 	methodCache := Dictionary new.
-	symbolCache := IdentityDictionary new.
-	overrides := Dictionary new.
-
+	overrides := Dictionary new
 ]
 
 { #category : #initialization }

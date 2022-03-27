@@ -224,9 +224,7 @@ PowertalkRingRuntime >> superBehavior [
 
 { #category : #services }
 PowertalkRingRuntime >> symbolFrom: anObjectMap [
-	^ symbolCache
-		at: anObjectMap
-		ifAbsentPut: [ anObjectMap asString asSymbol ]
+	^ anObjectMap symbol
 ]
 
 { #category : #services }
