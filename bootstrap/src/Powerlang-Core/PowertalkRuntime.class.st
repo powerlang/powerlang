@@ -81,7 +81,7 @@ PowertalkRuntime >> evaluatePrimitive: primitive in: frame [
 				ifTrue: [ self smallintBehavior ]
 				ifFalse: [ receiver behavior ] ].
 	primitive = #Class
-		ifTrue: [ ^ self classFor: receiver ].
+		ifTrue: [ ^ self speciesFor: receiver ].
 	primitive = #UnderSize
 		ifTrue: [ ^ self newInteger: receiver size ].
 	primitive = #Size

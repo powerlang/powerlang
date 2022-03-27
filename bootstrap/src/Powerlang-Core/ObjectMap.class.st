@@ -28,6 +28,11 @@ ObjectMap class >> new: anRGBehavior size: size [
 	^ class new initializeAs: anRGBehavior sized: size
 ]
 
+{ #category : #services }
+ObjectMap >> allSlotNames [
+	^#()
+]
+
 { #category : #accessing }
 ObjectMap >> arrayedSize [
 	^self size

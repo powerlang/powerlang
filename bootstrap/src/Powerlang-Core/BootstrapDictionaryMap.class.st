@@ -11,6 +11,17 @@ Class {
 }
 
 { #category : #accessing }
+BootstrapDictionaryMap >> associationAt: aSymbol ifAbsent: aBlock [
+	^ assocs at: aSymbol ifAbsent: aBlock
+]
+
+{ #category : #accessing }
+BootstrapDictionaryMap >> associationAt: aSymbol ifPresent: aBlock [
+	assocs at: aSymbol ifPresent: [:assoc |  ^ aBlock value: assoc ].
+	^ nil
+]
+
+{ #category : #accessing }
 BootstrapDictionaryMap >> associations [
 	^ assocs values
 ]

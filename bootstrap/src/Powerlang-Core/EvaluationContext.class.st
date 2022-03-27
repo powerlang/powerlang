@@ -217,6 +217,11 @@ EvaluationContext >> literal: anObject [
 ]
 
 { #category : #visiting }
+EvaluationContext >> loadAssociationValue: association [
+	^system loadAssociationValue: association
+]
+
+{ #category : #visiting }
 EvaluationContext >> loadNamed: aSymbol [
 	^system loadNamed: aSymbol in: receiver
 ]
@@ -273,6 +278,60 @@ EvaluationContext >> return: anObject [
 	nonLocalReturn value: anObject
 ]
 
+{ #category : #accessing }
+EvaluationContext >> staticBindingFor: aSymbol [
+	| symbol |
+	symbol := system symbolFrom: aSymbol.
+	(self staticBindingForIvar: symbol)
+		ifNotNil: [ :b | ^ b ].
+	(self staticBindingForCvar: symbol) ifNotNil: [ :b | ^ b ].
+	^ self staticBindingForMvar: symbol
+]
+
+{ #category : #accessing }
+EvaluationContext >> staticBindingForCvar: aSymbol [
+	| species cvars class |
+	species := system speciesFor: receiver.
+	[ cvars := species classVariables.
+	cvars isNil ifFalse: [ 
+		cvars associationAt: aSymbol ifPresent: [:assoc |
+			^ SAssociationBinding new association: assoc ].
+	species localPools
+		do: [ :pool | 
+			pool associationAt: aSymbol ifPresent: [:assoc | 
+					class := pool isConstant
+						ifTrue: [ SConstantPoolBinding ]
+						ifFalse: [ SAssociationBinding ].
+					^ class new association: assoc ] ]].
+	species := species superclass.
+	species isNil ] whileFalse.
+	^ nil
+]
+
+{ #category : #accessing }
+EvaluationContext >> staticBindingForIvar: aSymbol [
+	| ivar |
+	ivar := receiver allSlotNames indexOf: aSymbol.
+	^ ivar > 0
+		ifTrue: [ SInstVarBinding new index: ivar ]
+]
+
+{ #category : #accessing }
+EvaluationContext >> staticBindingForMvar: aSymbol [
+	| assoc class |
+	class := system speciesFor: receiver.
+	assoc := class module namespace
+		associationAt: aSymbol
+		ifAbsent: [ self error: 'unbound variable: ' , aSymbol asString].
+	^ SAssociationBinding new association: assoc
+]
+
+{ #category : #services }
+EvaluationContext >> storeAssociation: association value: anObject [ 
+	system storeAssociation: association value: anObject 
+
+]
+
 { #category : #visiting }
 EvaluationContext >> storeNamed: aSymbol with: anObject [
 	^ system storeNamed: aSymbol in: receiver with: anObject
@@ -302,11 +361,6 @@ EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 { #category : #visiting }
 EvaluationContext >> trueLiteral [
 	^system true
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitArgument: anSIdentifier [
-	^arguments at: anSIdentifier binding index
 ]
 
 { #category : #visiting }
@@ -392,9 +446,4 @@ EvaluationContext >> visitScript: anSScript [
 	anSScript statements
 		do: [ :node | result := node acceptVisitor: self ].
 	^ result
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitTemporary: anSIdentifier [
-	^temporaries at: anSIdentifier binding index
 ]

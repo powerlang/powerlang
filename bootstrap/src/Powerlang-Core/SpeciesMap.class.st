@@ -71,50 +71,6 @@ SpeciesMap >> lookupInModule: aSymbol [
 ]
 
 { #category : #accessing }
-SpeciesMap >> staticBindingFor: aSymbol [
-	(self staticBindingForIvar: aSymbol) ifNotNil: [ :value | ^ value ].
-	(self staticBindingForCvar: aSymbol) ifNotNil: [ :value | ^ value ].
-	^(self staticBindingForMvar: aSymbol)
-
-]
-
-{ #category : #accessing }
-SpeciesMap >> staticBindingForCvar: aSymbol [
-	| species cvars assoc class |
-	species := self.
-	[ cvars := species cvars.
-	(cvars includesKey: aSymbol)
-		ifTrue: [ assoc := cvars associationAt: aSymbol.
-			^ SAssociationBinding new association: assoc ].
-	species localPools
-		do: [ :pool | 
-			(pool includesKey: aSymbol)
-				ifTrue: [ assoc := pool associationAt: aSymbol.
-					class := pool isConstant ifTrue: [ SConstantPoolBinding ] ifFalse: [ 					 SAssociationBinding].
-										^class new association: assoc ] ].
-	species := species superclass.
-	species notNil ] whileTrue.
-	^ nil
-]
-
-{ #category : #accessing }
-SpeciesMap >> staticBindingForIvar: aSymbol [
-	| ivar |
-	ivar := self allInstVarNames indexOf: aSymbol.
-	^ivar > 0
-		ifTrue: [ SInstVarBinding new index: ivar ]
-]
-
-{ #category : #accessing }
-SpeciesMap >> staticBindingForMvar: aSymbol [
-	| assoc |
-	assoc := self module
-		associationAt: aSymbol
-		ifAbsent: [ self error: 'unbound variable: ' , aSymbol ].
-	^SAssociationBinding new association: assoc
-]
-
-{ #category : #accessing }
 SpeciesMap >> storeCvar: aSymbol with: anObject [
 	| species cvars |
 	species := self. 

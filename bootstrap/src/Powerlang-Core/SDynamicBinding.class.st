@@ -2,7 +2,8 @@ Class {
 	#name : #SDynamicBinding,
 	#superclass : #SBinding,
 	#instVars : [
-		'name'
+		'name',
+		'cache'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -14,12 +15,18 @@ SDynamicBinding class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #accessing }
 SDynamicBinding >> assign: value within: evaluator [
-	^ evaluator storeNamed: name asString with: value
+	cache ifNil: [ self lookupWithin: evaluator ].
+	cache assign: value within: evaluator
 ]
 
 { #category : #accessing }
 SDynamicBinding >> isDynamic [
 	^true
+]
+
+{ #category : #accessing }
+SDynamicBinding >> lookupWithin: evaluator [
+	cache := evaluator staticBindingFor: name
 ]
 
 { #category : #accessing }
@@ -41,7 +48,6 @@ SDynamicBinding >> printOn: aStream [
 
 { #category : #accessing }
 SDynamicBinding >> valueWithin: evaluator [
-	^evaluator loadNamed: name asString
-
-
+	cache ifNil: [ self lookupWithin: evaluator ].
+	^ cache valueWithin: evaluator
 ]

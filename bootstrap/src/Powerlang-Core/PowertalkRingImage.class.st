@@ -62,6 +62,11 @@ PowertalkRingImage class >> newKernelSpec [
 
 ]
 
+{ #category : #accessing }
+PowertalkRingImage class >> resetKernelSpec [
+	KernelSpec := nil
+]
+
 { #category : #initialization }
 PowertalkRingImage >> => aSymbol [
 	^ specs at: aSymbol

@@ -18,8 +18,3 @@ SConstantPoolBinding >> isConstant [
 SConstantPoolBinding >> value [
 	^association
 ]
-
-{ #category : #evaluating }
-SConstantPoolBinding >> valueWithin: evaluator [
-	^ evaluator constPoolValueAt: index
-]

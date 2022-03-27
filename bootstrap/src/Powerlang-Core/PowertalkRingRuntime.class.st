@@ -29,11 +29,6 @@ PowertalkRingRuntime >> behaviorOf: anObjectMap [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> classFor: anObjectMap [
-	^image classFor: anObjectMap spec
-]
-
-{ #category : #accessing }
 PowertalkRingRuntime >> compile: anRGMethod [
 	| class |
 	class := image speciesFor: anRGMethod parent.
@@ -107,6 +102,11 @@ PowertalkRingRuntime >> initialize [
 { #category : #services }
 PowertalkRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ClosureMap
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> loadAssociationValue: association [
+	^association value
 ]
 
 { #category : #accessing }
@@ -201,6 +201,16 @@ PowertalkRingRuntime >> removeOverride: assoc [
 { #category : #accessing }
 PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
 	^ anSCompiledMethod prepareForExecution; optimizedCode
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> speciesFor: anObjectMap [
+	^ image speciesFor: anObjectMap spec
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> storeAssociation: association value: anObject [
+	association value: anObject
 ]
 
 { #category : #accessing }
