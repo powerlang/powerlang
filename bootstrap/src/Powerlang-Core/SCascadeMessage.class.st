@@ -3,7 +3,8 @@ Class {
 	#superclass : #SExpression,
 	#instVars : [
 		'selector',
-		'arguments'
+		'arguments',
+		'cache'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -29,8 +30,25 @@ SCascadeMessage >> arguments: aCollection [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> cache: anSCompiledMethod when: type [
+	cache ifNil: [ ^ cache := Array with: type with: anSCompiledMethod ].
+	cache := cache , (Array with: type with: anSCompiledMethod)
+]
+
+{ #category : #accessing }
 SCascadeMessage >> isCascadeMessage [
 	^true
+]
+
+{ #category : #accessing }
+SCascadeMessage >> methodFor: requiredType [
+	| type |
+	cache ifNil: [ ^ nil ].
+	1 to: cache size by: 2 do: [ :i | 
+		type := cache at: i.
+		type == requiredType
+			ifTrue: [ ^ cache at: i + 1 ] ].
+	^ nil
 ]
 
 { #category : #accessing }

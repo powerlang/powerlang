@@ -341,6 +341,16 @@ PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
+	| method |
+	method := anSMessage methodFor: aBehavior.
+	method
+		ifNil: [ method := self lookup: aSymbol startingAt: aBehavior.
+			anSMessage cache: method when: aBehavior ].
+	^ method
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> newBootstrapDictionaryOf: receiver [
 	^ self subclassResponsibility
 ]
@@ -414,6 +424,30 @@ PowertalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean [
 		ifTrue: [ self superBehavior]
 		ifFalse: [ self behaviorOf: receiver ].
 	method := self lookup: aSymbol startingAt: behavior.
+	self ASSERT: method notNil.
+	size := self methodEnvironmentSize: method.
+	environment := self newEnvironmentSized: size.
+	frame := EvaluationContext new
+		receiver: receiver;
+		arguments: arguments;
+		environment: environment;
+		method: method;
+		system: self.
+	^ frame evaluate
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage [
+	| behavior method environment frame size |
+	(self isUndermessage: aSymbol)
+		ifTrue: [ ^ self
+				evaluateUnderprimitive: aSymbol
+				with: receiver
+				with: arguments ].
+	behavior := aBoolean
+		ifTrue: [ self superBehavior ]
+		ifFalse: [ self behaviorOf: receiver ].
+	method := self lookup: aSymbol startingAt: behavior sendSite: anSMessage.
 	self ASSERT: method notNil.
 	size := self methodEnvironmentSize: method.
 	environment := self newEnvironmentSized: size.

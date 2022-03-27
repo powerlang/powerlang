@@ -5,7 +5,8 @@ Class {
 		'selector',
 		'receiver',
 		'arguments',
-		'opcodes'
+		'opcodes',
+		'cache'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -39,6 +40,17 @@ SMessage >> arguments: aCollection [
 ]
 
 { #category : #printing }
+SMessage >> cache: anSCompiledMethod when: type [
+	cache
+		ifNil: [ ^ cache := Array with: type with:
+			anSCompiledMethod].
+	cache := cache
+		,
+			(Array with: type with: 
+			anSCompiledMethod)
+]
+
+{ #category : #printing }
 SMessage >> initialize [
 	super initialize.
 	arguments := #()
@@ -57,6 +69,17 @@ SMessage >> isMessage [
 { #category : #printing }
 SMessage >> isOptimized [
 	^opcodes notNil
+]
+
+{ #category : #printing }
+SMessage >> methodFor: requiredType [
+	| type |
+	cache ifNil: [ ^ nil ].
+	1 to: cache size by: 2 do: [ :i | 
+		type := cache at: i.
+		type == requiredType
+			ifTrue: [ ^ cache at: i + 1 ] ].
+	^ nil
 ]
 
 { #category : #private }

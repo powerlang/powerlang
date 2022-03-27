@@ -393,7 +393,7 @@ EvaluationContext >> visitCascade: anSCascade [
 				send: selector
 				to: recv
 				with: args
-				super: anSCascade receiver isSuper ].
+				super: anSCascade receiver isSuper sendSite: msg ].
 	^ last
 ]
 
@@ -421,6 +421,7 @@ EvaluationContext >> visitMessage: anSMessage [
 		to: recv
 		with: args
 		super: anSMessage receiver isSuper
+		sendSite: anSMessage
 ]
 
 { #category : #visiting }
