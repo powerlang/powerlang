@@ -4,11 +4,11 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'nativeCode',
 		'astcodes',
 		'class',
 		'selector',
-		'source'
+		'source',
+		'optimizedCode'
 	],
 	#pools : [
 		'SCompiledMethodFlags'
@@ -100,7 +100,7 @@ SCompiledMethod >> copyWithLiterals: aCollection [
 		astcodes: astcodes;
 		classBinding: class;
 		format: format;
-		nativeCode: nativeCode;
+		optimizedCode: optimizedCode;
 		selector: selector;
 		source: source;
 		yourself
@@ -200,13 +200,13 @@ SCompiledMethod >> literals [
 ]
 
 { #category : #accessing }
-SCompiledMethod >> nativeCode [
-	^nativeCode
+SCompiledMethod >> optimizedCode [
+	^optimizedCode
 ]
 
 { #category : #accessing }
-SCompiledMethod >> nativeCode: aNativeCode [ 
-	nativeCode := aNativeCode 
+SCompiledMethod >> optimizedCode: anObject [
+	optimizedCode := anObject
 ]
 
 { #category : #constants }

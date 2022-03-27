@@ -4,8 +4,8 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'nativeCode',
-		'method'
+		'method',
+		'optimizedCode'
 	],
 	#pools : [
 		'SCompiledBlockFlags'
@@ -102,20 +102,20 @@ SCompiledBlock >> method: aCompiledMethod [
 ]
 
 { #category : #constants }
-SCompiledBlock >> nativeCode [
-	^nativeCode
-]
-
-{ #category : #constants }
-SCompiledBlock >> nativeCode: code [
-	nativeCode := code
-]
-
-{ #category : #constants }
 SCompiledBlock >> newClosure [
 	| closure |
 	closure := SClosure new: self environmentCount.
 	^ closure block: self
+]
+
+{ #category : #constants }
+SCompiledBlock >> optimizedCode [
+	^optimizedCode
+]
+
+{ #category : #constants }
+SCompiledBlock >> optimizedCode: anObject [
+	optimizedCode := anObject
 ]
 
 { #category : #constants }

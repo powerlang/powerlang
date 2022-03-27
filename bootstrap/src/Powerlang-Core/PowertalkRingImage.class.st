@@ -593,7 +593,7 @@ PowertalkRingImage >> transferBlock: anSCompiledBlock [
 	transferred
 		method: method;
 		format: format;
-		nativeCode: nilObj.
+		optimizedCode: nilObj.
 	^ transferred
 ]
 

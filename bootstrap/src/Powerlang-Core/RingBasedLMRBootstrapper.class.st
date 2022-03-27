@@ -205,7 +205,7 @@ RingBasedLMRBootstrapper >> newCallback: aNativeCode bytesFrom: aByteArray [
 		slotNamed: 'class' put: class;
 		methods: original methods;
 		next: source nil;
-		nativeCode: aNativeCode.
+		optimizedCode: aNativeCode.
 	code behavior: behavior.
 	^ code
 ]
@@ -234,7 +234,7 @@ RingBasedLMRBootstrapper >> newMethod: anAstcode selector: aSymbol in: classname
 	selector := source newSymbol: aSymbol.
 	format := source newInteger: anInteger.
 	method
-		nativeCode: source nil;
+		optimizedCode: source nil;
 		astcodes: astcodes;
 		class: class;
 		selector: selector;
