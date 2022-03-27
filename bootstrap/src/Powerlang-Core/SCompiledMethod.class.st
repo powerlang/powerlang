@@ -214,6 +214,12 @@ SCompiledMethod >> pragma: aPragmaNode [
 
 ]
 
+{ #category : #accessing }
+SCompiledMethod >> prepareForExecution [
+	optimizedCode ifNil: [ optimizedCode := self sexpressions ].
+	^ optimizedCode
+]
+
 { #category : #printing }
 SCompiledMethod >> printOn: aStream [
 	aStream
