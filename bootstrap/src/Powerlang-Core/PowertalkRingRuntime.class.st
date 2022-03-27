@@ -100,10 +100,8 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 
 { #category : #accessing }
 PowertalkRingRuntime >> initialize [
-
 	super initialize.
-	undermessages := self class undermessages.
-	sexpressionsCache := IdentityDictionary new
+	undermessages := self class undermessages
 ]
 
 { #category : #services }
@@ -202,9 +200,7 @@ PowertalkRingRuntime >> removeOverride: assoc [
 
 { #category : #accessing }
 PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
-	^ sexpressionsCache
-		at: anSCompiledMethod
-		ifAbsentPut: [ anSCompiledMethod sexpressions ]
+	^ anSCompiledMethod prepareForExecution; optimizedCode
 ]
 
 { #category : #accessing }
