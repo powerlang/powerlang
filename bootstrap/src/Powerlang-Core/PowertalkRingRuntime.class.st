@@ -145,7 +145,7 @@ PowertalkRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 
 { #category : #accessing }
 PowertalkRingRuntime >> newEnvironmentSized: anInteger [
-	^image newSlots: #Array sized: anInteger
+	^ image newArraySized: anInteger
 ]
 
 { #category : #accessing }

@@ -23,7 +23,11 @@ Class {
 		'symbols',
 		'bootstrapDicts',
 		'identityMap',
-		'specs'
+		'specs',
+		'closureSpec',
+		'arraySpec',
+		'smiSpec',
+		'symbolSpec'
 	],
 	#classInstVars : [
 		'KernelSpec'
@@ -392,10 +396,16 @@ PowertalkRingImage >> metaclasses [
 
 { #category : #initialization }
 PowertalkRingImage >> newArray: anArray [
-	| assoc |
-	assoc := self newSlots: 'Array' sized: anArray size.
-	anArray withIndexDo: [ :obj :i | assoc at: i put: obj ].
-	^ assoc
+	| array |
+	array := self newArraySized: anArray size.
+	anArray withIndexDo: [ :obj :i | array at: i put: obj ].
+	^ array
+]
+
+{ #category : #initialization }
+PowertalkRingImage >> newArraySized: anInteger [
+^self basicNewSlotsOf: arraySpec sized: anInteger.
+
 ]
 
 { #category : #initialization }
@@ -453,7 +463,7 @@ PowertalkRingImage >> newBytesOf: anRGBehavior sized: anInteger [
 
 { #category : #accessing }
 PowertalkRingImage >> newClosure: anInteger [
-	^ ClosureMap new: self => #Closure size: anInteger withAll: nilObj
+	^ ClosureMap new: closureSpec size: anInteger withAll: nilObj
 ]
 
 { #category : #accessing }
@@ -467,7 +477,7 @@ PowertalkRingImage >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
-	^self newSmallInteger: anInteger
+	^ SmallintObjectMap new: smiSpec valued: anInteger
 ]
 
 { #category : #initialization }
@@ -527,14 +537,6 @@ PowertalkRingImage >> newSlotsOf: anRGBehavior sized: size [
 ]
 
 { #category : #initialization }
-PowertalkRingImage >> newSmallInteger: anInteger [
-	self ASSERT: (anInteger between: minSMI and: maxSMI).
-	^ SmallintObjectMap
-		new: self => #SmallInteger
-		valued: anInteger
-]
-
-{ #category : #initialization }
 PowertalkRingImage >> newString: aString [
 	| bytes |
 	bytes := aString copyWith: Character null.
@@ -556,7 +558,7 @@ PowertalkRingImage >> newStringArray: strings [
 PowertalkRingImage >> newSymbol: aSymbol [
 	| new |
 	identityMap at: aSymbol ifPresent: [ :s | ^ s ].
-	new := SymbolMap new: self => 'Symbol' symbol: aSymbol.
+	new := SymbolMap new: symbolSpec symbol: aSymbol.
 	symbols add: new.
 	^ identityMap at: aSymbol put: new
 ]
@@ -583,7 +585,11 @@ PowertalkRingImage >> specs [
 
 { #category : #accessing }
 PowertalkRingImage >> specs: anRGEnvironment [
-	specs := anRGEnvironment 
+	specs := anRGEnvironment.
+	closureSpec := self => #Closure.
+	arraySpec := self => #Array.
+	smiSpec := self => #SmallInteger.
+	symbolSpec := self =>#Symbol
 ]
 
 { #category : #accessing }

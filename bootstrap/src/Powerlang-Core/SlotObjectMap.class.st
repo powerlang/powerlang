@@ -17,6 +17,12 @@ SlotObjectMap class >> new [
 ]
 
 { #category : #'instance creation' }
+SlotObjectMap class >> new: anRGBehavior size: size [
+
+	^ self new initializeAs: anRGBehavior sized: size
+]
+
+{ #category : #'instance creation' }
 SlotObjectMap class >> new: anRGBehavior size: size withAll: value [
 	| obj |
 	obj := self new: anRGBehavior size: size.
