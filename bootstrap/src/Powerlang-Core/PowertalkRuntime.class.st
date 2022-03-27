@@ -76,100 +76,100 @@ PowertalkRuntime >> evaluatePrimitive: primitive in: frame [
 	| receiver arguments index size argument value string |
 	receiver := frame receiver.
 	arguments := frame arguments.
-	primitive = #Behavior
+	primitive == #Behavior
 		ifTrue: [ ^ receiver isImmediate
 				ifTrue: [ self smallintBehavior ]
 				ifFalse: [ receiver behavior ] ].
-	primitive = #Class
+	primitive == #Class
 		ifTrue: [ ^ self speciesFor: receiver ].
-	primitive = #UnderSize
+	primitive == #UnderSize
 		ifTrue: [ ^ self newInteger: receiver size ].
-	primitive = #Size
+	primitive == #Size
 		ifTrue: [ ^ self newInteger: receiver arrayedSize ].
-	primitive = #At
+	primitive == #At
 		ifTrue: [ index := arguments first value.
 			value := receiver at: index.
 			^ receiver isBytes
 				ifTrue: [ self newInteger: value ]
 				ifFalse: [ value ] ].
-	primitive = #AtPut
+	primitive == #AtPut
 		ifTrue: [ index := arguments first value.
 			^ receiver at: index put: arguments second ].
-	primitive = #New
+	primitive == #New
 		ifTrue: [ ^ self newSlotsOf: receiver ].
-	primitive = #NewSized
+	primitive == #NewSized
 		ifTrue: [ size := arguments first value.
 			^ self newOf: receiver sized: size ].
-	primitive = #NewBytes
+	primitive == #NewBytes
 		ifTrue: [ size := arguments first value.
 			^ self newBytesOf: receiver sized: size ].
-	primitive = #Equal
+	primitive == #Equal
 		ifTrue: [ argument := arguments first.
 			^ self booleanFor: receiver = argument ].
-	primitive = #SMIPlus
+	primitive == #SMIPlus
 		ifTrue: [ ^ self newInteger: receiver value + arguments first value ].
-	primitive = #SMIMinus
+	primitive == #SMIMinus
 		ifTrue: [ ^ self newInteger: receiver value - arguments first value ].
-	primitive = #SMITimes
+	primitive == #SMITimes
 		ifTrue: [ ^ self newInteger: receiver value * arguments first value ].
-	primitive = #SMIIntDiv
+	primitive == #SMIIntDiv
 		ifTrue: [ ^ self newInteger: receiver value // arguments first value ].
-	primitive = #SMIIntQuot
+	primitive == #SMIIntQuot
 		ifTrue: [ ^ self newInteger: receiver value \\ arguments first value ].
-	primitive = #SMIBitAnd
+	primitive == #SMIBitAnd
 		ifTrue: [ ^ self newInteger: (receiver value bitAnd: arguments first value) ].
-	primitive = #SMIBitXor
+	primitive == #SMIBitXor
 		ifTrue: [ ^ self newInteger: (receiver value bitXor: arguments first value) ].
-	primitive = #SMIBitShift
+	primitive == #SMIBitShift
 		ifTrue:
 			[ ^ self newInteger: (receiver value bitShift: arguments first value) ].
-	primitive = #SMIHighBit
+	primitive == #SMIHighBit
 		ifTrue: [ ^ self newInteger: receiver value highBit ].
-	primitive = #SMIGreaterThan
+	primitive == #SMIGreaterThan
 		ifTrue: [ ^ self booleanFor: receiver value > arguments first value ].
-	primitive = #SMIGreaterEqualThan
+	primitive == #SMIGreaterEqualThan
 		ifTrue: [ ^ self booleanFor: receiver value >= arguments first value ].
-	primitive = #SMIEqual
+	primitive == #SMIEqual
 		ifTrue: [ ^ self booleanFor: receiver value = arguments first value ].
-	primitive = #SMINotEqual
+	primitive == #SMINotEqual
 		ifTrue: [ ^ self booleanFor: receiver value != arguments first value ].
-	primitive = #SMISize
+	primitive == #SMISize
 		ifTrue: [ ^ self newInteger: receiver value bytesCount ].
-	primitive = #ClosureValue
+	primitive == #ClosureValue
 		ifTrue: [ ^ self evaluatePrimitiveClosureValue: receiver ].
-	primitive = #ClosureValueWithArgs
+	primitive == #ClosureValueWithArgs
 		ifTrue: [ ^ self evaluateClosure: receiver withArgs: arguments ].
-	primitive = #ClosureWhileTrue
+	primitive == #ClosureWhileTrue
 		ifTrue:
 			[ ^ self evaluatePrimitiveClosure: receiver whileTrue: arguments first ].
-	primitive = #ClosureWhileFalse
+	primitive == #ClosureWhileFalse
 		ifTrue: [ ^ self
 				evaluatePrimitiveClosure: receiver
 				whileFalse: arguments first ].
-	primitive = #ClosureArgumentCount
+	primitive == #ClosureArgumentCount
 		ifTrue: [ ^ self evaluatePrimitiveClosureArgumentCount: receiver ].
-	primitive = #StringReplaceFromToWithStartingAt
+	primitive == #StringReplaceFromToWithStartingAt
 		ifTrue: [ receiver bytes
 				replaceFrom: arguments first value
 				to: arguments second value
 				with: arguments third bytes
 				startingAt: arguments fourth value.
 			^ receiver ].
-	primitive = #FloatNew
+	primitive == #FloatNew
 		ifTrue: [ ^ self newBytesOf: receiver sized: 8 ].
-	primitive = #DictionaryNew
+	primitive == #DictionaryNew
 		ifTrue: [ ^ self newBootstrapDictionaryOf: receiver ].
-	primitive = #BootstrapDictBeConstant
+	primitive == #BootstrapDictBeConstant
 		ifTrue: [ ^ receiver beConstant ].
-	primitive = #BootstrapDictKeys
+	primitive == #BootstrapDictKeys
 		ifTrue: [ ^ receiver keys ].
-	primitive = #BootstrapDictAt
+	primitive == #BootstrapDictAt
 		ifTrue: [ string := arguments first asString.
 			^ receiver at: string ].
-	primitive = #BootstrapDictAtPut
+	primitive == #BootstrapDictAtPut
 		ifTrue: [ string := arguments first asString.
 			^ receiver at: string put: arguments second ].
-	primitive = #PrimeFor
+	primitive == #PrimeFor
 		ifTrue: [ ^ self evaluatePrimitivePrimeFor: arguments first value ].
 	self ASSERT: false
 ]
