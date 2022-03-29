@@ -104,53 +104,6 @@ PowertalkRuntime >> evaluatePrimitiveHash: receiver [
 	^ self newInteger: hash
 ]
 
-{ #category : #accessing }
-PowertalkRuntime >> evaluateUnderprimitive: selector with: recv with: args [
-	| result |
-	selector == #_isSmallInteger
-		ifTrue: [ ^ self booleanFor: recv isImmediate ].
-	selector == #_isLarge
-		ifTrue: [ ^ self booleanFor: recv isSmall not ].
-	selector == #_smallSize
-		ifTrue: [ ^ self
-				newInteger:
-					(recv isSmall
-						ifTrue: [ recv size ]
-						ifFalse: [ self error ]) ].
-	selector == #_largeSize
-		ifTrue: [ ^ self
-				newInteger:
-					(recv isSmall
-						ifTrue: [ self error ]
-						ifFalse: [ recv size ]) ].
-	selector == #_basicFlags
-		ifTrue: [ ^ self newInteger: recv headerFlags ].
-	selector == #_basicAt:
-		ifTrue: [ ^ recv slots at: args first value ].
-	selector == #_byteAt:
-		ifTrue: [ result := recv bytes at: args first value.
-			^ self newInteger: result ].
-	selector == #_basicHash
-		ifTrue: [ ^ self newInteger: recv headerHash ].
-	selector == #_basicHash:
-		ifTrue: [ recv headerHash: args first value.
-			^ recv ].
-	selector == #_smallIntegerByteAt:
-		ifTrue: [ result := recv value byteAt: args first value.
-			^ self newInteger: result ].
-	selector == #_bitShiftLeft:
-		ifTrue: [ result := recv value bitShift: args first value.
-			^ self newInteger: result ].
-	selector == #_uShortAtOffset:
-		ifTrue: [ ^ result := self
-				newInteger: (recv bytes unsignedShortAt: args first value + 1) ].
-	selector == #_uShortAtOffset:put:
-		ifTrue: [ result := args second.
-			recv bytes unsignedShortAt: args first value + 1 put: result value.
-			^ result ].
-	self ASSERT: false
-]
-
 { #category : #initialization }
 PowertalkRuntime >> false [
 	^ falseObj
