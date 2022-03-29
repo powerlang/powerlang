@@ -3,12 +3,16 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'frames',
-		'undermessages',
 		'methodCache',
 		'overrides',
 		'falseObj',
 		'trueObj',
-		'nilObj'
+		'nilObj',
+		'workStack',
+		'regR',
+		'context',
+		'undermessages',
+		'primitives'
 	],
 	#classVars : [
 		'Undermessages'
@@ -46,14 +50,26 @@ PowertalkRuntime >> booleanFrom: anObject [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> classFor: anObject [
-	^self subclassResponsibility
-]
-
-{ #category : #accessing }
 PowertalkRuntime >> evaluateClosure: receiver [ 
 ^self evaluateClosure: receiver withArgs: { }
 
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> evaluateClosure: receiver whileFalse: arg [
+	| result |
+	[ result := self evaluateClosure: receiver.
+	self booleanFrom: result ]
+		whileFalse: [ self evaluateClosure: arg ].
+	^ receiver
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> evaluateClosure: receiver whileTrue: arg [
+	| result |
+	[ result := self evaluateClosure: receiver.
+	self booleanFrom: result ] whileTrue: [ self evaluateClosure: arg ].
+	^ receiver
 ]
 
 { #category : #visiting }
@@ -72,134 +88,10 @@ PowertalkRuntime >> evaluateClosure: receiver withArgs: arguments [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> evaluatePrimitive: primitive in: frame [
-	| receiver arguments index size argument value string |
-	receiver := frame receiver.
-	arguments := frame arguments.
-	primitive == #Behavior
-		ifTrue: [ ^ receiver isImmediate
-				ifTrue: [ self smallintBehavior ]
-				ifFalse: [ receiver behavior ] ].
-	primitive == #Class
-		ifTrue: [ ^ self speciesFor: receiver ].
-	primitive == #UnderSize
-		ifTrue: [ ^ self newInteger: receiver size ].
-	primitive == #Size
-		ifTrue: [ ^ self newInteger: receiver arrayedSize ].
-	primitive == #At
-		ifTrue: [ index := arguments first value.
-			value := receiver at: index.
-			^ receiver isBytes
-				ifTrue: [ self newInteger: value ]
-				ifFalse: [ value ] ].
-	primitive == #AtPut
-		ifTrue: [ index := arguments first value.
-			^ receiver at: index put: arguments second ].
-	primitive == #New
-		ifTrue: [ ^ self newSlotsOf: receiver ].
-	primitive == #NewSized
-		ifTrue: [ size := arguments first value.
-			^ self newOf: receiver sized: size ].
-	primitive == #NewBytes
-		ifTrue: [ size := arguments first value.
-			^ self newBytesOf: receiver sized: size ].
-	primitive == #Equal
-		ifTrue: [ argument := arguments first.
-			^ self booleanFor: receiver = argument ].
-	primitive == #SMIPlus
-		ifTrue: [ ^ self newInteger: receiver value + arguments first value ].
-	primitive == #SMIMinus
-		ifTrue: [ ^ self newInteger: receiver value - arguments first value ].
-	primitive == #SMITimes
-		ifTrue: [ ^ self newInteger: receiver value * arguments first value ].
-	primitive == #SMIIntDiv
-		ifTrue: [ ^ self newInteger: receiver value // arguments first value ].
-	primitive == #SMIIntQuot
-		ifTrue: [ ^ self newInteger: receiver value \\ arguments first value ].
-	primitive == #SMIBitAnd
-		ifTrue: [ ^ self newInteger: (receiver value bitAnd: arguments first value) ].
-	primitive == #SMIBitXor
-		ifTrue: [ ^ self newInteger: (receiver value bitXor: arguments first value) ].
-	primitive == #SMIBitShift
-		ifTrue:
-			[ ^ self newInteger: (receiver value bitShift: arguments first value) ].
-	primitive == #SMIHighBit
-		ifTrue: [ ^ self newInteger: receiver value highBit ].
-	primitive == #SMIGreaterThan
-		ifTrue: [ ^ self booleanFor: receiver value > arguments first value ].
-	primitive == #SMIGreaterEqualThan
-		ifTrue: [ ^ self booleanFor: receiver value >= arguments first value ].
-	primitive == #SMIEqual
-		ifTrue: [ ^ self booleanFor: receiver value = arguments first value ].
-	primitive == #SMINotEqual
-		ifTrue: [ ^ self booleanFor: receiver value != arguments first value ].
-	primitive == #SMISize
-		ifTrue: [ ^ self newInteger: receiver value bytesCount ].
-	primitive == #ClosureValue
-		ifTrue: [ ^ self evaluatePrimitiveClosureValue: receiver ].
-	primitive == #ClosureValueWithArgs
-		ifTrue: [ ^ self evaluateClosure: receiver withArgs: arguments ].
-	primitive == #ClosureWhileTrue
-		ifTrue:
-			[ ^ self evaluatePrimitiveClosure: receiver whileTrue: arguments first ].
-	primitive == #ClosureWhileFalse
-		ifTrue: [ ^ self
-				evaluatePrimitiveClosure: receiver
-				whileFalse: arguments first ].
-	primitive == #ClosureArgumentCount
-		ifTrue: [ ^ self evaluatePrimitiveClosureArgumentCount: receiver ].
-	primitive == #StringReplaceFromToWithStartingAt
-		ifTrue: [ receiver bytes
-				replaceFrom: arguments first value
-				to: arguments second value
-				with: arguments third bytes
-				startingAt: arguments fourth value.
-			^ receiver ].
-	primitive == #FloatNew
-		ifTrue: [ ^ self newBytesOf: receiver sized: 8 ].
-	primitive == #DictionaryNew
-		ifTrue: [ ^ self newBootstrapDictionaryOf: receiver ].
-	primitive == #BootstrapDictBeConstant
-		ifTrue: [ ^ receiver beConstant ].
-	primitive == #BootstrapDictKeys
-		ifTrue: [ ^ receiver keys ].
-	primitive == #BootstrapDictAt
-		ifTrue: [ string := arguments first asString.
-			^ receiver at: string ].
-	primitive == #BootstrapDictAtPut
-		ifTrue: [ string := arguments first asString.
-			^ receiver at: string put: arguments second ].
-	primitive == #PrimeFor
-		ifTrue: [ ^ self evaluatePrimitivePrimeFor: arguments first value ].
-	self ASSERT: false
-]
-
-{ #category : #accessing }
-PowertalkRuntime >> evaluatePrimitiveClosure: receiver whileFalse: arg [
-	| result |
-	[ result := self evaluateClosure: receiver.
-	self booleanFrom: result ]
-		whileFalse: [ self evaluateClosure: arg ].
-	^ receiver
-]
-
-{ #category : #accessing }
-PowertalkRuntime >> evaluatePrimitiveClosure: receiver whileTrue: arg [
-	| result |
-	[ result := self evaluateClosure: receiver.
-	self booleanFrom: result ] whileTrue: [ self evaluateClosure: arg ].
-	^ receiver
-]
-
-{ #category : #accessing }
-PowertalkRuntime >> evaluatePrimitiveClosureArgumentCount: receiver [
-	^ self subclassResponsibility
-]
-
-{ #category : #accessing }
-PowertalkRuntime >> evaluatePrimitiveClosureValue: receiver [
-	^ self evaluateClosure: receiver withArgs: {}.
-
+PowertalkRuntime >> evaluateMethod: anSCompiledMethod [
+		| sexpressions |
+	sexpressions := self sexpressionsOf: anSCompiledMethod.
+		self visitMethod: sexpressions
 ]
 
 { #category : #accessing }
@@ -325,14 +217,74 @@ PowertalkRuntime >> initializeEmulationOverrides [
 		override: #'HashTable class' -> #primeFor: with: 'PrimeFor'
 ]
 
+{ #category : #initializing }
+PowertalkRuntime >> initializePrimitives [
+	primitives := IdentityDictionary new.
+	primitives
+		at: #Behavior put: self primitiveBehavior;
+		at: #Class put: self primitiveClass;
+		at: #UnderSize put: self primitiveUnderSize;
+		at: #Size put: self primitiveSize;
+		at: #At put: self primitiveAt;
+		at: #AtPut put: self primitiveAtPut;
+		at: #New put: self primitiveNew;
+		at: #NewSized put: self primitiveNewSized;
+		at: #NewBytes put: self primitiveNewBytes;
+		at: #Equal put: self primitiveEqual;
+		at: #SMIPlus put: self primitiveSMIPlus;
+		at: #SMIMinus put: self primitiveSMIMinus;
+		at: #SMITimes put: self primitiveSMITimes;
+		at: #SMIIntDiv put: self primitiveSMIIntDiv;
+		at: #SMIIntQuot put: self primitiveSMIIntQuot;
+		at: #SMIBitAnd put: self primitiveSMIBitAnd;
+		at: #SMIBitXor put: self primitiveSMIBitXor;
+		at: #SMIBitShift put: self primitiveSMIBitShift;
+		at: #SMIHighBit put: self primitiveSMIHighBit;
+		at: #SMIGreaterThan put: self primitiveSMIGreaterThan;
+		at: #SMIGreaterEqualThan put: self primitiveSMIGreaterEqualThan;
+		at: #SMIEqual put: self primitiveSMIEqual;
+		at: #SMINotEqual put: self primitiveSMINotEqual;
+		at: #SMISize put: self primitiveSMISize;
+		at: #ClosureValue put: self primitiveClosureValue;
+		at: #ClosureValueWithArgs put: self primitiveClosureValueWithArgs;
+		at: #ClosureWhileTrue put: self primitiveClosureWhileTrue;
+		at: #ClosureWhileFalse put: self primitiveClosureWhileFalse;
+		at: #ClosureArgumentCount put: self primitiveClosureArgumentCount;
+		at: #StringReplaceFromToWithStartingAt
+			put: self primitiveStringReplaceFromToWithStartingAt;
+		at: #FloatNew put: self primitiveFloatNew;
+		at: #DictionaryNew put: self primitiveBootstrapDictNew;
+		at: #BootstrapDictBeConstant
+			put: self primitiveBootstrapDictBeConstant;
+		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
+		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
+		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
+		at: #PrimeFor put: self primitivePrimeFor
+]
+
+{ #category : #initializing }
+PowertalkRuntime >> initializeUndermessages [
+	undermessages := IdentityDictionary new.
+	undermessages
+		at: #_isSmallInteger put: self underprimitiveIsSmallInteger;
+		at: #_isLarge put: self underprimitiveIsLarge;
+		at: #_smallSize put: self underprimitiveSmallSize;
+		at: #_largeSize put: self underprimitiveLargeSize;
+		at: #_basicFlags put: self underprimitiveBasicFlags;
+		at: #_basicAt: put: self underprimitiveBasicAt;
+		at: #_byteAt: put: self underprimitiveByteAt;
+		at: #_basicHash put: self underprimitiveBasicHash;
+		at: #_basicHash: put: self underprimitiveBasicHashPut;
+		at: #_smallIntegerByteAt:
+			put: self underprimitiveSmallIntegerByteAt;
+		at: #_bitShiftLeft: put: self underprimitiveBitShiftLeft;
+		at: #_uShortAtOffset: put: self underprimitiveUShortAtOffset;
+		at: #_uShortAtOffset:put: put: self underprimitiveUShortAtOffsetPut
+]
+
 { #category : #accessing }
 PowertalkRuntime >> isClosure: anObjectMap [
 	^ self subclassResponsibility
-]
-
-{ #category : #testing }
-PowertalkRuntime >> isUndermessage: selector [
-	^ undermessages includes: selector
 ]
 
 { #category : #accessing }
@@ -345,7 +297,9 @@ PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage [
 	| method |
 	method := anSMessage methodFor: aBehavior.
 	method
-		ifNil: [ method := self lookup: aSymbol startingAt: aBehavior.
+		ifNil: [ 
+					undermessages at: aSymbol ifPresent: [:block | anSMessage cacheUndermessage: block. ^block ].
+			method := self lookup: aSymbol startingAt: aBehavior.
 			anSMessage cache: method when: aBehavior ].
 	^ method
 ]
@@ -396,12 +350,264 @@ PowertalkRuntime >> override: assoc with: primitiveName [
 
 { #category : #accessing }
 PowertalkRuntime >> popFrame [
-	frames removeLast
+	frames removeLast.
+	frames isEmpty ifFalse: [ context := frames last ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveAt [
+	| receiver index value |
+	^[ receiver := context receiver.  index := context arguments first value.
+			value := receiver at: index.
+			 receiver isBytes
+				ifTrue: [ self newInteger: value ]
+				ifFalse: [ value ] ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveAtPut [
+	| arguments index |
+	^ [ arguments := context arguments.
+	index := arguments first value.
+	context receiver at: index put: arguments second ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBehavior [
+	| receiver |
+	^[ receiver := context receiver. receiver isImmediate
+				ifTrue: [ self smallintBehavior ]
+				ifFalse: [ receiver behavior ] ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBootstrapDictAt [
+	| string |
+	^[ string := context arguments first asString.
+	 context receiver at: string ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBootstrapDictAtPut [
+	| string |
+	^[ string := context arguments first asString.
+			 context receiver at: string put: context arguments second ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBootstrapDictBeConstant [
+	^[ context receiver beConstant ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBootstrapDictKeys [
+	^[ context receiver keys ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveBootstrapDictNew [
+	^ [ self newBootstrapDictionaryOf: context receiver ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClass [
+	^[ self speciesFor: context receiver ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClosureArgumentCount [
+	^ [ self newInteger: context receiver block argumentCount ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClosureValue [
+	^ [ self evaluateClosure: context receiver ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClosureValueWithArgs [
+	^[ self evaluateClosure: context receiver withArgs: context arguments ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClosureWhileFalse [
+	^[ self
+				evaluateClosure: context receiver
+				whileFalse: context arguments first ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveClosureWhileTrue [
+	^[ self evaluateClosure: context receiver whileTrue: context arguments first ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveEqual [
+	^ [ 
+	self booleanFor: context receiver = context arguments first ]
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveFloatNew [
+	^[ self newBytesOf: context receiver sized: 8 ].
+
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> pushFrame: aMethodEvaluator [
-	frames addLast: aMethodEvaluator
+PowertalkRuntime >> primitiveFor: aSymbol [
+	^primitives at: aSymbol
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveNew [
+	^[ self newSlotsOf: context receiver ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveNewBytes [
+	| size |
+	^[ size := context arguments first value.
+			self newBytesOf: context receiver sized: size ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveNewSized [
+	| size |
+	^[ size := context arguments first value.
+			self newOf: context receiver sized: size ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitivePrimeFor [
+	^[ self evaluatePrimitivePrimeFor: context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIBitAnd [
+	^[ self newInteger: (context receiver value bitAnd: context arguments first value) ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIBitShift [
+	^[ self newInteger: (context receiver value bitShift: context arguments first value) ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIBitXor [
+	^[ self newInteger: (context receiver value bitXor: context arguments first value) ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIEqual [
+	^[ self booleanFor: context receiver value = context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIGreaterEqualThan [
+	^[ self booleanFor: context receiver value >= context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIGreaterThan [
+	^[ self booleanFor: context receiver value > context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIHighBit [
+	^[ self newInteger: context receiver value highBit ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIIntDiv [
+	^[ self newInteger: context receiver value // context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIIntQuot [
+	^[ self newInteger: context receiver value \\ context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIMinus [
+	^[ self newInteger: context receiver value - context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMINotEqual [
+	^[ self booleanFor: context receiver value != context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMIPlus [
+	^[ self newInteger: context receiver value + context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMISize [
+	^[ self newInteger: context receiver value bytesCount ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSMITimes [
+	^[ self newInteger: context receiver value * context arguments first value ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveSize [
+	^[ self newInteger: context receiver arrayedSize ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveStringReplaceFromToWithStartingAt [
+	| receiver arguments |
+	^[ receiver := context receiver. arguments := context arguments. receiver bytes
+				replaceFrom: arguments first value
+				to: arguments second value
+				with:  arguments third bytes
+				startingAt: arguments fourth value.
+			 receiver ].
+
+]
+
+{ #category : #primitives }
+PowertalkRuntime >> primitiveUnderSize [
+	^[ self newInteger: context receiver size ].
+
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> pushFrame: anEvaluationContext [
+	frames addLast: anEvaluationContext.
+	context := anEvaluationContext 
 ]
 
 { #category : #accessing }
@@ -414,40 +620,23 @@ self
 
 { #category : #accessing }
 PowertalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean [
-	| behavior method environment frame size |
-	(self isUndermessage: aSymbol)
-		ifTrue: [ ^ self
-				evaluateUnderprimitive: aSymbol
-				with: receiver
-				with: arguments ].
-	behavior := aBoolean
-		ifTrue: [ self superBehavior]
-		ifFalse: [ self behaviorOf: receiver ].
-	method := self lookup: aSymbol startingAt: behavior.
-	self ASSERT: method notNil.
-	size := self methodEnvironmentSize: method.
-	environment := self newEnvironmentSized: size.
-	frame := EvaluationContext new
-		receiver: receiver;
-		arguments: arguments;
-		environment: environment;
-		method: method;
-		system: self.
-	^ frame evaluate
+	^self send: aSymbol to: receiver with: arguments super: aBoolean sendSite: SMessage new
+
 ]
 
 { #category : #accessing }
 PowertalkRuntime >> send: aSymbol to: receiver with: arguments super: aBoolean sendSite: anSMessage [
 	| behavior method environment frame size |
-	(self isUndermessage: aSymbol)
-		ifTrue: [ ^ self
-				evaluateUnderprimitive: aSymbol
-				with: receiver
-				with: arguments ].
+	anSMessage cachedUndermessage ifNotNil: [ :block | ^ block value: receiver value: arguments ].
 	behavior := aBoolean
 		ifTrue: [ self superBehavior ]
 		ifFalse: [ self behaviorOf: receiver ].
-	method := self lookup: aSymbol startingAt: behavior sendSite: anSMessage.
+	method := self
+		lookup: aSymbol
+		startingAt: behavior
+		sendSite: anSMessage.
+	method class == BlockClosure
+		ifTrue: [ ^ method value: receiver value: arguments ].
 	self ASSERT: method notNil.
 	size := self methodEnvironmentSize: method.
 	environment := self newEnvironmentSized: size.
@@ -481,6 +670,16 @@ PowertalkRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> sexpressionsOf: anSCompiledMethod [
+self subclassResponsibility
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> speciesFor: anObject [
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> superBehavior [
 	^ self subclassResponsibility
 ]
@@ -500,6 +699,95 @@ PowertalkRuntime >> true [
 	^ trueObj
 ]
 
+{ #category : #underprimitives }
+PowertalkRuntime >> underprimitiveBasicAt [
+	^ [ :receiver :arguments | receiver slots at: arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveBasicFlags [
+	^ [ :receiver :arguments | self newInteger: receiver headerFlags ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveBasicHash [
+	^ [ :receiver :arguments | self newInteger: receiver headerHash ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveBasicHashPut [
+	^ [ :receiver :arguments | receiver headerHash: arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveBitShiftLeft [
+	| result |
+	^ [ :receiver :arguments | result := receiver value
+		bitShift: arguments first value.
+	self newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveByteAt [
+	| result |
+	^ [:receiver :arguments |  result :=  receiver bytes
+		at:  arguments first value.
+	self newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveIsLarge [
+	^ [ :receiver :arguments | self booleanFor: receiver isSmall not ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveIsSmallInteger [
+	^ [ :receiver :arguments | self booleanFor: receiver isImmediate ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveLargeSize [
+	^ [ :receiver :arguments | 
+	receiver isSmall
+		ifTrue: [ self error ].
+	self newInteger: receiver size ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveSmallIntegerByteAt [
+	| result |
+	^ [ :receiver :arguments | result := receiver value
+		byteAt: context arguments first value.
+	self newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveSmallSize [
+	^ [ :receiver :arguments | 
+	receiver isSmall
+		ifFalse: [ self error ].
+	self newInteger: receiver size ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveUShortAtOffset [
+	| result |
+	^ [:receiver :arguments |  result := receiver bytes
+		unsignedShortAt: context arguments first value + 1.
+	self newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> underprimitiveUShortAtOffsetPut [
+	| value  |
+	^ [ :receiver :arguments | 
+	value := arguments second.
+	context receiver bytes
+		unsignedShortAt: arguments first value + 1
+		put: value value.
+	value ]
+]
+
 { #category : #accessing }
 PowertalkRuntime >> unwind: environment returning: value [
 	| home frame |
@@ -510,6 +798,7 @@ PowertalkRuntime >> unwind: environment returning: value [
 	frames size to: 1 by: -1 do: [ :i | 
 		frame := frames at: i.
 		(frame isHomeOf: home)
-			ifTrue: [ frames removeLast: frames size - i + 1. ^ value ]. ].
+			ifTrue: [ frames removeLast: frames size - i + 1. frames isEmpty ifFalse: [ context := frames last ].
+				^ value ] ].
 	self error: 'frame not found'
 ]

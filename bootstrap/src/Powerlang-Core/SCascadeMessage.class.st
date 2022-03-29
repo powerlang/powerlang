@@ -36,6 +36,17 @@ SCascadeMessage >> cache: anSCompiledMethod when: type [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> cacheUndermessage: aBlockClosure [
+	cache := aBlockClosure
+]
+
+{ #category : #accessing }
+SCascadeMessage >> cachedUndermessage [
+	^ cache class == BlockClosure
+		ifTrue: [ cache ]
+]
+
+{ #category : #accessing }
 SCascadeMessage >> isCascadeMessage [
 	^true
 ]

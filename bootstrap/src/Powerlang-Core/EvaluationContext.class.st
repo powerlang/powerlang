@@ -10,7 +10,8 @@ Class {
 		'environment',
 		'system',
 		'isBlock',
-		'nonLocalReturn'
+		'nonLocalReturn',
+		'operands'
 	],
 	#classVars : [
 		'Undermessages'
@@ -427,10 +428,12 @@ EvaluationContext >> visitMessage: anSMessage [
 { #category : #visiting }
 EvaluationContext >> visitMethod: anSMethod [
 	| primitive |
-	primitive := anSMethod primitive.
-	^ primitive
-		ifNil: [ self visitScript: anSMethod. receiver ]
-		ifNotNil: [ system evaluatePrimitive: primitive in: self ]
+	primitive := anSMethod pragma.
+	primitive ifNil: [ self visitScript: anSMethod. ^receiver ].
+	primitive class == SPragma
+		ifTrue: [ primitive := system primitiveFor: anSMethod primitive.
+			anSMethod pragma: primitive ].
+	^ primitive value
 ]
 
 { #category : #visiting }

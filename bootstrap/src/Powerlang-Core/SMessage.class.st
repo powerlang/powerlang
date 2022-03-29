@@ -51,6 +51,16 @@ SMessage >> cache: anSCompiledMethod when: type [
 ]
 
 { #category : #printing }
+SMessage >> cacheUndermessage: aBlockClosure [
+	cache := aBlockClosure
+]
+
+{ #category : #printing }
+SMessage >> cachedUndermessage [
+	^cache class == BlockClosure ifTrue: [ cache ]
+]
+
+{ #category : #printing }
 SMessage >> initialize [
 	super initialize.
 	arguments := #()

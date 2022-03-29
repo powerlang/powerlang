@@ -67,11 +67,6 @@ PowertalkRingRuntime >> evaluateClosure: closure withArgs: arguments [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> evaluatePrimitiveClosureArgumentCount: receiver [
-	^ self newInteger: receiver block argumentCount
-]
-
-{ #category : #accessing }
 PowertalkRingRuntime >> evaluatePrimitivePrimeFor: anInteger [
 	| result |
 
@@ -90,13 +85,8 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 	image := aPowertalkImage.
 	nilObj := image nil.
 	trueObj := image true.
-	falseObj := image false. self initializeEmulationOverrides
-]
-
-{ #category : #accessing }
-PowertalkRingRuntime >> initialize [
-	super initialize.
-	undermessages := self class undermessages
+	falseObj := image false.
+	self initializeEmulationOverrides; initializePrimitives; initializeUndermessages
 ]
 
 { #category : #services }
