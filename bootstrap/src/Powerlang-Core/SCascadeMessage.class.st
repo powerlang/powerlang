@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'selector',
 		'arguments',
+		'cascade',
 		'cache'
 	],
 	#category : #'Powerlang-Core-SExpressions'
@@ -17,6 +18,11 @@ SCascadeMessage class >> decodeUsing: anAstcodeDecoder [
 { #category : #accessing }
 SCascadeMessage >> acceptVisitor: visitor [
 	^ visitor visitCascadeMessage: self
+]
+
+{ #category : #accessing }
+SCascadeMessage >> argumentCount [
+	^arguments size
 ]
 
 { #category : #accessing }
@@ -47,6 +53,16 @@ SCascadeMessage >> cachedUndermessage [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> cascade [ ^
+	cascade
+]
+
+{ #category : #accessing }
+SCascadeMessage >> cascade: anSCascade [
+	cascade := anSCascade
+]
+
+{ #category : #accessing }
 SCascadeMessage >> isCascadeMessage [
 	^true
 ]
@@ -60,6 +76,11 @@ SCascadeMessage >> methodFor: requiredType [
 		type == requiredType
 			ifTrue: [ ^ cache at: i + 1 ] ].
 	^ nil
+]
+
+{ #category : #accessing }
+SCascadeMessage >> receiver [
+	^cascade receiver
 ]
 
 { #category : #accessing }

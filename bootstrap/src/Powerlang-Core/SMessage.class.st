@@ -29,6 +29,11 @@ SMessage >> acceptVisitor: visitor [
 	^visitor visitMessage: self
 ]
 
+{ #category : #accessing }
+SMessage >> argumentCount [
+	^arguments size
+]
+
 { #category : #printing }
 SMessage >> arguments [
 	^arguments
