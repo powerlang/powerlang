@@ -55,6 +55,13 @@ PowertalkRuntime >> initialize [
 	methodCache := Dictionary new
 ]
 
+{ #category : #initialization }
+PowertalkRuntime >> initializeInterpreter [
+	"interpreter := PowertalkIterativeTreeInterpreter new runtime: self"
+	"interpreter := PowertalkIterativeLinearInterpreter new runtime: self"
+	interpreter := PowertalkRecursiveInterpreter new runtime: self
+]
+
 { #category : #accessing }
 PowertalkRuntime >> instanceVarOf: receiver at: anInteger [
 	^ receiver slotAt: anInteger
