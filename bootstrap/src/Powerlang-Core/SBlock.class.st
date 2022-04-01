@@ -35,6 +35,11 @@ SBlock >> capturesHome [
 ]
 
 { #category : #accessing }
+SBlock >> compiledCode [
+	^ compiledCode ifNil: [ compiledCode := SCompiledBlock new ]
+]
+
+{ #category : #accessing }
 SBlock >> index [
 	^index
 ]
@@ -61,7 +66,7 @@ SBlock >> inlinedArgs: anArray [
 
 { #category : #initialization }
 SBlock >> isInlined [
-	^compiledCode isNil
+	^ compiledCode isNil or: [ compiledCode method isNil ]
 ]
 
 { #category : #accessing }
@@ -73,6 +78,11 @@ SBlock >> offsetOfCurrentEnvironment [
 SBlock >> offsetOfEnvironment: anInteger [
 	(anInteger = 1 and: [ self capturesHome ]) ifTrue: [ ^ 0 ].
 	^ 2
+]
+
+{ #category : #accessing }
+SBlock >> optimizedCode [
+	^compiledCode optimizedCode
 ]
 
 { #category : #unclassified }

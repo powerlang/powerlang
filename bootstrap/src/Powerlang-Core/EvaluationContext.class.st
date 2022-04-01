@@ -9,9 +9,7 @@ Class {
 		'temporaries',
 		'environment',
 		'system',
-		'isBlock',
-		'nonLocalReturn',
-		'operands'
+		'isBlock'
 	],
 	#classVars : [
 		'Undermessages'
@@ -58,23 +56,11 @@ EvaluationContext >> arguments: aCollection [
 ]
 
 { #category : #visiting }
-EvaluationContext >> associationValueAt: anInteger [
-	^ (method at: anInteger) value
-]
-
-{ #category : #visiting }
-EvaluationContext >> associationValueAt: anInteger put: value [
-	| association |
-	association := (method at: anInteger).
-	^association value: value
-]
-
-{ #category : #visiting }
 EvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
 	next := self.
-	[ next notNil ]
+	([ next notNil and: [next method notNil]])
 		whileTrue: [ bt
 				add:
 					{next method signature.
@@ -89,16 +75,10 @@ EvaluationContext >> beBlock [
 ]
 
 { #category : #visiting }
-EvaluationContext >> booleanFor: aBoolean [
-	^ aBoolean
-		ifTrue: [ system true ]
-		ifFalse: [ system false ]
-]
-
-{ #category : #visiting }
-EvaluationContext >> captureClosure: anSBlock with: block [
-	| closure s i type env arg |
-	closure := system image newClosure: block environmentCount.
+EvaluationContext >> captureClosure: anSBlock [
+	| block closure s i type env arg |
+	block := anSBlock compiledCode.
+	closure := system newClosure: block environmentCount.
 	closure
 		block: block;
 		astcodes: anSBlock;
@@ -126,14 +106,14 @@ EvaluationContext >> classBinding [
 	^method classBinding
 ]
 
-{ #category : #visiting }
-EvaluationContext >> constPoolValueAt: anInteger [
-	^ method at: anInteger
+{ #category : #accessing }
+EvaluationContext >> environment [
+	^ environment
 ]
 
 { #category : #visiting }
-EvaluationContext >> environment: anObjectMap [
-	environment := anObjectMap
+EvaluationContext >> environment: anObject [
+	environment := anObject
 ]
 
 { #category : #visiting }
@@ -151,45 +131,18 @@ EvaluationContext >> environmentFor: anInteger [
 ]
 
 { #category : #visiting }
-EvaluationContext >> evaluate [
-	| result sexpressions |
-	nonLocalReturn := [ :value |
-		 ^ system unwind: environment returning: value ].
-	"system frames size > 8 ifTrue: [self halt]."
-	system pushFrame: self.
-	sexpressions := system sexpressionsOf: method.
-	result := self visitMethod: sexpressions.
-	system popFrame.
-	^ result
-]
-
-{ #category : #visiting }
-EvaluationContext >> evaluateBlock: sblock args: anArray [
-	" as this block is inlined, we didn't capture parent environment.
-	Thus, we don't know if environment is a closure or a method home.
-	We unwind to that environment and clean up later if it was a closure. "
-
-	anArray
-		with: sblock inlinedArgs
-		do: [ :arg :i | temporaries at: i put: arg ].
-	^ self visitScript: sblock
-]
-
-{ #category : #visiting }
-EvaluationContext >> evaluateBlock: sblock args: anArray closure: closure [
-	" inlined blocks can only return to their real parent environment.
-	Here we complete the non-local return process for them, unwinding
-	to the real home environment "
-
-	temporaries := Array new: sblock tempCount.
-	environment := closure.
-	arguments := anArray.
-	^ self visitScript: sblock
-]
-
-{ #category : #visiting }
-EvaluationContext >> falseLiteral [
+EvaluationContext >> false [
 	^ system false
+]
+
+{ #category : #visiting }
+EvaluationContext >> home [
+	| frame searched |
+	isBlock ifFalse: [ ^self ].
+	frame := parent.
+	searched := (system isClosure: environment) ifTrue: [ environment builder environment] ifFalse: [ environment ].
+	[frame notNil] whileTrue: [ frame environment == searched ifTrue: [^frame home]. frame := frame parent.].
+self error: 'cannot return from this closure'
 ]
 
 { #category : #visiting }
@@ -198,13 +151,35 @@ EvaluationContext >> initialize [
 ]
 
 { #category : #visiting }
-EvaluationContext >> instanceVarAt: anInteger [
-	^ receiver slotAt: anInteger
+EvaluationContext >> initializeForBlock: sblock args: anArray closure: closure [
+	"When the block is not inlined, closure becomes the environment of the new context.
+	But when it is inlined, the environment is the one of the builder, which is already
+	set because we copied from the builder frame."
+
+
+	sblock isInlined
+		ifTrue: [ anArray
+				with: sblock inlinedArgs
+				do: [ :arg :i | temporaries at: i put: arg ] ]
+		ifFalse: [ temporaries := Array new: sblock tempCount.
+			arguments := anArray.
+			environment := closure. ]
+]
+
+{ #category : #visiting }
+EvaluationContext >> instanceVarAt: index [
+	^ system instanceVarOf: receiver at: index
 ]
 
 { #category : #visiting }
 EvaluationContext >> instanceVarAt: index put: aValue [
-	^ receiver slotAt: index put: aValue
+	^ system instanceVarOf: receiver at: index put: aValue
+]
+
+{ #category : #visiting }
+EvaluationContext >> isBlock [
+	^isBlock
+	
 ]
 
 { #category : #visiting }
@@ -217,14 +192,9 @@ EvaluationContext >> literal: anObject [
 	^anObject
 ]
 
-{ #category : #visiting }
-EvaluationContext >> loadAssociationValue: association [
-	^system loadAssociationValue: association
-]
-
-{ #category : #visiting }
-EvaluationContext >> loadNamed: aSymbol [
-	^system loadNamed: aSymbol in: receiver
+{ #category : #services }
+EvaluationContext >> loadAssociationValue: anObject [
+	^system loadAssociationValue: anObject
 ]
 
 { #category : #visiting }
@@ -239,7 +209,7 @@ EvaluationContext >> method: anSCompiledMethod [
 ]
 
 { #category : #visiting }
-EvaluationContext >> nilLiteral [
+EvaluationContext >> nil [
 	^ system nil
 ]
 
@@ -249,8 +219,8 @@ EvaluationContext >> parent [
 ]
 
 { #category : #visiting }
-EvaluationContext >> parent: anInterpreter [
-	parent := anInterpreter
+EvaluationContext >> parent: anEvaluationContext [
+	parent := anEvaluationContext
 ]
 
 { #category : #printing }
@@ -274,17 +244,10 @@ EvaluationContext >> receiver: anObject [
 ]
 
 { #category : #visiting }
-EvaluationContext >> return: anObject [
-	self isBlock ifTrue: [ ^environment builder return: anObject ].
-	nonLocalReturn value: anObject
-]
-
-{ #category : #accessing }
 EvaluationContext >> staticBindingFor: aSymbol [
 	| symbol |
 	symbol := system symbolFrom: aSymbol.
-	(self staticBindingForIvar: symbol)
-		ifNotNil: [ :b | ^ b ].
+	(self staticBindingForIvar: symbol) ifNotNil: [ :b | ^ b ].
 	(self staticBindingForCvar: symbol) ifNotNil: [ :b | ^ b ].
 	^ self staticBindingForMvar: symbol
 ]
@@ -330,17 +293,11 @@ EvaluationContext >> staticBindingForMvar: aSymbol [
 { #category : #services }
 EvaluationContext >> storeAssociation: association value: anObject [ 
 	system storeAssociation: association value: anObject 
-
 ]
 
 { #category : #visiting }
-EvaluationContext >> storeNamed: aSymbol with: anObject [
-	^ system storeNamed: aSymbol in: receiver with: anObject
-]
-
-{ #category : #visiting }
-EvaluationContext >> system: anEmulator [
-	system := anEmulator
+EvaluationContext >> system: aPowertalkRuntime [
+	system := aPowertalkRuntime
 ]
 
 { #category : #visiting }
@@ -360,94 +317,6 @@ EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 ]
 
 { #category : #visiting }
-EvaluationContext >> trueLiteral [
-	^system true
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitAssignment: anSAssignment [
-	| result |
-	result := anSAssignment expression acceptVisitor: self.
-	anSAssignment assignees
-		do: [ :identifier | identifier binding assign: result within: self ].
-	^result
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitBlock: anSBlock [
-	| block |
-	block := anSBlock isInlined
-		ifTrue: [ SCompiledBlock new ]
-		ifFalse: [ anSBlock compiledCode ].
-	^ self captureClosure: anSBlock with: block
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitCascade: anSCascade [
-	| recv args selector last |
-	recv := anSCascade receiver acceptVisitor: self.
-	anSCascade messages
-		do: [ :msg | 
-			args := msg arguments collect: [ :code | code acceptVisitor: self ].
-			selector := system symbolFrom: msg selector.
-			last := system
-				send: selector
-				to: recv
-				with: args
-				super: anSCascade receiver isSuper sendSite: msg ].
-	^ last
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitIdentifier: anSIdentifier [
-	^anSIdentifier binding valueWithin: self.
-
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitLiteral: anSLiteral [
-	^ system transferLiteral: anSLiteral value
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitMessage: anSMessage [
-	| recv args selector |
-	recv := anSMessage receiver acceptVisitor: self.
-	args := anSMessage arguments
-		collect: [ :code | code acceptVisitor: self ].
-	selector := system symbolFrom: anSMessage selector.
-	self ASSERT: selector !== #error:.
-	^ system
-		send: selector
-		to: recv
-		with: args
-		super: anSMessage receiver isSuper
-		sendSite: anSMessage
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitMethod: anSMethod [
-	| primitive |
-	primitive := anSMethod pragma.
-	primitive ifNil: [ self visitScript: anSMethod. ^receiver ].
-	primitive class == SPragma
-		ifTrue: [ primitive := system primitiveFor: anSMethod primitive.
-			anSMethod pragma: primitive ].
-	^ primitive value
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitReturn: anSReturn [
-	| value |
-	value := anSReturn expression acceptVisitor: self.
-	^self return: value
-]
-
-{ #category : #visiting }
-EvaluationContext >> visitScript: anSScript [
-	| result |
-	result := system nil.
-	anSScript statements
-		do: [ :node | result := node acceptVisitor: self ].
-	^ result
+EvaluationContext >> true [
+	^ system true
 ]

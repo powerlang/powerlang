@@ -34,27 +34,6 @@ SpeciesMap >> instanceSpec: anRGBehavior [
 ]
 
 { #category : #accessing }
-SpeciesMap >> loadCvar: aSymbol [
-	| species vars |
-	species := self.
-	[ vars := species classVariables.
-	vars isNil ifFalse: [vars at: aSymbol ifPresent: [ :value | ^ value ].
-	species localPools
-		do: [ :pool | pool at: aSymbol ifPresent: [ :value | ^ value ] ]].
-	species := species superclass.
-	species isNil ] whileFalse.
-	^ nil
-]
-
-{ #category : #accessing }
-SpeciesMap >> loadNamed: aSymbol [
-	(self loadCvar: aSymbol) ifNotNil: [ :value | ^ value ].
-	^ self module namespace
-		at: aSymbol
-		ifAbsent: [ self error: 'unbound variable: ' , aSymbol ]
-]
-
-{ #category : #accessing }
 SpeciesMap >> localPools [
 	^self subclassResponsibility
 ]

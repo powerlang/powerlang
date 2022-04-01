@@ -20,6 +20,6 @@ SSelfBinding >> printOn: aStream [
 ]
 
 { #category : #testing }
-SSelfBinding >> valueWithin: evaluator [
-	^evaluator receiver
+SSelfBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext receiver
 ]

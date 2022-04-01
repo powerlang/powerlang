@@ -10,7 +10,8 @@ Class {
 	#instVars : [
 		'namespace',
 		'image',
-		'sexpressionsCache'
+		'sexpressionsCache',
+		'overrides'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
@@ -40,6 +41,7 @@ PowertalkRingRuntime >> compile: anRGMethod [
 { #category : #accessing }
 PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 	| behavior m c smethod |
+	self ASSERT: aSymbol !== #error:.
 	behavior := aBehavior.
 	[ m := self methodFor: aSymbol in: behavior.
 	m
@@ -52,27 +54,14 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 			self doLookup: aSymbol startingAt: c ]
 ]
 
-{ #category : #accessing }
-PowertalkRingRuntime >> evaluateClosure: closure withArgs: arguments [
-		| frame sblock evaluator result |
-	frame := closure builder.
-	sblock := closure astcodes.
-	evaluator := frame copy beBlock.
-	self pushFrame: evaluator.
-	result := sblock isInlined
-		ifTrue: [ evaluator evaluateBlock: sblock args: arguments ]
-		ifFalse: [ evaluator evaluateBlock: sblock args: arguments closure: closure ].
-	self popFrame
-	.^ result
+{ #category : #services }
+PowertalkRingRuntime >> homeFrameOf: aClosureMap [
+	^ aClosureMap slotAt: 2
 ]
 
-{ #category : #accessing }
-PowertalkRingRuntime >> evaluatePrimitivePrimeFor: anInteger [
-	| result |
-
-	result := #(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97 101 103 107 109 113 127 131 137 139 149 151 157 163 167 173 179 181 191 193 197 199 211 223 227 229 233 239 241 251 269 359 479 641 857 1151 1549 2069 2237 2423 2617 2797 2999 3167 3359 3539 3727 3911 4441 4787 5119 5471 5801 6143 6521 6827 7177 7517 7853 8783 9601 10243 10867 11549 12239 12919 13679 14293 15013 15731 17569 19051 20443 21767 23159 24611 25847 27397 28571 30047 31397 35771 38201 40841 43973 46633 48989 51631 54371 57349 60139 62969)
-		detect: [ :i | i >= anInteger ].
-	^ self newInteger: result
+{ #category : #services }
+PowertalkRingRuntime >> homeFrameOf: aClosureMap put: anObject [
+	^ aClosureMap slotAt: 2 put: anObject
 ]
 
 { #category : #accessing }
@@ -86,7 +75,62 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 	nilObj := image nil.
 	trueObj := image true.
 	falseObj := image false.
-	self initializeEmulationOverrides; initializePrimitives; initializeUndermessages
+	self
+		initializeEmulationOverrides;
+		initializeInterpreter
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> initialize [
+	super initialize.
+	overrides := Dictionary new.
+]
+
+{ #category : #initialization }
+PowertalkRingRuntime >> initializeEmulationOverrides [
+	self
+		override: #Species -> #basicNew with: 'New';
+		override: #Species -> #basicNew: with: 'NewSized';
+		override: #Species -> #new with: 'New';
+		override: #Species -> #new: with: 'NewSized';
+		override: #Species -> #primitiveNewBytes: with: 'NewBytes';
+		override: #'Float class' -> #new with: 'FloatNew';
+		override: #'PoolDictionary class' -> #new with: 'DictionaryNew';
+		override: #'Namespace class' -> #new with: 'DictionaryNew';
+		override: #ProtoObject -> #_size with: 'UnderSize';
+		override: #ProtoObject -> #behavior with: 'Behavior';
+		override: #ProtoObject -> #class with: 'Class';
+		override: #ProtoObject -> #== with: 'Equal';
+		override: #ProtoObject -> #primitiveSize with: 'Size';
+		override: #ProtoObject -> #primitiveAt: with: 'At';
+		override: #ProtoObject -> #primitiveAt:put: with: 'AtPut';
+		override: #ProtoObject -> #basicHash with: 'Hash';
+		override: #SmallInteger -> #+ with: 'SMIPlus';
+		override: #SmallInteger -> #- with: 'SMIMinus';
+		override: #SmallInteger -> #* with: 'SMITimes';
+		override: #SmallInteger -> #// with: 'SMIIntDiv';
+		override: #SmallInteger -> #\\ with: 'SMIIntQuot';
+		override: #SmallInteger -> #bitAnd: with: 'SMIBitAnd';
+		override: #SmallInteger -> #bitXor: with: 'SMIBitXor';
+		override: #SmallInteger -> #bitShift: with: 'SMIBitShift';
+		override: #SmallInteger -> #highBit with: 'SMIHighBit';
+		override: #SmallInteger -> #> with: 'SMIGreaterThan';
+		override: #SmallInteger -> #>= with: 'SMIGreaterEqualThan';
+		override: #SmallInteger -> #= with: 'SMIEqual';
+		override: #SmallInteger -> #sizeInBytes with: 'SMISize';
+		override: #Closure -> #value with: 'ClosureValue';
+		override: #Closure -> #evaluateAtomically with: 'ClosureValue';
+		override: #Closure -> #value: with: 'ClosureValueWithArgs';
+		override: #Closure -> #value:value: with: 'ClosureValueWithArgs';
+		override: #Closure -> #value:value:value:
+			with: 'ClosureValueWithArgs';
+		override: #Closure -> #evaluateWith: with: 'ClosureValueWithArgs';
+		override: #Closure -> #evaluateWith:with:
+			with: 'ClosureValueWithArgs';
+		override: #Closure -> #argumentCount with: 'ClosureArgumentCount';
+		override: #String -> #replaceFrom:to:with:startingAt:
+			with: 'StringReplaceFromToWithStartingAt';
+		override: #'HashTable class' -> #primeFor: with: 'PrimeFor'
 ]
 
 { #category : #services }
@@ -95,16 +139,13 @@ PowertalkRingRuntime >> isClosure: anObjectMap [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> loadAssociationValue: association [
-	^association value
+PowertalkRingRuntime >> literalFor: anObject [
+	^ image transferLiteral: anObject
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> loadNamed: aSymbol in: receiver [
-	| species |
-	(receiver loadIvar: aSymbol) ifNotNil: [ :value | ^ value ].
-	species := image speciesFor: receiver spec.
-	^species loadNamed: aSymbol
+PowertalkRingRuntime >> loadAssociationValue: association [
+	^association value
 ]
 
 { #category : #services }
@@ -131,6 +172,11 @@ PowertalkRingRuntime >> newBootstrapDictionaryOf: aSpeciesMap [
 { #category : #accessing }
 PowertalkRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 	^ image newOf: aSpeciesMap spec instanceSide sized: size
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> newClosure: anInteger [
+	^ image newClosure: anInteger
 ]
 
 { #category : #accessing }
@@ -178,6 +224,14 @@ PowertalkRingRuntime >> override: assoc with: primitive [
 ]
 
 { #category : #accessing }
+PowertalkRingRuntime >> removeBootstrapDictionaryOverrides [
+self
+		removeOverride: #'PoolDictionary class' -> #new;
+		removeOverride: #'Namespace class' -> #new
+
+]
+
+{ #category : #accessing }
 PowertalkRingRuntime >> removeOverride: assoc [
 	| species selector |
 	species := image specs at: assoc key.
@@ -204,18 +258,8 @@ PowertalkRingRuntime >> storeAssociation: association value: anObject [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> storeNamed: aSymbol in: receiver with: anObject [
-	| species |
-	(receiver storeIvar: aSymbol with: anObject)
-		ifNotNil: [ :value | ^ value ].
-	species := image speciesFor: receiver spec.
-	^species storeNamed: aSymbol with: anObject
-
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> superBehavior [
-	^frames last classBinding superclass instanceSpec
+PowertalkRingRuntime >> superBehaviorOf: aSpeciesMap [
+	^ aSpeciesMap superclass instanceSpec
 ]
 
 { #category : #services }
@@ -225,7 +269,7 @@ PowertalkRingRuntime >> symbolFrom: anObjectMap [
 
 { #category : #services }
 PowertalkRingRuntime >> symbolFromLocal: aSymbol [
-	^aSymbol
+	^ image newSymbol: aSymbol
 ]
 
 { #category : #accessing }

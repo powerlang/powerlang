@@ -13,8 +13,8 @@ SInstVarBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #testing }
-SInstVarBinding >> assign: value within: evaluator [
-	evaluator instanceVarAt: index put: value
+SInstVarBinding >> assign: value within: anEvaluationContext [
+	anEvaluationContext instanceVarAt: index put: value
 ]
 
 { #category : #accessing }
@@ -38,6 +38,6 @@ SInstVarBinding >> printOn: aStream [
 ]
 
 { #category : #accessing }
-SInstVarBinding >> valueWithin: evaluator [
-	^evaluator instanceVarAt: index
+SInstVarBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext instanceVarAt: index
 ]

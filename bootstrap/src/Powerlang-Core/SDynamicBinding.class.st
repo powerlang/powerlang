@@ -14,9 +14,9 @@ SDynamicBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #accessing }
-SDynamicBinding >> assign: value within: evaluator [
-	cache ifNil: [ self lookupWithin: evaluator ].
-	cache assign: value within: evaluator
+SDynamicBinding >> assign: value within: anEvaluationContext [
+	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	cache assign: value within: anEvaluationContext
 ]
 
 { #category : #accessing }
@@ -25,8 +25,8 @@ SDynamicBinding >> isDynamic [
 ]
 
 { #category : #accessing }
-SDynamicBinding >> lookupWithin: evaluator [
-	cache := evaluator staticBindingFor: name
+SDynamicBinding >> lookupWithin: anEvaluationContext [
+	cache := anEvaluationContext staticBindingFor: name
 ]
 
 { #category : #accessing }
@@ -47,7 +47,7 @@ SDynamicBinding >> printOn: aStream [
 ]
 
 { #category : #accessing }
-SDynamicBinding >> valueWithin: evaluator [
-	cache ifNil: [ self lookupWithin: evaluator ].
-	^ cache valueWithin: evaluator
+SDynamicBinding >> valueWithin: anEvaluationContext [
+	cache ifNil: [ self lookupWithin: anEvaluationContext ].
+	^ cache valueWithin: anEvaluationContext
 ]

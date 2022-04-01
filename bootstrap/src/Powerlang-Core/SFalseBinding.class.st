@@ -15,6 +15,6 @@ SFalseBinding >> value [
 ]
 
 { #category : #printing }
-SFalseBinding >> valueWithin: evaluator [
-	^evaluator falseLiteral
+SFalseBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext false
 ]

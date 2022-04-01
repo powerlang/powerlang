@@ -15,7 +15,7 @@ PowertalkRingRuntimeTest >> ==> anObject [
 
 { #category : #tests }
 PowertalkRingRuntimeTest >> assertNoLeftoverFrames [
-	self assert: runtime frames isEmpty
+	self assert: runtime interpreter hasFinished
 ]
 
 { #category : #tests }
@@ -109,7 +109,29 @@ PowertalkRingRuntimeTest >> test132sendIfTrueToTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test140sendWhileTrue [
+PowertalkRingRuntimeTest >> test140evaluateClosure [
+	| result |
+	self
+		compile: 'foo ^[5] value'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test141evaluateClosureFrames [
+	| result |
+	self
+		compile: 'foo [5] value'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: image true ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test150sendWhileTrue [
 	| result |
 	self
 		compile: 'foo
@@ -124,7 +146,7 @@ PowertalkRingRuntimeTest >> test140sendWhileTrue [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test141sendToDo [
+PowertalkRingRuntimeTest >> test151sendToDo [
 	| result |
 	self
 		compile:
@@ -140,34 +162,12 @@ PowertalkRingRuntimeTest >> test141sendToDo [
 ]
 
 { #category : #tests }
-PowertalkRingRuntimeTest >> test150compute20dividedBy5 [
+PowertalkRingRuntimeTest >> test152compute20dividedBy5 [
 	| result |
 	result := runtime sendLocal: #/ to: self ==> 20 with: {(self ==> 5)}.
 	self 
 		assert: result equals: self ==> 4;
 		assertNoLeftoverFrames
-]
-
-{ #category : #tests }
-PowertalkRingRuntimeTest >> test160evaluateClosure [
-	| result |
-	self
-		compile: 'foo ^[5] value'
-		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: self ==> 5 ].
-	self assertNoLeftoverFrames
-]
-
-{ #category : #tests }
-PowertalkRingRuntimeTest >> test160evaluateClosureFrames [
-	| result |
-	self
-		compile: 'foo [5] value'
-		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: image true ].
-	self assertNoLeftoverFrames
 ]
 
 { #category : #tests }
@@ -291,7 +291,7 @@ PowertalkRingRuntimeTest >> test170evaluateNonInlinedClosureIfTrue [
 	self
 		compile:
 			'foo 
-			| a result |
+			| a result closure |
 			a := 3.
 			closure := [ a + 4 ].
 			result := true ifTrue: closure.

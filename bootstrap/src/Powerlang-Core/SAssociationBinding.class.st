@@ -9,8 +9,8 @@ Class {
 }
 
 { #category : #testing }
-SAssociationBinding >> assign: value within: evaluator [
-	evaluator storeAssociation: association value: value
+SAssociationBinding >> assign: value within: anEvaluationContext [
+	anEvaluationContext storeAssociation: association value: value
 ]
 
 { #category : #accessing }
@@ -44,7 +44,6 @@ SAssociationBinding >> isConstant [
 ]
 
 { #category : #testing }
-SAssociationBinding >> valueWithin: evaluator [
-	^evaluator loadAssociationValue: association
-
+SAssociationBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext loadAssociationValue: association
 ]

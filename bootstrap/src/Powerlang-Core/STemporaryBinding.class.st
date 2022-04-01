@@ -10,8 +10,8 @@ STemporaryBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #'as yet unclassified' }
-STemporaryBinding >> assign: value within: evaluator [
-	evaluator temporaryAt: position in: environment put: value
+STemporaryBinding >> assign: value within: anEvaluationContext [
+	anEvaluationContext temporaryAt: position in: environment put: value
 ]
 
 { #category : #testing }
@@ -34,6 +34,6 @@ STemporaryBinding >> printOn: aStream [
 ]
 
 { #category : #'as yet unclassified' }
-STemporaryBinding >> valueWithin: evaluator [
-	^evaluator temporaryAt: position in: environment
+STemporaryBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext temporaryAt: position in: environment
 ]
