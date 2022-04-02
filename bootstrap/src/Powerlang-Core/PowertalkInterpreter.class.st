@@ -49,11 +49,6 @@ PowertalkInterpreter >> context: anEvaluationContext [
 ]
 
 { #category : #accessing }
-PowertalkInterpreter >> dropToS [
-	context pushOperation: SOpDropToS new
-]
-
-{ #category : #accessing }
 PowertalkInterpreter >> evaluateClosure: receiver [
 	^ self evaluateClosure: receiver withArgs: #()
 ]
@@ -184,7 +179,7 @@ PowertalkInterpreter >> nil [
 PowertalkInterpreter >> primitiveAt [
 	| receiver index value |
 	^ [ receiver := context receiver.
-	index := context arguments first value.
+	index := context firstArgument value.
 	value := receiver at: index.
 	receiver isBytes
 		ifTrue: [ runtime newInteger: value ]
@@ -193,10 +188,9 @@ PowertalkInterpreter >> primitiveAt [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveAtPut [
-	| arguments index |
-	^ [ arguments := context arguments.
-	index := arguments first value.
-	context receiver at: index put: arguments second ]
+	| index |
+	^ [ index := context firstArgument value.
+	context receiver at: index put: context secondArgument ]
 ]
 
 { #category : #primitives }
@@ -211,17 +205,15 @@ PowertalkInterpreter >> primitiveBehavior [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictAt [
 	| string |
-	^[ string := context arguments first asString.
-	 context receiver at: string ].
-
+	^ [ string := context firstArgument asString.
+	context receiver at: string ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictAtPut [
 	| string |
-	^[ string := context arguments first asString.
-			 context receiver at: string put: context arguments second ].
-
+	^ [ string := context firstArgument asString.
+	context receiver at: string put: context secondArgument ]
 ]
 
 { #category : #primitives }
@@ -264,7 +256,7 @@ PowertalkInterpreter >> primitiveClosureValueWithArgs [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveEqual [
-	^ [ runtime booleanFor: context receiver = context arguments first ]
+	^ [ runtime booleanFor: context receiver = context firstArgument ]
 ]
 
 { #category : #primitives }
@@ -285,21 +277,20 @@ PowertalkInterpreter >> primitiveNew [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveNewBytes [
 	| size |
-	^ [ size := context arguments first value.
+	^ [ size := context firstArgument value.
 	runtime newBytesOf: context receiver sized: size ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveNewSized [
 	| size |
-	^ [ size := context arguments first value.
+	^ [ size := context firstArgument value.
 	runtime newOf: context receiver sized: size ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitivePrimeFor [
-	^[ self primitivePrimeFor: context arguments first value ].
-
+	^ [ self primitivePrimeFor: context firstArgument value ]
 ]
 
 { #category : #accessing }
@@ -314,37 +305,37 @@ PowertalkInterpreter >> primitivePrimeFor: anInteger [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitAnd [
 	^ [ runtime
-		newInteger: (context receiver value bitAnd: context arguments first value) ]
+		newInteger: (context receiver value bitAnd: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitShift [
 	^ [ runtime
-		newInteger: (context receiver value bitShift: context arguments first value) ]
+		newInteger: (context receiver value bitShift: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitXor [
 	^ [ runtime
-		newInteger: (context receiver value bitXor: context arguments first value) ]
+		newInteger: (context receiver value bitXor: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIEqual [
 	^ [ runtime
-		booleanFor: context receiver value = context arguments first value ]
+		booleanFor: context receiver value = context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterEqualThan [
 	^ [ runtime
-		booleanFor: context receiver value >= context arguments first value ]
+		booleanFor: context receiver value >= context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterThan [
 	^ [ runtime
-		booleanFor: context receiver value > context arguments first value ]
+		booleanFor: context receiver value > context firstArgument value ]
 ]
 
 { #category : #primitives }
@@ -355,31 +346,31 @@ PowertalkInterpreter >> primitiveSMIHighBit [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntDiv [
 	^ [ runtime
-		newInteger: context receiver value // context arguments first value ]
+		newInteger: context receiver value // context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntQuot [
 	^ [ runtime
-		newInteger: context receiver value \\ context arguments first value ]
+		newInteger: context receiver value \\ context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIMinus [
 	^ [ runtime
-		newInteger: context receiver value - context arguments first value ]
+		newInteger: context receiver value - context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMINotEqual [
 	^ [ runtime
-		booleanFor: context receiver value != context arguments first value ]
+		booleanFor: context receiver value != context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIPlus [
 	^ [ runtime
-		newInteger: context receiver value + context arguments first value ]
+		newInteger: context receiver value + context firstArgument value ]
 ]
 
 { #category : #primitives }
@@ -390,7 +381,7 @@ PowertalkInterpreter >> primitiveSMISize [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMITimes [
 	^ [ runtime
-		newInteger: context receiver value * context arguments first value ]
+		newInteger: context receiver value * context firstArgument value ]
 ]
 
 { #category : #primitives }
@@ -400,14 +391,14 @@ PowertalkInterpreter >> primitiveSize [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveStringReplaceFromToWithStartingAt [
-	| receiver arguments |
-	^[ receiver := context receiver. arguments := context arguments. receiver bytes
-				replaceFrom: arguments first value
-				to: arguments second value
-				with:  arguments third bytes
-				startingAt: arguments fourth value.
-			 receiver ].
-
+	| receiver |
+	^ [ receiver := context receiver.
+	receiver bytes
+		replaceFrom: context firstArgument value
+		to: context secondArgument value
+		with: context thirdArgument bytes
+		startingAt: context fourthArgument value.
+	receiver ]
 ]
 
 { #category : #primitives }
@@ -439,11 +430,7 @@ PowertalkInterpreter >> sendLocal: aSymbol to: receiver [
 
 { #category : #accessing }
 PowertalkInterpreter >> stackSize [
-	| current result |
-	current := context.
-	result := 0.
-	[ current notNil ] whileTrue: [ result := result + 1. current := current parent ].
-	^result.
+	^context framesCount
 ]
 
 { #category : #initialization }
@@ -509,7 +496,7 @@ PowertalkInterpreter >> underprimitiveLargeSize [
 PowertalkInterpreter >> underprimitiveSmallIntegerByteAt [
 	| result |
 	^ [ :receiver :arguments | 
-	result := receiver value byteAt: context arguments first value.
+	result := receiver value byteAt: arguments first value.
 	runtime newInteger: result ]
 ]
 
@@ -526,7 +513,7 @@ PowertalkInterpreter >> underprimitiveUShortAtOffset [
 	| result |
 	^ [ :receiver :arguments | 
 	result := receiver bytes
-		unsignedShortAt: context arguments first value + 1.
+		unsignedShortAt: arguments second value + 1.
 	runtime newInteger: result ]
 ]
 
@@ -535,7 +522,7 @@ PowertalkInterpreter >> underprimitiveUShortAtOffsetPut [
 	| value |
 	^ [ :receiver :arguments | 
 	value := arguments second.
-	context receiver bytes
+	receiver bytes
 		unsignedShortAt: arguments first value + 1
 		put: value value.
 	value ]

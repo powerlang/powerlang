@@ -166,6 +166,13 @@ PowertalkIterativeTreeInterpreter >> visitMethod: anSMethod [
 ]
 
 { #category : #accessing }
+PowertalkIterativeTreeInterpreter >> visitOpRestart: anSOpRestart [
+	| sexpressions |
+	sexpressions := runtime sexpressionsOf: context method.
+	self push: sexpressions
+]
+
+{ #category : #accessing }
 PowertalkIterativeTreeInterpreter >> visitReturn: anSReturn [
 	self
 		pushOpReturn: anSReturn local;

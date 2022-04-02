@@ -32,7 +32,7 @@ PowertalkIterativeInterpreter >> evaluationContextClass [
 
 { #category : #accessing }
 PowertalkIterativeInterpreter >> hasFinished [
-	^context parent isNil
+	^ context hasFinished
 ]
 
 { #category : #initializing }
@@ -112,8 +112,6 @@ PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
 	| message argcount arguments behavior method size environment |
-	self stackSize > 1000
-		ifTrue: [ self halt ].
 	message := anSOpDispatchMessage message.
 	argcount := message argumentCount.
 	arguments := context popOperands: argcount.
@@ -170,13 +168,6 @@ PowertalkIterativeInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpPushR: anSOpPushR [
 	context pushOperand: regR
-]
-
-{ #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpRestart: anSOpRestart [
-	| sexpressions |
-	sexpressions := runtime sexpressionsOf: context method.
-	self push: sexpressions
 ]
 
 { #category : #accessing }

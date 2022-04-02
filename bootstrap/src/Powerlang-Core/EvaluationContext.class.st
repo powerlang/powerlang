@@ -135,6 +135,27 @@ EvaluationContext >> false [
 	^ system false
 ]
 
+{ #category : #accessing }
+EvaluationContext >> firstArgument [
+	^arguments at: 1
+]
+
+{ #category : #accessing }
+EvaluationContext >> fourthArgument [
+	^ arguments at: 4
+]
+
+{ #category : #accessing }
+EvaluationContext >> framesCount [
+	| current result |
+	current := self.
+	result := 0.
+	[ current notNil ]
+		whileTrue: [ result := result + 1.
+			current := current parent ].
+	^ result
+]
+
 { #category : #visiting }
 EvaluationContext >> home [
 	| frame searched |
@@ -220,7 +241,9 @@ EvaluationContext >> parent [
 
 { #category : #visiting }
 EvaluationContext >> parent: anEvaluationContext [
-	parent := anEvaluationContext
+	parent := anEvaluationContext.
+	(isBlock not and: [self framesCount > 1000])
+		ifTrue: [ self halt ].
 ]
 
 { #category : #printing }
@@ -241,6 +264,11 @@ EvaluationContext >> receiver [
 { #category : #visiting }
 EvaluationContext >> receiver: anObject [
 	receiver := anObject
+]
+
+{ #category : #accessing }
+EvaluationContext >> secondArgument [
+	^ arguments at: 2
 ]
 
 { #category : #visiting }
@@ -314,6 +342,11 @@ EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
 	env := self environmentFor: anInteger.
 	^ env at: index put: aValue
+]
+
+{ #category : #accessing }
+EvaluationContext >> thirdArgument [
+	^ arguments at: 3
 ]
 
 { #category : #visiting }

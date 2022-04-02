@@ -14,6 +14,11 @@ IterativeEvaluationContext >> beBlock [
 	operands := nil
 ]
 
+{ #category : #'as yet unclassified' }
+IterativeEvaluationContext >> hasFinished [
+	^parent isNil
+]
+
 { #category : #visiting }
 IterativeEvaluationContext >> operandAt: anInteger [
 	^operands at: operands size - anInteger 
