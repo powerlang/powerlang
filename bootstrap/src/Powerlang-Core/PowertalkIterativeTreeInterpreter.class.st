@@ -21,7 +21,7 @@ PowertalkIterativeTreeInterpreter >> evaluate [
 
 { #category : #accessing }
 PowertalkIterativeTreeInterpreter >> evaluationContextClass [
-	^ IterativeTreeEvaluationContext
+	^ LinkedTreeEvaluationContext
 ]
 
 { #category : #accessing }

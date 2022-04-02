@@ -1,6 +1,6 @@
 Class {
-	#name : #RecursiveEvaluationContext,
-	#superclass : #EvaluationContext,
+	#name : #RecursiveLinkedEvaluationContext,
+	#superclass : #LinkedEvaluationContext,
 	#instVars : [
 		'nonLocalReturn'
 	],
@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-RecursiveEvaluationContext >> evaluateFor: interpreter [
+RecursiveLinkedEvaluationContext >> evaluateFor: interpreter [
 	| sexpressions result |
 	nonLocalReturn := [ :value | 
 	interpreter context: self home parent.
@@ -20,7 +20,7 @@ RecursiveEvaluationContext >> evaluateFor: interpreter [
 ]
 
 { #category : #'as yet unclassified' }
-RecursiveEvaluationContext >> return: anObject [
+RecursiveLinkedEvaluationContext >> return: anObject [
 	^self isBlock
 		ifTrue: [ nonLocalReturn value: anObject ]
 		ifFalse: [ anObject ]

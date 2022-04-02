@@ -1,6 +1,6 @@
 Class {
-	#name : #IterativeLinearEvaluationContext,
-	#superclass : #IterativeEvaluationContext,
+	#name : #LinkedLinearEvaluationContext,
+	#superclass : #IterativeLinkedEvaluationContext,
 	#instVars : [
 		'pc'
 	],
@@ -8,13 +8,13 @@ Class {
 }
 
 { #category : #visiting }
-IterativeLinearEvaluationContext >> initialize [
+LinkedLinearEvaluationContext >> initialize [
 	super initialize.
 pc := 1
 ]
 
 { #category : #accessing }
-IterativeLinearEvaluationContext >> nextOperation [
+LinkedLinearEvaluationContext >> nextOperation [
 	| op |
 	pc <= work size ifFalse: [^nil].
 	op := work at: pc.
@@ -23,12 +23,12 @@ IterativeLinearEvaluationContext >> nextOperation [
 ]
 
 { #category : #visiting }
-IterativeLinearEvaluationContext >> restart [
+LinkedLinearEvaluationContext >> restart [
 	super restart.
 	pc := 1
 ]
 
 { #category : #visiting }
-IterativeLinearEvaluationContext >> work: aCollection [
+LinkedLinearEvaluationContext >> work: aCollection [
 	work := aCollection
 ]

@@ -1,5 +1,5 @@
 Class {
-	#name : #EvaluationContext,
+	#name : #LinkedEvaluationContext,
 	#superclass : #Object,
 	#instVars : [
 		'parent',
@@ -21,7 +21,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-EvaluationContext class >> initialize [
+LinkedEvaluationContext class >> initialize [
 	"
 	self initialize
 	"
@@ -30,7 +30,7 @@ EvaluationContext class >> initialize [
 ]
 
 { #category : #'instance creation' }
-EvaluationContext class >> new [
+LinkedEvaluationContext class >> new [
 	"return an initialized instance"
 
 	^ self basicNew initialize.
@@ -38,7 +38,7 @@ EvaluationContext class >> new [
 ]
 
 { #category : #visiting }
-EvaluationContext >> argumentAt: index in: anInteger [
+LinkedEvaluationContext >> argumentAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^arguments at: index ].
 	env := self environmentFor: anInteger.
@@ -46,17 +46,17 @@ EvaluationContext >> argumentAt: index in: anInteger [
 ]
 
 { #category : #visiting }
-EvaluationContext >> arguments [
+LinkedEvaluationContext >> arguments [
 	^arguments
 ]
 
 { #category : #visiting }
-EvaluationContext >> arguments: aCollection [
+LinkedEvaluationContext >> arguments: aCollection [
 	arguments := aCollection
 ]
 
 { #category : #visiting }
-EvaluationContext >> backtrace [
+LinkedEvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
 	next := self.
@@ -70,12 +70,12 @@ EvaluationContext >> backtrace [
 ]
 
 { #category : #visiting }
-EvaluationContext >> beBlock [
+LinkedEvaluationContext >> beBlock [
 	isBlock := true
 ]
 
 { #category : #visiting }
-EvaluationContext >> captureClosure: anSBlock [
+LinkedEvaluationContext >> captureClosure: anSBlock [
 	| block closure s i type env arg |
 	block := anSBlock compiledCode.
 	closure := system newClosure: block environmentCount.
@@ -102,22 +102,22 @@ EvaluationContext >> captureClosure: anSBlock [
 ]
 
 { #category : #services }
-EvaluationContext >> classBinding [
+LinkedEvaluationContext >> classBinding [
 	^method classBinding
 ]
 
 { #category : #accessing }
-EvaluationContext >> environment [
+LinkedEvaluationContext >> environment [
 	^ environment
 ]
 
 { #category : #visiting }
-EvaluationContext >> environment: anObject [
+LinkedEvaluationContext >> environment: anObject [
 	environment := anObject
 ]
 
 { #category : #visiting }
-EvaluationContext >> environmentFor: anInteger [
+LinkedEvaluationContext >> environmentFor: anInteger [
 	"
 	-1: inlined argument.
 	 0: current env.
@@ -131,22 +131,22 @@ EvaluationContext >> environmentFor: anInteger [
 ]
 
 { #category : #visiting }
-EvaluationContext >> false [
+LinkedEvaluationContext >> false [
 	^ system false
 ]
 
 { #category : #accessing }
-EvaluationContext >> firstArgument [
+LinkedEvaluationContext >> firstArgument [
 	^arguments at: 1
 ]
 
 { #category : #accessing }
-EvaluationContext >> fourthArgument [
+LinkedEvaluationContext >> fourthArgument [
 	^ arguments at: 4
 ]
 
 { #category : #accessing }
-EvaluationContext >> framesCount [
+LinkedEvaluationContext >> framesCount [
 	| current result |
 	current := self.
 	result := 0.
@@ -157,7 +157,7 @@ EvaluationContext >> framesCount [
 ]
 
 { #category : #visiting }
-EvaluationContext >> home [
+LinkedEvaluationContext >> home [
 	| frame searched |
 	isBlock ifFalse: [ ^self ].
 	frame := parent.
@@ -167,12 +167,12 @@ self error: 'cannot return from this closure'
 ]
 
 { #category : #visiting }
-EvaluationContext >> initialize [
+LinkedEvaluationContext >> initialize [
 	isBlock := false
 ]
 
 { #category : #visiting }
-EvaluationContext >> initializeForBlock: sblock args: anArray closure: closure [
+LinkedEvaluationContext >> initializeForBlock: sblock args: anArray closure: closure [
 	"When the block is not inlined, closure becomes the environment of the new context.
 	But when it is inlined, the environment is the one of the builder, which is already
 	set because we copied from the builder frame."
@@ -188,66 +188,66 @@ EvaluationContext >> initializeForBlock: sblock args: anArray closure: closure [
 ]
 
 { #category : #visiting }
-EvaluationContext >> instanceVarAt: index [
+LinkedEvaluationContext >> instanceVarAt: index [
 	^ system instanceVarOf: receiver at: index
 ]
 
 { #category : #visiting }
-EvaluationContext >> instanceVarAt: index put: aValue [
+LinkedEvaluationContext >> instanceVarAt: index put: aValue [
 	^ system instanceVarOf: receiver at: index put: aValue
 ]
 
 { #category : #visiting }
-EvaluationContext >> isBlock [
+LinkedEvaluationContext >> isBlock [
 	^isBlock
 	
 ]
 
 { #category : #visiting }
-EvaluationContext >> isHomeOf: env [
+LinkedEvaluationContext >> isHomeOf: env [
 	^ environment == env andNot: [ isBlock ]
 ]
 
 { #category : #visiting }
-EvaluationContext >> literal: anObject [
+LinkedEvaluationContext >> literal: anObject [
 	^anObject
 ]
 
 { #category : #services }
-EvaluationContext >> loadAssociationValue: anObject [
+LinkedEvaluationContext >> loadAssociationValue: anObject [
 	^system loadAssociationValue: anObject
 ]
 
 { #category : #visiting }
-EvaluationContext >> method [
+LinkedEvaluationContext >> method [
 	^method
 ]
 
 { #category : #accessing }
-EvaluationContext >> method: anSCompiledMethod [
+LinkedEvaluationContext >> method: anSCompiledMethod [
 	method := anSCompiledMethod.
 	temporaries := Array new: anSCompiledMethod tempCount
 ]
 
 { #category : #visiting }
-EvaluationContext >> nil [
+LinkedEvaluationContext >> nil [
 	^ system nil
 ]
 
 { #category : #visiting }
-EvaluationContext >> parent [
+LinkedEvaluationContext >> parent [
 	^parent
 ]
 
 { #category : #visiting }
-EvaluationContext >> parent: anEvaluationContext [
+LinkedEvaluationContext >> parent: anEvaluationContext [
 	parent := anEvaluationContext.
 	(isBlock not and: [self framesCount > 1000])
 		ifTrue: [ self halt ].
 ]
 
 { #category : #printing }
-EvaluationContext >> printOn: aStream [
+LinkedEvaluationContext >> printOn: aStream [
  self backtrace
 				do: [ :frame | 
 					frame
@@ -257,22 +257,22 @@ EvaluationContext >> printOn: aStream [
 ]
 
 { #category : #visiting }
-EvaluationContext >> receiver [
+LinkedEvaluationContext >> receiver [
 	^receiver
 ]
 
 { #category : #visiting }
-EvaluationContext >> receiver: anObject [
+LinkedEvaluationContext >> receiver: anObject [
 	receiver := anObject
 ]
 
 { #category : #accessing }
-EvaluationContext >> secondArgument [
+LinkedEvaluationContext >> secondArgument [
 	^ arguments at: 2
 ]
 
 { #category : #visiting }
-EvaluationContext >> staticBindingFor: aSymbol [
+LinkedEvaluationContext >> staticBindingFor: aSymbol [
 	| symbol |
 	symbol := system symbolFrom: aSymbol.
 	(self staticBindingForIvar: symbol) ifNotNil: [ :b | ^ b ].
@@ -281,7 +281,7 @@ EvaluationContext >> staticBindingFor: aSymbol [
 ]
 
 { #category : #accessing }
-EvaluationContext >> staticBindingForCvar: aSymbol [
+LinkedEvaluationContext >> staticBindingForCvar: aSymbol [
 	| species cvars class |
 	species := system speciesFor: receiver.
 	[ cvars := species classVariables.
@@ -301,7 +301,7 @@ EvaluationContext >> staticBindingForCvar: aSymbol [
 ]
 
 { #category : #accessing }
-EvaluationContext >> staticBindingForIvar: aSymbol [
+LinkedEvaluationContext >> staticBindingForIvar: aSymbol [
 	| ivar |
 	ivar := receiver allSlotNames indexOf: aSymbol.
 	^ ivar > 0
@@ -309,7 +309,7 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 ]
 
 { #category : #accessing }
-EvaluationContext >> staticBindingForMvar: aSymbol [
+LinkedEvaluationContext >> staticBindingForMvar: aSymbol [
 	| assoc class |
 	class := system speciesFor: receiver.
 	assoc := class module namespace
@@ -319,17 +319,17 @@ EvaluationContext >> staticBindingForMvar: aSymbol [
 ]
 
 { #category : #services }
-EvaluationContext >> storeAssociation: association value: anObject [ 
+LinkedEvaluationContext >> storeAssociation: association value: anObject [ 
 	system storeAssociation: association value: anObject 
 ]
 
 { #category : #visiting }
-EvaluationContext >> system: aPowertalkRuntime [
+LinkedEvaluationContext >> system: aPowertalkRuntime [
 	system := aPowertalkRuntime
 ]
 
 { #category : #visiting }
-EvaluationContext >> temporaryAt: index in: anInteger [
+LinkedEvaluationContext >> temporaryAt: index in: anInteger [
 	| env |
 	anInteger ifNil: [ ^ temporaries at: index ].
 	env := self environmentFor: anInteger.
@@ -337,7 +337,7 @@ EvaluationContext >> temporaryAt: index in: anInteger [
 ]
 
 { #category : #visiting }
-EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
+LinkedEvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 	| env |
 	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
 	env := self environmentFor: anInteger.
@@ -345,11 +345,11 @@ EvaluationContext >> temporaryAt: index in: anInteger put: aValue [
 ]
 
 { #category : #accessing }
-EvaluationContext >> thirdArgument [
+LinkedEvaluationContext >> thirdArgument [
 	^ arguments at: 3
 ]
 
 { #category : #visiting }
-EvaluationContext >> true [
+LinkedEvaluationContext >> true [
 	^ system true
 ]

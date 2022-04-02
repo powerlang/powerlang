@@ -1,6 +1,6 @@
 Class {
-	#name : #IterativeEvaluationContext,
-	#superclass : #EvaluationContext,
+	#name : #IterativeLinkedEvaluationContext,
+	#superclass : #LinkedEvaluationContext,
 	#instVars : [
 		'operands',
 		'work'
@@ -9,40 +9,40 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> beBlock [
+IterativeLinkedEvaluationContext >> beBlock [
 	super beBlock.
 	operands := nil
 ]
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> hasFinished [
+IterativeLinkedEvaluationContext >> hasFinished [
 	^parent isNil
 ]
 
 { #category : #visiting }
-IterativeEvaluationContext >> operandAt: anInteger [
+IterativeLinkedEvaluationContext >> operandAt: anInteger [
 	^operands at: operands size - anInteger 
 ]
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> popOperand [
+IterativeLinkedEvaluationContext >> popOperand [
 	^operands removeLast
 ]
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> popOperands: anInteger [
+IterativeLinkedEvaluationContext >> popOperands: anInteger [
 
 	^ anInteger = 0 ifTrue: [#()] ifFalse: [operands removeLast: anInteger]
 ]
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> pushOperand: anObject [
+IterativeLinkedEvaluationContext >> pushOperand: anObject [
 	
 	operands ifNil: [ operands := OrderedCollection new ].
 	operands add: anObject
 ]
 
 { #category : #'as yet unclassified' }
-IterativeEvaluationContext >> restart [
+IterativeLinkedEvaluationContext >> restart [
 	operands ifNotNil: [operands reset]
 ]

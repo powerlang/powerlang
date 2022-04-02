@@ -109,7 +109,7 @@ PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments supe
 	self ASSERT: method notNil.
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
-	context := RecursiveEvaluationContext new
+	context := RecursiveLinkedEvaluationContext new
 		receiver: receiver;
 		arguments: arguments;
 		environment: environment;

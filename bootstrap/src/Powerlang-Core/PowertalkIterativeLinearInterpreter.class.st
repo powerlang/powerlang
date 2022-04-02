@@ -18,7 +18,7 @@ PowertalkIterativeLinearInterpreter >> evaluate [
 
 { #category : #visiting }
 PowertalkIterativeLinearInterpreter >> evaluationContextClass [
-	^ IterativeLinearEvaluationContext
+	^ LinkedLinearEvaluationContext
 ]
 
 { #category : #visiting }
