@@ -1,6 +1,6 @@
 Class {
 	#name : #LinkedEvaluationContext,
-	#superclass : #Object,
+	#superclass : #EvaluationContext,
 	#instVars : [
 		'parent',
 		'method',
@@ -8,14 +8,7 @@ Class {
 		'arguments',
 		'temporaries',
 		'environment',
-		'system',
 		'isBlock'
-	],
-	#classVars : [
-		'Undermessages'
-	],
-	#pools : [
-		'ClosureElementTypes'
 	],
 	#category : #'Powerlang-Core-Execution'
 }
@@ -38,11 +31,16 @@ LinkedEvaluationContext class >> new [
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> argumentAt: index in: anInteger [
-	| env |
-	anInteger ifNil: [ ^arguments at: index ].
-	env := self environmentFor: anInteger.
-	^env at: index.
+LinkedEvaluationContext >> argumentAt: anInteger [
+	^arguments at: anInteger
+]
+
+{ #category : #visiting }
+LinkedEvaluationContext >> argumentAt: index in: environmentIndex [
+	| env | 
+	environmentIndex ifNil: [ ^ arguments at: index ].
+	env := self environmentFor: environmentIndex.
+	^ env at: index
 ]
 
 { #category : #visiting }
@@ -55,7 +53,7 @@ LinkedEvaluationContext >> arguments: aCollection [
 	arguments := aCollection
 ]
 
-{ #category : #visiting }
+{ #category : #services }
 LinkedEvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
@@ -72,38 +70,6 @@ LinkedEvaluationContext >> backtrace [
 { #category : #visiting }
 LinkedEvaluationContext >> beBlock [
 	isBlock := true
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> captureClosure: anSBlock [
-	| block closure s i type env arg |
-	block := anSBlock compiledCode.
-	closure := system newClosure: block environmentCount.
-	closure
-		block: block;
-		astcodes: anSBlock;
-		builder: self.
-	s := anSBlock capturedVariables readStream.
-	i := 1.
-	[ s atEnd ]
-		whileFalse: [ type := s next.
-			type = Self
-				ifTrue: [ closure at: i put: receiver ].
-			type = Environment
-				ifTrue: [ closure at: i put: environment ].
-			type = EnvironmentValue
-				ifTrue: [ env := environment at: s next.
-					closure at: i put: env ].
-			type = LocalArgument
-				ifTrue: [ arg := arguments at: s next.
-					closure at: i put: arg ].
-			i := i + 1 ].
-	^ closure
-]
-
-{ #category : #services }
-LinkedEvaluationContext >> classBinding [
-	^method classBinding
 ]
 
 { #category : #accessing }
@@ -128,11 +94,6 @@ LinkedEvaluationContext >> environmentFor: anInteger [
 	anInteger = -1
 		ifTrue: [ ^ temporaries ].
 	^ environment at: anInteger
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> false [
-	^ system false
 ]
 
 { #category : #accessing }
@@ -188,16 +149,6 @@ LinkedEvaluationContext >> initializeForBlock: sblock args: anArray closure: clo
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> instanceVarAt: index [
-	^ system instanceVarOf: receiver at: index
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> instanceVarAt: index put: aValue [
-	^ system instanceVarOf: receiver at: index put: aValue
-]
-
-{ #category : #visiting }
 LinkedEvaluationContext >> isBlock [
 	^isBlock
 	
@@ -206,16 +157,6 @@ LinkedEvaluationContext >> isBlock [
 { #category : #visiting }
 LinkedEvaluationContext >> isHomeOf: env [
 	^ environment == env andNot: [ isBlock ]
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> literal: anObject [
-	^anObject
-]
-
-{ #category : #services }
-LinkedEvaluationContext >> loadAssociationValue: anObject [
-	^system loadAssociationValue: anObject
 ]
 
 { #category : #visiting }
@@ -230,11 +171,6 @@ LinkedEvaluationContext >> method: anSCompiledMethod [
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> nil [
-	^ system nil
-]
-
-{ #category : #visiting }
 LinkedEvaluationContext >> parent [
 	^parent
 ]
@@ -244,16 +180,6 @@ LinkedEvaluationContext >> parent: anEvaluationContext [
 	parent := anEvaluationContext.
 	(isBlock not and: [self framesCount > 1000])
 		ifTrue: [ self halt ].
-]
-
-{ #category : #printing }
-LinkedEvaluationContext >> printOn: aStream [
- self backtrace
-				do: [ :frame | 
-					frame
-						do: [ :elem | elem printOn: aStream ]
-						separatedBy: [ aStream nextPutAll: '. ' ].
-					aStream cr ]
 ]
 
 { #category : #visiting }
@@ -272,84 +198,33 @@ LinkedEvaluationContext >> secondArgument [
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> staticBindingFor: aSymbol [
-	| symbol |
-	symbol := system symbolFrom: aSymbol.
-	(self staticBindingForIvar: symbol) ifNotNil: [ :b | ^ b ].
-	(self staticBindingForCvar: symbol) ifNotNil: [ :b | ^ b ].
-	^ self staticBindingForMvar: symbol
-]
-
-{ #category : #accessing }
-LinkedEvaluationContext >> staticBindingForCvar: aSymbol [
-	| species cvars class |
-	species := system speciesFor: receiver.
-	[ cvars := species classVariables.
-	cvars isNil ifFalse: [ 
-		cvars associationAt: aSymbol ifPresent: [:assoc |
-			^ SAssociationBinding new association: assoc ].
-	species localPools
-		do: [ :pool | 
-			pool associationAt: aSymbol ifPresent: [:assoc | 
-					class := pool isConstant
-						ifTrue: [ SConstantPoolBinding ]
-						ifFalse: [ SAssociationBinding ].
-					^ class new association: assoc ] ]].
-	species := species superclass.
-	species isNil ] whileFalse.
-	^ nil
-]
-
-{ #category : #accessing }
-LinkedEvaluationContext >> staticBindingForIvar: aSymbol [
-	| ivar |
-	ivar := receiver allSlotNames indexOf: aSymbol.
-	^ ivar > 0
-		ifTrue: [ SInstVarBinding new index: ivar ]
-]
-
-{ #category : #accessing }
-LinkedEvaluationContext >> staticBindingForMvar: aSymbol [
-	| assoc class |
-	class := system speciesFor: receiver.
-	assoc := class module namespace
-		associationAt: aSymbol
-		ifAbsent: [ self error: 'unbound variable: ' , aSymbol asString].
-	^ SAssociationBinding new association: assoc
-]
-
-{ #category : #services }
-LinkedEvaluationContext >> storeAssociation: association value: anObject [ 
-	system storeAssociation: association value: anObject 
+LinkedEvaluationContext >> stackTemporaryAt: index [
+	^ temporaries at: index
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> system: aPowertalkRuntime [
-	system := aPowertalkRuntime
+LinkedEvaluationContext >> stackTemporaryAt: index put: value [
+	^temporaries at: index put: value
+	
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> temporaryAt: index in: anInteger [
+LinkedEvaluationContext >> temporaryAt: index in: environmentIndex [
 	| env |
-	anInteger ifNil: [ ^ temporaries at: index ].
-	env := self environmentFor: anInteger.
+	environmentIndex ifNil: [ ^ self stackTemporaryAt: index ].
+	env := self environmentFor: environmentIndex.
 	^ env at: index
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> temporaryAt: index in: anInteger put: aValue [
+LinkedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 	| env |
-	anInteger ifNil: [ ^ temporaries	at:index put: aValue ].
-	env := self environmentFor: anInteger.
-	^ env at: index put: aValue
+	environmentIndex ifNil: [ ^ self stackTemporaryAt: index put: value ].
+	env := self environmentFor: environmentIndex.
+	^ env at: index put: value
 ]
 
 { #category : #accessing }
 LinkedEvaluationContext >> thirdArgument [
 	^ arguments at: 3
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> true [
-	^ system true
 ]

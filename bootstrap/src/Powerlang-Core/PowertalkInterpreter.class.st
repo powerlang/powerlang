@@ -63,7 +63,7 @@ PowertalkInterpreter >> evaluateClosure: aPClosure with: anObject with: anotherO
 	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 PowertalkInterpreter >> evaluateClosure: receiver withArgs: arguments [
 	^self subclassResponsibility
 ]

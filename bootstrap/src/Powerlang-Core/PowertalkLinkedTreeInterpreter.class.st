@@ -1,16 +1,16 @@
 Class {
-	#name : #PowertalkIterativeTreeInterpreter,
-	#superclass : #PowertalkIterativeInterpreter,
+	#name : #PowertalkLinkedTreeInterpreter,
+	#superclass : #PowertalkIterativeLinkedInterpreter,
 	#category : #'Powerlang-Core-Execution'
 }
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> dropToS [
+PowertalkLinkedTreeInterpreter >> dropToS [
 	context pushOperation: SOpDropToS new
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> evaluate [
+PowertalkLinkedTreeInterpreter >> evaluate [
 	| operation |
 	[ context hasWork ]
 		whileTrue: [ operation := context popOperation.
@@ -20,36 +20,36 @@ PowertalkIterativeTreeInterpreter >> evaluate [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> evaluationContextClass [
+PowertalkLinkedTreeInterpreter >> evaluationContextClass [
 	^ LinkedTreeEvaluationContext
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> loadRfromStack: anInteger [
+PowertalkLinkedTreeInterpreter >> loadRfromStack: anInteger [
 	| load |
 	load := SOpLoadRfromStack new index: anInteger.
 		context pushOperation: load
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> loadRwithSelf [
+PowertalkLinkedTreeInterpreter >> loadRwithSelf [
 		context pushOperation:SOpLoadRwithSelf new
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> prepareDispatch: dispatch [
+PowertalkLinkedTreeInterpreter >> prepareDispatch: dispatch [
 	context pushOperation: dispatch
 ]
 
-{ #category : #accessing }
-PowertalkIterativeTreeInterpreter >> prepareFor: anSCompiledMethod [
+{ #category : #private }
+PowertalkLinkedTreeInterpreter >> prepareFor: anSCompiledMethod [
 	| sexpressions |
 	sexpressions := runtime sexpressionsOf: anSCompiledMethod.
 	self push: sexpressions
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> prepareForBlock: sblock [
+PowertalkLinkedTreeInterpreter >> prepareForBlock: sblock [
 	| statements |
 	statements := sblock statements.
 	(statements isEmpty orNot: [ statements last isReturn ])
@@ -59,24 +59,24 @@ PowertalkIterativeTreeInterpreter >> prepareForBlock: sblock [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> push: anSExpression [
+PowertalkLinkedTreeInterpreter >> push: anSExpression [
 		context pushOperation: anSExpression
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> pushOpAssign: aCollection [
+PowertalkLinkedTreeInterpreter >> pushOpAssign: aCollection [
 	| op |
 	op := SOpAssign new assignees: aCollection.
 		context pushOperation: op
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> pushOpReturn [
+PowertalkLinkedTreeInterpreter >> pushOpReturn [
 		context pushOperation: SOpReturn new
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> pushOpReturn: aBoolean [
+PowertalkLinkedTreeInterpreter >> pushOpReturn: aBoolean [
 	| class |
 	class := (aBoolean andNot: [ context isBlock ])
 		ifTrue: [ SOpReturn ]
@@ -85,12 +85,12 @@ PowertalkIterativeTreeInterpreter >> pushOpReturn: aBoolean [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> pushR [
+PowertalkLinkedTreeInterpreter >> pushR [
 		context pushOperation: SOpPushR new
 ]
 
 { #category : #initializing }
-PowertalkIterativeTreeInterpreter >> underprimitiveRestart [
+PowertalkLinkedTreeInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | 
 	| sexpressions |
 	sexpressions := runtime sexpressionsOf: context method.
@@ -100,14 +100,14 @@ PowertalkIterativeTreeInterpreter >> underprimitiveRestart [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitAssignment: anSAssignment [
+PowertalkLinkedTreeInterpreter >> visitAssignment: anSAssignment [
 	self
 		pushOpAssign: anSAssignment assignees;		push: anSAssignment expression
 
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitCascade: anSCascade [
+PowertalkLinkedTreeInterpreter >> visitCascade: anSCascade [
 	| dispatch args argsize |
 	self dropToS.
 	anSCascade messages
@@ -128,7 +128,7 @@ PowertalkIterativeTreeInterpreter >> visitCascade: anSCascade [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitMessage: anSMessage [
+PowertalkLinkedTreeInterpreter >> visitMessage: anSMessage [
 	| dispatch args argsize |
 	messageCount := messageCount + 1.
 	dispatch := SOpDispatchMessage new message: anSMessage.
@@ -148,7 +148,7 @@ PowertalkIterativeTreeInterpreter >> visitMessage: anSMessage [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitMethod: anSMethod [
+PowertalkLinkedTreeInterpreter >> visitMethod: anSMethod [
 	| primitive statements |
 	primitive := anSMethod pragma.
 	primitive
@@ -166,14 +166,14 @@ PowertalkIterativeTreeInterpreter >> visitMethod: anSMethod [
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitOpRestart: anSOpRestart [
+PowertalkLinkedTreeInterpreter >> visitOpRestart: anSOpRestart [
 	| sexpressions |
 	sexpressions := runtime sexpressionsOf: context method.
 	self push: sexpressions
 ]
 
 { #category : #accessing }
-PowertalkIterativeTreeInterpreter >> visitReturn: anSReturn [
+PowertalkLinkedTreeInterpreter >> visitReturn: anSReturn [
 	self
 		pushOpReturn: anSReturn local;
 		push: anSReturn expression

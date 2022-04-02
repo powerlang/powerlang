@@ -112,7 +112,7 @@ SExpressionInterpreter >> evaluateClosure: aPClosure with: anObject with: anothe
 	^ self evaluateClosure: aPClosure withArgs: {anObject. anotherObject}
 ]
 
-{ #category : #visiting }
+{ #category : #private }
 SExpressionInterpreter >> evaluateClosure: aPClosure withArgs: anArray [
 	| oldArgs oldTemps oldEnv block sblock result |
 	block := aPClosure block.

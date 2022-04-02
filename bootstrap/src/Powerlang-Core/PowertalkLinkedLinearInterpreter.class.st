@@ -1,6 +1,6 @@
 Class {
-	#name : #PowertalkIterativeLinearInterpreter,
-	#superclass : #PowertalkIterativeInterpreter,
+	#name : #PowertalkLinkedLinearInterpreter,
+	#superclass : #PowertalkIterativeLinkedInterpreter,
 	#instVars : [
 		'linearizer'
 	],
@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> evaluate [
+PowertalkLinkedLinearInterpreter >> evaluate [
 	| operation |
 	[ operation := context nextOperation. operation notNil]
 		whileTrue: [ 			operation acceptVisitor: self ].
@@ -17,30 +17,30 @@ PowertalkIterativeLinearInterpreter >> evaluate [
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> evaluationContextClass [
+PowertalkLinkedLinearInterpreter >> evaluationContextClass [
 	^ LinkedLinearEvaluationContext
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> initialize [
+PowertalkLinkedLinearInterpreter >> initialize [
 	super initialize.
 	linearizer := SExpressionLinearizer new.
 
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> initializePrimitives [
+PowertalkLinkedLinearInterpreter >> initializePrimitives [
 	super initializePrimitives.
 	linearizer primitives: primitives
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> prepareDispatch: dispatch [
+PowertalkLinkedLinearInterpreter >> prepareDispatch: dispatch [
 	context work:  {dispatch}
 ]
 
-{ #category : #visiting }
-PowertalkIterativeLinearInterpreter >> prepareFor: anSCompiledMethod [
+{ #category : #private }
+PowertalkLinkedLinearInterpreter >> prepareFor: anSCompiledMethod [
 	| operations array |
 	operations := runtime sexpressionsOf: anSCompiledMethod.
 	operations isCollection
@@ -52,7 +52,7 @@ PowertalkIterativeLinearInterpreter >> prepareFor: anSCompiledMethod [
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> prepareForBlock: sblock [
+PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
 	| operations |
 	operations := sblock optimizedCode.
 	context work: operations; restart .
@@ -60,13 +60,13 @@ PowertalkIterativeLinearInterpreter >> prepareForBlock: sblock [
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> underprimitiveRestart [
+PowertalkLinkedLinearInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | 
 	context
 		restart]
 ]
 
 { #category : #visiting }
-PowertalkIterativeLinearInterpreter >> visitOpPrimitive: anSOpPrimtive [
+PowertalkLinkedLinearInterpreter >> visitOpPrimitive: anSOpPrimtive [
 	regR := anSOpPrimtive block value
 ]

@@ -14,23 +14,6 @@ PowertalkIterativeInterpreter >> evaluate [
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> evaluateClosure: closure withArgs: arguments [
-	| frame sblock |
-	frame := closure builder.
-	sblock := closure astcodes.
-	context := frame copy
-		beBlock;
-		parent: context;
-		initializeForBlock: sblock args: arguments closure: closure.
-	^ self prepareForBlock: sblock
-]
-
-{ #category : #accessing }
-PowertalkIterativeInterpreter >> evaluationContextClass [
-	^self subclassResponsibility
-]
-
-{ #category : #accessing }
 PowertalkIterativeInterpreter >> hasFinished [
 	^ context hasFinished
 ]
@@ -47,7 +30,7 @@ PowertalkIterativeInterpreter >> prepareDispatch: dispatch [
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 PowertalkIterativeInterpreter >> prepareFor: anSCompiledMethod [
 	self subclassResponsibility
 ]
@@ -60,27 +43,6 @@ PowertalkIterativeInterpreter >> prepareForBlock: sblock [
 { #category : #accessing }
 PowertalkIterativeInterpreter >> regR: anObject [ 
 	regR := anObject
-]
-
-{ #category : #accessing }
-PowertalkIterativeInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
-	| symbol literal dummy message dispatch |
-	symbol := runtime symbolFromLocal: aSymbol.
-	literal := SLiteral new value: nilObj.
-	dummy := Array new: anArray size withAll: literal.
-	message := SMessage new
-		selector: symbol;
-		receiver: literal;
-		arguments: dummy.
-	dispatch := SOpDispatchMessage new message: message.
-	regR := receiver.
-	context := self evaluationContextClass new system: self.
-	self prepareDispatch: dispatch.
-	dummy isEmpty
-		ifFalse: [ context pushOperand: receiver ].
-	anArray do: [ :arg | context pushOperand: arg ].
-	self evaluate.
-	^ regR
 ]
 
 { #category : #accessing }
@@ -107,37 +69,6 @@ PowertalkIterativeInterpreter >> visitLiteral: anSLiteral [
 PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
 	anSOpAssign assignees
 		do: [ :identifier | identifier binding assign: regR within: context ]
-]
-
-{ #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
-	| message argcount arguments behavior method size environment |
-	message := anSOpDispatchMessage message.
-	argcount := message argumentCount.
-	arguments := context popOperands: argcount.
-	(argcount > 0 andNot: [ message isCascadeMessage ])
-		ifTrue: [ context popOperand ].
-	message cachedUndermessage
-		ifNotNil: [ :block | ^ regR := block value: regR value: arguments ].
-	behavior := message receiver isSuper
-		ifTrue: [ runtime superBehaviorOf: context classBinding ]
-		ifFalse: [ runtime behaviorOf: regR ].
-	method := self
-		lookup: message selector
-		startingAt: behavior
-		sendSite: message.
-	method class == BlockClosure
-		ifTrue: [ ^ regR := method value: regR value: arguments ].
-	size := runtime methodEnvironmentSize: method.
-	environment := runtime newEnvironmentSized: size.
-	context := self evaluationContextClass new
-		receiver: regR;
-		arguments: arguments;
-		environment: environment;
-		method: method;
-		parent: context;
-		system: runtime.
-	self prepareFor: method
 ]
 
 { #category : #accessing }
@@ -168,9 +99,4 @@ PowertalkIterativeInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpPushR: anSOpPushR [
 	context pushOperand: regR
-]
-
-{ #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpReturn: anSOpReturn [
-	context := context parent
 ]

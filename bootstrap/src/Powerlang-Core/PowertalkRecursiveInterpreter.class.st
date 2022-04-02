@@ -21,7 +21,7 @@ PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 	^ receiver
 ]
 
-{ #category : #accessing }
+{ #category : #private }
 PowertalkRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock result |
 	frame := closure builder.
@@ -78,7 +78,7 @@ PowertalkRecursiveInterpreter >> primitiveClosureWhileTrue [
 		whileTrue: context arguments first ]
 ]
 
-{ #category : #visiting }
+{ #category : #initializing }
 PowertalkRecursiveInterpreter >> runtime: aPowertalkRuntime [
 	super runtime: aPowertalkRuntime.
 	aPowertalkRuntime
