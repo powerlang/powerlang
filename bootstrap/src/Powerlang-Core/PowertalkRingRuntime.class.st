@@ -25,6 +25,11 @@ PowertalkRingRuntime class >> new [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> argumentCountOf: anObjectMap [
+	^ anObjectMap argumentCount
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> behaviorOf: anObjectMap [
 	^ anObjectMap spec
 ]
