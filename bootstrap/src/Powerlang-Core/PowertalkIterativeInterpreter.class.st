@@ -73,7 +73,12 @@ PowertalkIterativeInterpreter >> visitOpAssign: anSOpAssign [
 
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpDropToS: anSOpDropToS [
-	context popOperand
+	context dropOperands: anSOpDropToS count
+]
+
+{ #category : #accessing }
+PowertalkIterativeInterpreter >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [
+	regR := context stackTemporaryAt: anSOpLoadRfromFrame index
 ]
 
 { #category : #accessing }
@@ -92,11 +97,11 @@ PowertalkIterativeInterpreter >> visitOpLoadRwithSelf: anSOpLoadRwithSelf [
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpNonLocalReturn: anSOpReturn [
-	context := context home parent
+PowertalkIterativeInterpreter >> visitOpPushR: anSOpPushR [
+	context pushOperand: regR
 ]
 
 { #category : #accessing }
-PowertalkIterativeInterpreter >> visitOpPushR: anSOpPushR [
-	context pushOperand: regR
+PowertalkIterativeInterpreter >> visitOpStoreRintoFrame: anSOpStoreRintoFrame [
+	context stackTemporaryAt: anSOpStoreRintoFrame index put: regR
 ]

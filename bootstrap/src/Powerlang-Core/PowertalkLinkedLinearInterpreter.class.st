@@ -59,6 +59,12 @@ PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
 	^ nilObj
 ]
 
+{ #category : #initializing }
+PowertalkLinkedLinearInterpreter >> runtime: aPowertalkRuntime [
+	super runtime: aPowertalkRuntime.
+	linearizer runtime: aPowertalkRuntime
+]
+
 { #category : #visiting }
 PowertalkLinkedLinearInterpreter >> underprimitiveRestart [
 	^ [ :receiver :arguments | 

@@ -74,6 +74,11 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 ]
 
 { #category : #accessing }
+PowertalkIterativeLinkedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
+	context := context home parent
+]
+
+{ #category : #accessing }
 PowertalkIterativeLinkedInterpreter >> visitOpReturn: anSOpReturn [
 	context := context parent
 ]

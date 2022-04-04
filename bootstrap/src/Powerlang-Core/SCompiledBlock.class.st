@@ -119,6 +119,18 @@ SCompiledBlock >> optimizedCode: anObject [
 ]
 
 { #category : #constants }
+SCompiledBlock >> printOn: aStream [
+	aStream
+		print: method classBinding;
+		nextPutAll: '>>';
+		print: method selector;
+		nextPutAll: ' [block ';
+		print: self id;
+		nextPutAll: ']'
+
+]
+
+{ #category : #constants }
 SCompiledBlock >> tempCount [
 	^format bitsAt: TempCount
 ]

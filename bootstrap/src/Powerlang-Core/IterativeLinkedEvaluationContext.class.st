@@ -15,6 +15,11 @@ IterativeLinkedEvaluationContext >> beBlock [
 ]
 
 { #category : #'as yet unclassified' }
+IterativeLinkedEvaluationContext >> dropOperands: anInteger [
+	anInteger timesRepeat: [ operands removeLast ]
+]
+
+{ #category : #'as yet unclassified' }
 IterativeLinkedEvaluationContext >> hasFinished [
 	^parent isNil
 ]

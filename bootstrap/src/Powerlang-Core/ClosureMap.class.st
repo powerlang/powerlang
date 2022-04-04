@@ -44,3 +44,12 @@ ClosureMap >> builder [
 ClosureMap >> builder: aMethodEvaluator [
 	builder := aMethodEvaluator
 ]
+
+{ #category : #accessing }
+ClosureMap >> printOn: aStream [
+	aStream
+		nextPutAll: '<< ['.
+	self slots do: [ :slot | aStream print: slot ] separatedBy: [ aStream nextPutAll: ', ' ].
+aStream
+		nextPutAll: '] >>'
+]
