@@ -22,16 +22,29 @@ PowertalkIterativeStackedInterpreter >> evaluate [
 
 { #category : #private }
 PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
-	| sblock block |
+	| sblock block receiver |
 	sblock := closure astcodes.
 	block := sblock compiledCode.
 	work := block optimizedCode.
-	context popFrame; buildFrameFor: regR code: block environment: closure.
+	receiver := block capturesSelf ifTrue: [closure at: 1] ifFalse: [nilObj].
+	context
+		popFrame;
+		buildFrameFor: receiver code: block environment: closure.
 	sblock isInlined
 		ifTrue: [ arguments
 				with: sblock inlinedArgs
 				do: [ :arg :i | context stackTemporaryAt: i put: arg ] ].
 	^ regR
+]
+
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: block [
+	| argcount arguments |
+	argcount := message argumentCount.
+	arguments := context popOperands: argcount.
+	regR := block value: regR value: arguments. 
+	(argcount > 0 andNot: [ message isCascadeMessage ])
+				ifTrue: [ context popOperand ]
 ]
 
 { #category : #initialization }
@@ -94,6 +107,7 @@ PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: an
 		ifFalse: [ context pushOperand: receiver ].
 	anArray do: [ :arg | context pushOperand: arg ].
 	work := {dispatch}.
+	context regPC: 0.
 	self evaluate.
 	^ regR
 ]
@@ -105,16 +119,10 @@ PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
-	| message argcount arguments behavior method size environment |
+	| message arguments behavior method size environment |
 	message := anSOpDispatchMessage message.
-	argcount := message argumentCount.
 	message cachedUndermessage
-		ifNotNil: [ :block | 
-			arguments := context popOperands: argcount.
-			regR := block value: regR value: arguments.
-			(argcount > 0 andNot: [ message isCascadeMessage ])
-				ifTrue: [ context popOperand ].
-			^ self ].
+		ifNotNil: [ :block | ^self evaluateUndermessage: message with: block].
 	behavior := message receiver isSuper
 		ifTrue: [ runtime superBehaviorOf: context classBinding ]
 		ifFalse: [ runtime behaviorOf: regR ].
@@ -123,11 +131,13 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		startingAt: behavior
 		sendSite: message.
 	method class == BlockClosure
-		ifTrue: [ ^ regR := method value: regR value: arguments ].
+		ifTrue: [^self evaluateUndermessage: message with: method ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	self prepareFor: method.
 	work := method optimizedCode.
+	"(runtime symbolFrom: message selector) == #foo
+		ifTrue: [ self halt ]."
 	context buildFrameFor: regR code: method environment: environment
 ]
 
@@ -152,6 +162,11 @@ PowertalkIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 	context unwind.
 		work := context regM optimizedCode
+]
+
+{ #category : #initialization }
+PowertalkIterativeStackedInterpreter >> visitOpPopR: anSOpPopR [
+	regR := context pop
 ]
 
 { #category : #initialization }

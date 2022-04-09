@@ -15,7 +15,7 @@ Class {
 
 { #category : #initialization }
 StackedEvaluationContext >> argumentAt: anInteger [
-	^stack at: regBP + 1 + anInteger
+	^stack at: regBP + 1 + (regM argumentCount - anInteger + 1)
 ]
 
 { #category : #initialization }
@@ -109,19 +109,19 @@ StackedEvaluationContext >> environment: environmentIndex at: index put: value [
 	environmentIndex = -1
 		ifTrue: [ ^ self stackTemporaryAt: index put: value ].
 	env := environmentIndex = 0
-		ifTrue: [  regE ]
+		ifTrue: [ regE ]
 		ifFalse: [ regE at: environmentIndex ].
 	^ env at: index put: value
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> firstArgument [
-	^stack at: regBP + 2
+	^ self argumentAt: 1
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> fourthArgument [
-	^stack at: regBP + 5
+	^ self argumentAt: 4
 ]
 
 { #category : #initialization }
@@ -188,6 +188,21 @@ StackedEvaluationContext >> popFrame [
 ]
 
 { #category : #initialization }
+StackedEvaluationContext >> popOperand [
+	^self pop
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> popOperands: anInteger [
+	| result |
+	anInteger = 0
+		ifTrue: [ ^ #() ].
+	result := Array new: anInteger.
+	anInteger to: 1 by: -1 do: [ :i | result at: i put: self pop ].
+	^ result
+]
+
+{ #category : #initialization }
 StackedEvaluationContext >> printOn: aStream [
 	| slot |
 	regSP to: regBP + 3 do: [ :i | slot := stack at: i. aStream nextPutAll: i hex; nextPutAll: ' -> '; print: slot;cr ].
@@ -248,13 +263,13 @@ StackedEvaluationContext >> regPC: anInteger [
 StackedEvaluationContext >> restart [
 	| nilObj |
 	nilObj := system nil.
-	regBP - self tempsOffset to: regSP by: -1 do: [:i | stack at: i put: nilObj].
+	regBP - self tempOffset to: regSP by: -1 do: [ :i | stack at: i put: nilObj ].
 	pc := 1
 ]
 
 { #category : #initialization }
 StackedEvaluationContext >> secondArgument [
-	^stack at: regBP + 3
+	^ self argumentAt: 2
 ]
 
 { #category : #initialization }
@@ -293,7 +308,7 @@ StackedEvaluationContext >> temporaryAt: index in: environmentIndex put: value [
 
 { #category : #initialization }
 StackedEvaluationContext >> thirdArgument [
-	^stack at: regBP + 4
+	^ self argumentAt: 3
 ]
 
 { #category : #initialization }

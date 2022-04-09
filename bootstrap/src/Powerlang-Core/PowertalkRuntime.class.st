@@ -57,9 +57,13 @@ PowertalkRuntime >> initialize [
 
 { #category : #initialization }
 PowertalkRuntime >> initializeInterpreter [
+	"interpreter := PowertalkRecursiveInterpreter new runtime: self"
+
 	"interpreter := PowertalkIterativeTreeInterpreter new runtime: self"
-	"interpreter := PowertalkIterativeLinearInterpreter new runtime: self"
-	interpreter := PowertalkRecursiveInterpreter new runtime: self
+
+	interpreter := PowertalkLinkedLinearInterpreter new runtime: self
+
+	"interpreter := PowertalkIterativeStackedInterpreter new runtime: self"
 ]
 
 { #category : #accessing }
