@@ -10,7 +10,9 @@ Class {
 		'one',
 		'plus',
 		'stackTop',
-		'dropsArguments'
+		'dropsArguments',
+		'not',
+		'equalsEquals'
 	],
 	#category : #'Powerlang-Core-Execution'
 }
@@ -46,12 +48,21 @@ SExpressionLinearizer >> currentPC [
 
 { #category : #initialization }
 SExpressionLinearizer >> dispatch: message [
-	| op |
+	| op count |
 	op := SOpDispatchMessage new message: message.
 	operations add: op.
-	"dispatch removes the receiver from stack when pushed"
-	message arguments notEmpty
-		ifTrue: [ stackTop := stackTop - 1 ]
+	dropsArguments ifTrue: [ ^self ].
+	
+	count := message arguments size.
+	count > 0 ifTrue: [ count := count + 1 ].
+	stackTop := stackTop - count 
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> dropCascadeMessageArgs: argsize [
+	(argsize = 0 orNot: [ dropsArguments ])
+		ifTrue: [ ^ self ].
+	self dropToS: argsize
 ]
 
 { #category : #initialization }
@@ -100,7 +111,7 @@ SExpressionLinearizer >> inline: anSMessage binaryWhile: aBoolean [
 ]
 
 { #category : #initialization }
-SExpressionLinearizer >> inline: anSMessage branchIf: aBoolean [
+SExpressionLinearizer >> inline: anSMessage if: aBoolean [
 	| branch end |
 	anSMessage receiver acceptVisitor: self.
 	branch := self branchIf: aBoolean not.
@@ -115,6 +126,50 @@ SExpressionLinearizer >> inline: anSMessage branchIf: aBoolean [
 ]
 
 { #category : #initialization }
+SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
+	| nilObj message branch end arg |
+	anSMessage receiver acceptVisitor: self.
+	self pushR.
+	nilObj := SLiteral new value: runtime nil.
+	message := SMessage new
+		receiver: (SOpLoadRfromStack new index: 0);
+		arguments: {nilObj};
+		selector: equalsEquals.
+	self visitMessage: message.
+	branch := self branchIf: aBoolean not.
+	arg := anSMessage arguments first.
+	arg isBlock ifTrue: [ self visitStatements: arg statements] ifFalse: [ arg acceptVisitor: self ].
+	end := self
+		dropToS;
+		jump.
+	self
+		branchTargetOf: branch;
+		popR;
+		branchTargetOf: end
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inline: anSMessage ifNilIfNotNil: aBoolean [
+	| nilObj message branch end |
+	anSMessage receiver acceptVisitor: self.
+	nilObj := SLiteral new value: runtime nil.
+	message := SMessage new
+		receiver: (SOpLoadRfromStack new: 1);
+		arguments: {nilObj};
+		selector: equalsEquals.
+	self visitMessage: message.
+	branch := self branchIf: aBoolean not.
+	end := self
+		visitStatements: anSMessage arguments first statements;
+		jump.
+	self
+		branchTargetOf: branch;
+		visitStatements: anSMessage arguments second statements;
+		branchTargetOf: end;
+		dropToS
+]
+
+{ #category : #initialization }
 SExpressionLinearizer >> inline: anSMessage ifTrueIfFalse: aBoolean [
 	| branch end |
 	anSMessage receiver acceptVisitor: self.
@@ -126,6 +181,63 @@ SExpressionLinearizer >> inline: anSMessage ifTrueIfFalse: aBoolean [
 		branchTargetOf: branch;
 		visitStatements: anSMessage arguments second statements;
 		branchTargetOf: end
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inline: anSMessage unitaryWhile: aBoolean [
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| start branch |
+	start := self currentPC.
+	self visitStatements: anSMessage receiver statements.
+	branch :=  self branchIf: aBoolean.
+	branch target: start.
+
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineAnd: anSMessage [
+	| branch |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: false.
+	self visitStatements: anSMessage arguments first statements; branchTargetOf: branch
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineAndNot: anSMessage [
+	| branch message |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: false.
+	message := SMessage new
+		selector: not;
+		arguments: #().
+	self
+		visitStatements: anSMessage arguments first statements;
+		dispatch: message;
+		branchTargetOf: branch
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineOr: anSMessage [
+	| branch |
+	anSMessage receiver acceptVisitor: self.
+	branch := self branchIf: true.
+	self visitStatements: anSMessage arguments first statements.
+	self branchTargetOf: branch
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineOrNot: anSMessage [
+	| branch message |
+	anSMessage receiver acceptVisitor: self.
+		branch := self branchIf: true.
+	message := SMessage new
+		selector: not;
+		arguments: #().
+	self
+		visitStatements: anSMessage arguments first statements;
+		dispatch: message;
+		branchTargetOf: branch
 ]
 
 { #category : #initialization }
@@ -156,7 +268,8 @@ SExpressionLinearizer >> inlineToDo: anSMessage [
 		visitMessage: increment;
 		storeRintoFrameAt: index;
 		jumpTo: start;
-		branchTargetOf: end
+		branchTargetOf: end;
+		dropToS: 1
 ]
 
 { #category : #initialization }
@@ -171,13 +284,6 @@ SExpressionLinearizer >> jump [
 SExpressionLinearizer >> jumpTo: anInteger [
 | op |
 op := SOpJump new target: anInteger.
-	operations add: op
-]
-
-{ #category : #initialization }
-SExpressionLinearizer >> loadRfromFrameAt: anInteger [
-	| op |
-	op := SOpLoadRfromFrame new index: anInteger.
 	operations add: op
 ]
 
@@ -202,6 +308,12 @@ SExpressionLinearizer >> loadRwithSelf [
 { #category : #initialization }
 SExpressionLinearizer >> operations [
 ^operations
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> popR [
+	operations add: SOpPopR new.
+	stackTop := stackTop - 1
 ]
 
 { #category : #initialization }
@@ -248,7 +360,9 @@ SExpressionLinearizer >> runtime: aPowertalkRuntime [
 	literal := runtime newInteger: 1.
 	one := SLiteral new value: literal.
 	plus := runtime symbolFromLocal: #+.
-	greaterThan := runtime symbolFromLocal: #>
+	greaterThan := runtime symbolFromLocal: #>.
+	equalsEquals := runtime symbolFromLocal: #==.
+	not := runtime symbolFromLocal: #not
 ]
 
 { #category : #initialization }
@@ -299,7 +413,8 @@ SExpressionLinearizer >> visitCascade: anSCascade [
 					self pushR ].
 			self
 				loadRfromStack: argsize;
-				dispatch: msg; dropToS: argsize ].
+				dispatch: msg;
+				dropCascadeMessageArgs: argsize ].
 	self dropToS
 ]
 
@@ -313,17 +428,17 @@ SExpressionLinearizer >> visitInlinedMessage: anSMessage [
 	| selector |
 	selector := runtime symbolFrom: anSMessage selector.
 	selector == #ifTrue:
-		ifTrue: [ ^ self inline: anSMessage branchIf: true ].
+		ifTrue: [ ^ self inline: anSMessage if: true ].
 	selector == #ifFalse:
-		ifTrue: [ ^ self inline: anSMessage branchIf: false ].
+		ifTrue: [ ^ self inline: anSMessage if: false ].
 	selector == #ifNil:
-		ifTrue: [ ^ self inlineBranch: anSMessage ifNil: true ].
+		ifTrue: [ ^ self inline: anSMessage ifNil: true ].
 	selector == #ifNotNil:
-		ifTrue: [ ^ self inlineBranch: anSMessage ifNil: false ].
+		ifTrue: [ ^ self inline: anSMessage ifNil: false ].
 	selector == #ifNil:ifNotNil:
-		ifTrue: [ ^ self inlineBranch: anSMessage ifNilIfNotNil: true ].
+		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: true ].
 	selector == #ifNil:ifNotNil:
-		ifTrue: [ ^ self inlineBranch: anSMessage ifNilIfNotNil: false ].
+		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: false ].
 	selector == #ifTrue:ifFalse:
 		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: true ].
 	selector == #ifFalse:ifTrue:
@@ -403,6 +518,11 @@ SExpressionLinearizer >> visitMethod: anSMethod [
 { #category : #visiting }
 SExpressionLinearizer >> visitOpLoadRfromFrame: anSOpLoadRfromFrame [ 
 	operations add: anSOpLoadRfromFrame
+]
+
+{ #category : #visiting }
+SExpressionLinearizer >> visitOpLoadRfromStack: anSOpLoadRfromStack [
+self loadRfromStack: anSOpLoadRfromStack index
 ]
 
 { #category : #initialization }

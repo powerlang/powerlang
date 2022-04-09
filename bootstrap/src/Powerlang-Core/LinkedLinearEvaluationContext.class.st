@@ -22,10 +22,33 @@ LinkedLinearEvaluationContext >> nextOperation [
 	^ op
 ]
 
+{ #category : #accessing }
+LinkedLinearEvaluationContext >> regPC: anInteger [
+	pc := anInteger
+]
+
 { #category : #visiting }
 LinkedLinearEvaluationContext >> restart [
 	super restart.
 	pc := 1
+]
+
+{ #category : #accessing }
+LinkedLinearEvaluationContext >> stackTemporaryAt: index [
+	| size |
+	size := temporaries size.
+	^index > size
+		ifTrue: [ operands at: index - size ]
+		ifFalse: [ temporaries at: index ]
+]
+
+{ #category : #accessing }
+LinkedLinearEvaluationContext >> stackTemporaryAt: index put: value [
+	| size |
+	size := temporaries size.
+	^ index > size
+		ifTrue: [ operands at: index - size put: value ]
+		ifFalse: [ temporaries at: index put: value ]
 ]
 
 { #category : #visiting }

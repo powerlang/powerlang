@@ -65,6 +65,11 @@ SBlock >> inlinedArgs: anArray [
 ]
 
 { #category : #initialization }
+SBlock >> isBlock [
+	^true
+]
+
+{ #category : #initialization }
 SBlock >> isInlined [
 	^ compiledCode isNil or: [ compiledCode method isNil ]
 ]

@@ -60,6 +60,11 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> homeEnvironmentOf: aClosureMap [
+	^ aClosureMap slotAt: 2
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> homeFrameOf: aClosureMap [
 	^ aClosureMap slotAt: 2
 ]

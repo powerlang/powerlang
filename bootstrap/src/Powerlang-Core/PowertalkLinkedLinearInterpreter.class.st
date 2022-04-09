@@ -73,6 +73,28 @@ PowertalkLinkedLinearInterpreter >> underprimitiveRestart [
 ]
 
 { #category : #visiting }
+PowertalkLinkedLinearInterpreter >> visitOpJump: anSOpJump [
+	context regPC: anSOpJump target + 1
+]
+
+{ #category : #visiting }
+PowertalkLinkedLinearInterpreter >> visitOpJumpFalse: anSOpJumpFalse [
+	regR == falseObj
+		ifTrue: [ context regPC: anSOpJumpFalse target+1 ]
+]
+
+{ #category : #visiting }
+PowertalkLinkedLinearInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
+	regR == trueObj
+		ifTrue: [ context regPC: anSOpJumpTrue target +1]
+]
+
+{ #category : #visiting }
+PowertalkLinkedLinearInterpreter >> visitOpPopR: anSOpPopR [
+	regR := context popOperand
+]
+
+{ #category : #visiting }
 PowertalkLinkedLinearInterpreter >> visitOpPrimitive: anSOpPrimtive [
 	regR := anSOpPrimtive block value
 ]

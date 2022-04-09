@@ -109,6 +109,105 @@ PowertalkRingRuntimeTest >> test132sendIfTrueToTrue [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test133sendIfTrueToTrueAndTrue [
+	| result |
+	self
+		compile: 'foo ^(true and: [true]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test134sendIfTrueToTrueAndFalse [
+	| result |
+	self
+		compile: 'foo ^(true and: [false]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> nil ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test135sendIfTrueToFalseAndTrue [
+	| result |
+	self
+		compile: 'foo ^(false and: [true]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> nil ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test136sendIfTrueToFalseOrTrue [
+	| result |
+	self
+		compile: 'foo ^(false or: [true]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test137sendIfTrueToFalseOrFalse [
+	| result |
+	self
+		compile: 'foo ^(false or: [false]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> nil ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
+	| result |
+	self
+		compile: 'foo ^(true or: [false]) ifTrue: [5]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilToNil [
+	| result |
+	self
+		compile: 'foo ^nil ifNil: [self]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: image true ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilToNotNil [
+	| result |
+	self
+		compile: 'foo ^false ifNil: [self]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: image false ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNotNilWithArg [
+	| result |
+	self
+		compile: 'foo ^5 ifNotNil: [:a | a]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test140evaluateClosure [
 	| result |
 	self
@@ -124,6 +223,17 @@ PowertalkRingRuntimeTest >> test141evaluateClosureFrames [
 	| result |
 	self
 		compile: 'foo [5] value'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: image true ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test142evaluateClosureReceiver [
+	| result |
+	self
+		compile: 'foo [self] value'
 		in: #ProtoObject
 		during: [ result := runtime sendLocal: #foo to: image true.
 			self assert: result equals: image true ].
@@ -168,6 +278,22 @@ PowertalkRingRuntimeTest >> test152compute20dividedBy5 [
 	self 
 		assert: result equals: self ==> 4;
 		assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test152sendToDoWithInterval [
+	| result |
+	self
+		compile:
+			'foo
+			 | a |
+			a := 0.
+			(3 to: 4) do: [:i | a := a + i].
+			^a'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 7 ].
+	self assertNoLeftoverFrames
 ]
 
 { #category : #tests }
@@ -316,6 +442,20 @@ PowertalkRingRuntimeTest >> test180evaluateToDo [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test181evaluateIntervalSize [
+	| result |
+	self
+		compile:
+			'foo ^(1 to: 2) size'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self
+				assert: result isImmediate;
+				assert: result value equals:  2 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test185evaluateArrayDo [
 	| result |
 	self
@@ -354,6 +494,23 @@ PowertalkRingRuntimeTest >> test186evaluateOrderedCollectionDo [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test187evaluateArrayToDo [
+	| result |
+	self
+		compile:
+			'foo | a |
+				a := Array new: 2.
+				1 to: 2 do: [ :i | a at: i put: i ].
+				^a first + a second'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self
+				assert: result isImmediate;
+				assert: result value equals: 1 + 2 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test188evaluateReplaceFromToWith [
 	| result |
 	self
@@ -386,6 +543,22 @@ PowertalkRingRuntimeTest >> test190evaluateStringConcatenation [
 		in: #ProtoObject
 		during: [ result := runtime sendLocal: #foo to: image true.
 			self assert: result asString equals: 'ABCDE' ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test191evaluateIntervalCollect [
+	| result |
+	self
+		compile:
+			'foo | result |
+				result := (1 to: 2) collect: [:i | i].
+				^result first + result second'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self
+				assert: result isImmediate;
+				assert: result value equals: 1 + 2].
 	self assertNoLeftoverFrames
 ]
 
