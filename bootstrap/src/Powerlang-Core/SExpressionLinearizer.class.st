@@ -127,8 +127,13 @@ SExpressionLinearizer >> inline: anSMessage if: aBoolean [
 
 { #category : #initialization }
 SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
-	| nilObj message branch end arg |
+	| nilObj message branch end arg index |
 	anSMessage receiver acceptVisitor: self.
+	arg := anSMessage arguments first.
+	(arg isBlock and: [ arg inlinedArgs size = 1]) ifTrue: [ 
+		index := arg inlinedArgs first.
+		self storeRintoFrameAt: index
+		 ].
 	self pushR.
 	nilObj := SLiteral new value: runtime nil.
 	message := SMessage new
@@ -137,8 +142,10 @@ SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 		selector: equalsEquals.
 	self visitMessage: message.
 	branch := self branchIf: aBoolean not.
-	arg := anSMessage arguments first.
-	arg isBlock ifTrue: [ self visitStatements: arg statements] ifFalse: [ arg acceptVisitor: self ].
+
+	arg isBlock
+		ifTrue: [ self visitStatements: arg statements ]
+		ifFalse: [ arg acceptVisitor: self ].
 	end := self
 		dropToS;
 		jump.
@@ -150,21 +157,27 @@ SExpressionLinearizer >> inline: anSMessage ifNil: aBoolean [
 
 { #category : #initialization }
 SExpressionLinearizer >> inline: anSMessage ifNilIfNotNil: aBoolean [
-	| nilObj message branch end |
+	| arguments nilObj message branch end arg index |
 	anSMessage receiver acceptVisitor: self.
+	arguments := anSMessage arguments.
+	arg := aBoolean ifTrue: [arguments second] ifFalse: [arguments first].
+	(arg isBlock and: [ arg inlinedArgs size = 1 ])
+		ifTrue: [ index := arg inlinedArgs first.
+			self storeRintoFrameAt: index ].
+	self pushR.
 	nilObj := SLiteral new value: runtime nil.
 	message := SMessage new
-		receiver: (SOpLoadRfromStack new: 1);
+		receiver: (SOpLoadRfromStack new index: 0);
 		arguments: {nilObj};
 		selector: equalsEquals.
 	self visitMessage: message.
 	branch := self branchIf: aBoolean not.
 	end := self
-		visitStatements: anSMessage arguments first statements;
+		visitStatements: arguments first statements;
 		jump.
 	self
 		branchTargetOf: branch;
-		visitStatements: anSMessage arguments second statements;
+		visitStatements: arguments second statements;
 		branchTargetOf: end;
 		dropToS
 ]

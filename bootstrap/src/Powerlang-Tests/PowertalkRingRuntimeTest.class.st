@@ -175,6 +175,50 @@ PowertalkRingRuntimeTest >> test138sendIfTrueToTrueOrFalse [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNil [
+	| result |
+	self
+		compile: 'foo ^nil ifNil: [3] ifNotNil: [4]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 3 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilToNotNil [
+	| result |
+	self
+		compile: 'foo ^#abc ifNil: [3] ifNotNil: [4]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 4 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArg [
+	| result |
+	self
+		compile: 'foo ^5 ifNil: [3] ifNotNil: [:a | a]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 5 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test139sendIfNilIfNotNilWithArgToNil [
+	| result |
+	self
+		compile: 'foo ^nil ifNil: [3] ifNotNil: [:a | a]'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 3 ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test139sendIfNilToNil [
 	| result |
 	self
