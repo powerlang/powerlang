@@ -229,11 +229,13 @@ AstcodeEncoder >> nextTypePut: anInteger [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> visitAssignment: anAssignmentNode [ 
+AstcodeEncoder >> visitAssignment: anAssignmentNode [
+	| assignees |
 	self nextTypePut: AssignmentId.
-	anAssignmentNode assignees
-		do: [:node | self nestedEncode: [node acceptVisitor: self]].
-	self nestedEncode: [anAssignmentNode expression acceptVisitor: self]
+	assignees := anAssignmentNode assignees.
+	self nextPut: assignees size.
+	assignees do: [ :node | node acceptVisitor: self].
+	anAssignmentNode expression acceptVisitor: self
 ]
 
 { #category : #visiting }

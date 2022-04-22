@@ -68,14 +68,14 @@ AstcodeDecoder >> decodeArgument [
 
 { #category : #public }
 AstcodeDecoder >> decodeAssignment [
-	| assignment codes |
+	| assignment count assignees |
 	assignment := SAssignment new.
-	codes := stream upToEnd collect: [:elem | self decodeNode: elem].
-	assignment expression: codes last.
-	1 to: codes size - 1 do: [:i | | identifier |
-		identifier := codes at: i.
-		assignment assign: identifier].
-	^assignment
+	count := self next.
+	assignees := (1 to: count)
+		collect: [ :i | self decodeExpression ].
+	assignment expression: self decodeExpression.
+	assignees do: [ :identifier | assignment assign: identifier ].
+	^ assignment
 ]
 
 { #category : #public }
