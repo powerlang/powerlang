@@ -186,20 +186,6 @@ AstcodeDecoder >> decodeIdentifier [
 	^ SIdentifier new binding: binding
 ]
 
-{ #category : #public }
-AstcodeDecoder >> decodeInlineNodes: anArray [
-  | prev result type decoded |
-  anArray ifNil: [ ^#() ].
-  prev := stream.
-  result := OrderedCollection new.
-  stream := anArray readStream.
-  [ stream atEnd ] whileFalse: [ type := self nodeTypeOf: stream next.
-		decoded := type decodeUsing: self.
-		result add: decoded ]. 
-  stream := prev.
-  ^result
-]
-
 { #category : #initialization }
 AstcodeDecoder >> decodeInstVar [
 	^SInstVarBinding new index: self nextInteger
@@ -217,23 +203,18 @@ AstcodeDecoder >> decodeLiteral [
 
 { #category : #public }
 AstcodeDecoder >> decodeMessage [
-	| index selector receiver arguments opcodes |
+	| inlined index selector receiver arguments |
+	inlined := self nextBoolean.
 	index := stream next.
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
 	receiver := self decodeNode: stream next.
 	arguments := self decodeNodes: stream next.
-	stream atEnd
-		ifFalse: [ opcodes := stream peek = 0
-				ifTrue: [ stream next.
-					#inlined ]
-				ifFalse: [ self decodeInlineNodes: stream next ] ].
 	^ SMessage new
 		receiver: receiver;
 		selector: selector;
-		arguments: arguments;
-		opcodes: opcodes
+		arguments: arguments; inlined: inlined
 ]
 
 { #category : #public }
