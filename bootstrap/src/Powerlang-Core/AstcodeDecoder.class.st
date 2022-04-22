@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'method',
-		'stream'
+		'stream',
+		'builder'
 	],
 	#classVars : [
 		'BindingTypes',
@@ -160,6 +161,14 @@ AstcodeDecoder >> decodeDynamicVar [
 	^ SDynamicBinding new name: name
 ]
 
+{ #category : #public }
+AstcodeDecoder >> decodeExpression [
+	| type |
+	type := self nodeTypeOf: stream next.
+	^type decodeUsing: self.
+
+]
+
 { #category : #initialization }
 AstcodeDecoder >> decodeGlobalBinding [
 	| index assoc |
@@ -277,8 +286,10 @@ AstcodeDecoder >> decodePoolVar [
 AstcodeDecoder >> decodeReturn [
 	| expression local |
 	local := stream next.
-	expression := self decodeNode: stream next.
-	^SReturn new local: local; expression: expression
+	expression := self decodeExpression.
+	^ SReturn new
+		local: local;
+		expression: expression
 ]
 
 { #category : #public }

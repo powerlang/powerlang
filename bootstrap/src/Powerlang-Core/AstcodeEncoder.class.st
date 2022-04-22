@@ -327,8 +327,9 @@ AstcodeEncoder >> visitParseNode: aParseNode [
 AstcodeEncoder >> visitReturn: aReturnNode [
 	self
 		nextTypePut: ReturnId;
-		nextPut: script realScript isMethod;
-		nestedEncode: [aReturnNode expression acceptVisitor: self]
+		nextPut: script realScript isMethod.
+	
+		aReturnNode expression acceptVisitor: self
 ]
 
 { #category : #visiting }
