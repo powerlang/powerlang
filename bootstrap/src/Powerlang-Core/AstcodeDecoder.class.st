@@ -80,17 +80,18 @@ AstcodeDecoder >> decodeAssignment [
 
 { #category : #public }
 AstcodeDecoder >> decodeBlock [
-	| expression next block index |
+	| expression inlined block index |
 	expression := SBlock new.
-	next := stream peek.
-	next != 0
-		ifTrue: [ index := stream next. block := method at: index.
+	inlined := self nextBoolean.
+	inlined
+		ifTrue: [	expression inlinedArgs: self nextArray]
+		ifFalse: [  index := stream next.
+			block := method at: index.
 			expression
 				compiledCode: block;
 				index: index;
-				capturedVariables: stream next ]
-		ifFalse: [ stream next.
-			expression inlinedArgs: stream next ].
+				capturedVariables: self nextArray 
+			 ].
 	expression statements: self decodeStatements.
 	^ expression
 ]
@@ -322,6 +323,19 @@ AstcodeDecoder >> method: aCompiledMethod [
 { #category : #public }
 AstcodeDecoder >> next [
 	^stream next
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextArray [
+	| count |
+	count := stream next. 
+	^stream next: count
+
+]
+
+{ #category : #initialization }
+AstcodeDecoder >> nextBoolean [
+	^ stream next = 1
 ]
 
 { #category : #initialization }

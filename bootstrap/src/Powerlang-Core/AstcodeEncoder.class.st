@@ -219,8 +219,19 @@ AstcodeEncoder >> nestedEncode: aBlock [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> nextBooleanPut: aBoolean [
+	stream nextPut: aBoolean asBit
+
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> nextPut: anInteger [
 	stream nextPut: anInteger
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextPutAll: aCollection [
+	stream nextPut: aCollection size; nextPutAll: aCollection
 ]
 
 { #category : #visiting }
@@ -240,16 +251,18 @@ AstcodeEncoder >> visitAssignment: anAssignmentNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitBlock: aBlockNode [
-	| args |
+	| args inlined |
 	self nextTypePut: BlockId.
-	aBlockNode isInlined
-		ifTrue: [ stream nextPut: 0. args := aBlockNode arguments collect: [:id | id binding index]. 
-			stream nextPut: args asArray ]
+	inlined := aBlockNode isInlined.
+	self nextBooleanPut: inlined.
+	inlined
+		ifTrue: [ args := aBlockNode arguments collect: [ :id | id binding index ].
+			self nextPutAll: args asArray ]
 		ifFalse: [ | index captured |
 			index := self compiledBlockIndexOf: aBlockNode.
 			self nextPut: index.
 			captured := self encodeClosureElements: aBlockNode.
-			stream nextPut: captured ].
+			self nextPutAll: captured ].
 	self visitScript: aBlockNode
 ]
 
