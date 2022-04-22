@@ -98,16 +98,14 @@ AstcodeDecoder >> decodeBlock [
 
 { #category : #public }
 AstcodeDecoder >> decodeCascade [
-	| cascade receiver messages prev message |
+	| cascade receiver messages message count |
 	cascade := SCascade new.
-	receiver := self decodeNode: stream next.
-	prev := stream.
-	messages := stream upToEnd
-		collect: [ :elem | 
-			stream := elem readStream.
+	receiver := self decodeExpression.
+	count := self next.
+	messages := (1 to: count)
+		collect: [ :i |
 			message := SCascadeMessage decodeUsing: self.
 			message cascade: cascade ].
-	stream := prev.
 	^ cascade
 		receiver: receiver;
 		messages: messages
@@ -115,13 +113,13 @@ AstcodeDecoder >> decodeCascade [
 
 { #category : #public }
 AstcodeDecoder >> decodeCascadeMessage [
-	| index selector arguments |
+	| index selector arguments count |
 	index := stream next.
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
-	arguments := stream upToEnd
-		collect: [ :node | self decodeNode: node ].
+	count := self nextInteger.
+	arguments := (1 to: count) collect: [ :node | self decodeExpression ].
 	^ SCascadeMessage new
 		selector: selector;
 		arguments: arguments

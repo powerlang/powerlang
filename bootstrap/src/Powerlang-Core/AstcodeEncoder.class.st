@@ -253,22 +253,26 @@ AstcodeEncoder >> visitBraceNode: aBraceNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitCascade: aCascadeNode [
-	self
-		nextTypePut: CascadeId;
-		nestedEncode: [aCascadeNode receiver acceptVisitor: self].
-	aCascadeNode messages
-		do: [:node | self nestedEncode: [self visitCascadeMessage: node]]
+	| messages |
+	self nextTypePut: CascadeId.
+	aCascadeNode receiver acceptVisitor: self.
+	messages := aCascadeNode messages.
+	self nextPut: messages size.
+	messages do: [ :node | self visitCascadeMessage: node ]
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
-	| symbol selector |
+	| symbol selector arguments |
 	symbol := aCascadeMessageNode selector symbol.
 	selector := method indexOf: symbol.
 	self nextPut: selector.
-	selector = 0 ifTrue: [self nextPut: symbol].
-	aCascadeMessageNode arguments do: [:arg | 
-		self nestedEncode: [arg acceptVisitor: self]]
+	selector = 0
+		ifTrue: [ self nextPut: symbol ].
+	arguments := aCascadeMessageNode arguments.
+	self nextPut: arguments size.
+	arguments
+		do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }
