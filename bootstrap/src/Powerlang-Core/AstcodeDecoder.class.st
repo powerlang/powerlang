@@ -72,8 +72,8 @@ AstcodeDecoder >> decodeAssignment [
 	assignment := SAssignment new.
 	count := self next.
 	assignees := (1 to: count)
-		collect: [ :i | self decodeExpression ].
-	assignment expression: self decodeExpression.
+		collect: [ :i | self nextExpression ].
+	assignment expression: self nextExpression.
 	assignees do: [ :identifier | assignment assign: identifier ].
 	^ assignment
 ]
@@ -99,7 +99,7 @@ AstcodeDecoder >> decodeBlock [
 AstcodeDecoder >> decodeCascade [
 	| cascade receiver messages message count |
 	cascade := SCascade new.
-	receiver := self decodeExpression.
+	receiver := self nextExpression.
 	count := self next.
 	messages := (1 to: count)
 		collect: [ :i |
@@ -118,7 +118,7 @@ AstcodeDecoder >> decodeCascadeMessage [
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
 	count := self nextInteger.
-	arguments := (1 to: count) collect: [ :node | self decodeExpression ].
+	arguments := (1 to: count) collect: [ :node | self nextExpression ].
 	^ SCascadeMessage new
 		selector: selector;
 		arguments: arguments
@@ -157,14 +157,6 @@ AstcodeDecoder >> decodeDynamicVar [
 	index := self nextInteger.
 	name := method at: index.
 	^ SDynamicBinding new name: name
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeExpression [
-	| type |
-	type := self nodeTypeOf: stream next.
-	^type decodeUsing: self.
-
 ]
 
 { #category : #initialization }
@@ -206,7 +198,7 @@ AstcodeDecoder >> decodeMessage [
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
-	receiver := self decodeExpression.
+	receiver := self nextExpression.
 	arguments := self nextExpressionArray.
 	^ SMessage new
 		receiver: receiver;
@@ -234,24 +226,6 @@ AstcodeDecoder >> decodeMethod [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeNode: anArray [
-	| prev type result |
-	prev := stream.
-	stream := anArray readStream.
-	type := self nodeTypeOf: stream next.
-	result := type decodeUsing: self.
-	stream := prev.
-	^result
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeNodes: anArray [
-	anArray ifNil: [^#(  )].
-	^anArray collect: [:arg | self decodeNode: arg  ].
-
-]
-
-{ #category : #public }
 AstcodeDecoder >> decodePoolVar [
 	| index assoc |
 	index := self nextInteger.
@@ -264,15 +238,10 @@ AstcodeDecoder >> decodePoolVar [
 AstcodeDecoder >> decodeReturn [
 	| expression local |
 	local := stream next.
-	expression := self decodeExpression.
+	expression := self nextExpression.
 	^ SReturn new
 		local: local;
 		expression: expression
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeStatement: anArray [
-	^self decodeNode: anArray
 ]
 
 { #category : #public }
@@ -311,10 +280,18 @@ AstcodeDecoder >> nextBoolean [
 ]
 
 { #category : #public }
+AstcodeDecoder >> nextExpression [
+	| type |
+	type := self nodeTypeOf: stream next.
+	^type decodeUsing: self.
+
+]
+
+{ #category : #public }
 AstcodeDecoder >> nextExpressionArray [
 	| count |
 	count := self nextInteger.
-	^(1 to: count) collect: [ :arg | self decodeExpression ]
+	^(1 to: count) collect: [ :arg | self nextExpression ]
 ]
 
 { #category : #initialization }

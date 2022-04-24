@@ -185,18 +185,6 @@ AstcodeEncoder >> method: aCompiledMethod [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> nestedEncode: aBlock [
-	| prev nested |
-	prev := stream.
-	nested := Array streamContents: [:s | 
-		stream := s.
-		aBlock value.
-		stream contents].
-	stream := prev.
-	stream nextPut: nested
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> nextBooleanPut: aBoolean [
 	stream nextPut: aBoolean asBit
 
