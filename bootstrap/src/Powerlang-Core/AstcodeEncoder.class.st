@@ -332,10 +332,12 @@ AstcodeEncoder >> visitReturn: aReturnNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitScript: aScriptNode [
-	| prev |
+	| prev statements |
 	prev := script.
 	script := aScriptNode.
-	aScriptNode statements
-		do: [:node | self nestedEncode: [node acceptVisitor: self]].
+	statements := aScriptNode statements.
+	self nextPut: statements size.
+	statements
+		do: [ :node |node acceptVisitor: self ].
 	script := prev
 ]

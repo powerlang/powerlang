@@ -84,15 +84,14 @@ AstcodeDecoder >> decodeBlock [
 	expression := SBlock new.
 	inlined := self nextBoolean.
 	inlined
-		ifTrue: [	expression inlinedArgs: self nextArray]
-		ifFalse: [  index := stream next.
+		ifTrue: [ expression inlinedArgs: self nextArray ]
+		ifFalse: [ index := stream next.
 			block := method at: index.
 			expression
 				compiledCode: block;
 				index: index;
-				capturedVariables: self nextArray 
-			 ].
-	expression statements: self decodeStatements.
+				capturedVariables: self nextArray ].
+	expression statements: self nextExpressionArray.
 	^ expression
 ]
 
@@ -223,15 +222,13 @@ AstcodeDecoder >> decodeMethod [
 		ifTrue: [ self error: 'method astcode expected' ].
 	node := SMethod new.
 	next := stream peek.
-	(next = PragmaId)
-		ifTrue:
-			[ stream next.
-			pragma := SPragma new
-				name: stream next.
+	next = PragmaId
+		ifTrue: [ stream next.
+			pragma := SPragma new name: stream next.
 			node pragma: pragma ].
-		 node
-			compiledCode: method;
-		statements: self decodeStatements.
+	node
+		compiledCode: method;
+		statements: self nextExpressionArray.
 	^ node
 ]
 
@@ -278,11 +275,6 @@ AstcodeDecoder >> decodeStatement: anArray [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodeStatements [
-	^stream upToEnd collect: [:statement | self decodeStatement: statement]
-]
-
-{ #category : #public }
 AstcodeDecoder >> decodeTemporary [
 	^STemporaryBinding new
 		index: self nextInteger;
@@ -315,6 +307,13 @@ AstcodeDecoder >> nextArray [
 { #category : #initialization }
 AstcodeDecoder >> nextBoolean [
 	^ stream next = 1
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextExpressionArray [
+	| count |
+	count := self nextInteger.
+	^(1 to: count) collect: [ :arg | self decodeExpression ]
 ]
 
 { #category : #initialization }
