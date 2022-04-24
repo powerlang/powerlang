@@ -291,7 +291,7 @@ AstcodeEncoder >> visitLiteral: aLiteralNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitMessage: aMessageNode [
-	| symbol selector |
+	| symbol selector arguments |
 	symbol := aMessageNode selector symbol.
 	selector := method indexOf: symbol.
 	self
@@ -300,10 +300,11 @@ AstcodeEncoder >> visitMessage: aMessageNode [
 		nextPut: selector.
 	selector = 0
 		ifTrue: [ self nextPut: symbol ].
-	self nestedEncode: [ aMessageNode receiver acceptVisitor: self ].
-	self
-		nestedEncode: [ aMessageNode arguments
-				do: [ :arg | self nestedEncode: [ arg acceptVisitor: self ] ] ]
+	aMessageNode receiver acceptVisitor: self.
+	arguments := aMessageNode arguments.
+	self nextPut: arguments size.
+	arguments
+		do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }

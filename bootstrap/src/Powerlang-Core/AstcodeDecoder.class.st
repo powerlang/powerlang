@@ -206,12 +206,13 @@ AstcodeDecoder >> decodeMessage [
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
-	receiver := self decodeNode: stream next.
-	arguments := self decodeNodes: stream next.
+	receiver := self decodeExpression.
+	arguments := self nextExpressionArray.
 	^ SMessage new
 		receiver: receiver;
 		selector: selector;
-		arguments: arguments; inlined: inlined
+		arguments: arguments;
+		inlined: inlined
 ]
 
 { #category : #public }
