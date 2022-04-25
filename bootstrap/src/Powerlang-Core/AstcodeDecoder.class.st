@@ -68,10 +68,10 @@ AstcodeDecoder >> decodeArgument [
 
 { #category : #public }
 AstcodeDecoder >> decodeAssignment [
-	| assignment count assignees |
+	| assignment assignees |
 	assignment := SAssignment new.
-	count := self nextInteger.
-	assignees := (1 to: count) collect: [ :i | self nextExpression ].
+	
+	assignees := self nextExpressionArray.
 	assignment expression: self nextExpression.
 	assignees do: [ :identifier | assignment assign: identifier ].
 	^ assignment
@@ -111,13 +111,9 @@ AstcodeDecoder >> decodeCascade [
 
 { #category : #public }
 AstcodeDecoder >> decodeCascadeMessage [
-	| index selector arguments count |
-	index := self nextInteger.
-	selector := index = 0
-		ifTrue: [ stream next ]
-		ifFalse: [ method at: index ].
-	count := self nextInteger.
-	arguments := (1 to: count) collect: [ :node | self nextExpression ].
+	| selector arguments |
+	selector := self nextSymbol.
+	arguments := self nextExpressionArray.
 	^ SCascadeMessage new
 		selector: selector;
 		arguments: arguments
@@ -190,12 +186,9 @@ AstcodeDecoder >> decodeLiteral [
 
 { #category : #public }
 AstcodeDecoder >> decodeMessage [
-	| inlined index selector receiver arguments |
+	| inlined selector receiver arguments |
 	inlined := self nextBoolean.
-	index := self nextInteger.
-	selector := index = 0
-		ifTrue: [ stream next ]
-		ifFalse: [ method at: index ].
+	selector := self nextSymbol.
 	receiver := self nextExpression.
 	arguments := self nextExpressionArray.
 	^ SMessage new

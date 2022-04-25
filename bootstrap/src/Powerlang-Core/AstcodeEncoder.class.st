@@ -278,16 +278,11 @@ AstcodeEncoder >> visitCascade: aCascadeNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
-	| symbol selector arguments |
-	symbol := aCascadeMessageNode selector symbol.
-	selector := method indexOf: symbol.
-	self nextPut: selector.
-	selector = 0
-		ifTrue: [ self nextPut: symbol ].
+	| arguments |
+	self nextSymbolPut: aCascadeMessageNode selector symbol.
 	arguments := aCascadeMessageNode arguments.
 	self nextPut: arguments size.
-	arguments
-		do: [ :arg | arg acceptVisitor: self ]
+	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }
@@ -309,20 +304,16 @@ AstcodeEncoder >> visitLiteral: aLiteralNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitMessage: aMessageNode [
-	| symbol selector arguments |
-	symbol := aMessageNode selector symbol.
-	selector := method indexOf: symbol.
+	| arguments |
+
 	self
 		nextTypePut: MessageId;
 		nextBooleanPut: aMessageNode isInlined;
-		nextPut: selector.
-	selector = 0
-		ifTrue: [ self nextPut: symbol ].
+		nextSymbolPut: aMessageNode selector symbol.
 	aMessageNode receiver acceptVisitor: self.
 	arguments := aMessageNode arguments.
 	self nextPut: arguments size.
-	arguments
-		do: [ :arg | arg acceptVisitor: self ]
+	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }
