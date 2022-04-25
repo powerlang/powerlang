@@ -61,18 +61,17 @@ AstcodeDecoder >> bindingTypeOf: id [
 
 { #category : #public }
 AstcodeDecoder >> decodeArgument [
-	^SArgumentBinding new
+	^ SArgumentBinding new
 		index: self nextInteger;
-		environment: self nextInteger
+		environment: self nextEnvironment
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeAssignment [
 	| assignment count assignees |
 	assignment := SAssignment new.
-	count := self next.
-	assignees := (1 to: count)
-		collect: [ :i | self nextExpression ].
+	count := self nextInteger.
+	assignees := (1 to: count) collect: [ :i | self nextExpression ].
 	assignment expression: self nextExpression.
 	assignees do: [ :identifier | assignment assign: identifier ].
 	^ assignment
@@ -85,7 +84,7 @@ AstcodeDecoder >> decodeBlock [
 	inlined := self nextBoolean.
 	inlined
 		ifTrue: [ expression inlinedArgs: self nextArray ]
-		ifFalse: [ index := stream next.
+		ifFalse: [ index := self nextInteger.
 			block := method at: index.
 			expression
 				compiledCode: block;
@@ -100,9 +99,9 @@ AstcodeDecoder >> decodeCascade [
 	| cascade receiver messages message count |
 	cascade := SCascade new.
 	receiver := self nextExpression.
-	count := self next.
+	count := self nextInteger.
 	messages := (1 to: count)
-		collect: [ :i |
+		collect: [ :i | 
 			message := SCascadeMessage decodeUsing: self.
 			message cascade: cascade ].
 	^ cascade
@@ -113,7 +112,7 @@ AstcodeDecoder >> decodeCascade [
 { #category : #public }
 AstcodeDecoder >> decodeCascadeMessage [
 	| index selector arguments count |
-	index := stream next.
+	index := self nextInteger.
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
@@ -153,10 +152,7 @@ AstcodeDecoder >> decodeConstantPoolVar [
 
 { #category : #public }
 AstcodeDecoder >> decodeDynamicVar [
-	| index name |
-	index := self nextInteger.
-	name := method at: index.
-	^ SDynamicBinding new name: name
+	^ SDynamicBinding new name: self nextSymbol
 ]
 
 { #category : #initialization }
@@ -185,16 +181,18 @@ AstcodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
 	value := index = 0
-		ifTrue: [ stream next ]
+		ifTrue: [ self  nextInteger ]
 		ifFalse: [ method at: index ].
-	^ SLiteral new index: index; value: value
+	^ SLiteral new
+		index: index;
+		value: value
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeMessage [
 	| inlined index selector receiver arguments |
 	inlined := self nextBoolean.
-	index := stream next.
+	index := self nextInteger.
 	selector := index = 0
 		ifTrue: [ stream next ]
 		ifFalse: [ method at: index ].
@@ -217,7 +215,7 @@ AstcodeDecoder >> decodeMethod [
 	next := stream peek.
 	next = PragmaId
 		ifTrue: [ stream next.
-			pragma := SPragma new name: stream next.
+			pragma := SPragma new name: self nextSymbol.
 			node pragma: pragma ].
 	node
 		compiledCode: method;
@@ -237,7 +235,7 @@ AstcodeDecoder >> decodePoolVar [
 { #category : #public }
 AstcodeDecoder >> decodeReturn [
 	| expression local |
-	local := stream next.
+	local := self nextBoolean.
 	expression := self nextExpression.
 	^ SReturn new
 		local: local;
@@ -246,9 +244,9 @@ AstcodeDecoder >> decodeReturn [
 
 { #category : #public }
 AstcodeDecoder >> decodeTemporary [
-	^STemporaryBinding new
+	^ STemporaryBinding new
 		index: self nextInteger;
-		environment: self nextInteger
+		environment: self nextEnvironment
 ]
 
 { #category : #unclassified }
@@ -262,21 +260,23 @@ AstcodeDecoder >> method: aCompiledMethod [
 ]
 
 { #category : #public }
-AstcodeDecoder >> next [
-	^stream next
-]
-
-{ #category : #public }
 AstcodeDecoder >> nextArray [
 	| count |
-	count := stream next. 
-	^stream next: count
-
+	count := self nextInteger.
+	^ stream next: count
 ]
 
 { #category : #initialization }
 AstcodeDecoder >> nextBoolean [
 	^ stream next = 1
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextEnvironment [
+	| value |
+	value := self nextInteger.
+	^ value != -2
+		ifTrue: [ value ]
 ]
 
 { #category : #public }
@@ -296,7 +296,30 @@ AstcodeDecoder >> nextExpressionArray [
 
 { #category : #initialization }
 AstcodeDecoder >> nextInteger [
-	^stream next
+	| value |
+	value := stream next.
+	value = 16r80
+		ifTrue: [ ^ stream int64 ].
+	^ value <= 127
+		ifTrue: [ value ]
+		ifFalse: [ value - 16r100 ]
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextSymbol [
+	| index |
+	index := self nextInteger.
+	^method at: index.
+
+]
+
+{ #category : #initialization }
+AstcodeDecoder >> nextUnsignedInteger [
+	| value |
+	value := self nextByte.
+	^value < 128
+		ifTrue: [value]
+		ifFalse: [value - 128 + (self nextUnsignedInteger bitShift: 7)]
 ]
 
 { #category : #public }

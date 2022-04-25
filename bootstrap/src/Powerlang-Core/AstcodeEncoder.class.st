@@ -35,10 +35,10 @@ AstcodeEncoder >> compiledBlockIndexOf: aBlockNode [
 AstcodeEncoder >> encodeArgument: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
-	stream
+	self
 		nextPut: ArgumentId;
-		nextPut: anInteger;
-		nextPut: encoded
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
 ]
 
 { #category : #visiting }
@@ -61,11 +61,8 @@ AstcodeEncoder >> encodeClosureElements: aBlockNode [
 
 { #category : #visiting }
 AstcodeEncoder >> encodeDynamicVar: name [
-	| index |
-	index := method indexOf: name asSymbol ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: DynamicVarId;
-		nextPut: index
+	stream nextPut: DynamicVarId.
+	self nextSymbolPut: name
 ]
 
 { #category : #visiting }
@@ -154,10 +151,10 @@ AstcodeEncoder >> encodeSuper [
 AstcodeEncoder >> encodeTemporary: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
-	stream
+	self
 		nextPut: TemporaryId;
-		nextPut: anInteger;
-		nextPut: encoded
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
 ]
 
 { #category : #visiting }
@@ -168,7 +165,9 @@ AstcodeEncoder >> encodeTrue [
 { #category : #visiting }
 AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
 	aLocalEnvironment isStack
-		ifTrue: [ ^ aLocalEnvironment isInlinedArgument ifTrue: [-1] ifFalse: [nil] ].
+		ifTrue: [ ^ aLocalEnvironment isInlinedArgument
+				ifTrue: [ -1 ]
+				ifFalse: [ -2 ] ].
 	aLocalEnvironment isCurrent
 		ifTrue: [ ^ 0 ].
 	^ aLocalEnvironment index
@@ -176,7 +175,7 @@ AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
 
 { #category : #accessing }
 AstcodeEncoder >> initialize [
-	stream := #() writeStream
+	stream := #[] writeStream
 ]
 
 { #category : #accessing }
@@ -185,9 +184,27 @@ AstcodeEncoder >> method: aCompiledMethod [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> nextBigIntegerPut: anInteger [
+	stream
+		nextPut: 16r80;
+		int64: anInteger
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> nextBooleanPut: aBoolean [
 	stream nextPut: aBoolean asBit
 
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextIntegerPut: anInteger [
+	| value |
+	(anInteger > 127 or: [ anInteger < -127 ])
+		ifTrue: [ ^ self nextBigIntegerPut: anInteger ].
+	value := anInteger >= 0
+		ifTrue: [ anInteger ]
+		ifFalse: [ anInteger + 16r100 ].
+	stream nextPut: value
 ]
 
 { #category : #visiting }
@@ -198,6 +215,16 @@ AstcodeEncoder >> nextPut: anInteger [
 { #category : #visiting }
 AstcodeEncoder >> nextPutAll: aCollection [
 	stream nextPut: aCollection size; nextPutAll: aCollection
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextSymbolPut: aSymbol [
+	| index |
+	index := method
+		indexOf: aSymbol asSymbol
+		ifAbsent: [ self ASSERT: false ].
+	stream	nextPut: index
+
 ]
 
 { #category : #visiting }
@@ -273,8 +300,11 @@ AstcodeEncoder >> visitIdentifier: anIdentifierNode [
 AstcodeEncoder >> visitLiteral: aLiteralNode [
 	| index |
 	index := method indexOf: aLiteralNode value.
-	self nextTypePut: LiteralId; nextPut: index.
-	index = 0 ifTrue: [self nextPut: aLiteralNode value]
+	self
+		nextTypePut: LiteralId;
+		nextPut: index.
+	index = 0
+		ifTrue: [ self nextIntegerPut: aLiteralNode value ]
 ]
 
 { #category : #visiting }
@@ -300,7 +330,7 @@ AstcodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
 	pragma := aMethodNode pragma.
-	pragma isUsed ifTrue: [ self nextTypePut: PragmaId; nextPut: pragma name ].
+	pragma isUsed ifTrue: [ self nextTypePut: PragmaId; nextSymbolPut: pragma name ].
 	self visitScript: aMethodNode.
 	^stream contents
 ]
@@ -314,7 +344,7 @@ AstcodeEncoder >> visitParseNode: aParseNode [
 AstcodeEncoder >> visitReturn: aReturnNode [
 	self
 		nextTypePut: ReturnId;
-		nextPut: script realScript isMethod.
+		nextBooleanPut: script realScript isMethod.
 	
 		aReturnNode expression acceptVisitor: self
 ]
