@@ -223,8 +223,7 @@ AstcodeEncoder >> nextSymbolPut: aSymbol [
 	index := method
 		indexOf: aSymbol asSymbol
 		ifAbsent: [ self ASSERT: false ].
-	stream	nextPut: index
-
+	self nextIntegerPut: index
 ]
 
 { #category : #visiting }
@@ -237,8 +236,8 @@ AstcodeEncoder >> visitAssignment: anAssignmentNode [
 	| assignees |
 	self nextTypePut: AssignmentId.
 	assignees := anAssignmentNode assignees.
-	self nextPut: assignees size.
-	assignees do: [ :node | node acceptVisitor: self].
+	self nextIntegerPut: assignees size.
+	assignees do: [ :node | node acceptVisitor: self ].
 	anAssignmentNode expression acceptVisitor: self
 ]
 
@@ -272,7 +271,7 @@ AstcodeEncoder >> visitCascade: aCascadeNode [
 	self nextTypePut: CascadeId.
 	aCascadeNode receiver acceptVisitor: self.
 	messages := aCascadeNode messages.
-	self nextPut: messages size.
+	self nextIntegerPut: messages size.
 	messages do: [ :node | self visitCascadeMessage: node ]
 ]
 
@@ -281,7 +280,7 @@ AstcodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
 	| arguments |
 	self nextSymbolPut: aCascadeMessageNode selector symbol.
 	arguments := aCascadeMessageNode arguments.
-	self nextPut: arguments size.
+	self nextIntegerPut: arguments size.
 	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
@@ -297,7 +296,7 @@ AstcodeEncoder >> visitLiteral: aLiteralNode [
 	index := method indexOf: aLiteralNode value.
 	self
 		nextTypePut: LiteralId;
-		nextPut: index.
+		nextIntegerPut: index.
 	index = 0
 		ifTrue: [ self nextIntegerPut: aLiteralNode value ]
 ]
@@ -305,14 +304,13 @@ AstcodeEncoder >> visitLiteral: aLiteralNode [
 { #category : #visiting }
 AstcodeEncoder >> visitMessage: aMessageNode [
 	| arguments |
-
 	self
 		nextTypePut: MessageId;
 		nextBooleanPut: aMessageNode isInlined;
 		nextSymbolPut: aMessageNode selector symbol.
 	aMessageNode receiver acceptVisitor: self.
 	arguments := aMessageNode arguments.
-	self nextPut: arguments size.
+	self nextIntegerPut: arguments size.
 	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
@@ -346,8 +344,7 @@ AstcodeEncoder >> visitScript: aScriptNode [
 	prev := script.
 	script := aScriptNode.
 	statements := aScriptNode statements.
-	self nextPut: statements size.
-	statements
-		do: [ :node |node acceptVisitor: self ].
+	self nextIntegerPut: statements size.
+	statements do: [ :node | node acceptVisitor: self ].
 	script := prev
 ]

@@ -85,7 +85,7 @@ AstcodeDecoder >> decodeBlock [
 	inlined
 		ifTrue: [ expression inlinedArgs: self nextArray ]
 		ifFalse: [ index := self nextInteger.
-			block := method at: index.
+			block := self literalAt: index.
 			expression
 				compiledCode: block;
 				index: index;
@@ -122,25 +122,28 @@ AstcodeDecoder >> decodeCascadeMessage [
 { #category : #initialization }
 AstcodeDecoder >> decodeClassBinding [
 	| index assoc |
-		index := self nextInteger.
-
-	assoc := method at: index.
-	^ SClassBinding new index: index; association: assoc
+	index := self nextInteger.
+	assoc := self literalAt: index.
+	^ SClassBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeClassVar [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
-	^ SClassVarBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SClassVarBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeConstantPoolVar [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
+	assoc := self literalAt: index.
 	^ SConstantPoolBinding new
 		index: index;
 		association: assoc
@@ -155,8 +158,10 @@ AstcodeDecoder >> decodeDynamicVar [
 AstcodeDecoder >> decodeGlobalBinding [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
-	^ SGlobalBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SGlobalBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
@@ -177,8 +182,8 @@ AstcodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
 	value := index = 0
-		ifTrue: [ self  nextInteger ]
-		ifFalse: [ method at: index ].
+		ifTrue: [ self nextInteger ]
+		ifFalse: [ self literalAt: index ].
 	^ SLiteral new
 		index: index;
 		value: value
@@ -220,9 +225,10 @@ AstcodeDecoder >> decodeMethod [
 AstcodeDecoder >> decodePoolVar [
 	| index assoc |
 	index := self nextInteger.
-
-	assoc := method at: index.
-	^ SPoolVarBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SPoolVarBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
@@ -302,8 +308,7 @@ AstcodeDecoder >> nextInteger [
 AstcodeDecoder >> nextSymbol [
 	| index |
 	index := self nextInteger.
-	^method at: index.
-
+	^ self literalAt: index
 ]
 
 { #category : #initialization }
