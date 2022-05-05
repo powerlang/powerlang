@@ -59,7 +59,7 @@ EvaluationContext >> captureClosure: anSBlock [
 
 { #category : #services }
 EvaluationContext >> classBinding [
-	^ self method classBinding
+	^system methodClassBinding: self method
 ]
 
 { #category : #visiting }

@@ -16,7 +16,7 @@ SmallintObjectMap class >> new: anRGBehavior valued: anInteger [
 SmallintObjectMap >> = anObject [
 	anObject class == self class
 		ifFalse: [ ^ false ].
-	^value == anObject value
+	^ value = anObject value
 ]
 
 { #category : #accessing }

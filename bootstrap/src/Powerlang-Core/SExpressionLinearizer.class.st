@@ -12,7 +12,25 @@ Class {
 		'stackTop',
 		'dropsArguments',
 		'not',
-		'equalsEquals'
+		'equalsEquals',
+		'ifTrue',
+		'ifFalse',
+		'ifTrueIfFalse',
+		'ifFalseIfTrue',
+		'ifNil',
+		'ifNotNil',
+		'ifNilIfNotNil',
+		'ifNotNilIfNil',
+		'whileTrue',
+		'whileFalse',
+		'whileTrue_',
+		'whileFalse_',
+		'toDo',
+		'toByDo',
+		'repeat',
+		'timesRepeat',
+		'andNot',
+		'orNot'
 	],
 	#category : #'Powerlang-Core-Execution'
 }
@@ -375,7 +393,24 @@ SExpressionLinearizer >> runtime: aPowertalkRuntime [
 	plus := runtime symbolFromLocal: #+.
 	greaterThan := runtime symbolFromLocal: #>.
 	equalsEquals := runtime symbolFromLocal: #==.
-	not := runtime symbolFromLocal: #not
+	not := runtime symbolFromLocal: #not.
+	ifTrue := runtime symbolFromLocal: #ifTrue:.
+	ifFalse := runtime symbolFromLocal: #ifFalse:.
+	ifTrueIfFalse := runtime symbolFromLocal: #ifTrue:ifFalse:.
+	ifFalseIfTrue := runtime symbolFromLocal: #ifFalse:ifTrue:.
+	ifNil := runtime symbolFromLocal: #ifNil:.
+	ifNotNil := runtime symbolFromLocal: #ifNotNil:.
+	ifNilIfNotNil := runtime symbolFromLocal: #ifNil:ifNotNil:.
+	ifNotNilIfNil := runtime symbolFromLocal: #ifNotNil:ifNil:.
+	whileTrue := runtime symbolFromLocal: #whileTrue.
+	whileFalse := runtime symbolFromLocal: #whileFalse.
+	whileTrue_ := runtime symbolFromLocal: #whileTrue:.
+	whileFalse_ := runtime symbolFromLocal: #whileFalse:.
+	toDo := runtime symbolFromLocal: #to:do:.
+	toByDo := runtime symbolFromLocal: #to:by:do:.
+	andNot := runtime symbolFromLocal: #andNot:.
+	orNot	:= runtime symbolFromLocal: #orNot:.
+
 ]
 
 { #category : #initialization }
@@ -439,49 +474,50 @@ SExpressionLinearizer >> visitIdentifier: anSIdentifier [
 { #category : #initialization }
 SExpressionLinearizer >> visitInlinedMessage: anSMessage [
 	| selector |
-	selector := runtime symbolFrom: anSMessage selector.
-	selector == #ifTrue:
+	selector := anSMessage selector.
+	selector == ifTrue
 		ifTrue: [ ^ self inline: anSMessage if: true ].
-	selector == #ifFalse:
+	selector == ifFalse
 		ifTrue: [ ^ self inline: anSMessage if: false ].
-	selector == #ifNil:
+	selector == ifNil
 		ifTrue: [ ^ self inline: anSMessage ifNil: true ].
-	selector == #ifNotNil:
+	selector == ifNotNil
 		ifTrue: [ ^ self inline: anSMessage ifNil: false ].
-	selector == #ifNil:ifNotNil:
+	selector == ifNilIfNotNil
 		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: true ].
-	selector == #ifNil:ifNotNil:
+	selector == ifNotNilIfNil
 		ifTrue: [ ^ self inline: anSMessage ifNilIfNotNil: false ].
-	selector == #ifTrue:ifFalse:
+	selector == ifTrueIfFalse
 		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: true ].
-	selector == #ifFalse:ifTrue:
+	selector == ifFalseIfTrue
 		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: false ].
-	selector == #whileTrue
+	selector == whileTrue
 		ifTrue: [ ^ self inline: anSMessage unitaryWhile: true ].
-	selector == #whileFalse
+	selector == whileFalse
 		ifTrue: [ ^ self inline: anSMessage unitaryWhile: false ].
-	selector == #whileTrue:
+	selector == whileTrue_
 		ifTrue: [ ^ self inline: anSMessage binaryWhile: true ].
-	selector == #whileFalse:
+	selector == whileFalse_
 		ifTrue: [ ^ self inline: anSMessage binaryWhile: false ].
-	selector == #repeat
+	selector == repeat
 		ifTrue: [ ^ self inlineRepeat: anSMessage ].
-	selector == #to:do:
+	selector == toDo
 		ifTrue: [ ^ self inlineToDo: anSMessage ].
-	selector == #to:by:do:
+	selector == toByDo
 		ifTrue: [ ^ self inlineToByDo: anSMessage ].
-	selector == #timesRepeat:
-		ifTrue: [ ^ self inlineTimesRepeat: anSMessage].
+	selector == timesRepeat
+		ifTrue: [ ^ self inlineTimesRepeat: anSMessage ].
+	selector == andNot
+		ifTrue: [ ^ self inlineAndNot: anSMessage ].
+	selector == orNot
+		ifTrue: [ ^ self inlineOrNot: anSMessage ].
+	selector := runtime localSymbolFrom: selector.
 	(selector beginsWith: #or:)
 		ifTrue: [ ^ self inlineOr: anSMessage ].
 	(selector beginsWith: #and:)
 		ifTrue: [ ^ self inlineAnd: anSMessage ].
-	selector == #andNot:
-		ifTrue: [ ^ self inlineAndNot: anSMessage ].
-	selector == #orNot:
-		ifTrue: [ ^ self inlineOrNot: anSMessage ].
-	self ASSERT: false
 
+	self ASSERT: false
 ]
 
 { #category : #initialization }
@@ -511,15 +547,15 @@ SExpressionLinearizer >> visitMessage: anSMessage [
 
 { #category : #initialization }
 SExpressionLinearizer >> visitMethod: anSMethod [
-	| primitive statements |
+	| primitive statements symbol |
 	self reset.
 	primitive := anSMethod pragma.
 	primitive
-		ifNotNil: [ primitive := primitives at: anSMethod primitive.
+		ifNotNil: [symbol := runtime symbolFrom: anSMethod primitive. primitive := primitives at: symbol.
 			^ self
 				primitive: primitive;
 				return ].
-	stackTop := anSMethod compiledCode tempCount.
+	stackTop := runtime methodTempCount: anSMethod compiledCode.
 	statements := anSMethod statements.
 	statements do: [ :node | node acceptVisitor: self ].
 	(statements isEmpty orNot: [ statements last isReturn ])

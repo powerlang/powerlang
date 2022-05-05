@@ -33,6 +33,16 @@ PowertalkRingRuntime >> behaviorOf: anObjectMap [
 	^ anObjectMap spec
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> blockArgumentCount: block [
+	^ block argumentCount
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockTempCount: block [
+	^ block tempCount
+]
+
 { #category : #accessing }
 PowertalkRingRuntime >> compile: anRGMethod [
 	| class |
@@ -59,13 +69,8 @@ PowertalkRingRuntime >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> homeFrameOf: aClosureMap [
+PowertalkRingRuntime >> homeEnvironmentOf: aClosureMap [
 	^ aClosureMap slotAt: 2
-]
-
-{ #category : #services }
-PowertalkRingRuntime >> homeFrameOf: aClosureMap put: anObject [
-	^ aClosureMap slotAt: 2 put: anObject
 ]
 
 { #category : #accessing }
@@ -137,6 +142,11 @@ PowertalkRingRuntime >> initializeEmulationOverrides [
 		override: #'HashTable class' -> #primeFor: with: 'PrimeFor'
 ]
 
+{ #category : #accessing }
+PowertalkRingRuntime >> isBlock: anSCompiledMethod [
+	^anSCompiledMethod isBlock
+]
+
 { #category : #services }
 PowertalkRingRuntime >> isClosure: anObjectMap [
 	^anObjectMap class = ClosureMap
@@ -164,6 +174,21 @@ PowertalkRingRuntime >> lookupAssociationFor: aSymbol in: dictionary [
 				ifPresent: [ :assoc | assoc]
 ]
 
+{ #category : #accessing }
+PowertalkRingRuntime >> method: anSCompiledMethod literalAt: index [
+	^anSCompiledMethod at: index
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> methodArgumentCount: method [
+	^ method argumentCount
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> methodClassBinding: method [
+	^ method classBinding
+]
+
 { #category : #services }
 PowertalkRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
@@ -175,9 +200,29 @@ PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
 	^anRGBehavior methodNamed: aSymbol
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod [
+	^ anSCompiledMethod optimizedCode
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod put: anObject [
+	anSCompiledMethod optimizedCode: anObject
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> methodTempCount: method [
+	^ method tempCount
+]
+
 { #category : #accessing }
 PowertalkRingRuntime >> moduleNamespace: anObjectMap [ 
 	^ anObjectMap namespace
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> newArraySized: anInteger [
+	^ image newArraySized: anInteger
 ]
 
 { #category : #accessing }
@@ -193,6 +238,11 @@ PowertalkRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 { #category : #accessing }
 PowertalkRingRuntime >> newClosure: anInteger [
 	^ image newClosure: anInteger
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> newCompiledMethod [
+	^ SCompiledMethod new
 ]
 
 { #category : #accessing }
@@ -213,6 +263,11 @@ PowertalkRingRuntime >> newOf: aSpeciesMap sized: size [
 { #category : #accessing }
 PowertalkRingRuntime >> newSlotsOf: aSpeciesMap [
 	^image newSlotsOf: aSpeciesMap spec instanceSide sized: 0
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> newSymbol: aSymbol [
+	^ image newSymbol: aSymbol
 ]
 
 { #category : #accessing }
@@ -276,6 +331,11 @@ PowertalkRingRuntime >> speciesFor: anObjectMap [
 { #category : #accessing }
 PowertalkRingRuntime >> speciesModule: aSpeciesMap [
 	^ aSpeciesMap module
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> speciesSuperclass: aSpeciesMap [
+	^ aSpeciesMap superclass
 ]
 
 { #category : #accessing }

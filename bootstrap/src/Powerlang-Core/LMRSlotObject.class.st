@@ -8,6 +8,16 @@ Class {
 }
 
 { #category : #accessing }
+LMRSlotObject >> at: index [
+	^ slots at: index
+]
+
+{ #category : #accessing }
+LMRSlotObject >> at: index put: anLMRObject [
+	^ slots at: index put: anLMRObject
+]
+
+{ #category : #accessing }
 LMRSlotObject >> basicAt: index put: anLMRObject [
 	^ slots at: index put: anLMRObject
 ]
@@ -31,4 +41,9 @@ LMRSlotObject >> slotAt: index [
 { #category : #accessing }
 LMRSlotObject >> slotAt: index put: anLMRObject [
 	^ slots at: index put: anLMRObject
+]
+
+{ #category : #accessing }
+LMRSlotObject >> slots [
+	^ slots
 ]

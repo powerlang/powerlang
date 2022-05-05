@@ -41,7 +41,8 @@ RingBasedLMRBootstrapper >> convert [
 		fixBehaviors;
 		convertBootstrapDictionaries;
 		convertClosure;
-		initializeSymbolTable.
+		initializeSymbolTable;
+		initializeRuntime.
 	^ dest
 ]
 
@@ -98,16 +99,18 @@ RingBasedLMRBootstrapper >> fixBehaviors [
 		initializeBehavior: nilObj spec: source => #UndefinedObject;
 		initializeBehavior: trueObj spec: source => #True;
 		initializeBehavior: falseObj spec: source => #False.
-		
 	metaspec := source => #Metaclass.
 	behaviorspec := source => #Behavior.
-	source classes values with: source metaclasses values do: [ :class :metaclass |
+	source classes values
+		with: source metaclasses values
+		do: [ :class :metaclass | 
 			mclass := mapping at: class.
 			mmetaclass := mapping at: metaclass.
 			self
-				initializeBehavior: mclass spec: metaclass spec;
-				initializeBehavior: mmetaclass spec: metaspec]
-.	behaviors do: [:behavior | self				initializeBehavior: behavior spec: behaviorspec ]
+				initializeBehavior: mclass spec: metaclass instanceSpec;
+				initializeBehavior: mmetaclass spec: metaspec ].
+	behaviors
+		do: [ :behavior | self initializeBehavior: behavior spec: behaviorspec ]
 ]
 
 { #category : #initialization }
@@ -127,19 +130,49 @@ RingBasedLMRBootstrapper >> headerFor: aRingObject [
 RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	| index |
 	source := aPowertalkRingImage.
-	index := (source => #Class) allInstVarNames
-		indexOf: 'instanceBehavior'.
-	dest classInstanceBehaviorIndex: index.
 	index := (source => #Class) allInstVarNames indexOf: 'name'.
 	dest classNameIndex: index.
+	index := (source => #Class) allInstVarNames indexOf: 'module'.
+	dest classModuleIndex: index.	
+	index := (source => #Metaclass) allInstVarNames indexOf: 'class'.
+	dest metaclassInstanceClassIndex: index.
+	index := (source => #Species) allInstVarNames
+		indexOf: 'instanceVariables'.
+	dest speciesIvarsIndex: index.
+	index := (source => #Species) allInstVarNames indexOf: 'superclass'.
+	dest speciesSuperclassIndex: index.
+	index := (source => #Species) allInstVarNames
+		indexOf: 'instanceBehavior'.
+	dest speciesInstanceBehaviorIndex: index.
+	index := (source => #Class) allInstVarNames indexOf: 'classVariables'.
+	dest classClassVariablesIndex: index.
+	index := (source => #Species) allInstVarNames indexOf: 'format'.
+	dest speciesFormatIndex: index.
+	index := (source => #Module) allInstVarNames indexOf: 'namespace'.
+	dest moduleNamespaceIndex: index.
 	index := (source => #Behavior) allInstVarNames indexOf: 'methods'.
 	dest behaviorMethodDictionaryIndex: index.
 	index := (source => #Behavior) allInstVarNames indexOf: 'next'.
 	dest behaviorNextIndex: index.
 	index := (source => #Behavior) allInstVarNames indexOf: 'class'.
 	dest behaviorClassIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames indexOf: 'flags'.
-	dest methodFlagsIndex: index
+	index := (source => #MethodDictionary) allInstVarNames
+		indexOf: 'table'.
+	dest dictionaryTableIndex: index.
+	index := (source => #CompiledMethod) allInstVarNames
+		indexOf: 'format'.
+	dest methodFlagsIndex: index.
+	index := (source => #CompiledMethod) allInstVarNames
+		indexOf: 'astcodes'.
+	dest methodAstcodesIndex: index.
+	index := (source => #CompiledMethod) allInstVarNames
+		indexOf: 'classBinding'.
+	dest methodClassBindingIndex: index.
+	index := (source => #CompiledMethod) allInstVarNames
+		indexOf: 'optimizedCode'.
+	dest
+		methodOptimizedCodeIndex: index;
+		methodInstSize: (source => #CompiledMethod) allInstVarNames size
 ]
 
 { #category : #initialization }
@@ -158,25 +191,51 @@ RingBasedLMRBootstrapper >> initializeBehavior: anLMRHeapObject spec: anRGBehavi
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> initializeRuntime [
+	| map symbols array method smi block metaclass |
+	symbols := Dictionary new.
+	#(+ - < > <= >= = == not)
+		do: [ :symbol | 
+			map := source newSymbol: symbol.
+			symbols at: symbol put: (mapping at: map) ].
+	array := mapping at: (source classNamed: #Array).
+	method := mapping at: (source classNamed: #CompiledMethod).
+	block := mapping at: (source classNamed: #CompiledBlock).
+	smi := mapping at: (source classNamed: #SmallInteger).
+	metaclass := mapping at: (source classNamed: #Metaclass).
+	dest
+		arrayClass: array;
+		methodClass: method;
+		blockClass: block;
+		smallIntegerClass: smi;
+		metaclassClass: metaclass;
+		knownSymbols: symbols;
+		wordSize: source wordSize;
+		initializeInterpreter
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> initializeSymbolTable [
-	| symbol table mapped |
+	| symbol namespace cvars table mapped |
 	symbol := source classNamed: #Symbol.
-	table := symbol classVariables at: #SymbolTable.
+	namespace := symbol classVariables.
+	cvars := namespace at: 1.
+	table := cvars at: #SymbolTable.
 	mapped := mapping at: table.
 	dest symbolTable: mapped
 ]
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> instantiateMetaobjects [
-	| ibehavior mclass mbehavior |
+	| ibehavior mspecies mbehavior |
 	source classes , source metaclasses
-		do: [ :class | 
-			ibehavior := class instanceBehavior.
-			mclass := self newMapping: class.
+		do: [ :species | 
+			ibehavior := species instanceBehavior.
+			mspecies := self newMapping: species.
 			mbehavior := self newBehaviorMapping: ibehavior.
-			behaviors at: class instanceSpec put: mbehavior.
+			behaviors at: species instanceSpec put: mbehavior.
 			mapping
-				at: class put: mclass;
+				at: species put: mspecies;
 				at: ibehavior put: mbehavior ]
 ]
 

@@ -13,6 +13,11 @@ LMRByteObject >> asLocalString [
 ]
 
 { #category : #accessing }
+LMRByteObject >> bytes [
+	^bytes
+]
+
+{ #category : #accessing }
 LMRByteObject >> bytes: aByteArray [
 	self ASSERT: aByteArray size = header size.
 	bytes := aByteArray

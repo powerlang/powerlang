@@ -15,7 +15,9 @@ Class {
 
 { #category : #initialization }
 StackedEvaluationContext >> argumentAt: anInteger [
-	^stack at: regBP + 1 + (regM argumentCount - anInteger + 1)
+	| args |
+	args := self isBlock ifTrue: [ system blockArgumentCount: regM ] ifFalse: [ system methodArgumentCount: regM ].
+	^stack at: regBP + 1 + (args - anInteger + 1)
 ]
 
 { #category : #initialization }
@@ -46,14 +48,21 @@ StackedEvaluationContext >> backtrace [
 ]
 
 { #category : #initialization }
-StackedEvaluationContext >> buildFrameFor: receiver code: code environment: environment [
+StackedEvaluationContext >> buildClosureFrameFor: receiver code: code environment: environment [
+	| temps |
+	temps := system blockTempCount: code.
+	self buildFrameFor: receiver code: code environment: environment temps: temps
+]
 
+{ #category : #initialization }
+StackedEvaluationContext >> buildFrameFor: receiver code: code environment: environment temps: temps [
 	regS := receiver.
 	regM := code.
 	self
 		push: pc;
 		push: regBP.
 	regBP := regSP.
+	regBP < 100 ifTrue: [ self error: 'stack overflow' ].
 	self
 		push: receiver;
 		push: code;
@@ -61,7 +70,18 @@ StackedEvaluationContext >> buildFrameFor: receiver code: code environment: envi
 		push: environment.
 	regE := environment.
 	pc := 0.
-	code tempCount timesRepeat: [ self push: self nil ]
+	temps timesRepeat: [ self push: self nil ]
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment: environment [
+	| temps |
+	temps := system methodTempCount: code.
+	self
+		buildFrameFor: receiver
+		code: code
+		environment: environment
+		temps: temps
 ]
 
 { #category : #initialization }
@@ -147,7 +167,7 @@ StackedEvaluationContext >> initialize [
 
 { #category : #initialization }
 StackedEvaluationContext >> isBlock [
-	^ regM isBlock
+	^ system isBlock: regM
 ]
 
 { #category : #initialization }
@@ -257,6 +277,11 @@ StackedEvaluationContext >> regPC [
 { #category : #accessing }
 StackedEvaluationContext >> regPC: anInteger [ 
 	pc := anInteger
+]
+
+{ #category : #services }
+StackedEvaluationContext >> reserveStackSlots: anInteger [
+	regSP := regSP - anInteger
 ]
 
 { #category : #initialization }

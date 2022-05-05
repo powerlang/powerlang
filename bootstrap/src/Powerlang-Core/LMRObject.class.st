@@ -21,3 +21,8 @@ LMRObject >> at: index put: value [
 	
 	self subclassResponsibility  
 ]
+
+{ #category : #accessing }
+LMRObject >> isImmediate [
+	^false
+]
