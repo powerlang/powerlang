@@ -88,6 +88,11 @@ PowertalkRuntime >> literalFor: anObject [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> localSymbolFrom: anObject [
+	^ anObject bytes asString asSymbol
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
 ]

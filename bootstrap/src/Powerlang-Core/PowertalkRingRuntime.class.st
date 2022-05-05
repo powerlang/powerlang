@@ -8,7 +8,6 @@ Class {
 	#name : #PowertalkRingRuntime,
 	#superclass : #PowertalkRuntime,
 	#instVars : [
-		'namespace',
 		'image',
 		'sexpressionsCache',
 		'overrides'
@@ -154,6 +153,18 @@ PowertalkRingRuntime >> loadAssociationValue: association [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> localSymbolFrom: anObjectMap [
+	^ anObjectMap symbol
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> lookupAssociationFor: aSymbol in: dictionary [
+^dictionary
+				associationAt: aSymbol
+				ifPresent: [ :assoc | assoc]
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> methodEnvironmentSize: anSCompiledMethod [
 	^anSCompiledMethod environmentCount
 ]
@@ -165,8 +176,8 @@ PowertalkRingRuntime >> methodFor: aSymbol in: anRGBehavior [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> namespace [
-	^ namespace
+PowertalkRingRuntime >> moduleNamespace: anObjectMap [ 
+	^ anObjectMap namespace
 ]
 
 { #category : #accessing }
@@ -253,8 +264,23 @@ PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
 ]
 
 { #category : #accessing }
+PowertalkRingRuntime >> speciesClassVariables: aSpeciesMap [
+	^ aSpeciesMap classVariables
+]
+
+{ #category : #accessing }
 PowertalkRingRuntime >> speciesFor: anObjectMap [
 	^ image speciesFor: anObjectMap spec
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> speciesModule: aSpeciesMap [
+	^ aSpeciesMap module
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> staticBindingForIvar: aSymbol in: receiver [
+	^receiver allSlotNames indexOf: aSymbol.
 ]
 
 { #category : #accessing }

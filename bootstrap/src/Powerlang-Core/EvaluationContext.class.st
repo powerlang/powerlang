@@ -153,42 +153,36 @@ EvaluationContext >> staticBindingFor: aSymbol [
 
 { #category : #accessing }
 EvaluationContext >> staticBindingForCvar: aSymbol [
-	| species cvars class |
+	| species cvars namespace nilObj |
 	species := system speciesFor: self receiver.
-	[ cvars := species classVariables.
-	cvars isNil
-		ifFalse: [ cvars
-				associationAt: aSymbol
-				ifPresent: [ :assoc | ^ SAssociationBinding new association: assoc ].
-			species localPools
-				do: [ :pool | 
-					pool
-						associationAt: aSymbol
-						ifPresent: [ :assoc | 
-							class := pool isConstant
-								ifTrue: [ SConstantPoolBinding ]
-								ifFalse: [ SAssociationBinding ].
-							^ class new association: assoc ] ] ].
-	species := species superclass.
-	species isNil ] whileFalse.
+	nilObj := system nil.
+	[ cvars := system speciesClassVariables: species.
+	cvars = nilObj
+		ifFalse: [ 1 to: cvars size do: [ :i | 
+				namespace := cvars at: i.
+				(system lookupAssociationFor: aSymbol in: namespace)
+					ifNotNil: [ :assoc | ^ SAssociationBinding new association: assoc ] ] ].
+	species := system speciesSuperclass: species.
+	species = nilObj ] whileFalse.
 	^ nil
 ]
 
 { #category : #accessing }
 EvaluationContext >> staticBindingForIvar: aSymbol [
 	| ivar |
-	ivar := self receiver allSlotNames indexOf: aSymbol.
+	ivar := system staticBindingForIvar: aSymbol in: self receiver.
 	^ ivar > 0
 		ifTrue: [ SInstVarBinding new index: ivar ]
 ]
 
 { #category : #accessing }
 EvaluationContext >> staticBindingForMvar: aSymbol [
-	| assoc class |
-	class := system speciesFor: self receiver.
-	assoc := class module namespace
-		associationAt: aSymbol
-		ifAbsent: [ self error: 'unbound variable: ' , aSymbol asString].
+	| species module namespace assoc |
+	species := system speciesFor: self receiver.
+	module := system speciesModule: species.
+	namespace := system moduleNamespace: module.
+	assoc := system lookupAssociationFor: aSymbol in: namespace.
+	assoc ifNil: [ self error: 'unbound variable: ' , aSymbol asString ].
 	^ SAssociationBinding new association: assoc
 ]
 
