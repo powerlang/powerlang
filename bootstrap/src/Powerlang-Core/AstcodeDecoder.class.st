@@ -59,6 +59,11 @@ AstcodeDecoder >> bindingTypeOf: id [
 	^ BindingTypes at: id
 ]
 
+{ #category : #accessing }
+AstcodeDecoder >> builder: aRuntime [ 
+	builder := aRuntime
+]
+
 { #category : #public }
 AstcodeDecoder >> decodeArgument [
 	^ SArgumentBinding new
@@ -182,7 +187,7 @@ AstcodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
 	value := index = 0
-		ifTrue: [ self nextInteger ]
+		ifTrue: [ self nextLiteralInteger ]
 		ifFalse: [ self literalAt: index ].
 	^ SLiteral new
 		index: index;
@@ -213,7 +218,7 @@ AstcodeDecoder >> decodeMethod [
 	next := stream peek.
 	next = PragmaId
 		ifTrue: [ stream next.
-			pragma := SPragma new name: self nextSymbol.
+			pragma := SPragma new name: self nextSymbolOrNil.
 			node pragma: pragma ].
 	node
 		compiledCode: method;
@@ -250,12 +255,12 @@ AstcodeDecoder >> decodeTemporary [
 
 { #category : #unclassified }
 AstcodeDecoder >> literalAt: anInteger [
-	^method at: anInteger
+	^ builder ifNil: [method at: anInteger] ifNotNil: [builder method: method literalAt: anInteger]
 ]
 
 { #category : #accessing }
-AstcodeDecoder >> method: aCompiledMethod [
-	method := aCompiledMethod
+AstcodeDecoder >> method: aMethod [
+	method := aMethod
 ]
 
 { #category : #public }
@@ -304,11 +309,27 @@ AstcodeDecoder >> nextInteger [
 		ifFalse: [ value - 16r100 ]
 ]
 
+{ #category : #unclassified }
+AstcodeDecoder >> nextLiteralInteger [
+	| value |
+	value := self nextInteger.
+	^ builder
+		ifNil: [ value ]
+		ifNotNil: [ builder newInteger: value ]
+]
+
 { #category : #public }
 AstcodeDecoder >> nextSymbol [
 	| index |
 	index := self nextInteger.
 	^ self literalAt: index
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextSymbolOrNil [
+	| index |
+	index := self nextInteger.
+	^index != 0 ifTrue: [ self literalAt: index]
 ]
 
 { #category : #initialization }

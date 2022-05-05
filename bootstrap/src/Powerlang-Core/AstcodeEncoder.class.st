@@ -319,9 +319,13 @@ AstcodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
 	pragma := aMethodNode pragma.
-	pragma isUsed ifTrue: [ self nextTypePut: PragmaId; nextSymbolPut: pragma name ].
+	pragma isUsed
+		ifTrue: [ self nextTypePut: PragmaId.
+			pragma name
+				ifNotNil: [ self nextSymbolPut: pragma name ]
+				ifNil: [ self nextPut: 0 ] ].
 	self visitScript: aMethodNode.
-	^stream contents
+	^ stream contents 
 ]
 
 { #category : #visiting }
