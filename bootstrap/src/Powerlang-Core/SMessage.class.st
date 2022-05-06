@@ -5,8 +5,8 @@ Class {
 		'selector',
 		'receiver',
 		'arguments',
-		'opcodes',
-		'cache'
+		'cache',
+		'inlined'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -68,22 +68,23 @@ SMessage >> cachedUndermessage [
 { #category : #printing }
 SMessage >> initialize [
 	super initialize.
-	arguments := #()
+	arguments := #().
+	inlined := false
+]
+
+{ #category : #private }
+SMessage >> inlined: aBoolean [
+	inlined := aBoolean
 ]
 
 { #category : #printing }
 SMessage >> isInlined [
-	^opcodes = #inlined
+	^ inlined
 ]
 
 { #category : #printing }
 SMessage >> isMessage [
 	^true
-]
-
-{ #category : #printing }
-SMessage >> isOptimized [
-	^opcodes notNil
 ]
 
 { #category : #printing }
@@ -95,16 +96,6 @@ SMessage >> methodFor: requiredType [
 		type == requiredType
 			ifTrue: [ ^ cache at: i + 1 ] ].
 	^ nil
-]
-
-{ #category : #private }
-SMessage >> opcodes [
-	^opcodes
-]
-
-{ #category : #private }
-SMessage >> opcodes: aCollection [
-	opcodes := aCollection
 ]
 
 { #category : #printing }

@@ -163,13 +163,15 @@ PowertalkRingImage >> classes [
 
 { #category : #accessing }
 PowertalkRingImage >> createBootstrapCVars: spec [
-	| names cvars |
+	| names cvars array |
 	names := spec classVariables.
 	names isEmpty
 		ifTrue: [ ^ nilObj ].
 	cvars := self newBootstrapDictionaryOf: self => #Dictionary.
 	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
-	^ cvars
+	array := self newArraySized: 1.
+	array at: 1 put: cvars.
+	^ array
 ]
 
 { #category : #accessing }
@@ -271,8 +273,10 @@ PowertalkRingImage >> fillSpecies: species with: classDefinition [
 
 { #category : #initialization }
 PowertalkRingImage >> fillSymbols [
-	| table |
-	table := (self classNamed: #Symbol) classVariables at: 'SymbolTable'.
+	| table namespace cvars |
+	namespace := (self classNamed: #Symbol) classVariables.
+	cvars := namespace at: 1.
+	table := cvars at: 'SymbolTable'.
 	symbols
 		do: [ :sym | runtime sendLocal: #add: to: table with: {sym} ]
 ]

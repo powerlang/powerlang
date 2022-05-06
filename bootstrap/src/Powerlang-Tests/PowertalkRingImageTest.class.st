@@ -65,3 +65,11 @@ PowertalkRingImageTest >> test040superclasses [
 		assert: collection superclass equals: object;
 		assert: metaproto superclass equals: class
 ]
+
+{ #category : #tests }
+PowertalkRingImageTest >> test050metaclasses [
+	| proto metaproto |
+	proto := image classNamed: #ProtoObject.
+	metaproto := image metaclassFor: (image => #ProtoObject) metaclass.
+	self assert: metaproto instanceSide equals: proto
+]

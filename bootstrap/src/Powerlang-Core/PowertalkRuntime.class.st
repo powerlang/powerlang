@@ -57,9 +57,13 @@ PowertalkRuntime >> initialize [
 
 { #category : #initialization }
 PowertalkRuntime >> initializeInterpreter [
+	"interpreter := PowertalkRecursiveInterpreter new runtime: self"
+
 	"interpreter := PowertalkIterativeTreeInterpreter new runtime: self"
-	"interpreter := PowertalkIterativeLinearInterpreter new runtime: self"
-	interpreter := PowertalkRecursiveInterpreter new runtime: self
+
+	"interpreter := PowertalkLinkedLinearInterpreter new runtime: self"
+
+	interpreter := PowertalkIterativeStackedInterpreter new runtime: self
 ]
 
 { #category : #accessing }
@@ -88,8 +92,18 @@ PowertalkRuntime >> literalFor: anObject [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> localSymbolFrom: anObject [
+	^ anObject bytes asString asSymbol
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> lookup: aSymbol startingAt: aBehavior [
 	^methodCache at: aSymbol -> aBehavior ifAbsentPut: [ self doLookup: aSymbol startingAt: aBehavior ]
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> methodClassBinding: method [
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }
@@ -157,8 +171,8 @@ PowertalkRuntime >> sendLocal: aSymbol to: receiver with: anArray [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> sexpressionsOf: anSCompiledMethod [
-self subclassResponsibility
+PowertalkRuntime >> sexpressionsOf: aMethod [
+	^self subclassResponsibility
 ]
 
 { #category : #accessing }

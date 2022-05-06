@@ -35,10 +35,10 @@ AstcodeEncoder >> compiledBlockIndexOf: aBlockNode [
 AstcodeEncoder >> encodeArgument: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
-	stream
+	self
 		nextPut: ArgumentId;
-		nextPut: anInteger;
-		nextPut: encoded
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
 ]
 
 { #category : #visiting }
@@ -61,21 +61,13 @@ AstcodeEncoder >> encodeClosureElements: aBlockNode [
 
 { #category : #visiting }
 AstcodeEncoder >> encodeDynamicVar: name [
-	| index |
-	index := method indexOf: name asSymbol ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: DynamicVarId;
-		nextPut: index
+	stream nextPut: DynamicVarId.
+	self nextSymbolPut: name
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> encodeFalse [
 	stream nextPut: FalseId
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeInlinedMessage: aMessageNode [
-	self nextTypePut: 0
 ]
 
 { #category : #visiting }
@@ -136,23 +128,6 @@ AstcodeEncoder >> encodeNil [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> encodeOptimizedBinary: aMessageNode [
-	| optimizer |
-	optimizer := BinaryMessageOptimizer on: aMessageNode using: self.
-	self nestedEncode: [optimizer emitOpcodes]
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeOptimizedMessage: aMessageNode [
-	| selector |
-	selector := aMessageNode selector.
-	aMessageNode isInlined ifTrue: [^self encodeInlinedMessage: aMessageNode].
-	(BinaryMessageOptimizer optimizesMessage: selector value) ifFalse: [^self].
-	aMessageNode arguments size = 1
-		ifTrue: [^self encodeOptimizedBinary: aMessageNode]
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> encodePopR [
 	stream nextPut: PopRid 
 ]
@@ -176,10 +151,10 @@ AstcodeEncoder >> encodeSuper [
 AstcodeEncoder >> encodeTemporary: anInteger env: environment [
 	| encoded |
 	encoded := self encodedEnvironment: environment.
-	stream
+	self
 		nextPut: TemporaryId;
-		nextPut: anInteger;
-		nextPut: encoded
+		nextIntegerPut: anInteger;
+		nextIntegerPut: encoded
 ]
 
 { #category : #visiting }
@@ -190,7 +165,9 @@ AstcodeEncoder >> encodeTrue [
 { #category : #visiting }
 AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
 	aLocalEnvironment isStack
-		ifTrue: [ ^ aLocalEnvironment isInlinedArgument ifTrue: [-1] ifFalse: [nil] ].
+		ifTrue: [ ^ aLocalEnvironment isInlinedArgument
+				ifTrue: [ -1 ]
+				ifFalse: [ -2 ] ].
 	aLocalEnvironment isCurrent
 		ifTrue: [ ^ 0 ].
 	^ aLocalEnvironment index
@@ -198,7 +175,7 @@ AstcodeEncoder >> encodedEnvironment: aLocalEnvironment [
 
 { #category : #accessing }
 AstcodeEncoder >> initialize [
-	stream := #() writeStream
+	stream := #[] writeStream
 ]
 
 { #category : #accessing }
@@ -207,15 +184,27 @@ AstcodeEncoder >> method: aCompiledMethod [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> nestedEncode: aBlock [
-	| prev nested |
-	prev := stream.
-	nested := Array streamContents: [:s | 
-		stream := s.
-		aBlock value.
-		stream contents].
-	stream := prev.
-	stream nextPut: nested
+AstcodeEncoder >> nextBigIntegerPut: anInteger [
+	stream
+		nextPut: 16r80;
+		int64: anInteger
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextBooleanPut: aBoolean [
+	stream nextPut: aBoolean asBit
+
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextIntegerPut: anInteger [
+	| value |
+	(anInteger > 127 or: [ anInteger < -127 ])
+		ifTrue: [ ^ self nextBigIntegerPut: anInteger ].
+	value := anInteger >= 0
+		ifTrue: [ anInteger ]
+		ifFalse: [ anInteger + 16r100 ].
+	stream nextPut: value
 ]
 
 { #category : #visiting }
@@ -224,30 +213,48 @@ AstcodeEncoder >> nextPut: anInteger [
 ]
 
 { #category : #visiting }
+AstcodeEncoder >> nextPutAll: aCollection [
+	stream nextPut: aCollection size; nextPutAll: aCollection
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextSymbolPut: aSymbol [
+	| index |
+	index := method
+		indexOf: aSymbol asSymbol
+		ifAbsent: [ self ASSERT: false ].
+	self nextIntegerPut: index
+]
+
+{ #category : #visiting }
 AstcodeEncoder >> nextTypePut: anInteger [
 	stream nextPut: anInteger
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> visitAssignment: anAssignmentNode [ 
+AstcodeEncoder >> visitAssignment: anAssignmentNode [
+	| assignees |
 	self nextTypePut: AssignmentId.
-	anAssignmentNode assignees
-		do: [:node | self nestedEncode: [node acceptVisitor: self]].
-	self nestedEncode: [anAssignmentNode expression acceptVisitor: self]
+	assignees := anAssignmentNode assignees.
+	self nextIntegerPut: assignees size.
+	assignees do: [ :node | node acceptVisitor: self ].
+	anAssignmentNode expression acceptVisitor: self
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitBlock: aBlockNode [
-	| args |
+	| args inlined |
 	self nextTypePut: BlockId.
-	aBlockNode isInlined
-		ifTrue: [ stream nextPut: 0. args := aBlockNode arguments collect: [:id | id binding index]. 
-			stream nextPut: args asArray ]
+	inlined := aBlockNode isInlined.
+	self nextBooleanPut: inlined.
+	inlined
+		ifTrue: [ args := aBlockNode arguments collect: [ :id | id binding index ].
+			self nextPutAll: args asArray ]
 		ifFalse: [ | index captured |
 			index := self compiledBlockIndexOf: aBlockNode.
 			self nextPut: index.
 			captured := self encodeClosureElements: aBlockNode.
-			stream nextPut: captured ].
+			self nextPutAll: captured ].
 	self visitScript: aBlockNode
 ]
 
@@ -260,22 +267,21 @@ AstcodeEncoder >> visitBraceNode: aBraceNode [
 
 { #category : #visiting }
 AstcodeEncoder >> visitCascade: aCascadeNode [
-	self
-		nextTypePut: CascadeId;
-		nestedEncode: [aCascadeNode receiver acceptVisitor: self].
-	aCascadeNode messages
-		do: [:node | self nestedEncode: [self visitCascadeMessage: node]]
+	| messages |
+	self nextTypePut: CascadeId.
+	aCascadeNode receiver acceptVisitor: self.
+	messages := aCascadeNode messages.
+	self nextIntegerPut: messages size.
+	messages do: [ :node | self visitCascadeMessage: node ]
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitCascadeMessage: aCascadeMessageNode [
-	| symbol selector |
-	symbol := aCascadeMessageNode selector symbol.
-	selector := method indexOf: symbol.
-	self nextPut: selector.
-	selector = 0 ifTrue: [self nextPut: symbol].
-	aCascadeMessageNode arguments do: [:arg | 
-		self nestedEncode: [arg acceptVisitor: self]]
+	| arguments |
+	self nextSymbolPut: aCascadeMessageNode selector symbol.
+	arguments := aCascadeMessageNode arguments.
+	self nextIntegerPut: arguments size.
+	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }
@@ -288,24 +294,24 @@ AstcodeEncoder >> visitIdentifier: anIdentifierNode [
 AstcodeEncoder >> visitLiteral: aLiteralNode [
 	| index |
 	index := method indexOf: aLiteralNode value.
-	self nextTypePut: LiteralId; nextPut: index.
-	index = 0 ifTrue: [self nextPut: aLiteralNode value]
+	self
+		nextTypePut: LiteralId;
+		nextIntegerPut: index.
+	index = 0
+		ifTrue: [ self nextIntegerPut: aLiteralNode value ]
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitMessage: aMessageNode [
-	| symbol selector |
-	symbol := aMessageNode selector symbol.
-	selector := method indexOf: symbol.
+	| arguments |
 	self
 		nextTypePut: MessageId;
-		nextPut: selector.
-	selector = 0
-		ifTrue: [ self nextPut: symbol ].
-	self nestedEncode: [ aMessageNode receiver acceptVisitor: self ].
-	self
-		nestedEncode: [ aMessageNode arguments do: [ :arg | self nestedEncode: [arg acceptVisitor: self] ] ].
-	self encodeOptimizedMessage: aMessageNode
+		nextBooleanPut: aMessageNode isInlined;
+		nextSymbolPut: aMessageNode selector symbol.
+	aMessageNode receiver acceptVisitor: self.
+	arguments := aMessageNode arguments.
+	self nextIntegerPut: arguments size.
+	arguments do: [ :arg | arg acceptVisitor: self ]
 ]
 
 { #category : #visiting }
@@ -313,9 +319,13 @@ AstcodeEncoder >> visitMethod: aMethodNode [
 	| pragma |
 	self nextTypePut: MethodId.
 	pragma := aMethodNode pragma.
-	pragma isUsed ifTrue: [ self nextTypePut: PragmaId; nextPut: pragma name ].
+	pragma isUsed
+		ifTrue: [ self nextTypePut: PragmaId.
+			pragma name
+				ifNotNil: [ self nextSymbolPut: pragma name ]
+				ifNil: [ self nextPut: 0 ] ].
 	self visitScript: aMethodNode.
-	^stream contents
+	^ stream contents 
 ]
 
 { #category : #visiting }
@@ -327,16 +337,18 @@ AstcodeEncoder >> visitParseNode: aParseNode [
 AstcodeEncoder >> visitReturn: aReturnNode [
 	self
 		nextTypePut: ReturnId;
-		nextPut: script realScript isMethod;
-		nestedEncode: [aReturnNode expression acceptVisitor: self]
+		nextBooleanPut: script realScript isMethod.
+	
+		aReturnNode expression acceptVisitor: self
 ]
 
 { #category : #visiting }
 AstcodeEncoder >> visitScript: aScriptNode [
-	| prev |
+	| prev statements |
 	prev := script.
 	script := aScriptNode.
-	aScriptNode statements
-		do: [:node | self nestedEncode: [node acceptVisitor: self]].
+	statements := aScriptNode statements.
+	self nextIntegerPut: statements size.
+	statements do: [ :node | node acceptVisitor: self ].
 	script := prev
 ]

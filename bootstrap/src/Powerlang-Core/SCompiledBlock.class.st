@@ -4,8 +4,8 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'method',
-		'optimizedCode'
+		'optimizedCode',
+		'method'
 	],
 	#pools : [
 		'SCompiledBlockFlags'
@@ -23,12 +23,12 @@ SCompiledBlock class >> new [
 
 { #category : #constants }
 SCompiledBlock >> argumentCount [
-	^format bitsAt: ArgCount
+	^format bitsAt: BlockArgCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> argumentCount: anInteger [
-	format := format bitsAt: ArgCount put: anInteger
+	format := format bitsAt: BlockArgCount put: anInteger
 ]
 
 { #category : #constants }
@@ -57,12 +57,12 @@ SCompiledBlock >> capturesSelf: aBoolean [
 
 { #category : #constants }
 SCompiledBlock >> environmentCount [
-	^ format bitsAt: EnvCount
+	^ format bitsAt: BlockEnvCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> environmentCount: anInteger [
-	format := format bitsAt: EnvCount put: anInteger
+	format := format bitsAt: BlockEnvCount put: anInteger
 ]
 
 { #category : #constants }
@@ -132,12 +132,12 @@ SCompiledBlock >> printOn: aStream [
 
 { #category : #constants }
 SCompiledBlock >> tempCount [
-	^format bitsAt: TempCount
+	^format bitsAt: BlockTempCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> tempCount: anInteger [
-	format := format bitsAt: TempCount put: anInteger
+	format := format bitsAt: BlockTempCount put: anInteger
 ]
 
 { #category : #constants }

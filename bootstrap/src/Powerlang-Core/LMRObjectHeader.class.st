@@ -35,8 +35,18 @@ LMRObjectHeader >> bytes: bytes arrayed: arrayed named: named [
 ]
 
 { #category : #accessing }
+LMRObjectHeader >> flags [
+	^flags
+]
+
+{ #category : #accessing }
 LMRObjectHeader >> hash: anInteger [
 	hash := anInteger
+]
+
+{ #category : #accessing }
+LMRObjectHeader >> isSmall [
+	^ self size < 256
 ]
 
 { #category : #accessing }
@@ -46,5 +56,6 @@ LMRObjectHeader >> size [
 
 { #category : #accessing }
 LMRObjectHeader >> size: anInteger [
-	size := anInteger
+	size := anInteger.
+	self isSmall ifTrue: [ flags := flags | 16r80]
 ]

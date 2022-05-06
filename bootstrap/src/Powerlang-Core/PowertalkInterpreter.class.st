@@ -48,6 +48,25 @@ PowertalkInterpreter >> context: anEvaluationContext [
 	context := anEvaluationContext
 ]
 
+{ #category : #initializing }
+PowertalkInterpreter >> convertPrimitives [
+	| original |
+	original := primitives.
+	primitives := IdentityDictionary new.
+	original
+		keysAndValuesDo:
+			[ :symbol :block | primitives at: (runtime symbolFromLocal: symbol) put: block ]
+]
+
+{ #category : #initializing }
+PowertalkInterpreter >> convertUndermessages [
+	| original |
+	original := undermessages.
+	undermessages := IdentityDictionary new.
+	original keysAndValuesDo: [ :symbol :block | undermessages at: (runtime symbolFromLocal: symbol) put: block ]
+
+]
+
 { #category : #accessing }
 PowertalkInterpreter >> evaluateClosure: receiver [
 	^ self evaluateClosure: receiver withArgs: #()
@@ -149,7 +168,35 @@ PowertalkInterpreter >> initializeUndermessages [
 			put: self underprimitiveSmallIntegerByteAt;
 		at: #_bitShiftLeft: put: self underprimitiveBitShiftLeft;
 		at: #_uShortAtOffset: put: self underprimitiveUShortAtOffset;
-		at: #_uShortAtOffset:put: put: self underprimitiveUShortAtOffsetPut
+		at: #_uShortAtOffset:put: put: self underprimitiveUShortAtOffsetPut;
+		at: #_smiPlus: put: self underprimitiveSMIPlus;
+		at: #_smiMinus: put: self underprimitiveSMIMinus;
+		at: #_smiTimes: put: self underprimitiveSMITimes;
+		at: #_smiLowerThan: put: self underprimitiveSMILowerThan;
+		at: #_smiLowerEqualThan: put: self underprimitiveSMILowerEqualThan;
+		at: #_smiGreaterThan: put: self underprimitiveSMIGreaterThan;
+		at: #_smiGreaterEqualThan:
+			put: self underprimitiveSMIGreaterEqualThan;
+		at: #_smiEquals: put: self underprimitiveSMIEquals;
+		at: #_identityEquals: put: self underprimitiveIdentityEquals;
+		at: #_leadingZeroBitCount
+			put: self underprimitiveLeadingZeroBitCount;
+		at: #_quotientTowardZero:
+			put: self underprimitiveSMIQuotientTowardZero;
+		at: #_remainderTowardZero:
+			put: self underprimitiveSMIRemainderTowardZero;
+		at: #_bitShiftLeft: put: self underprimitiveSMIBitShiftLeft;
+		at: #_bitShiftRight: put: self underprimitiveSMIBitShiftRight;
+		at: #_smiBitAnd: put: self underprimitiveSMIBitAnd;
+		at: #_smiBitOr: put: self underprimitiveSMIBitOr
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> isIdentical: anObject to: anotherObject [
+	^ anObject == anotherObject
+		or: [ anObject isImmediate
+				and: [ anotherObject isImmediate
+						and: [ anObject value = anotherObject value ] ] ]
 ]
 
 { #category : #accessing }
@@ -157,12 +204,13 @@ PowertalkInterpreter >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessa
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
 	method
-		ifNil: [ symbol := runtime symbolFrom: aSymbol.
+		ifNil: [ 
 			undermessages
-				at: symbol
+				at: aSymbol
 				ifPresent: [ :block | 
 					anSMessage cacheUndermessage: block.
 					^ block ].
+			symbol := runtime symbolFrom: aSymbol.
 			method := runtime lookup: symbol startingAt: aBehavior.
 			self ASSERT: method notNil.
 			anSMessage cache: method when: aBehavior ].
@@ -420,7 +468,9 @@ PowertalkInterpreter >> runtime: aPowertalkRuntime [
 	nilObj := runtime nil.
 	trueObj := runtime true.
 	falseObj := runtime false.
-	self initializeUndermessages; initializePrimitives
+	self
+		initializeUndermessages;
+		initializePrimitives; convertUndermessages ; convertPrimitives 
 ]
 
 { #category : #accessing }
@@ -475,6 +525,11 @@ PowertalkInterpreter >> underprimitiveByteAt [
 ]
 
 { #category : #accessing }
+PowertalkInterpreter >> underprimitiveIdentityEquals [
+	^ [ :receiver :arguments | runtime booleanFor: (self isIdentical: receiver to: arguments first)]
+]
+
+{ #category : #accessing }
 PowertalkInterpreter >> underprimitiveIsLarge [
 	^ [ :receiver :arguments | runtime booleanFor: receiver isSmall not ]
 ]
@@ -490,6 +545,93 @@ PowertalkInterpreter >> underprimitiveLargeSize [
 	receiver isSmall
 		ifTrue: [ self error ].
 	runtime newInteger: receiver size ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveLeadingZeroBitCount [
+	^ [ :receiver :arguments | 
+	runtime
+		newInteger: (self
+		underprimitiveLeadingZeroBitCount: receiver value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveLeadingZeroBitCount: anInteger [
+	^ anInteger < 0
+		ifTrue: [ 0 ]
+		ifFalse: [ runtime wordSize * 8 - anInteger highBit ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitAnd [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value bitAnd: arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitOr [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value bitOr: arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitShiftLeft [
+	^ [ :receiver :arguments | runtime newInteger: receiver value << arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitShiftRight [
+	^ [ :receiver :arguments | 
+	runtime
+		newInteger: (receiver value >> arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIEquals [
+	^ [ :receiver :arguments | runtime booleanFor: receiver value = arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIGreaterEqualThan [
+	^ [ :receiver :arguments | runtime booleanFor: receiver value >= arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIGreaterThan [
+	^ [ :receiver :arguments | runtime booleanFor: receiver value > arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMILowerEqualThan [
+	^ [ :receiver :arguments | runtime booleanFor: receiver value <= arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMILowerThan [
+	^ [ :receiver :arguments | runtime booleanFor: receiver value < arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIMinus [
+	^ [ :receiver :arguments | runtime newInteger: receiver value - arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIPlus [
+	^ [ :receiver :arguments | runtime newInteger: receiver value + arguments first value ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIQuotientTowardZero [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value quo: arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIRemainderTowardZero [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value \\ arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMITimes [
+	^ [ :receiver :arguments | runtime newInteger: receiver value * arguments first value ]
 ]
 
 { #category : #accessing }

@@ -26,10 +26,12 @@ PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: argum
 	sblock := closure astcodes.
 	block := sblock compiledCode.
 	work := block optimizedCode.
-	receiver := block capturesSelf ifTrue: [closure at: 1] ifFalse: [nilObj].
+	receiver := block capturesSelf
+		ifTrue: [ closure at: 1 ]
+		ifFalse: [ nilObj ].
 	context
 		popFrame;
-		buildFrameFor: receiver code: block environment: closure.
+		buildClosureFrameFor: receiver code: block environment: closure.
 	sblock isInlined
 		ifTrue: [ arguments
 				with: sblock inlinedArgs
@@ -42,9 +44,8 @@ PowertalkIterativeStackedInterpreter >> evaluateUndermessage: message with: bloc
 	| argcount arguments |
 	argcount := message argumentCount.
 	arguments := context popOperands: argcount.
-	regR := block value: regR value: arguments. 
-	(argcount > 0 andNot: [ message isCascadeMessage ])
-				ifTrue: [ context popOperand ]
+	regR := block value: regR value: arguments.
+	context reserveStackSlots: argcount
 ]
 
 { #category : #initialization }
@@ -70,25 +71,29 @@ pc := context incRegPC.
 ]
 
 { #category : #private }
-PowertalkIterativeStackedInterpreter >> prepareFor: anSCompiledMethod [
-	| operations array |
-	operations := runtime sexpressionsOf: anSCompiledMethod.
+PowertalkIterativeStackedInterpreter >> prepareFor: method [
+	| operations linearized |
+	operations := runtime sexpressionsOf: method.
 	operations isCollection ifTrue: [ ^self ].
 	linearizer visitMethod: operations.
-			array := linearizer operations asArray.
-			operations optimizedCode: array.
+	linearized := linearizer operations asArray.
+	runtime methodOptimizedCode: method put: linearized
 
 ]
 
 { #category : #initializing }
 PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
-	| launcher |
+	| launcher code |
 	super runtime: aPowertalkRuntime.
-	linearizer runtime: aPowertalkRuntime; dropsArguments.
-	launcher := SCompiledMethod new optimizedCode: #().
+	linearizer
+		runtime: aPowertalkRuntime;
+		dropsArguments.
+	launcher := runtime newCompiledMethod.
+	code := runtime newArraySized: 0.
+	runtime methodOptimizedCode: launcher put: code.
 	context
 		system: runtime;
-		buildFrameFor: nilObj code: launcher environment: nilObj
+		buildMethodFrameFor: nilObj code: launcher environment: nilObj
 ]
 
 { #category : #initialization }
@@ -119,10 +124,10 @@ PowertalkIterativeStackedInterpreter >> underprimitiveRestart [
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMessage [
-	| message arguments behavior method size environment |
+	| message behavior method size environment |
 	message := anSOpDispatchMessage message.
 	message cachedUndermessage
-		ifNotNil: [ :block | ^self evaluateUndermessage: message with: block].
+		ifNotNil: [ :block | ^ self evaluateUndermessage: message with: block ].
 	behavior := message receiver isSuper
 		ifTrue: [ runtime superBehaviorOf: context classBinding ]
 		ifFalse: [ runtime behaviorOf: regR ].
@@ -131,14 +136,17 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		startingAt: behavior
 		sendSite: message.
 	method class == BlockClosure
-		ifTrue: [^self evaluateUndermessage: message with: method ].
+		ifTrue: [ ^ self evaluateUndermessage: message with: method ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	self prepareFor: method.
-	work := method optimizedCode.
+	work := runtime methodOptimizedCode: method.
 	"(runtime symbolFrom: message selector) == #foo
 		ifTrue: [ self halt ]."
-	context buildFrameFor: regR code: method environment: environment
+	context
+		buildMethodFrameFor: regR
+		code: method
+		environment: environment
 ]
 
 { #category : #initialization }
@@ -177,5 +185,5 @@ PowertalkIterativeStackedInterpreter >> visitOpPrimitive: anSOpPrimtive [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpReturn: anSOpReturn [
 	context popFrame.
-	work := context regM optimizedCode
+	work := runtime methodOptimizedCode: context regM
 ]

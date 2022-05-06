@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'method',
-		'stream'
+		'stream',
+		'builder'
 	],
 	#classVars : [
 		'BindingTypes',
@@ -58,54 +59,56 @@ AstcodeDecoder >> bindingTypeOf: id [
 	^ BindingTypes at: id
 ]
 
+{ #category : #accessing }
+AstcodeDecoder >> builder: aRuntime [ 
+	builder := aRuntime
+]
+
 { #category : #public }
 AstcodeDecoder >> decodeArgument [
-	^SArgumentBinding new
+	^ SArgumentBinding new
 		index: self nextInteger;
-		environment: self nextInteger
+		environment: self nextEnvironment
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeAssignment [
-	| assignment codes |
+	| assignment assignees |
 	assignment := SAssignment new.
-	codes := stream upToEnd collect: [:elem | self decodeNode: elem].
-	assignment expression: codes last.
-	1 to: codes size - 1 do: [:i | | identifier |
-		identifier := codes at: i.
-		assignment assign: identifier].
-	^assignment
+	
+	assignees := self nextExpressionArray.
+	assignment expression: self nextExpression.
+	assignees do: [ :identifier | assignment assign: identifier ].
+	^ assignment
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeBlock [
-	| expression next block index |
+	| expression inlined block index |
 	expression := SBlock new.
-	next := stream peek.
-	next != 0
-		ifTrue: [ index := stream next. block := method at: index.
+	inlined := self nextBoolean.
+	inlined
+		ifTrue: [ expression inlinedArgs: self nextArray ]
+		ifFalse: [ index := self nextInteger.
+			block := self literalAt: index.
 			expression
 				compiledCode: block;
 				index: index;
-				capturedVariables: stream next ]
-		ifFalse: [ stream next.
-			expression inlinedArgs: stream next ].
-	expression statements: self decodeStatements.
+				capturedVariables: self nextArray ].
+	expression statements: self nextExpressionArray.
 	^ expression
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeCascade [
-	| cascade receiver messages prev message |
+	| cascade receiver messages message count |
 	cascade := SCascade new.
-	receiver := self decodeNode: stream next.
-	prev := stream.
-	messages := stream upToEnd
-		collect: [ :elem | 
-			stream := elem readStream.
+	receiver := self nextExpression.
+	count := self nextInteger.
+	messages := (1 to: count)
+		collect: [ :i | 
 			message := SCascadeMessage decodeUsing: self.
 			message cascade: cascade ].
-	stream := prev.
 	^ cascade
 		receiver: receiver;
 		messages: messages
@@ -113,13 +116,9 @@ AstcodeDecoder >> decodeCascade [
 
 { #category : #public }
 AstcodeDecoder >> decodeCascadeMessage [
-	| index selector arguments |
-	index := stream next.
-	selector := index = 0
-		ifTrue: [ stream next ]
-		ifFalse: [ method at: index ].
-	arguments := stream upToEnd
-		collect: [ :node | self decodeNode: node ].
+	| selector arguments |
+	selector := self nextSymbol.
+	arguments := self nextExpressionArray.
 	^ SCascadeMessage new
 		selector: selector;
 		arguments: arguments
@@ -128,25 +127,28 @@ AstcodeDecoder >> decodeCascadeMessage [
 { #category : #initialization }
 AstcodeDecoder >> decodeClassBinding [
 	| index assoc |
-		index := self nextInteger.
-
-	assoc := method at: index.
-	^ SClassBinding new index: index; association: assoc
+	index := self nextInteger.
+	assoc := self literalAt: index.
+	^ SClassBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeClassVar [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
-	^ SClassVarBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SClassVarBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeConstantPoolVar [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
+	assoc := self literalAt: index.
 	^ SConstantPoolBinding new
 		index: index;
 		association: assoc
@@ -154,18 +156,17 @@ AstcodeDecoder >> decodeConstantPoolVar [
 
 { #category : #public }
 AstcodeDecoder >> decodeDynamicVar [
-	| index name |
-	index := self nextInteger.
-	name := method at: index.
-	^ SDynamicBinding new name: name
+	^ SDynamicBinding new name: self nextSymbol
 ]
 
 { #category : #initialization }
 AstcodeDecoder >> decodeGlobalBinding [
 	| index assoc |
 	index := self nextInteger.
-	assoc := method at: index.
-	^ SGlobalBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SGlobalBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
@@ -174,20 +175,6 @@ AstcodeDecoder >> decodeIdentifier [
 	type := self bindingTypeOf: self nextInteger.
 	binding := type decodeUsing: self.
 	^ SIdentifier new binding: binding
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeInlineNodes: anArray [
-  | prev result type decoded |
-  anArray ifNil: [ ^#() ].
-  prev := stream.
-  result := OrderedCollection new.
-  stream := anArray readStream.
-  [ stream atEnd ] whileFalse: [ type := self nodeTypeOf: stream next.
-		decoded := type decodeUsing: self.
-		result add: decoded ]. 
-  stream := prev.
-  ^result
 ]
 
 { #category : #initialization }
@@ -200,30 +187,25 @@ AstcodeDecoder >> decodeLiteral [
 	| index value |
 	index := self nextInteger.
 	value := index = 0
-		ifTrue: [ stream next ]
-		ifFalse: [ method at: index ].
-	^ SLiteral new index: index; value: value
+		ifTrue: [ self nextLiteralInteger ]
+		ifFalse: [ self literalAt: index ].
+	^ SLiteral new
+		index: index;
+		value: value
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeMessage [
-	| index selector receiver arguments opcodes |
-	index := stream next.
-	selector := index = 0
-		ifTrue: [ stream next ]
-		ifFalse: [ method at: index ].
-	receiver := self decodeNode: stream next.
-	arguments := self decodeNodes: stream next.
-	stream atEnd
-		ifFalse: [ opcodes := stream peek = 0
-				ifTrue: [ stream next.
-					#inlined ]
-				ifFalse: [ self decodeInlineNodes: stream next ] ].
+	| inlined selector receiver arguments |
+	inlined := self nextBoolean.
+	selector := self nextSymbol.
+	receiver := self nextExpression.
+	arguments := self nextExpressionArray.
 	^ SMessage new
 		receiver: receiver;
 		selector: selector;
 		arguments: arguments;
-		opcodes: opcodes
+		inlined: inlined
 ]
 
 { #category : #public }
@@ -234,88 +216,129 @@ AstcodeDecoder >> decodeMethod [
 		ifTrue: [ self error: 'method astcode expected' ].
 	node := SMethod new.
 	next := stream peek.
-	(next = PragmaId)
-		ifTrue:
-			[ stream next.
-			pragma := SPragma new
-				name: stream next.
+	next = PragmaId
+		ifTrue: [ stream next.
+			pragma := SPragma new name: self nextSymbolOrNil.
 			node pragma: pragma ].
-		 node
-			compiledCode: method;
-		statements: self decodeStatements.
+	node
+		compiledCode: method;
+		statements: self nextExpressionArray.
 	^ node
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeNode: anArray [
-	| prev type result |
-	prev := stream.
-	stream := anArray readStream.
-	type := self nodeTypeOf: stream next.
-	result := type decodeUsing: self.
-	stream := prev.
-	^result
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeNodes: anArray [
-	anArray ifNil: [^#(  )].
-	^anArray collect: [:arg | self decodeNode: arg  ].
-
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodePoolVar [
 	| index assoc |
 	index := self nextInteger.
-
-	assoc := method at: index.
-	^ SPoolVarBinding new index: index; association: assoc
+	assoc := self literalAt: index.
+	^ SPoolVarBinding new
+		index: index;
+		association: assoc
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeReturn [
 	| expression local |
-	local := stream next.
-	expression := self decodeNode: stream next.
-	^SReturn new local: local; expression: expression
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeStatement: anArray [
-	^self decodeNode: anArray
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeStatements [
-	^stream upToEnd collect: [:statement | self decodeStatement: statement]
+	local := self nextBoolean.
+	expression := self nextExpression.
+	^ SReturn new
+		local: local;
+		expression: expression
 ]
 
 { #category : #public }
 AstcodeDecoder >> decodeTemporary [
-	^STemporaryBinding new
+	^ STemporaryBinding new
 		index: self nextInteger;
-		environment: self nextInteger
+		environment: self nextEnvironment
 ]
 
 { #category : #unclassified }
 AstcodeDecoder >> literalAt: anInteger [
-	^method at: anInteger
+	^ builder ifNil: [method at: anInteger] ifNotNil: [builder method: method literalAt: anInteger]
 ]
 
 { #category : #accessing }
-AstcodeDecoder >> method: aCompiledMethod [
-	method := aCompiledMethod
+AstcodeDecoder >> method: aMethod [
+	method := aMethod
 ]
 
 { #category : #public }
-AstcodeDecoder >> next [
-	^stream next
+AstcodeDecoder >> nextArray [
+	| count |
+	count := self nextInteger.
+	^ stream next: count
+]
+
+{ #category : #initialization }
+AstcodeDecoder >> nextBoolean [
+	^ stream next = 1
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextEnvironment [
+	| value |
+	value := self nextInteger.
+	^ value != -2
+		ifTrue: [ value ]
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextExpression [
+	| type |
+	type := self nodeTypeOf: stream next.
+	^type decodeUsing: self.
+
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextExpressionArray [
+	| count |
+	count := self nextInteger.
+	^(1 to: count) collect: [ :arg | self nextExpression ]
 ]
 
 { #category : #initialization }
 AstcodeDecoder >> nextInteger [
-	^stream next
+	| value |
+	value := stream next.
+	value = 16r80
+		ifTrue: [ ^ stream int64 ].
+	^ value <= 127
+		ifTrue: [ value ]
+		ifFalse: [ value - 16r100 ]
+]
+
+{ #category : #unclassified }
+AstcodeDecoder >> nextLiteralInteger [
+	| value |
+	value := self nextInteger.
+	^ builder
+		ifNil: [ value ]
+		ifNotNil: [ builder newInteger: value ]
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextSymbol [
+	| index |
+	index := self nextInteger.
+	^ self literalAt: index
+]
+
+{ #category : #public }
+AstcodeDecoder >> nextSymbolOrNil [
+	| index |
+	index := self nextInteger.
+	^index != 0 ifTrue: [ self literalAt: index]
+]
+
+{ #category : #initialization }
+AstcodeDecoder >> nextUnsignedInteger [
+	| value |
+	value := self nextByte.
+	^value < 128
+		ifTrue: [value]
+		ifFalse: [value - 128 + (self nextUnsignedInteger bitShift: 7)]
 ]
 
 { #category : #public }

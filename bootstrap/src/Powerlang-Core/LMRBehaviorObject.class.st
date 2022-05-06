@@ -13,6 +13,11 @@ LMRBehaviorObject >> printInstance: anLMRObject on: aStream [
 ]
 
 { #category : #accessing }
+LMRBehaviorObject >> printOn: aStream [
+	runtime printBehavior: self on: aStream
+]
+
+{ #category : #accessing }
 LMRBehaviorObject >> runtime: aPowertalkLMR [
 	runtime := aPowertalkLMR
 ]

@@ -76,8 +76,10 @@ SMethodNode >> isMethod [
 
 { #category : #parsing }
 SMethodNode >> literals [
-	| literals v l binding |
+	| literals v l |
 	literals := OrderedCollection new.
+	pragma isUsed
+		ifTrue: [ literals add: pragma name ].
 	self
 		nodesDo: [ :n | 
 			n isLiteral
@@ -89,7 +91,11 @@ SMethodNode >> literals [
 			n isBraceNode
 				ifTrue: [ n isLiteral
 						ifTrue: [ self halt ]
-						ifFalse: [ literals add: #Array ] ].
+						ifFalse: [ literals
+								add: #Array;
+								add: #new:;
+								add: #at:put:;
+								add: #yourself ] ].
 			(n isIdentifier
 				and: [ l := n binding literal.
 					l notNil ])

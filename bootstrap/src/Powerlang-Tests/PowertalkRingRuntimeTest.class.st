@@ -75,6 +75,26 @@ PowertalkRingRuntimeTest >> test113compute20quotient5 [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test120sendSizeMinusOne [
+	| result |
+	self
+		compile: 'foo ^#abc _size - 1'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 3 ]
+]
+
+{ #category : #tests }
+PowertalkRingRuntimeTest >> test121sendCascade [
+	| result |
+	self
+		compile: 'foo ^#abc yourself; size'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 3 ]
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test130sendIfTrueToFalse [
 	| result |
 	self
