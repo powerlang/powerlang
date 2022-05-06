@@ -30,7 +30,9 @@ Class {
 		'classClassVariablesIndex',
 		'metaclassInstanceClassIndex',
 		'classModuleIndex',
-		'moduleNamespaceIndex'
+		'moduleNamespaceIndex',
+		'byteArrayClass',
+		'stringClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -38,6 +40,13 @@ Class {
 	],
 	#category : #'Powerlang-Core-Execution-LMR'
 }
+
+{ #category : #initialization }
+PowertalkLMR >> addSymbol: aSymbol [
+	| string |
+	string := self newString: aSymbol asString.
+	^ self sendLocal: #asSymbol to: string
+]
 
 { #category : #initialization }
 PowertalkLMR >> arrayClass: anLMRObject [
@@ -96,6 +105,11 @@ PowertalkLMR >> blockTempCount: anLMRObject [
 	| flags |
 	flags := anLMRObject slotAt: methodFlagsIndex.
 	^ flags value bitsAt: BlockTempCount
+]
+
+{ #category : #initialization }
+PowertalkLMR >> byteArrayClass: anLMRObject [
+	byteArrayClass := anLMRObject
 ]
 
 { #category : #initialization }
@@ -158,6 +172,16 @@ PowertalkLMR >> isBlock: compiledCode [
 { #category : #initialization }
 PowertalkLMR >> isMetaclass: anLMRObject [
 	^ (self speciesFor: anLMRObject) == metaclassClass
+]
+
+{ #category : #initialization }
+PowertalkLMR >> kernel [
+	^kernel
+]
+
+{ #category : #initialization }
+PowertalkLMR >> kernel: anLMRObject [ 
+	kernel := anLMRObject
 ]
 
 { #category : #initialization }
@@ -319,6 +343,18 @@ PowertalkLMR >> newArraySized: anInteger [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newByteArray: aByteArray [
+	| behavior header |
+	behavior := self speciesInstanceBehavior: byteArrayClass.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: aByteArray size;
+		hash: 0.
+	^ LMRByteObject new header: header; bytes: aByteArray
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newCompiledMethod [
 	| behavior header method |
 	behavior := self speciesInstanceBehavior: methodClass.
@@ -368,6 +404,20 @@ PowertalkLMR >> newSlots: class size: anInteger [
 { #category : #initialization }
 PowertalkLMR >> newSmallInteger: anInteger [
 	^ LMRSmallInteger new value: anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newString: aString [
+	| behavior header |
+	behavior := self speciesInstanceBehavior: stringClass.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: aString size + 1;
+		hash: 0.
+	^ LMRByteObject new
+		header: header;
+		bytes: aString, (String value: 0)
 ]
 
 { #category : #initialization }
@@ -478,7 +528,7 @@ PowertalkLMR >> speciesInstanceClass: anLMRObject [
 
 { #category : #initialization }
 PowertalkLMR >> speciesInstanceSize: anLMRObject [
-	^ (anLMRObject slotAt: speciesFormatIndex) bitAnd: 16r7F.
+	^ (anLMRObject slotAt: speciesFormatIndex) value bitAnd: 16r7F.
 ]
 
 { #category : #initialization }
@@ -531,6 +581,11 @@ PowertalkLMR >> staticBindingForIvar: aSymbol in: receiver [
 	bytes := aSymbol bytes.
 	all withIndexDo: [ :ivar :index | ivar bytes = bytes ifTrue: [ ^ index ] ].
 	^0
+]
+
+{ #category : #initialization }
+PowertalkLMR >> stringClass: anLMRObject [
+	stringClass := anLMRObject
 ]
 
 { #category : #initialization }

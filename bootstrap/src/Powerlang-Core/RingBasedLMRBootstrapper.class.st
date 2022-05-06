@@ -192,26 +192,32 @@ RingBasedLMRBootstrapper >> initializeBehavior: anLMRHeapObject spec: anRGBehavi
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass |
+	| map symbols array method smi block metaclass kernel byteArray string |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
 			map := source newSymbol: symbol.
 			symbols at: symbol put: (mapping at: map) ].
 	array := mapping at: (source classNamed: #Array).
+	byteArray := mapping at: (source classNamed: #ByteArray).
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
 	smi := mapping at: (source classNamed: #SmallInteger).
+	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
+	kernel := mapping at: source kernel.
 	dest
 		arrayClass: array;
+		byteArrayClass: byteArray;
 		methodClass: method;
 		blockClass: block;
 		smallIntegerClass: smi;
+		stringClass: string;
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
 		wordSize: source wordSize;
-		initializeInterpreter
+		initializeInterpreter;
+		kernel: kernel
 ]
 
 { #category : #initialization }

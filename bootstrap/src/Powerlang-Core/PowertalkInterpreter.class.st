@@ -186,7 +186,9 @@ PowertalkInterpreter >> initializeUndermessages [
 		at: #_remainderTowardZero:
 			put: self underprimitiveSMIRemainderTowardZero;
 		at: #_bitShiftLeft: put: self underprimitiveSMIBitShiftLeft;
-		at: #_bitShiftRight: put: self underprimitiveSMIBitShiftRight
+		at: #_bitShiftRight: put: self underprimitiveSMIBitShiftRight;
+		at: #_smiBitAnd: put: self underprimitiveSMIBitAnd;
+		at: #_smiBitOr: put: self underprimitiveSMIBitOr
 ]
 
 { #category : #accessing }
@@ -558,6 +560,16 @@ PowertalkInterpreter >> underprimitiveLeadingZeroBitCount: anInteger [
 	^ anInteger < 0
 		ifTrue: [ 0 ]
 		ifFalse: [ runtime wordSize * 8 - anInteger highBit ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitAnd [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value bitAnd: arguments first value) ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveSMIBitOr [
+	^ [ :receiver :arguments | runtime newInteger: (receiver value bitOr: arguments first value) ]
 ]
 
 { #category : #accessing }

@@ -4,11 +4,11 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
+		'optimizedCode',
 		'astcodes',
 		'class',
 		'selector',
-		'source',
-		'optimizedCode'
+		'source'
 	],
 	#pools : [
 		'SCompiledMethodFlags'

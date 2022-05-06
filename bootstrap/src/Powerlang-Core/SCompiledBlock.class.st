@@ -4,8 +4,8 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'method',
-		'optimizedCode'
+		'optimizedCode',
+		'method'
 	],
 	#pools : [
 		'SCompiledBlockFlags'

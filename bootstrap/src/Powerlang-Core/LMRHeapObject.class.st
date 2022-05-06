@@ -23,6 +23,16 @@ LMRHeapObject >> header: anInteger [
 ]
 
 { #category : #accessing }
+LMRHeapObject >> headerFlags [
+	^header flags
+]
+
+{ #category : #accessing }
+LMRHeapObject >> isSmall [
+	^ header isSmall
+]
+
+{ #category : #accessing }
 LMRHeapObject >> printOn: aStream [
 	self behavior printInstance: self on: aStream
 ]

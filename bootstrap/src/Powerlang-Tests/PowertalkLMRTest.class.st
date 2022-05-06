@@ -57,6 +57,7 @@ PowertalkLMRTest >> compile: aString in: classname during: aBlock [
 { #category : #tests }
 PowertalkLMRTest >> convert: anObject with: map [
 	map at: anObject ifPresent: [:mapped | ^mapped ].
+	anObject ifNil: [ ^runtime nil ].
 	anObject isInteger
 		ifTrue: [ ^ runtime newInteger: anObject ].
 	anObject isSymbol
@@ -88,9 +89,10 @@ PowertalkLMRTest >> convertMethod: anSCompiledMethod [
 
 { #category : #tests }
 PowertalkLMRTest >> globalNamed: aSymbol [
-	| symbol assoc |
+	| symbol namespace assoc |
 	symbol := runtime symbolFromLocal: aSymbol.
-	assoc := runtime lookupAssociationFor: symbol in: runtime kernel.
+	namespace := runtime moduleNamespace: runtime kernel.
+	assoc := runtime lookupAssociationFor: symbol in: namespace.
 	^runtime loadAssociationValue: assoc
 ]
 
@@ -143,9 +145,8 @@ PowertalkLMRTest >> test130sendIfTrueToFalse [
 	self
 		compile: 'foo ^false ifTrue: [#failed]'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: image nil ].
-		
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: runtime nil ].
 	self assertNoLeftoverFrames
 ]
 
@@ -155,8 +156,8 @@ PowertalkLMRTest >> test131sendIfFalseToTrue [
 	self
 		compile: 'foo ^true ifFalse: [#failed]'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: image nil ].
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: runtime nil ].
 	self assertNoLeftoverFrames
 ]
 
@@ -166,7 +167,7 @@ PowertalkLMRTest >> test132sendIfTrueToTrue [
 	self
 		compile: 'foo ^true ifTrue: [5]'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 5 ].
 	self assertNoLeftoverFrames
 ]
@@ -177,7 +178,7 @@ PowertalkLMRTest >> test140evaluateClosure [
 	self
 		compile: 'foo ^[5] value'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 5 ].
 	self assertNoLeftoverFrames
 ]
@@ -188,8 +189,8 @@ PowertalkLMRTest >> test141evaluateClosureFrames [
 	self
 		compile: 'foo [5] value'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: image true ].
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: runtime true ].
 	self assertNoLeftoverFrames
 ]
 
@@ -197,14 +198,15 @@ PowertalkLMRTest >> test141evaluateClosureFrames [
 PowertalkLMRTest >> test150sendWhileTrue [
 	| result |
 	self
-		compile: 'foo
+		compile:
+			'foo
 			 | a |
 			a := true.
 			[a] whileTrue: [a := false].
 			^a'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self assert: result equals: image false ].
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result equals: runtime false ].
 	self assertNoLeftoverFrames
 ]
 
@@ -219,7 +221,7 @@ PowertalkLMRTest >> test151sendToDo [
 			3 to: 4 do: [:i | a := a + i].
 			^a'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ].
 	self assertNoLeftoverFrames
 ]
@@ -239,7 +241,7 @@ PowertalkLMRTest >> test161evaluateClosureWithArgs [
 	self
 		compile: 'foo ^[:a :b | a + b] value: 3 value: 4'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -249,7 +251,7 @@ PowertalkLMRTest >> test162evaluateClosureWithArgsAndTemps [
 	self
 		compile: 'foo ^[:a :b | | t | t := a + b. t] value: 3 value: 4'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -259,7 +261,7 @@ PowertalkLMRTest >> test163evaluateClosureWithArgsAndMethodTemps [
 	self
 		compile: 'foo | t | ^[:a :b | t := a + b. t] value: 3 value: 4'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -276,7 +278,7 @@ PowertalkLMRTest >> test164evaluateClosureWithArgsAndMultipleTemps [
 					t := t + s.
 					t] value: 4'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -291,7 +293,7 @@ PowertalkLMRTest >> test165evaluateClosureNonLocalReturn [
 				s := 4.
 				^s'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 3 ]
 ]
 
@@ -301,7 +303,7 @@ PowertalkLMRTest >> test166evaluateNestedClosure [
 	self
 		compile: 'foo ^[ [ 7 ] value ] value'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -311,7 +313,7 @@ PowertalkLMRTest >> test167evaluateNestedClosureWithArgs [
 	self
 		compile: 'foo ^[:a | [:b | a + b ] value: 4 ] value: 3'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -329,7 +331,7 @@ PowertalkLMRTest >> test168evaluateNestedClosureWithTemps [
 				c := 4.
 				a + b + c ] value] value'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 9 ]
 ]
 
@@ -344,7 +346,7 @@ PowertalkLMRTest >> test169evaluateInlinedClosureInClosureWithMethodTemps [
 			[ true ifTrue: [ result := a + 4 ] ] value.
 			^result'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self assert: result equals: self ==> 7 ]
 ]
 
@@ -355,7 +357,7 @@ PowertalkLMRTest >> test180evaluateToDo [
 		compile:
 			'foo | result | result := 0. 1 to: 5 do: [:i | result := result + i]. ^result'
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
+		during: [ result := runtime sendLocal: #foo to: runtime true.
 			self
 				assert: result isImmediate;
 				assert: result value equals: 1 + 2 + 3 + 4 + 5 ].
@@ -366,30 +368,31 @@ PowertalkLMRTest >> test180evaluateToDo [
 PowertalkLMRTest >> test190evaluateStringConcatenation [
 	| result |
 	self
-		compile:
-			'foo ^''ABC'', ''DE'''
+		compile: 'foo ^''ABC'', ''DE'''
 		in: #ProtoObject
-		during: [ result := runtime sendLocal: #foo to: image true.
-			self
-				assert: result asLocalString equals: 'ABCDE' ].
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self assert: result asLocalString equals: 'ABCDE' ].
 	self assertNoLeftoverFrames
 ]
 
 { #category : #tests }
 PowertalkLMRTest >> test200createDictionary [
 	| class d |
-	class := image classNamed: #Dictionary.
+	class := runtime classNamed: #Dictionary.
 	d := runtime sendLocal: #new to: class with: {}.
-	self assert: d spec name equals: 'Dictionary'; assertNoLeftoverFrames
+	self
+		assert: d spec name equals: 'Dictionary';
+		assertNoLeftoverFrames
 ]
 
 { #category : #tests }
 PowertalkLMRTest >> test210addAssociationToDictionary [
 	| class d assoc |
-	class := image classNamed: #Dictionary.
-	assoc := image newAssociation: #foo -> nil.
+	class := runtime classNamed: #Dictionary.
+	assoc := runtime newAssociation: #foo -> nil.
 	d := runtime sendLocal: #new to: class with: {}.
 	runtime sendLocal: #add: to: d with: {assoc}.
-	self assert: d spec name equals: 'Dictionary';
+	self
+		assert: d spec name equals: 'Dictionary';
 		assertNoLeftoverFrames
 ]
