@@ -32,7 +32,8 @@ LinkedEvaluationContext class >> new [
 
 { #category : #visiting }
 LinkedEvaluationContext >> argumentAt: anInteger [
-	^arguments at: anInteger
+	1.
+	^ arguments at: anInteger
 ]
 
 { #category : #visiting }
