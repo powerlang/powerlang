@@ -37,7 +37,6 @@ EvaluationContext >> captureClosure: anSBlock [
 	closure := system newClosure: block environmentCount.
 	closure
 		block: block;
-		astcodes: anSBlock;
 		builder: self.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
@@ -104,6 +103,11 @@ EvaluationContext >> loadAssociationValue: anObject [
 
 { #category : #visiting }
 EvaluationContext >> method: anSCompiledMethod [
+	^ self subclassResponsibility
+]
+
+{ #category : #visiting }
+EvaluationContext >> methodArguments [
 	^ self subclassResponsibility
 ]
 

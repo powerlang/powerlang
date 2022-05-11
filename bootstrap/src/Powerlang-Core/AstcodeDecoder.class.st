@@ -91,6 +91,7 @@ AstcodeDecoder >> decodeBlock [
 		ifTrue: [ expression inlinedArgs: self nextArray ]
 		ifFalse: [ index := self nextInteger.
 			block := self literalAt: index.
+			builder ifNotNil: [ builder blockOptimizedCode: block put: expression ].
 			expression
 				compiledCode: block;
 				index: index;

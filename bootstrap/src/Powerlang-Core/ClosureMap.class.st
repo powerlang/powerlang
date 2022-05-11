@@ -3,8 +3,7 @@ Class {
 	#superclass : #SlotObjectMap,
 	#instVars : [
 		'block',
-		'builder',
-		'astcodes'
+		'builder'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
@@ -12,17 +11,6 @@ Class {
 { #category : #'instance creation' }
 ClosureMap class >> classFor: anRGBehavior [
 	^ self
-]
-
-{ #category : #accessing }
-ClosureMap >> astcodes [ ^
-	astcodes
-]
-
-{ #category : #accessing }
-ClosureMap >> astcodes: anSBlock [
-
-	astcodes := anSBlock
 ]
 
 { #category : #accessing }
@@ -43,6 +31,16 @@ ClosureMap >> builder [
 { #category : #accessing }
 ClosureMap >> builder: aMethodEvaluator [
 	builder := aMethodEvaluator
+]
+
+{ #category : #accessing }
+ClosureMap >> executionTree [
+	^ block optimizedCode
+]
+
+{ #category : #accessing }
+ClosureMap >> isClosure [ 
+	^true
 ]
 
 { #category : #accessing }
