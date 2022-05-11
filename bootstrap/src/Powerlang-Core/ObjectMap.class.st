@@ -80,6 +80,11 @@ ObjectMap >> isBytes [
 ]
 
 { #category : #testing }
+ObjectMap >> isClosure [
+	^ false
+]
+
+{ #category : #testing }
 ObjectMap >> isDictionaryMap [ 
 	^ false
 ]

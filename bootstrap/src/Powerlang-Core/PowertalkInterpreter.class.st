@@ -113,6 +113,7 @@ PowertalkInterpreter >> initializePrimitives [
 	primitives := IdentityDictionary new.
 	primitives
 		at: #Behavior put: self primitiveBehavior;
+		at: #SetBehavior put: self primitiveSetBehavior;
 		at: #Class put: self primitiveClass;
 		at: #UnderSize put: self primitiveUnderSize;
 		at: #Size put: self primitiveSize;
@@ -298,7 +299,7 @@ PowertalkInterpreter >> primitiveClosureValue [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveClosureValueWithArgs [
-	^[ self evaluateClosure: context receiver withArgs: context arguments ].
+	^[ self evaluateClosure: context receiver withArgs: context methodArguments ].
 
 ]
 
@@ -327,6 +328,11 @@ PowertalkInterpreter >> primitiveNewBytes [
 	| size |
 	^ [ size := context firstArgument value.
 	runtime newBytesOf: context receiver sized: size ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveNewObjectHeap [
+	^ [ runtime newObjectHeap ]
 ]
 
 { #category : #primitives }
@@ -433,8 +439,15 @@ PowertalkInterpreter >> primitiveSMITimes [
 ]
 
 { #category : #primitives }
+PowertalkInterpreter >> primitiveSetBehavior [
+	| receiver |
+	^ [ receiver := context receiver.
+	receiver behavior: context firstArgument. receiver ]
+]
+
+{ #category : #primitives }
 PowertalkInterpreter >> primitiveSize [
-	^ [ runtime newInteger: context receiver arrayedSize ]
+	^ [ runtime newInteger: (runtime arrayedSizeOf: context receiver) ]
 ]
 
 { #category : #primitives }
@@ -452,14 +465,6 @@ PowertalkInterpreter >> primitiveStringReplaceFromToWithStartingAt [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveUnderSize [
 	^ [ runtime newInteger: context receiver size ]
-]
-
-{ #category : #accessing }
-PowertalkInterpreter >> removeBootstrapDictionaryOverrides [
-self
-		removeOverride: #'PoolDictionary class' -> #new;
-		removeOverride: #'Namespace class' -> #new
-
 ]
 
 { #category : #initializing }

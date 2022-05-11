@@ -8,7 +8,7 @@ Class {
 PowertalkIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock |
 	frame := closure builder.
-	sblock := closure astcodes.
+	sblock := closure executionTree.
 	context := frame copy
 		beBlock;
 		parent: context;

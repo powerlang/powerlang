@@ -27,17 +27,19 @@ Class {
 		'closureSpec',
 		'arraySpec',
 		'smiSpec',
-		'symbolSpec'
+		'symbolSpec',
+		'vmPrimitivesSpec'
 	],
 	#classInstVars : [
-		'KernelSpec'
+		'KernelSpec',
+		'VMPrimitivesSpec'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #accessing }
 PowertalkRingImage class >> fromSpec [
-	^ self new specs: self kernelSpec
+	^ self new specs: self kernelSpec; vmPrimitivesSpec: self vmPrimitivesSpec
 ]
 
 { #category : #accessing }
@@ -67,8 +69,25 @@ PowertalkRingImage class >> newKernelSpec [
 ]
 
 { #category : #accessing }
-PowertalkRingImage class >> resetKernelSpec [
-	KernelSpec := nil
+PowertalkRingImage class >> newVMPrimitivesSpec [
+	| root current repo spec |
+	root := (Smalltalk getPackageDirectoryForPackage: self package)
+		/ '..' / '..'.
+	current := (root / 'specs' / 'current') contents asString trim.
+	repo := TonelRepository new directory: root / 'specs' / current / 'Kernel'.
+	spec := repo asRingEnvironmentWith: #(VM).
+	^ spec clean
+]
+
+{ #category : #accessing }
+PowertalkRingImage class >> resetSpecs [
+	KernelSpec := nil.
+	VMPrimitivesSpec := nil
+]
+
+{ #category : #accessing }
+PowertalkRingImage class >> vmPrimitivesSpec [
+	^ VMPrimitivesSpec ifNil: [ VMPrimitivesSpec := self newVMPrimitivesSpec ]
 ]
 
 { #category : #initialization }
@@ -705,6 +724,16 @@ PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
 { #category : #accessing }
 PowertalkRingImage >> true [
 	^ trueObj
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> vmPrimitivesSpec [
+	^vmPrimitivesSpec
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> vmPrimitivesSpec: anRGEnvironment [
+	vmPrimitivesSpec := anRGEnvironment
 ]
 
 { #category : #accessing }

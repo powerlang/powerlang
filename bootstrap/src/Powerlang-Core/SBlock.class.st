@@ -35,11 +35,6 @@ SBlock >> capturesHome [
 ]
 
 { #category : #accessing }
-SBlock >> compiledCode [
-	^ compiledCode ifNil: [ compiledCode := SCompiledBlock new ]
-]
-
-{ #category : #accessing }
 SBlock >> index [
 	^index
 ]
@@ -71,7 +66,7 @@ SBlock >> isBlock [
 
 { #category : #initialization }
 SBlock >> isInlined [
-	^ compiledCode isNil or: [ compiledCode method isNil ]
+	^ compiledCode isNil
 ]
 
 { #category : #accessing }

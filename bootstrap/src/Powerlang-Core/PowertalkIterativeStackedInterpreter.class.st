@@ -22,20 +22,15 @@ PowertalkIterativeStackedInterpreter >> evaluate [
 
 { #category : #private }
 PowertalkIterativeStackedInterpreter >> evaluateClosure: closure withArgs: arguments [
-	| sblock block receiver |
-	sblock := closure astcodes.
-	block := sblock compiledCode.
-	work := block optimizedCode.
-	receiver := block capturesSelf
+	| block receiver |
+	block := runtime closureBlock: closure.
+	work := runtime blockOptimizedCode: block.
+	receiver := (runtime blockCapturesSelf: block)
 		ifTrue: [ closure at: 1 ]
 		ifFalse: [ nilObj ].
 	context
 		popFrame;
 		buildClosureFrameFor: receiver code: block environment: closure.
-	sblock isInlined
-		ifTrue: [ arguments
-				with: sblock inlinedArgs
-				do: [ :arg :i | context stackTemporaryAt: i put: arg ] ].
 	^ regR
 ]
 
@@ -72,13 +67,19 @@ pc := context incRegPC.
 
 { #category : #private }
 PowertalkIterativeStackedInterpreter >> prepareFor: method [
+	self prepareForExecution: method
+
+]
+
+{ #category : #private }
+PowertalkIterativeStackedInterpreter >> prepareForExecution: method [
 	| operations linearized |
 	operations := runtime sexpressionsOf: method.
-	operations isCollection ifTrue: [ ^self ].
+	operations isCollection
+		ifTrue: [ ^ self ].
 	linearizer visitMethod: operations.
 	linearized := linearizer operations asArray.
 	runtime methodOptimizedCode: method put: linearized
-
 ]
 
 { #category : #initializing }

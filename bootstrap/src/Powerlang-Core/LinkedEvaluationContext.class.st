@@ -171,6 +171,11 @@ LinkedEvaluationContext >> method: anSCompiledMethod [
 ]
 
 { #category : #visiting }
+LinkedEvaluationContext >> methodArguments [
+	^ arguments
+]
+
+{ #category : #visiting }
 LinkedEvaluationContext >> parent [
 	^parent
 ]

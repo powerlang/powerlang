@@ -6,7 +6,8 @@ Class {
 		'falseObj',
 		'trueObj',
 		'nilObj',
-		'interpreter'
+		'interpreter',
+		'overrides'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -52,7 +53,8 @@ PowertalkRuntime >> false [
 
 { #category : #initialization }
 PowertalkRuntime >> initialize [
-	methodCache := Dictionary new
+	methodCache := Dictionary new.
+		overrides := Dictionary new
 ]
 
 { #category : #initialization }
@@ -93,7 +95,7 @@ PowertalkRuntime >> literalFor: anObject [
 
 { #category : #accessing }
 PowertalkRuntime >> localSymbolFrom: anObject [
-	^ anObject bytes asString asSymbol
+	^ anObject bytes allButLast asString asSymbol
 ]
 
 { #category : #accessing }
@@ -152,12 +154,6 @@ PowertalkRuntime >> newSlotsOf: receiver [
 PowertalkRuntime >> nil [
 	^nilObj
 	
-]
-
-{ #category : #accessing }
-PowertalkRuntime >> override: assoc with: primitiveName [
-	^self subclassResponsibility
-
 ]
 
 { #category : #accessing }

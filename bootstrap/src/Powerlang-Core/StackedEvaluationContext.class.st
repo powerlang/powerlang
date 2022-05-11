@@ -184,6 +184,13 @@ StackedEvaluationContext >> method: anSCompiledMethod [
 ]
 
 { #category : #initialization }
+StackedEvaluationContext >> methodArguments [
+	| count |
+	count := system methodArgumentCount: regM.
+	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
+]
+
+{ #category : #initialization }
 StackedEvaluationContext >> operandAt: anInteger [
 	^ stack at: regSP + anInteger
 ]

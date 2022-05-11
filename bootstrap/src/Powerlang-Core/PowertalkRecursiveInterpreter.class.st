@@ -25,15 +25,13 @@ PowertalkRecursiveInterpreter >> evaluateClosure: receiver whileTrue: arg [
 PowertalkRecursiveInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock result |
 	frame := closure builder.
-	sblock := closure astcodes.
+	sblock := closure executionTree.
 	context := frame copy
 		beBlock;
 		parent: context;
 		initializeForBlock: sblock args: arguments closure: closure.
-
 	result := nilObj.
-	sblock statements
-		do: [ :node | result := node acceptVisitor: self ].
+	sblock statements do: [ :node | result := node acceptVisitor: self ].
 	^ result
 ]
 
@@ -82,8 +80,8 @@ PowertalkRecursiveInterpreter >> primitiveClosureWhileTrue [
 PowertalkRecursiveInterpreter >> runtime: aPowertalkRuntime [
 	super runtime: aPowertalkRuntime.
 	aPowertalkRuntime
-		override: #Closure -> #whileTrue: with: 'ClosureWhileTrue';
-		override: #Closure -> #whileFalse: with: 'ClosureWhileFalse'
+		override: #Closure -> #whileTrue: withPrimitive: 'ClosureWhileTrue';
+		override: #Closure -> #whileFalse: withPrimitive: 'ClosureWhileFalse'
 ]
 
 { #category : #visiting }

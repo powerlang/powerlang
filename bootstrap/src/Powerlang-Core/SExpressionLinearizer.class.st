@@ -441,7 +441,10 @@ SExpressionLinearizer >> visitBlock: anSBlock [
 		ifTrue: [ self loadRwithNil ]
 		ifFalse: [ statements last isReturn
 				ifFalse: [ self return ] ].
-	anSBlock optimizedCode: operations asArray.
+	anSBlock isInlined ifFalse: [ 
+	runtime
+		blockOptimizedCode: anSBlock compiledCode
+		put: operations asArray].
 	operations := prevOperations.
 	inBlock := prevInBlock
 ]
@@ -551,7 +554,8 @@ SExpressionLinearizer >> visitMethod: anSMethod [
 	self reset.
 	primitive := anSMethod pragma.
 	primitive
-		ifNotNil: [symbol := runtime symbolFrom: anSMethod primitive. primitive := primitives at: symbol.
+		ifNotNil: [ symbol := runtime localSymbolFrom: anSMethod primitive.
+			primitive := primitives at: symbol.
 			^ self
 				primitive: primitive;
 				return ].

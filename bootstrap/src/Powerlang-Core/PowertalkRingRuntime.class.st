@@ -9,8 +9,7 @@ Class {
 	#superclass : #PowertalkRuntime,
 	#instVars : [
 		'image',
-		'sexpressionsCache',
-		'overrides'
+		'sexpressionsCache'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
@@ -28,6 +27,11 @@ PowertalkRingRuntime >> argumentCountOf: anObjectMap [
 	^ anObjectMap argumentCount
 ]
 
+{ #category : #accessing }
+PowertalkRingRuntime >> arrayedSizeOf: anObjectMap [
+	^anObjectMap arrayedSize
+]
+
 { #category : #services }
 PowertalkRingRuntime >> behaviorOf: anObjectMap [
 	^ anObjectMap spec
@@ -38,9 +42,34 @@ PowertalkRingRuntime >> blockArgumentCount: block [
 	^ block argumentCount
 ]
 
+{ #category : #'own services' }
+PowertalkRingRuntime >> blockCapturesSelf: block [
+	^ block capturesSelf 
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockExecutionTree: block [
+	^ block executionTree
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockOptimizedCode: block [
+	^block optimizedCode
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> blockOptimizedCode: block put: anObject [
+	block optimizedCode: anObject
+]
+
 { #category : #services }
 PowertalkRingRuntime >> blockTempCount: block [
 	^ block tempCount
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> closureBlock: aClosureMap [
+	^aClosureMap block
 ]
 
 { #category : #accessing }
@@ -89,57 +118,15 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 		initializeInterpreter
 ]
 
-{ #category : #accessing }
-PowertalkRingRuntime >> initialize [
-	super initialize.
-	overrides := Dictionary new.
-]
-
 { #category : #initialization }
 PowertalkRingRuntime >> initializeEmulationOverrides [
-	self
-		override: #Species -> #basicNew with: 'New';
-		override: #Species -> #basicNew: with: 'NewSized';
-		override: #Species -> #new with: 'New';
-		override: #Species -> #new: with: 'NewSized';
-		override: #Species -> #primitiveNewBytes: with: 'NewBytes';
-		override: #'Float class' -> #new with: 'FloatNew';
-		override: #'PoolDictionary class' -> #new with: 'DictionaryNew';
-		override: #'Namespace class' -> #new with: 'DictionaryNew';
-		override: #ProtoObject -> #_size with: 'UnderSize';
-		override: #ProtoObject -> #behavior with: 'Behavior';
-		override: #ProtoObject -> #class with: 'Class';
-		override: #ProtoObject -> #== with: 'Equal';
-		override: #ProtoObject -> #primitiveSize with: 'Size';
-		override: #ProtoObject -> #primitiveAt: with: 'At';
-		override: #ProtoObject -> #primitiveAt:put: with: 'AtPut';
-		override: #ProtoObject -> #basicHash with: 'Hash';
-		override: #SmallInteger -> #+ with: 'SMIPlus';
-		override: #SmallInteger -> #- with: 'SMIMinus';
-		override: #SmallInteger -> #* with: 'SMITimes';
-		override: #SmallInteger -> #// with: 'SMIIntDiv';
-		override: #SmallInteger -> #\\ with: 'SMIIntQuot';
-		override: #SmallInteger -> #bitAnd: with: 'SMIBitAnd';
-		override: #SmallInteger -> #bitXor: with: 'SMIBitXor';
-		override: #SmallInteger -> #bitShift: with: 'SMIBitShift';
-		override: #SmallInteger -> #highBit with: 'SMIHighBit';
-		override: #SmallInteger -> #> with: 'SMIGreaterThan';
-		override: #SmallInteger -> #>= with: 'SMIGreaterEqualThan';
-		override: #SmallInteger -> #= with: 'SMIEqual';
-		override: #SmallInteger -> #sizeInBytes with: 'SMISize';
-		override: #Closure -> #value with: 'ClosureValue';
-		override: #Closure -> #evaluateAtomically with: 'ClosureValue';
-		override: #Closure -> #value: with: 'ClosureValueWithArgs';
-		override: #Closure -> #value:value: with: 'ClosureValueWithArgs';
-		override: #Closure -> #value:value:value:
-			with: 'ClosureValueWithArgs';
-		override: #Closure -> #evaluateWith: with: 'ClosureValueWithArgs';
-		override: #Closure -> #evaluateWith:with:
-			with: 'ClosureValueWithArgs';
-		override: #Closure -> #argumentCount with: 'ClosureArgumentCount';
-		override: #String -> #replaceFrom:to:with:startingAt:
-			with: 'StringReplaceFromToWithStartingAt';
-		override: #'HashTable class' -> #primeFor: with: 'PrimeFor'
+	| classes |
+	classes := image vmPrimitivesSpec allClasses select: #isRingResolved.
+	classes
+		do: [ :class | 
+			class methods do: [ :m | self override: class name with: m ].
+			class metaclass methods
+				do: [ :m | self override: class metaclass name with: m ] ]
 ]
 
 { #category : #accessing }
@@ -270,8 +257,18 @@ PowertalkRingRuntime >> newSymbol: aSymbol [
 	^ image newSymbol: aSymbol
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> override: classname with: rgMethod [
+	| species selector method override |
+	species := image specs at: classname.
+	selector := rgMethod selector.
+	method := species methodNamed: selector.
+	override := method copy sourceCode: rgMethod sourceCode.
+	overrides at: species -> selector put: override
+]
+
 { #category : #accessing }
-PowertalkRingRuntime >> override: assoc with: primitive [
+PowertalkRingRuntime >> override: assoc withPrimitive: primitive [
 	| species selector method override count source |
 	species := image specs at: assoc key.
 	selector := assoc value.
@@ -286,8 +283,8 @@ PowertalkRingRuntime >> override: assoc with: primitive [
 								nextPutAll: keyword;
 								nextPutAll: ' arg';
 								nextPutAll: count asString;
-								space . 					count := count + 1 ].
-].
+								space.
+							count := count + 1 ] ].
 			s nextPutAll: '<primitive: ' , primitive , '>' ].
 	method := species methodNamed: selector.
 	override := method copy sourceCode: source.
@@ -297,7 +294,6 @@ PowertalkRingRuntime >> override: assoc with: primitive [
 { #category : #accessing }
 PowertalkRingRuntime >> removeBootstrapDictionaryOverrides [
 self
-		removeOverride: #'PoolDictionary class' -> #new;
 		removeOverride: #'Namespace class' -> #new
 
 ]

@@ -42,9 +42,9 @@ PowertalkLinkedTreeInterpreter >> prepareDispatch: dispatch [
 ]
 
 { #category : #private }
-PowertalkLinkedTreeInterpreter >> prepareFor: anSCompiledMethod [
+PowertalkLinkedTreeInterpreter >> prepareFor: method [
 	| sexpressions |
-	sexpressions := runtime sexpressionsOf: anSCompiledMethod.
+	sexpressions := self prepareForExecution: method.
 	self push: sexpressions
 ]
 
@@ -56,6 +56,12 @@ PowertalkLinkedTreeInterpreter >> prepareForBlock: sblock [
 		ifTrue: [ context pushOperation: SOpReturn new ].
 	statements reverseDo: [ :exp | context pushOperation: exp ].
 	^ nilObj
+]
+
+{ #category : #private }
+PowertalkLinkedTreeInterpreter >> prepareForExecution: anSCompiledMethod [
+	^runtime sexpressionsOf: anSCompiledMethod.
+
 ]
 
 { #category : #accessing }

@@ -40,6 +40,11 @@ PowertalkIterativeInterpreter >> prepareForBlock: sblock [
 	^self subclassResponsibility	
 ]
 
+{ #category : #private }
+PowertalkIterativeInterpreter >> prepareForExecution: method [
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 PowertalkIterativeInterpreter >> regR: anObject [ 
 	regR := anObject
