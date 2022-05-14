@@ -63,7 +63,7 @@ PowertalkLinkedLinearInterpreter >> prepareForExecution: anSCompiledMethod [
 		ifTrue: [ ^ operations ].
 	linearizer visitMethod: operations.
 	array := linearizer operations asArray.
-	operations optimizedCode: array.
+	runtime methodOptimizedCode: operations put: array.
 	^array
 ]
 

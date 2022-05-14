@@ -33,7 +33,8 @@ Class {
 		'moduleNamespaceIndex',
 		'byteArrayClass',
 		'stringClass',
-		'closureBlockIndex'
+		'closureBlockIndex',
+		'closureClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -105,6 +106,13 @@ PowertalkLMR >> blockArgumentCount: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> blockCapturesHome: block [
+	| flags |
+	flags := block slotAt: methodFlagsIndex.
+	^ flags value anyMask: BlockCapturesHome
+]
+
+{ #category : #initialization }
 PowertalkLMR >> blockCapturesSelf: block [
 	| flags |
 	flags := block slotAt: methodFlagsIndex.
@@ -117,8 +125,15 @@ PowertalkLMR >> blockClass: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> blockEnvironmentCount: anLMRObject [
+	| flags |
+	flags := anLMRObject slotAt: methodFlagsIndex.
+	^ flags value bitsAt: BlockEnvCount
+]
+
+{ #category : #initialization }
 PowertalkLMR >> blockExecutionTree: anLMRObject [
-	^ anLMRObject slotAt: methodAstcodesIndex
+	^ anLMRObject slotAt: methodOptimizedCodeIndex
 ]
 
 { #category : #initialization }
@@ -181,6 +196,22 @@ PowertalkLMR >> closureBlock: closure [
 { #category : #initialization }
 PowertalkLMR >> closureBlockIndex: anInteger [
 	closureBlockIndex := anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureClass: anLMRObject [
+	closureClass := anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureHome: closure [
+	| block |
+	block := self closureBlock: closure.
+	(self blockCapturesHome: block)
+		ifFalse: [ self error: 'closure has no home' ].
+	^ (self blockCapturesSelf: block)
+		ifTrue: [ closure at: 2 ]
+		ifFalse: [ closure at: 1 ]
 ]
 
 { #category : #initialization }
@@ -413,6 +444,15 @@ PowertalkLMR >> newBytes: class size: anInteger [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newClosureFor: compiledBlock [
+	| size closure |
+	size := self blockEnvironmentCount: compiledBlock.
+	closure := self newSlots: closureClass size:  size.
+	closure slotAt: closureBlockIndex put: compiledBlock.
+	^ closure
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newCompiledMethod [
 	| behavior header method |
 	behavior := self speciesInstanceBehavior: methodClass.
@@ -463,7 +503,12 @@ PowertalkLMR >> newSlots: class size: anInteger [
 		bytes: false arrayed: false named: true;
 		size: ivars + anInteger;
 		hash: 0.
-	^ LMRSlotObject new header: header
+	^ LMRSlotObject new header: header; nilSlots: nilObj
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newSlotsOf: class [
+	^ self newSlots: class size: 0
 ]
 
 { #category : #initialization }

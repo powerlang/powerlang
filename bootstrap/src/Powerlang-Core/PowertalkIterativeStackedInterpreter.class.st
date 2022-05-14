@@ -170,7 +170,7 @@ PowertalkIterativeStackedInterpreter >> visitOpJumpTrue: anSOpJumpTrue [
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
 	context unwind.
-		work := context regM optimizedCode
+		work := runtime methodOptimizedCode: context regM
 ]
 
 { #category : #initialization }

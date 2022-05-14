@@ -32,12 +32,8 @@ EvaluationContext >> backtrace [
 
 { #category : #visiting }
 EvaluationContext >> captureClosure: anSBlock [
-	| block closure s i type env arg |
-	block := anSBlock compiledCode.
-	closure := system newClosure: block environmentCount.
-	closure
-		block: block;
-		builder: self.
+	|  closure s i type env arg |
+	closure := system newClosureFor: anSBlock compiledCode.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]
@@ -78,11 +74,6 @@ EvaluationContext >> firstArgument [
 
 { #category : #visiting }
 EvaluationContext >> fourthArgument [
-	^ self subclassResponsibility
-]
-
-{ #category : #visiting }
-EvaluationContext >> home [
 	^ self subclassResponsibility
 ]
 

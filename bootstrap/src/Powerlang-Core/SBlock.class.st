@@ -75,12 +75,6 @@ SBlock >> offsetOfCurrentEnvironment [
 ]
 
 { #category : #accessing }
-SBlock >> offsetOfEnvironment: anInteger [
-	(anInteger = 1 and: [ self capturesHome ]) ifTrue: [ ^ 0 ].
-	^ 2
-]
-
-{ #category : #accessing }
 SBlock >> optimizedCode [
 	^compiledCode optimizedCode
 ]

@@ -24,6 +24,7 @@ PowertalkRingRuntime class >> new [
 
 { #category : #services }
 PowertalkRingRuntime >> argumentCountOf: anObjectMap [
+self halt.
 	^ anObjectMap argumentCount
 ]
 
@@ -70,6 +71,11 @@ PowertalkRingRuntime >> blockTempCount: block [
 { #category : #services }
 PowertalkRingRuntime >> closureBlock: aClosureMap [
 	^aClosureMap block
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> closureHome: aClosureMap [
+	^ aClosureMap home
 ]
 
 { #category : #accessing }
@@ -193,8 +199,8 @@ PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod [
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> methodOptimizedCode: anSCompiledMethod put: anObject [
-	anSCompiledMethod optimizedCode: anObject
+PowertalkRingRuntime >> methodOptimizedCode: method put: anObject [
+	method optimizedCode: anObject
 ]
 
 { #category : #services }
@@ -223,8 +229,12 @@ PowertalkRingRuntime >> newBytesOf:  aSpeciesMap sized: size [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> newClosure: anInteger [
-	^ image newClosure: anInteger
+PowertalkRingRuntime >> newClosureFor: compiledBlock [
+	| closure |
+	closure :=  image newClosure: compiledBlock environmentCount.
+	^closure
+		block: compiledBlock
+
 ]
 
 { #category : #accessing }

@@ -40,15 +40,17 @@ PowertalkLMRTest >> assertNoLeftoverFrames [
 
 { #category : #tests }
 PowertalkLMRTest >> compile: aString in: classname during: aBlock [
-	| class selector method |
+	| class behavior md selector method |
 	class := self globalNamed: classname.
+	behavior := runtime speciesInstanceBehavior: class.
+	md := runtime behaviorMethodDictionary: behavior.
 	method := SCompiler new compile: aString.
 	self assert: method notNil.
 	method := self convertMethod: method.
 	selector := method slotAt: 5.
 	runtime
 		sendLocal: #at:put:
-		to: class
+		to: md
 		with:
 			{selector.
 			method}
@@ -66,7 +68,21 @@ PowertalkLMRTest >> convert: anObject with: map [
 		ifTrue: [ ^ runtime newString: anObject ].
 	anObject class = ByteArray
 		ifTrue: [ ^ runtime newByteArray: anObject ].
+	anObject class = SCompiledBlock ifTrue: [ ^self convertBlock: anObject with: map ].
 	self ASSERT: false
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> convertBlock: anSCompiledBlock with: map [
+	| class result instsize slot |
+	class := self globalNamed: #CompiledBlock.
+	result := runtime newSlots: class size: 0.
+	map at: anSCompiledBlock put: result.
+	instsize := anSCompiledBlock class instSize.
+	1 to: instsize do: [ :i | 
+		slot := anSCompiledBlock instVarAt: i.
+		result slotAt: i put: (self convert: slot with: map) ].
+	^ result
 ]
 
 { #category : #tests }
@@ -378,21 +394,22 @@ PowertalkLMRTest >> test190evaluateStringConcatenation [
 { #category : #tests }
 PowertalkLMRTest >> test200createDictionary [
 	| class d |
-	class := runtime classNamed: #Dictionary.
+	class := self globalNamed: #Dictionary.
 	d := runtime sendLocal: #new to: class with: {}.
 	self
-		assert: d spec name equals: 'Dictionary';
+		assert: d localClassName equals: 'Dictionary';
 		assertNoLeftoverFrames
 ]
 
 { #category : #tests }
 PowertalkLMRTest >> test210addAssociationToDictionary [
-	| class d assoc |
-	class := runtime classNamed: #Dictionary.
-	assoc := runtime newAssociation: #foo -> nil.
+	| class symbol assoc d |
+	class := self globalNamed: #Dictionary.
+	symbol := runtime addSymbol: #foo.
+	assoc := runtime sendLocal: #-> to: symbol with: { runtime nil }.
 	d := runtime sendLocal: #new to: class with: {}.
 	runtime sendLocal: #add: to: d with: {assoc}.
 	self
-		assert: d spec name equals: 'Dictionary';
+		assert: d localClassName equals: 'Dictionary';
 		assertNoLeftoverFrames
 ]

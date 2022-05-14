@@ -443,6 +443,16 @@ PowertalkRingRuntimeTest >> test167evaluateNestedClosureWithArgs [
 ]
 
 { #category : #tests }
+PowertalkRingRuntimeTest >> test168evaluateNestedClosureNonLocalReturn [
+	| result |
+	self
+		compile: 'foo [ [ ^7 ] value ] value'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: image true.
+			self assert: result equals: self ==> 7 ]
+]
+
+{ #category : #tests }
 PowertalkRingRuntimeTest >> test168evaluateNestedClosureWithTemps [
 	| result |
 	self

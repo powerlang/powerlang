@@ -2,8 +2,7 @@ Class {
 	#name : #ClosureMap,
 	#superclass : #SlotObjectMap,
 	#instVars : [
-		'block',
-		'builder'
+		'block'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
@@ -24,18 +23,14 @@ ClosureMap >> block: anSCompiledBlock [
 ]
 
 { #category : #accessing }
-ClosureMap >> builder [
-	^ builder
-]
-
-{ #category : #accessing }
-ClosureMap >> builder: aMethodEvaluator [
-	builder := aMethodEvaluator
-]
-
-{ #category : #accessing }
 ClosureMap >> executionTree [
 	^ block optimizedCode
+]
+
+{ #category : #accessing }
+ClosureMap >> home [
+	block capturesHome ifFalse: [ self error: 'closure has no home' ].
+	^block capturesSelf ifTrue: [ self at: 2 ] ifFalse: [ self at: 1 ]
 ]
 
 { #category : #accessing }

@@ -29,7 +29,8 @@ StackedEvaluationContext >> argumentAt: index in: environmentIndex [
 
 { #category : #initialization }
 StackedEvaluationContext >> arguments [
-	|  count |
+	| count |
+	self halt.
 	count := system argumentCountOf: regM.
 	^ (count to: 1 by: -1) collect: [ :i | self argumentAt: i ]
 ]
@@ -82,14 +83,6 @@ StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment
 		code: code
 		environment: environment
 		temps: temps
-]
-
-{ #category : #initialization }
-StackedEvaluationContext >> captureClosure: anSBlock [
-	| closure |
-	closure := super captureClosure: anSBlock.
-	closure builder: self environment.
-	^closure
 ]
 
 { #category : #services }
@@ -346,14 +339,14 @@ StackedEvaluationContext >> thirdArgument [
 { #category : #initialization }
 StackedEvaluationContext >> unwind [
 	| home bp environment |
-	home := self environment builder.
+	home := system closureHome: self environment.
+	home == system nil ifTrue: [ self error: 'cannot return because closure has no home' ].
 	bp := regBP.
 	[ bp != 0 ]
 		whileTrue: [ environment := stack at: bp - 4.
 			environment == home
-				ifTrue: [
-					regBP := bp.
-					^self popFrame ].
+				ifTrue: [ regBP := bp.
+					^ self popFrame ].
 			bp := stack at: bp ].
 	self error: 'cannot return from this closure'
 ]

@@ -38,8 +38,7 @@ SScript >> initialize [
 
 { #category : #accessing }
 SScript >> optimizedCode: anObject [
-	^ self compiledCode
-	optimizedCode: anObject 
+	^ self compiledCode optimizedCode: anObject
 ]
 
 { #category : #printing }

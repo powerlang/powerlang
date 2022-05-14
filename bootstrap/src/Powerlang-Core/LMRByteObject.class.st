@@ -37,3 +37,8 @@ LMRByteObject >> header: anLMRObjectHeader [
 	super header: anLMRObjectHeader.
 	bytes := ByteArray new: header size
 ]
+
+{ #category : #accessing }
+LMRByteObject >> isBytes [
+	^true
+]

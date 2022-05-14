@@ -9,12 +9,12 @@ Class {
 
 { #category : #accessing }
 LMRSlotObject >> at: index [
-	^ slots at: index
+	^ slots at: header behavior classInstSize + index
 ]
 
 { #category : #accessing }
-LMRSlotObject >> at: index put: anLMRObject [
-	^ slots at: index put: anLMRObject
+LMRSlotObject >> at: index put: anLMRObject [	
+	^ slots at: header behavior classInstSize + index put: anLMRObject
 ]
 
 { #category : #accessing }
@@ -26,6 +26,11 @@ LMRSlotObject >> basicAt: index put: anLMRObject [
 LMRSlotObject >> header: anLMRObjectHeader [
 	super header: anLMRObjectHeader.
 	slots := Array new: header size
+]
+
+{ #category : #accessing }
+LMRSlotObject >> nilSlots: nilObj [
+	slots atAllPut: nilObj
 ]
 
 { #category : #accessing }

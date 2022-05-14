@@ -51,6 +51,13 @@ PowertalkRuntime >> false [
 	^ falseObj
 ]
 
+{ #category : #accessing }
+PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
+	| behavior |
+	behavior := self speciesInstanceBehavior: class.
+	^ methodCache removeKey: aSymbol -> behavior ifAbsent: nil
+]
+
 { #category : #initialization }
 PowertalkRuntime >> initialize [
 	methodCache := Dictionary new.
@@ -124,7 +131,7 @@ PowertalkRuntime >> newBytesOf: receiver sized: size [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newClosure: anInteger [
+PowertalkRuntime >> newClosureFor: compiledBlock [
 	^ self subclassResponsibility
 ]
 
@@ -174,6 +181,11 @@ PowertalkRuntime >> sexpressionsOf: aMethod [
 { #category : #accessing }
 PowertalkRuntime >> speciesFor: anObject [
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> speciesInstanceBehavior: class [
+^	self subclassResponsibility 
 ]
 
 { #category : #accessing }

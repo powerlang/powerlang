@@ -144,6 +144,7 @@ PowertalkInterpreter >> initializePrimitives [
 			put: self primitiveStringReplaceFromToWithStartingAt;
 		at: #FloatNew put: self primitiveFloatNew;
 		at: #DictionaryNew put: self primitiveBootstrapDictNew;
+		at: #FlushDispatchCaches put: self primitiveFlushDispatchCaches;
 		at: #BootstrapDictBeConstant
 			put: self primitiveBootstrapDictBeConstant;
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
@@ -311,6 +312,13 @@ PowertalkInterpreter >> primitiveEqual [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveFloatNew [
 	^ [ runtime newBytesOf: context receiver sized: 8 ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveFlushDispatchCaches [
+	^ [ runtime
+		flushDispatchCache: context receiver
+		in: context firstArgument ]
 ]
 
 { #category : #accessing }

@@ -181,8 +181,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #MethodDictionary) allInstVarNames
 		indexOf: 'table'.
 	dest dictionaryTableIndex: index.
-	index := (source => #Closure) allInstVarNames
-		indexOf: 'block'.
+	index := (source => #Closure) allInstVarNames indexOf: 'block'.
 	dest closureBlockIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'format'.
@@ -191,7 +190,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 		indexOf: 'astcodes'.
 	dest methodAstcodesIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'classBinding'.
+		indexOf: 'class'.
 	dest methodClassBindingIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'optimizedCode'.
@@ -229,7 +228,7 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string |
+	| map symbols array method smi block metaclass kernel byteArray string closure |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
@@ -239,6 +238,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	byteArray := mapping at: (source classNamed: #ByteArray).
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
+	closure := mapping at: (source classNamed: #Closure).
 	smi := mapping at: (source classNamed: #SmallInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
@@ -248,6 +248,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		byteArrayClass: byteArray;
 		methodClass: method;
 		blockClass: block;
+		closureClass: closure;
 		smallIntegerClass: smi;
 		stringClass: string;
 		metaclassClass: metaclass;
@@ -255,7 +256,9 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		wordSize: source wordSize;
 		initializeInterpreter;
 		kernel: kernel.
-	self prepareClosuresForExecution; initializeEmulationOverrides
+	self
+		prepareClosuresForExecution;
+		initializeEmulationOverrides
 ]
 
 { #category : #initialization }

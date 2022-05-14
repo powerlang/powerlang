@@ -8,6 +8,20 @@ Class {
 }
 
 { #category : #accessing }
+LMRBehaviorObject >> classInstSize [
+	| class |
+	class := runtime behaviorClass: self.
+	^runtime speciesInstanceSize: class
+]
+
+{ #category : #accessing }
+LMRBehaviorObject >> localClassName [
+	| class |
+	class := runtime behaviorClass: self.
+	^ runtime speciesLocalName: class
+]
+
+{ #category : #accessing }
 LMRBehaviorObject >> printInstance: anLMRObject on: aStream [
 	runtime print: anLMRObject on: aStream
 ]

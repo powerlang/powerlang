@@ -28,8 +28,18 @@ LMRHeapObject >> headerFlags [
 ]
 
 { #category : #accessing }
+LMRHeapObject >> headerHash [
+	^ header hash
+]
+
+{ #category : #accessing }
 LMRHeapObject >> isSmall [
 	^ header isSmall
+]
+
+{ #category : #accessing }
+LMRHeapObject >> localClassName [
+	^ self behavior localClassName
 ]
 
 { #category : #accessing }
