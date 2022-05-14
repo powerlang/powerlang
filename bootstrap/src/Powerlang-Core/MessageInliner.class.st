@@ -54,10 +54,11 @@ MessageInliner >> inline: aMessageNode [
 		ifTrue: [ ^ self inlineRepeat ].
 	s == #to:do:
 		ifTrue: [ ^ self inlineToDo ].
-	s == #to:by:do:
-		ifTrue: [ ^ self inlineToByDo ].
+	"s == #to:by:do:
+		ifTrue: [ ^ self inlineToByDo ]."
 	keywords := $: split: s.
-	keywords last = '' ifTrue: [ keywords := keywords allButLast ].
+	keywords last = ''
+		ifTrue: [ keywords := keywords allButLast ].
 	(keywords conform: [ :k | k = 'and' ])
 		ifTrue: [ ^ self inlineConditional ].
 	(keywords conform: [ :k | k = 'or' ])
