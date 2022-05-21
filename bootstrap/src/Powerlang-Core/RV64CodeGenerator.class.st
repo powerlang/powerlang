@@ -1,6 +1,6 @@
 Class {
 	#name : #RV64CodeGenerator,
-	#superclass : #BaseCodeGenerator,
+	#superclass : #RISCCodeGenerator,
 	#pools : [
 		'RegistersRISCV'
 	],

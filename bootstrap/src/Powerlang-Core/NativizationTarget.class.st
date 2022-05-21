@@ -58,7 +58,7 @@ NativizationTarget class >> x86_64_darwin [
 		name: 'x86_64-darwin';
 		wordSize: 8;
 		abi: SysVX64ABI new;
-		codeGeneratorClass: AssemblerAMD64;
+		codeGeneratorClass: AMD64CodeGenerator;
 		yourself
 ]
 
@@ -68,7 +68,7 @@ NativizationTarget class >> x86_64_linux_gnu [
 		name: 'x86_64-linux-gnu';
 		wordSize: 8;
 		abi: SysVX64ABI new;
-		codeGeneratorClass: AssemblerAMD64;   
+		codeGeneratorClass: AMD64CodeGenerator;   
 		yourself
 ]
 
@@ -78,7 +78,7 @@ NativizationTarget class >> x86_64_win32 [
 		name: 'x86_64-win32';
 		wordSize: 8;
 		abi: WinX64ABI new;
-		codeGeneratorClass: AssemblerAMD64;   
+		codeGeneratorClass: AMD64CodeGenerator;   
 		yourself
 ]
 
@@ -132,7 +132,7 @@ NativizationTarget >> newCodeGenerator [
 
 { #category : #'instance creation' }
 NativizationTarget >> newNativizer [
-	^ Nativizer forTarget: self
+	^ Assembler forTarget: self
 ]
 
 { #category : #'printing & storing' }

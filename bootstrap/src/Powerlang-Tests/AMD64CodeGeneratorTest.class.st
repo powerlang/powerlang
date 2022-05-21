@@ -1,5 +1,5 @@
 Class {
-	#name : #AssemblerAMD64Test,
+	#name : #AMD64CodeGeneratorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'assembler'
@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #utilities }
-AssemblerAMD64Test class >> generateTest: aMessage [
+AMD64CodeGeneratorTest class >> generateTest: aMessage [
 	| assembler bytes testSelector source |
 
 	"  For now, only handle messages with zero or more INTEGER arguments"
@@ -52,12 +52,12 @@ AssemblerAMD64Test class >> generateTest: aMessage [
 ]
 
 { #category : #utilities }
-AssemblerAMD64Test class >> generateTests [
+AMD64CodeGeneratorTest class >> generateTests [
 	"JITAssemblerAMD64 selectorsDo: [ :sel | sel isUnary ifTrue:[ self generateTest: sel ] ]."
 
 	| messages |
 
-	Nativizer class 
+	Assembler class 
 			compile: 'new ^ MessageCollector for: super new useAMD64 wordSize: 8' 
 			classified: #'temporary'.
 	[ 
@@ -67,7 +67,7 @@ AssemblerAMD64Test class >> generateTests [
 		MessageCollector messages copy.
 	] ensure: [ 
 		MessageCollector messages removeAll.
-		Nativizer class removeSelector: #new.
+		Assembler class removeSelector: #new.
 	].
 
 	self halt.    
@@ -76,14 +76,14 @@ AssemblerAMD64Test class >> generateTests [
 ]
 
 { #category : #running }
-AssemblerAMD64Test >> setUp [
+AMD64CodeGeneratorTest >> setUp [
 	super setUp.
 	assembler := NativizationTarget x86_64_linux_gnu newNativizer.
 	
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddAtoR [
+AMD64CodeGeneratorTest >> testAddAtoR [
 	
 	assembler perform: #addAtoR withArguments: #().
 	self 
@@ -93,7 +93,7 @@ AssemblerAMD64Test >> testAddAtoR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddDoubleX1toX0 [
+AMD64CodeGeneratorTest >> testAddDoubleX1toX0 [
 	
 	assembler perform: #addDoubleX1toX0 withArguments: #().
 	self 
@@ -103,7 +103,7 @@ AssemblerAMD64Test >> testAddDoubleX1toX0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddRconstant__1 [
+AMD64CodeGeneratorTest >> testAddRconstant__1 [
 	
 	assembler perform: #addRwithImmediate: withArguments: #(1).
 	self 
@@ -113,7 +113,7 @@ AssemblerAMD64Test >> testAddRconstant__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddRconstant__2 [
+AMD64CodeGeneratorTest >> testAddRconstant__2 [
 	
 	assembler perform: #addRwithImmediate: withArguments: #(2).
 	self 
@@ -123,7 +123,7 @@ AssemblerAMD64Test >> testAddRconstant__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddRconstant__4 [
+AMD64CodeGeneratorTest >> testAddRconstant__4 [
 	
 	assembler perform: #addRwithImmediate: withArguments: #(4).
 	self 
@@ -133,7 +133,7 @@ AssemblerAMD64Test >> testAddRconstant__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddRconstant__8 [
+AMD64CodeGeneratorTest >> testAddRconstant__8 [
 	
 	assembler perform: #addRwithImmediate: withArguments: #(8).
 	self 
@@ -143,7 +143,7 @@ AssemblerAMD64Test >> testAddRconstant__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddRconstant__m2 [
+AMD64CodeGeneratorTest >> testAddRconstant__m2 [
 	
 	assembler perform: #addRwithImmediate: withArguments: #(-2).
 	self 
@@ -153,7 +153,7 @@ AssemblerAMD64Test >> testAddRconstant__m2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddToTconstant__1 [
+AMD64CodeGeneratorTest >> testAddToTconstant__1 [
 	
 	assembler perform: #addTwithImmediate: withArguments: #(1).
 	self 
@@ -163,7 +163,7 @@ AssemblerAMD64Test >> testAddToTconstant__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAddTtoR [
+AMD64CodeGeneratorTest >> testAddTtoR [
 	
 	assembler perform: #addTtoR withArguments: #().
 	self 
@@ -173,7 +173,7 @@ AssemblerAMD64Test >> testAddTtoR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testAndRwithA [
+AMD64CodeGeneratorTest >> testAndRwithA [
 	
 	assembler perform: #andRwithA withArguments: #().
 	self 
@@ -183,7 +183,7 @@ AssemblerAMD64Test >> testAndRwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testBreakpoint [
+AMD64CodeGeneratorTest >> testBreakpoint [
 	
 	assembler perform: #breakpoint withArguments: #().
 	self 
@@ -193,7 +193,7 @@ AssemblerAMD64Test >> testBreakpoint [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testBuildFrame [
+AMD64CodeGeneratorTest >> testBuildFrame [
 	
 	assembler perform: #buildFrame withArguments: #().
 	self 
@@ -203,7 +203,7 @@ AssemblerAMD64Test >> testBuildFrame [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCallIndirectA [
+AMD64CodeGeneratorTest >> testCallIndirectA [
 	
 	assembler perform: #callIndirectA withArguments: #().
 	self 
@@ -213,7 +213,7 @@ AssemblerAMD64Test >> testCallIndirectA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCallIndirectM [
+AMD64CodeGeneratorTest >> testCallIndirectM [
 	
 	assembler perform: #callIndirectM withArguments: #().
 	self 
@@ -223,7 +223,7 @@ AssemblerAMD64Test >> testCallIndirectM [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testCallR [
+AMD64CodeGeneratorTest >> testCallR [
 	
 	assembler callR.
 	self 
@@ -233,7 +233,7 @@ AssemblerAMD64Test >> testCallR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testClearFPUFlags [
+AMD64CodeGeneratorTest >> testClearFPUFlags [
 	
 	assembler perform: #clearFPUFlags withArguments: #().
 	self 
@@ -243,7 +243,7 @@ AssemblerAMD64Test >> testClearFPUFlags [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testClearRhighHalf [
+AMD64CodeGeneratorTest >> testClearRhighHalf [
 	
 	assembler clearRhigh32.
 	self 
@@ -253,7 +253,7 @@ AssemblerAMD64Test >> testClearRhighHalf [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testClearRintegerBit [
+AMD64CodeGeneratorTest >> testClearRintegerBit [
 	
 	assembler perform: #clearRintegerBit withArguments: #().
 	self 
@@ -263,7 +263,7 @@ AssemblerAMD64Test >> testClearRintegerBit [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testClearSafeRintegerBit [
+AMD64CodeGeneratorTest >> testClearSafeRintegerBit [
 	
 	assembler perform: #clearSafeRintegerBit withArguments: #().
 	self 
@@ -273,7 +273,7 @@ AssemblerAMD64Test >> testClearSafeRintegerBit [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testCompareAwithFalse [
+AMD64CodeGeneratorTest >> testCompareAwithFalse [
 	
 	assembler compareAwithFalse.
 	self 
@@ -283,7 +283,7 @@ AssemblerAMD64Test >> testCompareAwithFalse [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testCompareAwithTrue [
+AMD64CodeGeneratorTest >> testCompareAwithTrue [
 	
 	assembler compareAwithTrue.
 	self 
@@ -293,7 +293,7 @@ AssemblerAMD64Test >> testCompareAwithTrue [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareEqualDoubleX0withAindirect [
+AMD64CodeGeneratorTest >> testCompareEqualDoubleX0withAindirect [
 	
 	assembler perform: #compareEqualDoubleX0withAindirect withArguments: #().
 	self 
@@ -303,7 +303,7 @@ AssemblerAMD64Test >> testCompareEqualDoubleX0withAindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareLessThanDoubleX0withAindirect [
+AMD64CodeGeneratorTest >> testCompareLessThanDoubleX0withAindirect [
 	
 	assembler perform: #compareLessThanDoubleX0withAindirect withArguments: #().
 	self 
@@ -313,7 +313,7 @@ AssemblerAMD64Test >> testCompareLessThanDoubleX0withAindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithA [
+AMD64CodeGeneratorTest >> testCompareRwithA [
 	
 	assembler perform: #compareRwithA withArguments: #().
 	self 
@@ -323,7 +323,7 @@ AssemblerAMD64Test >> testCompareRwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithFalse [
+AMD64CodeGeneratorTest >> testCompareRwithFalse [
 	
 	assembler perform: #compareRwithFalse withArguments: #().
 	self 
@@ -333,7 +333,7 @@ AssemblerAMD64Test >> testCompareRwithFalse [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithImmediate__0 [
+AMD64CodeGeneratorTest >> testCompareRwithImmediate__0 [
 	
 	assembler perform: #compareRwithImmediate: withArguments: #(0).
 	self 
@@ -343,7 +343,7 @@ AssemblerAMD64Test >> testCompareRwithImmediate__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithNil [
+AMD64CodeGeneratorTest >> testCompareRwithNil [
 	
 	assembler perform: #compareRwithNil withArguments: #().
 	self 
@@ -353,7 +353,7 @@ AssemblerAMD64Test >> testCompareRwithNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithSmallInteger__0 [
+AMD64CodeGeneratorTest >> testCompareRwithSmallInteger__0 [
 	
 	assembler perform: #compareRwithSmallInteger: withArguments: #(0).
 	self 
@@ -363,7 +363,7 @@ AssemblerAMD64Test >> testCompareRwithSmallInteger__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareRwithTrue [
+AMD64CodeGeneratorTest >> testCompareRwithTrue [
 	
 	assembler perform: #compareRwithTrue withArguments: #().
 	self 
@@ -373,7 +373,7 @@ AssemblerAMD64Test >> testCompareRwithTrue [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__1 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__1 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(1).
 	self 
@@ -383,7 +383,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__11 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__11 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(11).
 	self 
@@ -393,7 +393,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__13 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__13 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(13).
 	self 
@@ -403,7 +403,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__3 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__3 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(3).
 	self 
@@ -413,7 +413,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__5 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__5 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(5).
 	self 
@@ -423,7 +423,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__7 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__7 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(7).
 	self 
@@ -433,7 +433,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareSwithTindex__9 [
+AMD64CodeGeneratorTest >> testCompareSwithTindex__9 [
 	
 	assembler perform: #compareSwithTindex: withArguments: #(9).
 	self 
@@ -443,7 +443,7 @@ AssemblerAMD64Test >> testCompareSwithTindex__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareTwithA [
+AMD64CodeGeneratorTest >> testCompareTwithA [
 	
 	assembler perform: #compareTwithA withArguments: #().
 	self 
@@ -453,7 +453,7 @@ AssemblerAMD64Test >> testCompareTwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testCompareTwithImmediate__0 [
+AMD64CodeGeneratorTest >> testCompareTwithImmediate__0 [
 	
 	assembler perform: #compareTwithImmediate: withArguments: #(0).
 	self 
@@ -463,7 +463,7 @@ AssemblerAMD64Test >> testCompareTwithImmediate__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testConvertAtoNativeInteger [
+AMD64CodeGeneratorTest >> testConvertAtoNativeInteger [
 	
 	assembler perform: #convertAtoNativeInteger withArguments: #().
 	self 
@@ -473,7 +473,7 @@ AssemblerAMD64Test >> testConvertAtoNativeInteger [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testConvertRtoNativeInteger [
+AMD64CodeGeneratorTest >> testConvertRtoNativeInteger [
 	
 	assembler perform: #convertRtoNativeInteger withArguments: #().
 	self 
@@ -483,7 +483,7 @@ AssemblerAMD64Test >> testConvertRtoNativeInteger [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testConvertRtoSmallInteger [
+AMD64CodeGeneratorTest >> testConvertRtoSmallInteger [
 	
 	assembler perform: #convertRtoSmallInteger withArguments: #().
 	self 
@@ -493,7 +493,7 @@ AssemblerAMD64Test >> testConvertRtoSmallInteger [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testConvertTtoNativeInteger [
+AMD64CodeGeneratorTest >> testConvertTtoNativeInteger [
 	
 	assembler perform: #convertTtoNativeInteger withArguments: #().
 	self 
@@ -503,7 +503,7 @@ AssemblerAMD64Test >> testConvertTtoNativeInteger [
 ]
 
 { #category : #'as yet unclassified' }
-AssemblerAMD64Test >> testDecRindirect [
+AMD64CodeGeneratorTest >> testDecRindirect [
 	
 	assembler perform: #decRindirect withArguments: #().
 	self 
@@ -513,7 +513,7 @@ AssemblerAMD64Test >> testDecRindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__1 [
+AMD64CodeGeneratorTest >> testDiscardArguments__1 [
 	
 	assembler perform: #discardArguments: withArguments: #(1).
 	self 
@@ -523,7 +523,7 @@ AssemblerAMD64Test >> testDiscardArguments__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__2 [
+AMD64CodeGeneratorTest >> testDiscardArguments__2 [
 	
 	assembler perform: #discardArguments: withArguments: #(2).
 	self 
@@ -533,7 +533,7 @@ AssemblerAMD64Test >> testDiscardArguments__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__3 [
+AMD64CodeGeneratorTest >> testDiscardArguments__3 [
 	
 	assembler perform: #discardArguments: withArguments: #(3).
 	self 
@@ -543,7 +543,7 @@ AssemblerAMD64Test >> testDiscardArguments__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__4 [
+AMD64CodeGeneratorTest >> testDiscardArguments__4 [
 	
 	assembler perform: #discardArguments: withArguments: #(4).
 	self 
@@ -553,7 +553,7 @@ AssemblerAMD64Test >> testDiscardArguments__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__5 [
+AMD64CodeGeneratorTest >> testDiscardArguments__5 [
 	
 	assembler perform: #discardArguments: withArguments: #(5).
 	self 
@@ -563,7 +563,7 @@ AssemblerAMD64Test >> testDiscardArguments__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__6 [
+AMD64CodeGeneratorTest >> testDiscardArguments__6 [
 	
 	assembler perform: #discardArguments: withArguments: #(6).
 	self 
@@ -573,7 +573,7 @@ AssemblerAMD64Test >> testDiscardArguments__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDiscardArguments__7 [
+AMD64CodeGeneratorTest >> testDiscardArguments__7 [
 	
 	assembler perform: #discardArguments: withArguments: #(7).
 	self 
@@ -583,7 +583,7 @@ AssemblerAMD64Test >> testDiscardArguments__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDivideDoubleX0byX1 [
+AMD64CodeGeneratorTest >> testDivideDoubleX0byX1 [
 	
 	assembler perform: #divideDoubleX0byX1 withArguments: #().
 	self 
@@ -593,7 +593,7 @@ AssemblerAMD64Test >> testDivideDoubleX0byX1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDivideRbyT [
+AMD64CodeGeneratorTest >> testDivideRbyT [
 	
 	assembler perform: #extendRtoAandDividebyT withArguments: #().
 	self 
@@ -603,7 +603,7 @@ AssemblerAMD64Test >> testDivideRbyT [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testDropTopOfFPU [
+AMD64CodeGeneratorTest >> testDropTopOfFPU [
 	
 	assembler dropTopOfFPU.
 	self 
@@ -613,7 +613,7 @@ AssemblerAMD64Test >> testDropTopOfFPU [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testDropTos__1 [
+AMD64CodeGeneratorTest >> testDropTos__1 [
 	
 	assembler perform: #dropTos: withArguments: #(1).
 	self 
@@ -623,7 +623,7 @@ AssemblerAMD64Test >> testDropTos__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testEnsureRintegerBit [
+AMD64CodeGeneratorTest >> testEnsureRintegerBit [
 	
 	assembler perform: #setRintegerBit withArguments: #().
 	self 
@@ -633,7 +633,7 @@ AssemblerAMD64Test >> testEnsureRintegerBit [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testEnsureSafeRintegerBit [
+AMD64CodeGeneratorTest >> testEnsureSafeRintegerBit [
 	
 	assembler perform: #setSafeRintegerBit withArguments: #().
 	self 
@@ -643,7 +643,7 @@ AssemblerAMD64Test >> testEnsureSafeRintegerBit [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testExchangeRindirectWithT [
+AMD64CodeGeneratorTest >> testExchangeRindirectWithT [
 	
 	assembler perform: #exchangeRindirectWithT withArguments: #().
 	self 
@@ -653,7 +653,7 @@ AssemblerAMD64Test >> testExchangeRindirectWithT [
 ]
 
 { #category : #'as yet unclassified' }
-AssemblerAMD64Test >> testInitializeS [
+AMD64CodeGeneratorTest >> testInitializeS [
 	
 	assembler perform: #initializeS withArguments: #().
 	self 
@@ -663,7 +663,7 @@ AssemblerAMD64Test >> testInitializeS [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testJumpToMindex__1 [
+AMD64CodeGeneratorTest >> testJumpToMindex__1 [
 	
 	assembler perform: #jumpToMindex: withArguments: #(1).
 	self 
@@ -673,7 +673,7 @@ AssemblerAMD64Test >> testJumpToMindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledIntegerBitTestOfR [
+AMD64CodeGeneratorTest >> testLabeledIntegerBitTestOfR [
 	
 	assembler perform: #labeledIntegerBitTestOfR withArguments: #().
 	self 
@@ -683,7 +683,7 @@ AssemblerAMD64Test >> testLabeledIntegerBitTestOfR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledIntegerBitTestOfT [
+AMD64CodeGeneratorTest >> testLabeledIntegerBitTestOfT [
 	
 	assembler perform: #labeledIntegerBitTestOfT withArguments: #().
 	self 
@@ -693,7 +693,7 @@ AssemblerAMD64Test >> testLabeledIntegerBitTestOfT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledIntegerNativizationOfA [
+AMD64CodeGeneratorTest >> testLabeledIntegerNativizationOfA [
 	
 	assembler perform: #labeledIntegerNativizationOfA withArguments: #().
 	self 
@@ -703,7 +703,7 @@ AssemblerAMD64Test >> testLabeledIntegerNativizationOfA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledIntegerNativizationOfR [
+AMD64CodeGeneratorTest >> testLabeledIntegerNativizationOfR [
 	
 	assembler perform: #labeledIntegerNativizationOfR withArguments: #().
 	self 
@@ -713,7 +713,7 @@ AssemblerAMD64Test >> testLabeledIntegerNativizationOfR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledIntegerNativizationOfT [
+AMD64CodeGeneratorTest >> testLabeledIntegerNativizationOfT [
 	
 	assembler perform: #labeledIntegerNativizationOfT withArguments: #().
 	self 
@@ -723,7 +723,7 @@ AssemblerAMD64Test >> testLabeledIntegerNativizationOfT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLabeledNonIntegerBitTestOfR [
+AMD64CodeGeneratorTest >> testLabeledNonIntegerBitTestOfR [
 	
 	assembler perform: #labeledNonIntegerBitTestOfR withArguments: #().
 	self 
@@ -733,7 +733,7 @@ AssemblerAMD64Test >> testLabeledNonIntegerBitTestOfR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLeadingRzeroCount [
+AMD64CodeGeneratorTest >> testLeadingRzeroCount [
 	
 	assembler perform: #leadingRzeroCount withArguments: #().
 	self 
@@ -743,7 +743,7 @@ AssemblerAMD64Test >> testLeadingRzeroCount [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__1 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__1 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(1).
 	self 
@@ -753,7 +753,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__2 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__2 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(2).
 	self 
@@ -763,7 +763,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__3 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__3 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(3).
 	self 
@@ -773,7 +773,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__4 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__4 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(4).
 	self 
@@ -783,7 +783,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__5 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__5 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(5).
 	self 
@@ -793,7 +793,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithAindex__6 [
+AMD64CodeGeneratorTest >> testLoadAwithAindex__6 [
 	
 	assembler perform: #loadAwithAindex: withArguments: #(6).
 	self 
@@ -803,7 +803,7 @@ AssemblerAMD64Test >> testLoadAwithAindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__1 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__1 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(1).
 	self 
@@ -813,7 +813,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__2 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__2 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(2).
 	self 
@@ -823,7 +823,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__3 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__3 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(3).
 	self 
@@ -833,7 +833,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__4 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__4 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(4).
 	self 
@@ -843,7 +843,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__5 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__5 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(5).
 	self 
@@ -853,7 +853,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithEindex__6 [
+AMD64CodeGeneratorTest >> testLoadAwithEindex__6 [
 	
 	assembler perform: #loadAwithEindex: withArguments: #(6).
 	self 
@@ -863,7 +863,7 @@ AssemblerAMD64Test >> testLoadAwithEindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__3 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__3 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(3).
 	self 
@@ -873,7 +873,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__4 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__4 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(4).
 	self 
@@ -883,7 +883,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__5 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__5 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(5).
 	self 
@@ -893,7 +893,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__6 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__6 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(6).
 	self 
@@ -903,7 +903,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m10 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m10 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-10).
 	self 
@@ -913,7 +913,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m11 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m11 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-11).
 	self 
@@ -923,7 +923,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m12 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m12 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-12).
 	self 
@@ -933,7 +933,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m13 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m13 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-13).
 	self 
@@ -943,7 +943,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m17 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m17 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-17).
 	self 
@@ -953,7 +953,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m17 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m18 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m18 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-18).
 	self 
@@ -963,7 +963,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m2 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m2 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-2).
 	self 
@@ -973,7 +973,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m20 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m20 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-20).
 	self 
@@ -983,7 +983,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m20 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m3 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m3 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-3).
 	self 
@@ -993,7 +993,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m4 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m4 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-4).
 	self 
@@ -1003,7 +1003,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m5 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m5 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-5).
 	self 
@@ -1013,7 +1013,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m6 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m6 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-6).
 	self 
@@ -1023,7 +1023,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m7 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m7 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-7).
 	self 
@@ -1033,7 +1033,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m8 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m8 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-8).
 	self 
@@ -1043,7 +1043,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithFPindex__m9 [
+AMD64CodeGeneratorTest >> testLoadAwithFPindex__m9 [
 	
 	assembler perform: #loadAwithFPindex: withArguments: #(-9).
 	self 
@@ -1053,7 +1053,7 @@ AssemblerAMD64Test >> testLoadAwithFPindex__m9 [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testLoadAwithFalse [
+AMD64CodeGeneratorTest >> testLoadAwithFalse [
 	
 	assembler loadAwithFalse.
 	self 
@@ -1063,7 +1063,7 @@ AssemblerAMD64Test >> testLoadAwithFalse [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithLiteral__1405006117752879898543142606244511569936384000000000 [
+AMD64CodeGeneratorTest >> testLoadAwithLiteral__1405006117752879898543142606244511569936384000000000 [
 	
 	assembler perform: #loadAwithLiteral: withArguments: #(1405006117752879898543142606244511569936384000000000).
 	self 
@@ -1073,7 +1073,7 @@ AssemblerAMD64Test >> testLoadAwithLiteral__140500611775287989854314260624451156
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithNil [
+AMD64CodeGeneratorTest >> testLoadAwithNil [
 	
 	assembler perform: #loadAwithNil withArguments: #().
 	self 
@@ -1083,7 +1083,7 @@ AssemblerAMD64Test >> testLoadAwithNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithR [
+AMD64CodeGeneratorTest >> testLoadAwithR [
 	
 	assembler perform: #loadAwithR withArguments: #().
 	self 
@@ -1093,7 +1093,7 @@ AssemblerAMD64Test >> testLoadAwithR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithRoffsetAtA [
+AMD64CodeGeneratorTest >> testLoadAwithRoffsetAtA [
 	
 	assembler perform: #loadAwithRoffsetAtA withArguments: #().
 	self 
@@ -1103,7 +1103,7 @@ AssemblerAMD64Test >> testLoadAwithRoffsetAtA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithS [
+AMD64CodeGeneratorTest >> testLoadAwithS [
 	
 	assembler perform: #loadAwithS withArguments: #().
 	self 
@@ -1113,7 +1113,7 @@ AssemblerAMD64Test >> testLoadAwithS [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__1 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__1 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(1).
 	self 
@@ -1123,7 +1123,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__16 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__16 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(16).
 	self 
@@ -1133,7 +1133,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__2 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__2 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(2).
 	self 
@@ -1143,7 +1143,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__3 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__3 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(3).
 	self 
@@ -1153,7 +1153,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__4 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__4 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(4).
 	self 
@@ -1163,7 +1163,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSindex__5 [
+AMD64CodeGeneratorTest >> testLoadAwithSindex__5 [
 	
 	assembler perform: #loadAwithSindex: withArguments: #(5).
 	self 
@@ -1173,7 +1173,7 @@ AssemblerAMD64Test >> testLoadAwithSindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__0 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__0 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(0).
 	self 
@@ -1183,7 +1183,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1).
 	self 
@@ -1193,7 +1193,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__10 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__10 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(10).
 	self 
@@ -1203,7 +1203,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__100 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__100 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(100).
 	self 
@@ -1213,7 +1213,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__100 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1000 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1000 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1000).
 	self 
@@ -1223,7 +1223,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1023 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1023 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1023).
 	self 
@@ -1233,7 +1233,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1023 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1024 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1024 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1024).
 	self 
@@ -1243,7 +1243,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1024 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1048575 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1048575 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1048575).
 	self 
@@ -1253,7 +1253,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1048575 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1114112 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1114112 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1114112).
 	self 
@@ -1263,7 +1263,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1114112 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__12 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__12 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(12).
 	self 
@@ -1273,7 +1273,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__12288 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__12288 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(12288).
 	self 
@@ -1283,7 +1283,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__12288 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__123 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__123 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(123).
 	self 
@@ -1293,7 +1293,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__123 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__124 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__124 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(124).
 	self 
@@ -1303,7 +1303,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__124 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__125 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__125 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(125).
 	self 
@@ -1313,7 +1313,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__125 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__127 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__127 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(127).
 	self 
@@ -1323,7 +1323,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__127 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__128 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__128 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(128).
 	self 
@@ -1333,7 +1333,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__128 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__13 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__13 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(13).
 	self 
@@ -1343,7 +1343,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__14 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__14 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(14).
 	self 
@@ -1353,7 +1353,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__15 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__15 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(15).
 	self 
@@ -1363,7 +1363,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__16 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__16 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(16).
 	self 
@@ -1373,7 +1373,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__160 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__160 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(160).
 	self 
@@ -1383,7 +1383,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__160 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__162 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__162 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(162).
 	self 
@@ -1393,7 +1393,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__162 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__16273 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__16273 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(16273).
 	self 
@@ -1403,7 +1403,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__16273 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__16383 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__16383 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(16383).
 	self 
@@ -1413,7 +1413,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__16383 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__16384 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__16384 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(16384).
 	self 
@@ -1423,7 +1423,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__16384 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__1664525 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__1664525 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(1664525).
 	self 
@@ -1433,7 +1433,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__1664525 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__16777215 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__16777215 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(16777215).
 	self 
@@ -1443,7 +1443,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__16777215 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__192 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__192 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(192).
 	self 
@@ -1453,7 +1453,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__192 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__2 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__2 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(2).
 	self 
@@ -1463,7 +1463,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__2047 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__2047 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(2047).
 	self 
@@ -1473,7 +1473,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__2047 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__2048 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__2048 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(2048).
 	self 
@@ -1483,7 +1483,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__2048 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__216 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__216 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(216).
 	self 
@@ -1493,7 +1493,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__216 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__224 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__224 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(224).
 	self 
@@ -1503,7 +1503,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__224 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__240 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__240 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(240).
 	self 
@@ -1513,7 +1513,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__240 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__248 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__248 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(248).
 	self 
@@ -1523,7 +1523,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__248 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__251 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__251 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(251).
 	self 
@@ -1533,7 +1533,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__251 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__255 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__255 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(255).
 	self 
@@ -1543,7 +1543,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__255 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__256 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__256 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(256).
 	self 
@@ -1553,7 +1553,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__256 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__268435455 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__268435455 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(268435455).
 	self 
@@ -1563,7 +1563,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__268435455 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__3 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__3 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(3).
 	self 
@@ -1573,7 +1573,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__30000 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__30000 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(30000).
 	self 
@@ -1583,7 +1583,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__30000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__31 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__31 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(31).
 	self 
@@ -1593,7 +1593,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__31 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__32 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__32 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(32).
 	self 
@@ -1603,7 +1603,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__32 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__32752 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__32752 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(32752).
 	self 
@@ -1613,7 +1613,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__32752 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__32767 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__32767 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(32767).
 	self 
@@ -1623,7 +1623,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__32767 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__32768 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__32768 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(32768).
 	self 
@@ -1633,7 +1633,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__32768 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__34 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__34 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(34).
 	self 
@@ -1643,7 +1643,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__34 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__35 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__35 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(35).
 	self 
@@ -1653,7 +1653,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__35 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__36 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__36 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(36).
 	self 
@@ -1663,7 +1663,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__36 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__39 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__39 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(39).
 	self 
@@ -1673,7 +1673,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__39 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__4 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__4 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(4).
 	self 
@@ -1683,7 +1683,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__41 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__41 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(41).
 	self 
@@ -1693,7 +1693,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__41 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__42 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__42 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(42).
 	self 
@@ -1703,7 +1703,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__42 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__4294967295 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__4294967295 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(4294967295).
 	self 
@@ -1713,7 +1713,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__4294967295 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__4294967296 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__4294967296 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(4294967296).
 	self 
@@ -1723,7 +1723,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__4294967296 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__43 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__43 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(43).
 	self 
@@ -1733,7 +1733,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__43 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__45 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__45 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(45).
 	self 
@@ -1743,7 +1743,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__45 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__4503599627370496 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__4503599627370496 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(4503599627370496).
 	self 
@@ -1753,7 +1753,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__4503599627370496 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__46 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__46 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(46).
 	self 
@@ -1763,7 +1763,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__46 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__48 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__48 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(48).
 	self 
@@ -1773,7 +1773,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__48 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__49152 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__49152 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(49152).
 	self 
@@ -1783,7 +1783,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__49152 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__5 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__5 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(5).
 	self 
@@ -1793,7 +1793,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__50 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__50 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(50).
 	self 
@@ -1803,7 +1803,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__50 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__5000 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__5000 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(5000).
 	self 
@@ -1813,7 +1813,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__5000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__54 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__54 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(54).
 	self 
@@ -1823,7 +1823,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__54 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__54625 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__54625 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(54625).
 	self 
@@ -1833,7 +1833,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__54625 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__55 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__55 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(55).
 	self 
@@ -1843,7 +1843,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__55 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__55296 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__55296 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(55296).
 	self 
@@ -1853,7 +1853,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__55296 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__56320 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__56320 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(56320).
 	self 
@@ -1863,7 +1863,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__56320 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__57 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__57 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(57).
 	self 
@@ -1873,7 +1873,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__57 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__57344 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__57344 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(57344).
 	self 
@@ -1883,7 +1883,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__57344 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__58 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__58 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(58).
 	self 
@@ -1893,7 +1893,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__58 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__59 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__59 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(59).
 	self 
@@ -1903,7 +1903,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__59 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__6 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__6 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(6).
 	self 
@@ -1913,7 +1913,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__60 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__60 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(60).
 	self 
@@ -1923,7 +1923,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__60 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__62 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__62 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(62).
 	self 
@@ -1933,7 +1933,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__62 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__63 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__63 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(63).
 	self 
@@ -1943,7 +1943,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__63 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__64 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__64 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(64).
 	self 
@@ -1953,7 +1953,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__64 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__65535 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__65535 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(65535).
 	self 
@@ -1963,7 +1963,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__65535 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__65536 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__65536 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(65536).
 	self 
@@ -1973,7 +1973,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__65536 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__7 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__7 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(7).
 	self 
@@ -1983,7 +1983,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__75 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__75 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(75).
 	self 
@@ -1993,7 +1993,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__75 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__8 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__8 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(8).
 	self 
@@ -2003,7 +2003,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__8192 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__8192 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(8192).
 	self 
@@ -2013,7 +2013,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__8192 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__8204 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__8204 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(8204).
 	self 
@@ -2023,7 +2023,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__8204 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__8239 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__8239 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(8239).
 	self 
@@ -2033,7 +2033,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__8239 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__8287 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__8287 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(8287).
 	self 
@@ -2043,7 +2043,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__8287 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__87 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__87 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(87).
 	self 
@@ -2053,7 +2053,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__87 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__9 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__9 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(9).
 	self 
@@ -2063,7 +2063,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__90 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__90 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(90).
 	self 
@@ -2073,7 +2073,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__90 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__9007199254740992 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__9007199254740992 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(9007199254740992).
 	self 
@@ -2083,7 +2083,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__9007199254740992 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__91 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__91 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(91).
 	self 
@@ -2093,7 +2093,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__91 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__92 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__92 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(92).
 	self 
@@ -2103,7 +2103,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__92 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__93 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__93 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(93).
 	self 
@@ -2113,7 +2113,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__93 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__94 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__94 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(94).
 	self 
@@ -2123,7 +2123,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__94 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__95 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__95 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(95).
 	self 
@@ -2133,7 +2133,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__95 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__96 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__96 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(96).
 	self 
@@ -2143,7 +2143,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__96 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__m1 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__m1 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(-1).
 	self 
@@ -2153,7 +2153,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__m1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__m1023 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__m1023 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(-1023).
 	self 
@@ -2163,7 +2163,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__m1023 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadAwithSmallInteger__m2 [
+AMD64CodeGeneratorTest >> testLoadAwithSmallInteger__m2 [
 	
 	assembler perform: #loadAwithSmallInteger: withArguments: #(-2).
 	self 
@@ -2173,7 +2173,7 @@ AssemblerAMD64Test >> testLoadAwithSmallInteger__m2 [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testLoadAwithTrue [
+AMD64CodeGeneratorTest >> testLoadAwithTrue [
 	
 	assembler loadAwithTrue.
 	self 
@@ -2183,7 +2183,7 @@ AssemblerAMD64Test >> testLoadAwithTrue [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadEwithAddressOfRatA [
+AMD64CodeGeneratorTest >> testLoadEwithAddressOfRatA [
 	
 	assembler perform: #loadEwithAddressOfRatA withArguments: #().
 	self 
@@ -2193,7 +2193,7 @@ AssemblerAMD64Test >> testLoadEwithAddressOfRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadEwithNil [
+AMD64CodeGeneratorTest >> testLoadEwithNil [
 	
 	assembler perform: #loadEwithNil withArguments: #().
 	self 
@@ -2203,7 +2203,7 @@ AssemblerAMD64Test >> testLoadEwithNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadEwithR [
+AMD64CodeGeneratorTest >> testLoadEwithR [
 	
 	assembler perform: #loadEwithR withArguments: #().
 	self 
@@ -2213,7 +2213,7 @@ AssemblerAMD64Test >> testLoadEwithR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadFPwithR [
+AMD64CodeGeneratorTest >> testLoadFPwithR [
 	
 	assembler perform: #loadFPwithR withArguments: #().
 	self 
@@ -2223,7 +2223,7 @@ AssemblerAMD64Test >> testLoadFPwithR [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testLoadFPwithSP [
+AMD64CodeGeneratorTest >> testLoadFPwithSP [
 	
 	assembler loadFPwithSP.
 	self 
@@ -2233,7 +2233,7 @@ AssemblerAMD64Test >> testLoadFPwithSP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadLargeX0withRindirect [
+AMD64CodeGeneratorTest >> testLoadLargeX0withRindirect [
 	
 	assembler perform: #loadLargeX0withRindirect withArguments: #().
 	self 
@@ -2243,7 +2243,7 @@ AssemblerAMD64Test >> testLoadLargeX0withRindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadLargeX1withAindirect [
+AMD64CodeGeneratorTest >> testLoadLargeX1withAindirect [
 	
 	assembler perform: #loadLargeX1withAindirect withArguments: #().
 	self 
@@ -2253,7 +2253,7 @@ AssemblerAMD64Test >> testLoadLargeX1withAindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadLongMwithIPoffset__m34 [
+AMD64CodeGeneratorTest >> testLoadLongMwithIPoffset__m34 [
 	
 	assembler perform: #loadLongMwithIPoffset: withArguments: #(-34).
 	self 
@@ -2263,7 +2263,7 @@ AssemblerAMD64Test >> testLoadLongMwithIPoffset__m34 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadLongRwithRatOffsetA [
+AMD64CodeGeneratorTest >> testLoadLongRwithRatOffsetA [
 	
 	assembler perform: #loadLongRwithRatOffsetA withArguments: #().
 	self 
@@ -2273,7 +2273,7 @@ AssemblerAMD64Test >> testLoadLongRwithRatOffsetA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadLongSwithRindex__0 [
+AMD64CodeGeneratorTest >> testLoadLongSwithRindex__0 [
 	
 	assembler perform: #loadLongSwithRindex: withArguments: #(0).
 	self 
@@ -2283,7 +2283,7 @@ AssemblerAMD64Test >> testLoadLongSwithRindex__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMXCSRfromA [
+AMD64CodeGeneratorTest >> testLoadMXCSRfromA [
 	
 	assembler perform: #loadMXCSRfromA withArguments: #().
 	self 
@@ -2293,7 +2293,7 @@ AssemblerAMD64Test >> testLoadMXCSRfromA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithA [
+AMD64CodeGeneratorTest >> testLoadMwithA [
 	
 	assembler perform: #loadMwithA withArguments: #().
 	self 
@@ -2303,7 +2303,7 @@ AssemblerAMD64Test >> testLoadMwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithMindex__2 [
+AMD64CodeGeneratorTest >> testLoadMwithMindex__2 [
 	
 	assembler perform: #loadMwithMindex: withArguments: #(2).
 	self 
@@ -2313,7 +2313,7 @@ AssemblerAMD64Test >> testLoadMwithMindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithMindex__4 [
+AMD64CodeGeneratorTest >> testLoadMwithMindex__4 [
 	
 	assembler perform: #loadMwithMindex: withArguments: #(4).
 	self 
@@ -2323,7 +2323,7 @@ AssemblerAMD64Test >> testLoadMwithMindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithRindex__1 [
+AMD64CodeGeneratorTest >> testLoadMwithRindex__1 [
 	
 	assembler perform: #loadMwithRindex: withArguments: #(1).
 	self 
@@ -2333,7 +2333,7 @@ AssemblerAMD64Test >> testLoadMwithRindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__10 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__10 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(10).
 	self 
@@ -2343,7 +2343,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__12 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__12 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(12).
 	self 
@@ -2353,7 +2353,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__14 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__14 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(14).
 	self 
@@ -2363,7 +2363,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__15 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__15 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(15).
 	self 
@@ -2373,7 +2373,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__2 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__2 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(2).
 	self 
@@ -2383,7 +2383,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__4 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__4 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(4).
 	self 
@@ -2393,7 +2393,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__6 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__6 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(6).
 	self 
@@ -2403,7 +2403,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadMwithTindex__8 [
+AMD64CodeGeneratorTest >> testLoadMwithTindex__8 [
 	
 	assembler perform: #loadMwithTindex: withArguments: #(8).
 	self 
@@ -2413,7 +2413,7 @@ AssemblerAMD64Test >> testLoadMwithTindex__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRconvertingDoublePointedByR [
+AMD64CodeGeneratorTest >> testLoadRconvertingDoublePointedByR [
 	
 	assembler perform: #loadRconvertingDoublePointedByR withArguments: #().
 	self 
@@ -2423,7 +2423,7 @@ AssemblerAMD64Test >> testLoadRconvertingDoublePointedByR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithA [
+AMD64CodeGeneratorTest >> testLoadRwithA [
 	
 	assembler perform: #loadRwithA withArguments: #().
 	self 
@@ -2433,7 +2433,7 @@ AssemblerAMD64Test >> testLoadRwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithArgPointer [
+AMD64CodeGeneratorTest >> testLoadRwithArgPointer [
 	
 	assembler perform: #loadRwithArgPointer withArguments: #().
 	self 
@@ -2443,7 +2443,7 @@ AssemblerAMD64Test >> testLoadRwithArgPointer [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithE [
+AMD64CodeGeneratorTest >> testLoadRwithE [
 	
 	assembler perform: #loadRwithE withArguments: #().
 	self 
@@ -2453,7 +2453,7 @@ AssemblerAMD64Test >> testLoadRwithE [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__1 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__1 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(1).
 	self 
@@ -2463,7 +2463,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__2 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__2 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(2).
 	self 
@@ -2473,7 +2473,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__3 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__3 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(3).
 	self 
@@ -2483,7 +2483,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__4 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__4 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(4).
 	self 
@@ -2493,7 +2493,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__5 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__5 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(5).
 	self 
@@ -2503,7 +2503,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__6 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__6 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(6).
 	self 
@@ -2513,7 +2513,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithEindex__7 [
+AMD64CodeGeneratorTest >> testLoadRwithEindex__7 [
 	
 	assembler perform: #loadRwithEindex: withArguments: #(7).
 	self 
@@ -2523,7 +2523,7 @@ AssemblerAMD64Test >> testLoadRwithEindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFP [
+AMD64CodeGeneratorTest >> testLoadRwithFP [
 	
 	assembler perform: #loadRwithFP withArguments: #().
 	self 
@@ -2533,7 +2533,7 @@ AssemblerAMD64Test >> testLoadRwithFP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__1 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__1 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(1).
 	self 
@@ -2543,7 +2543,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__3 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__3 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(3).
 	self 
@@ -2553,7 +2553,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__4 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__4 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(4).
 	self 
@@ -2563,7 +2563,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__5 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__5 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(5).
 	self 
@@ -2573,7 +2573,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__6 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__6 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(6).
 	self 
@@ -2583,7 +2583,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__7 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__7 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(7).
 	self 
@@ -2593,7 +2593,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__8 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__8 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(8).
 	self 
@@ -2603,7 +2603,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__9 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__9 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(9).
 	self 
@@ -2613,7 +2613,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m10 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m10 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-10).
 	self 
@@ -2623,7 +2623,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m11 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m11 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-11).
 	self 
@@ -2633,7 +2633,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m12 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m12 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-12).
 	self 
@@ -2643,7 +2643,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m13 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m13 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-13).
 	self 
@@ -2653,7 +2653,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m14 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m14 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-14).
 	self 
@@ -2663,7 +2663,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m15 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m15 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-15).
 	self 
@@ -2673,7 +2673,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m16 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m16 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-16).
 	self 
@@ -2683,7 +2683,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m17 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m17 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-17).
 	self 
@@ -2693,7 +2693,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m17 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m18 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m18 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-18).
 	self 
@@ -2703,7 +2703,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m19 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m19 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-19).
 	self 
@@ -2713,7 +2713,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m19 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m2 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m2 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-2).
 	self 
@@ -2723,7 +2723,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m20 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m20 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-20).
 	self 
@@ -2733,7 +2733,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m20 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m21 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m21 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-21).
 	self 
@@ -2743,7 +2743,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m21 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m3 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m3 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-3).
 	self 
@@ -2753,7 +2753,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m4 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m4 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-4).
 	self 
@@ -2763,7 +2763,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m5 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m5 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-5).
 	self 
@@ -2773,7 +2773,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m6 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m6 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-6).
 	self 
@@ -2783,7 +2783,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m7 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m7 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-7).
 	self 
@@ -2793,7 +2793,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m8 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m8 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-8).
 	self 
@@ -2803,7 +2803,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFPindex__m9 [
+AMD64CodeGeneratorTest >> testLoadRwithFPindex__m9 [
 	
 	assembler perform: #loadRwithFPindex: withArguments: #(-9).
 	self 
@@ -2813,7 +2813,7 @@ AssemblerAMD64Test >> testLoadRwithFPindex__m9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithFalse [
+AMD64CodeGeneratorTest >> testLoadRwithFalse [
 	
 	assembler perform: #loadRwithFalse withArguments: #().
 	self 
@@ -2823,7 +2823,7 @@ AssemblerAMD64Test >> testLoadRwithFalse [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithImmediate__0 [
+AMD64CodeGeneratorTest >> testLoadRwithImmediate__0 [
 	
 	assembler perform: #loadRwithImmediate: withArguments: #(0).
 	self 
@@ -2833,7 +2833,7 @@ AssemblerAMD64Test >> testLoadRwithImmediate__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithM [
+AMD64CodeGeneratorTest >> testLoadRwithM [
 	
 	assembler perform: #loadRwithM withArguments: #().
 	self 
@@ -2843,7 +2843,7 @@ AssemblerAMD64Test >> testLoadRwithM [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithMindex__2 [
+AMD64CodeGeneratorTest >> testLoadRwithMindex__2 [
 	
 	assembler perform: #loadRwithMindex: withArguments: #(2).
 	self 
@@ -2853,7 +2853,7 @@ AssemblerAMD64Test >> testLoadRwithMindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithNil [
+AMD64CodeGeneratorTest >> testLoadRwithNil [
 	
 	assembler perform: #loadRwithNil withArguments: #().
 	self 
@@ -2863,7 +2863,7 @@ AssemblerAMD64Test >> testLoadRwithNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRatA [
+AMD64CodeGeneratorTest >> testLoadRwithRatA [
 	
 	assembler perform: #loadRwithRatA withArguments: #().
 	self 
@@ -2873,7 +2873,7 @@ AssemblerAMD64Test >> testLoadRwithRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRatOffsetA [
+AMD64CodeGeneratorTest >> testLoadRwithRatOffsetA [
 	
 	assembler perform: #loadRwithRatOffsetA withArguments: #().
 	self 
@@ -2883,7 +2883,7 @@ AssemblerAMD64Test >> testLoadRwithRatOffsetA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__1 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__1 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(1).
 	self 
@@ -2893,7 +2893,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__2 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__2 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(2).
 	self 
@@ -2903,7 +2903,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__3 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__3 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(3).
 	self 
@@ -2913,7 +2913,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__4 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__4 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(4).
 	self 
@@ -2923,7 +2923,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__5 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__5 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(5).
 	self 
@@ -2933,7 +2933,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__6 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__6 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(6).
 	self 
@@ -2943,7 +2943,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithRindex__7 [
+AMD64CodeGeneratorTest >> testLoadRwithRindex__7 [
 	
 	assembler perform: #loadRwithRindex: withArguments: #(7).
 	self 
@@ -2953,7 +2953,7 @@ AssemblerAMD64Test >> testLoadRwithRindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithS [
+AMD64CodeGeneratorTest >> testLoadRwithS [
 	
 	assembler perform: #loadRwithS withArguments: #().
 	self 
@@ -2963,7 +2963,7 @@ AssemblerAMD64Test >> testLoadRwithS [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSPindex__2 [
+AMD64CodeGeneratorTest >> testLoadRwithSPindex__2 [
 	
 	assembler perform: #loadRwithSPindex: withArguments: #(2).
 	self 
@@ -2973,7 +2973,7 @@ AssemblerAMD64Test >> testLoadRwithSPindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSPindex__3 [
+AMD64CodeGeneratorTest >> testLoadRwithSPindex__3 [
 	
 	assembler perform: #loadRwithSPindex: withArguments: #(3).
 	self 
@@ -2983,7 +2983,7 @@ AssemblerAMD64Test >> testLoadRwithSPindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSPindex__4 [
+AMD64CodeGeneratorTest >> testLoadRwithSPindex__4 [
 	
 	assembler perform: #loadRwithSPindex: withArguments: #(4).
 	self 
@@ -2993,7 +2993,7 @@ AssemblerAMD64Test >> testLoadRwithSPindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__1 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__1 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(1).
 	self 
@@ -3003,7 +3003,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__10 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__10 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(10).
 	self 
@@ -3013,7 +3013,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__11 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__11 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(11).
 	self 
@@ -3023,7 +3023,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__12 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__12 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(12).
 	self 
@@ -3033,7 +3033,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__13 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__13 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(13).
 	self 
@@ -3043,7 +3043,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__14 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__14 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(14).
 	self 
@@ -3053,7 +3053,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__15 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__15 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(15).
 	self 
@@ -3063,7 +3063,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__16 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__16 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(16).
 	self 
@@ -3073,7 +3073,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__17 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__17 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(17).
 	self 
@@ -3083,7 +3083,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__17 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__18 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__18 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(18).
 	self 
@@ -3093,7 +3093,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__19 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__19 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(19).
 	self 
@@ -3103,7 +3103,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__19 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__2 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__2 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(2).
 	self 
@@ -3113,7 +3113,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__3 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__3 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(3).
 	self 
@@ -3123,7 +3123,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__4 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__4 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(4).
 	self 
@@ -3133,7 +3133,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__5 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__5 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(5).
 	self 
@@ -3143,7 +3143,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__6 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__6 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(6).
 	self 
@@ -3153,7 +3153,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__7 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__7 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(7).
 	self 
@@ -3163,7 +3163,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__8 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__8 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(8).
 	self 
@@ -3173,7 +3173,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSindex__9 [
+AMD64CodeGeneratorTest >> testLoadRwithSindex__9 [
 	
 	assembler perform: #loadRwithSindex: withArguments: #(9).
 	self 
@@ -3183,7 +3183,7 @@ AssemblerAMD64Test >> testLoadRwithSindex__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__0 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__0 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(0).
 	self 
@@ -3193,7 +3193,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1).
 	self 
@@ -3203,7 +3203,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__10 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__10 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(10).
 	self 
@@ -3213,7 +3213,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__100 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__100 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(100).
 	self 
@@ -3223,7 +3223,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__100 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1000).
 	self 
@@ -3233,7 +3233,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__10000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__10000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(10000).
 	self 
@@ -3243,7 +3243,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__10000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1000000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1000000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1000000).
 	self 
@@ -3253,7 +3253,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1000000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1024 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1024 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1024).
 	self 
@@ -3263,7 +3263,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1024 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1075 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1075 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1075).
 	self 
@@ -3273,7 +3273,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1075 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__119886 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__119886 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(119886).
 	self 
@@ -3283,7 +3283,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__119886 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__12 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__12 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(12).
 	self 
@@ -3293,7 +3293,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__126 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__126 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(126).
 	self 
@@ -3303,7 +3303,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__126 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__127 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__127 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(127).
 	self 
@@ -3313,7 +3313,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__127 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__128 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__128 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(128).
 	self 
@@ -3323,7 +3323,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__128 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__13 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__13 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(13).
 	self 
@@ -3333,7 +3333,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__131072 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__131072 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(131072).
 	self 
@@ -3343,7 +3343,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__131072 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__13131 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__13131 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(13131).
 	self 
@@ -3353,7 +3353,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__13131 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__14 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__14 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(14).
 	self 
@@ -3363,7 +3363,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__140000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__140000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(140000).
 	self 
@@ -3373,7 +3373,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__140000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__15 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__15 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(15).
 	self 
@@ -3383,7 +3383,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__159 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__159 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(159).
 	self 
@@ -3393,7 +3393,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__159 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__16 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__16 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(16).
 	self 
@@ -3403,7 +3403,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__160 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__160 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(160).
 	self 
@@ -3413,7 +3413,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__160 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__16384 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__16384 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(16384).
 	self 
@@ -3423,7 +3423,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__16384 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__1664525 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__1664525 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(1664525).
 	self 
@@ -3433,7 +3433,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__1664525 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__16777216 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__16777216 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(16777216).
 	self 
@@ -3443,7 +3443,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__16777216 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__18 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__18 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(18).
 	self 
@@ -3453,7 +3453,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__192 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__192 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(192).
 	self 
@@ -3463,7 +3463,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__192 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__2 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__2 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(2).
 	self 
@@ -3473,7 +3473,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__20 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__20 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(20).
 	self 
@@ -3483,7 +3483,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__20 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__21 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__21 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(21).
 	self 
@@ -3493,7 +3493,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__21 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__22 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__22 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(22).
 	self 
@@ -3503,7 +3503,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__22 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__23 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__23 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(23).
 	self 
@@ -3513,7 +3513,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__23 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__24 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__24 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(24).
 	self 
@@ -3523,7 +3523,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__24 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__248 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__248 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(248).
 	self 
@@ -3533,7 +3533,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__248 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__25 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__25 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(25).
 	self 
@@ -3543,7 +3543,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__25 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__253 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__253 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(253).
 	self 
@@ -3553,7 +3553,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__253 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__255 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__255 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(255).
 	self 
@@ -3563,7 +3563,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__255 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__256 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__256 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(256).
 	self 
@@ -3573,7 +3573,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__256 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__26 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__26 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(26).
 	self 
@@ -3583,7 +3583,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__26 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__27 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__27 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(27).
 	self 
@@ -3593,7 +3593,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__27 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__3 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__3 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(3).
 	self 
@@ -3603,7 +3603,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__3000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__3000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(3000).
 	self 
@@ -3613,7 +3613,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__3000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__309 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__309 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(309).
 	self 
@@ -3623,7 +3623,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__309 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__31 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__31 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(31).
 	self 
@@ -3633,7 +3633,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__31 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__32 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__32 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(32).
 	self 
@@ -3643,7 +3643,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__32 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__32767 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__32767 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(32767).
 	self 
@@ -3653,7 +3653,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__32767 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__32768 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__32768 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(32768).
 	self 
@@ -3663,7 +3663,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__32768 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__4 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__4 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(4).
 	self 
@@ -3673,7 +3673,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__4000 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__4000 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(4000).
 	self 
@@ -3683,7 +3683,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__4000 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__4096 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__4096 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(4096).
 	self 
@@ -3693,7 +3693,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__4096 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__42 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__42 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(42).
 	self 
@@ -3703,7 +3703,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__42 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__4294967296 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__4294967296 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(4294967296).
 	self 
@@ -3713,7 +3713,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__4294967296 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__48 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__48 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(48).
 	self 
@@ -3723,7 +3723,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__48 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__5 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__5 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(5).
 	self 
@@ -3733,7 +3733,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__50 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__50 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(50).
 	self 
@@ -3743,7 +3743,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__50 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__5381 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__5381 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(5381).
 	self 
@@ -3753,7 +3753,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__5381 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__54 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__54 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(54).
 	self 
@@ -3763,7 +3763,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__54 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__55 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__55 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(55).
 	self 
@@ -3773,7 +3773,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__55 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__6 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__6 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(6).
 	self 
@@ -3783,7 +3783,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__64 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__64 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(64).
 	self 
@@ -3793,7 +3793,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__64 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__7 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__7 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(7).
 	self 
@@ -3803,7 +3803,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8).
 	self 
@@ -3813,7 +3813,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8192 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8192 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8192).
 	self 
@@ -3823,7 +3823,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8192 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8194 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8194 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8194).
 	self 
@@ -3833,7 +3833,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8194 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8195 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8195 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8195).
 	self 
@@ -3843,7 +3843,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8195 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8197 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8197 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8197).
 	self 
@@ -3853,7 +3853,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8197 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8211 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8211 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8211).
 	self 
@@ -3863,7 +3863,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8211 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8212 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8212 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8212).
 	self 
@@ -3873,7 +3873,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8212 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8216 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8216 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8216).
 	self 
@@ -3883,7 +3883,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8216 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8217 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8217 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8217).
 	self 
@@ -3893,7 +3893,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8217 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8220 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8220 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8220).
 	self 
@@ -3903,7 +3903,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8220 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8221 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8221 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8221).
 	self 
@@ -3913,7 +3913,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8221 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8226 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8226 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8226).
 	self 
@@ -3923,7 +3923,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8226 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8592 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8592 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8592).
 	self 
@@ -3933,7 +3933,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8592 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8593 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8593 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8593).
 	self 
@@ -3943,7 +3943,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8593 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8594 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8594 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8594).
 	self 
@@ -3953,7 +3953,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8594 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8595 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8595 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8595).
 	self 
@@ -3963,7 +3963,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8595 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8804 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8804 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8804).
 	self 
@@ -3973,7 +3973,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8804 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8805 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8805 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8805).
 	self 
@@ -3983,7 +3983,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8805 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8853 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8853 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8853).
 	self 
@@ -3993,7 +3993,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8853 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__8855 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__8855 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(8855).
 	self 
@@ -4003,7 +4003,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__8855 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__9 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__9 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(9).
 	self 
@@ -4013,7 +4013,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m1 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m1 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-1).
 	self 
@@ -4023,7 +4023,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m10 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m10 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-10).
 	self 
@@ -4033,7 +4033,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m12 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m12 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-12).
 	self 
@@ -4043,7 +4043,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m14 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m14 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-14).
 	self 
@@ -4053,7 +4053,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m15 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m15 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-15).
 	self 
@@ -4063,7 +4063,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m16 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m16 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-16).
 	self 
@@ -4073,7 +4073,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m18 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m18 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-18).
 	self 
@@ -4083,7 +4083,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m2 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m2 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-2).
 	self 
@@ -4093,7 +4093,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m20 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m20 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-20).
 	self 
@@ -4103,7 +4103,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m20 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m24 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m24 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-24).
 	self 
@@ -4113,7 +4113,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m24 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m3 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m3 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-3).
 	self 
@@ -4123,7 +4123,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m32 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m32 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-32).
 	self 
@@ -4133,7 +4133,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m32 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m4096 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m4096 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-4096).
 	self 
@@ -4143,7 +4143,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m4096 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m5 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m5 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-5).
 	self 
@@ -4153,7 +4153,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m6 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m6 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-6).
 	self 
@@ -4163,7 +4163,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m8 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m8 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-8).
 	self 
@@ -4173,7 +4173,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithSmallInteger__m9007199254740992 [
+AMD64CodeGeneratorTest >> testLoadRwithSmallInteger__m9007199254740992 [
 	
 	assembler perform: #loadRwithSmallInteger: withArguments: #(-9007199254740992).
 	self 
@@ -4183,7 +4183,7 @@ AssemblerAMD64Test >> testLoadRwithSmallInteger__m9007199254740992 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithT [
+AMD64CodeGeneratorTest >> testLoadRwithT [
 	
 	assembler perform: #loadRwithT withArguments: #().
 	self 
@@ -4193,7 +4193,7 @@ AssemblerAMD64Test >> testLoadRwithT [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testLoadRwithTIBatR [
+AMD64CodeGeneratorTest >> testLoadRwithTIBatR [
 	
 	assembler loadRwithTIBatR.
 	self 
@@ -4203,7 +4203,7 @@ AssemblerAMD64Test >> testLoadRwithTIBatR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithThreadVariableAtR [
+AMD64CodeGeneratorTest >> testLoadRwithThreadVariableAtR [
 	
 	assembler perform: #loadRwithThreadVariableAtR withArguments: #().
 	self 
@@ -4213,7 +4213,7 @@ AssemblerAMD64Test >> testLoadRwithThreadVariableAtR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadRwithTrue [
+AMD64CodeGeneratorTest >> testLoadRwithTrue [
 	
 	assembler perform: #loadRwithTrue withArguments: #().
 	self 
@@ -4223,7 +4223,7 @@ AssemblerAMD64Test >> testLoadRwithTrue [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testLoadSPwithFP [
+AMD64CodeGeneratorTest >> testLoadSPwithFP [
 	
 	assembler loadSPwithFP.
 	self 
@@ -4233,7 +4233,7 @@ AssemblerAMD64Test >> testLoadSPwithFP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadSwithAddressOfSatA [
+AMD64CodeGeneratorTest >> testLoadSwithAddressOfSatA [
 	
 	assembler perform: #loadSwithAddressOfSatA withArguments: #().
 	self 
@@ -4243,7 +4243,7 @@ AssemblerAMD64Test >> testLoadSwithAddressOfSatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadSwithNil [
+AMD64CodeGeneratorTest >> testLoadSwithNil [
 	
 	assembler perform: #loadSwithNil withArguments: #().
 	self 
@@ -4253,7 +4253,7 @@ AssemblerAMD64Test >> testLoadSwithNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadSwithRindex__3 [
+AMD64CodeGeneratorTest >> testLoadSwithRindex__3 [
 	
 	assembler perform: #loadSwithRindex: withArguments: #(3).
 	self 
@@ -4263,7 +4263,7 @@ AssemblerAMD64Test >> testLoadSwithRindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadSwithRindex__4 [
+AMD64CodeGeneratorTest >> testLoadSwithRindex__4 [
 	
 	assembler perform: #loadSwithRindex: withArguments: #(4).
 	self 
@@ -4273,7 +4273,7 @@ AssemblerAMD64Test >> testLoadSwithRindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithA [
+AMD64CodeGeneratorTest >> testLoadTwithA [
 	
 	assembler perform: #loadTwithA withArguments: #().
 	self 
@@ -4283,7 +4283,7 @@ AssemblerAMD64Test >> testLoadTwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithAindex__3 [
+AMD64CodeGeneratorTest >> testLoadTwithAindex__3 [
 	
 	assembler perform: #loadTwithAindex: withArguments: #(3).
 	self 
@@ -4293,7 +4293,7 @@ AssemblerAMD64Test >> testLoadTwithAindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithEindex__1 [
+AMD64CodeGeneratorTest >> testLoadTwithEindex__1 [
 	
 	assembler perform: #loadTwithEindex: withArguments: #(1).
 	self 
@@ -4303,7 +4303,7 @@ AssemblerAMD64Test >> testLoadTwithEindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithEindex__2 [
+AMD64CodeGeneratorTest >> testLoadTwithEindex__2 [
 	
 	assembler perform: #loadTwithEindex: withArguments: #(2).
 	self 
@@ -4313,7 +4313,7 @@ AssemblerAMD64Test >> testLoadTwithEindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithEindex__3 [
+AMD64CodeGeneratorTest >> testLoadTwithEindex__3 [
 	
 	assembler perform: #loadTwithEindex: withArguments: #(3).
 	self 
@@ -4323,7 +4323,7 @@ AssemblerAMD64Test >> testLoadTwithEindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithEindex__4 [
+AMD64CodeGeneratorTest >> testLoadTwithEindex__4 [
 	
 	assembler perform: #loadTwithEindex: withArguments: #(4).
 	self 
@@ -4333,7 +4333,7 @@ AssemblerAMD64Test >> testLoadTwithEindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithFPindex__3 [
+AMD64CodeGeneratorTest >> testLoadTwithFPindex__3 [
 	
 	assembler perform: #loadTwithFPindex: withArguments: #(3).
 	self 
@@ -4343,7 +4343,7 @@ AssemblerAMD64Test >> testLoadTwithFPindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithFPindex__4 [
+AMD64CodeGeneratorTest >> testLoadTwithFPindex__4 [
 	
 	assembler perform: #loadTwithFPindex: withArguments: #(4).
 	self 
@@ -4353,7 +4353,7 @@ AssemblerAMD64Test >> testLoadTwithFPindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithFPindex__5 [
+AMD64CodeGeneratorTest >> testLoadTwithFPindex__5 [
 	
 	assembler perform: #loadTwithFPindex: withArguments: #(5).
 	self 
@@ -4363,7 +4363,7 @@ AssemblerAMD64Test >> testLoadTwithFPindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithFPindex__6 [
+AMD64CodeGeneratorTest >> testLoadTwithFPindex__6 [
 	
 	assembler perform: #loadTwithFPindex: withArguments: #(6).
 	self 
@@ -4373,7 +4373,7 @@ AssemblerAMD64Test >> testLoadTwithFPindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithImmediate__0 [
+AMD64CodeGeneratorTest >> testLoadTwithImmediate__0 [
 	
 	assembler perform: #loadTwithImmediate: withArguments: #(0).
 	self 
@@ -4383,7 +4383,7 @@ AssemblerAMD64Test >> testLoadTwithImmediate__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithR [
+AMD64CodeGeneratorTest >> testLoadTwithR [
 	
 	assembler perform: #loadTwithR withArguments: #().
 	self 
@@ -4393,7 +4393,7 @@ AssemblerAMD64Test >> testLoadTwithR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadTwithTindex__1 [
+AMD64CodeGeneratorTest >> testLoadTwithTindex__1 [
 	
 	assembler perform: #loadTwithTindex: withArguments: #(1).
 	self 
@@ -4403,7 +4403,7 @@ AssemblerAMD64Test >> testLoadTwithTindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadX0withRasDouble [
+AMD64CodeGeneratorTest >> testLoadX0withRasDouble [
 	
 	assembler perform: #loadX0withRasDouble withArguments: #().
 	self 
@@ -4413,7 +4413,7 @@ AssemblerAMD64Test >> testLoadX0withRasDouble [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadX1roundingX0 [
+AMD64CodeGeneratorTest >> testLoadX1roundingX0 [
 	
 	assembler perform: #roundDoubleX0intoX1 withArguments: #().
 	self 
@@ -4423,7 +4423,7 @@ AssemblerAMD64Test >> testLoadX1roundingX0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadZeroExtendByteRwithRatA [
+AMD64CodeGeneratorTest >> testLoadZeroExtendByteRwithRatA [
 	
 	assembler perform: #loadZeroExtendByteRwithRatA withArguments: #().
 	self 
@@ -4433,7 +4433,7 @@ AssemblerAMD64Test >> testLoadZeroExtendByteRwithRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadZeroExtendByteRwithSPatA [
+AMD64CodeGeneratorTest >> testLoadZeroExtendByteRwithSPatA [
 	
 	assembler perform: #loadZeroExtendByteRwithSPatA withArguments: #().
 	self 
@@ -4443,7 +4443,7 @@ AssemblerAMD64Test >> testLoadZeroExtendByteRwithSPatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadZeroExtendLongRwithRatA [
+AMD64CodeGeneratorTest >> testLoadZeroExtendLongRwithRatA [
 	
 	assembler perform: #loadZeroExtendLongRwithRatA withArguments: #().
 	self 
@@ -4453,7 +4453,7 @@ AssemblerAMD64Test >> testLoadZeroExtendLongRwithRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLoadZeroExtendShortRwithRoffset__m8 [
+AMD64CodeGeneratorTest >> testLoadZeroExtendShortRwithRoffset__m8 [
 	
 	assembler perform: #loadZeroExtendShortRwithRoffset: withArguments: #(-8).
 	self 
@@ -4463,7 +4463,7 @@ AssemblerAMD64Test >> testLoadZeroExtendShortRwithRoffset__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testLock [
+AMD64CodeGeneratorTest >> testLock [
 	
 	assembler perform: #lock withArguments: #().
 	self 
@@ -4473,7 +4473,7 @@ AssemblerAMD64Test >> testLock [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testMoveTslots [
+AMD64CodeGeneratorTest >> testMoveTslots [
 	
 	assembler perform: #moveTslots withArguments: #().
 	self 
@@ -4483,7 +4483,7 @@ AssemblerAMD64Test >> testMoveTslots [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testMoveX0toR [
+AMD64CodeGeneratorTest >> testMoveX0toR [
 	
 	assembler perform: #moveX0toR withArguments: #().
 	self 
@@ -4493,7 +4493,7 @@ AssemblerAMD64Test >> testMoveX0toR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testMultiplyDoubleX0byX1 [
+AMD64CodeGeneratorTest >> testMultiplyDoubleX0byX1 [
 	
 	assembler perform: #multiplyDoubleX0byX1 withArguments: #().
 	self 
@@ -4503,7 +4503,7 @@ AssemblerAMD64Test >> testMultiplyDoubleX0byX1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testMultiplyRbyA [
+AMD64CodeGeneratorTest >> testMultiplyRbyA [
 	
 	assembler perform: #multiplyRbyAwideningToA withArguments: #().
 	self 
@@ -4513,7 +4513,7 @@ AssemblerAMD64Test >> testMultiplyRbyA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testOrRwithA [
+AMD64CodeGeneratorTest >> testOrRwithA [
 	
 	assembler perform: #orRwithA withArguments: #().
 	self 
@@ -4523,7 +4523,7 @@ AssemblerAMD64Test >> testOrRwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopA [
+AMD64CodeGeneratorTest >> testPopA [
 	
 	assembler perform: #popA withArguments: #().
 	self 
@@ -4533,7 +4533,7 @@ AssemblerAMD64Test >> testPopA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopE [
+AMD64CodeGeneratorTest >> testPopE [
 	
 	assembler perform: #popE withArguments: #().
 	self 
@@ -4543,7 +4543,7 @@ AssemblerAMD64Test >> testPopE [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopFP [
+AMD64CodeGeneratorTest >> testPopFP [
 	
 	assembler perform: #popFP withArguments: #().
 	self 
@@ -4553,7 +4553,7 @@ AssemblerAMD64Test >> testPopFP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopFalse [
+AMD64CodeGeneratorTest >> testPopFalse [
 	
 	assembler perform: #popFalse withArguments: #().
 	self 
@@ -4563,7 +4563,7 @@ AssemblerAMD64Test >> testPopFalse [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopG [
+AMD64CodeGeneratorTest >> testPopG [
 	
 	assembler perform: #popG withArguments: #().
 	self 
@@ -4573,7 +4573,7 @@ AssemblerAMD64Test >> testPopG [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopM [
+AMD64CodeGeneratorTest >> testPopM [
 	
 	assembler perform: #popM withArguments: #().
 	self 
@@ -4583,7 +4583,7 @@ AssemblerAMD64Test >> testPopM [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopNil [
+AMD64CodeGeneratorTest >> testPopNil [
 	
 	assembler perform: #popNil withArguments: #().
 	self 
@@ -4593,7 +4593,7 @@ AssemblerAMD64Test >> testPopNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopR [
+AMD64CodeGeneratorTest >> testPopR [
 	
 	assembler perform: #popR withArguments: #().
 	self 
@@ -4603,7 +4603,7 @@ AssemblerAMD64Test >> testPopR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopS [
+AMD64CodeGeneratorTest >> testPopS [
 	
 	assembler perform: #popS withArguments: #().
 	self 
@@ -4613,7 +4613,7 @@ AssemblerAMD64Test >> testPopS [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopSPindirect [
+AMD64CodeGeneratorTest >> testPopSPindirect [
 	
 	assembler perform: #popSPindirect withArguments: #().
 	self 
@@ -4623,7 +4623,7 @@ AssemblerAMD64Test >> testPopSPindirect [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testPopT [
+AMD64CodeGeneratorTest >> testPopT [
 	
 	assembler popT.
 	self 
@@ -4633,7 +4633,7 @@ AssemblerAMD64Test >> testPopT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPopTrue [
+AMD64CodeGeneratorTest >> testPopTrue [
 	
 	assembler perform: #popTrue withArguments: #().
 	self 
@@ -4643,7 +4643,7 @@ AssemblerAMD64Test >> testPopTrue [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushA [
+AMD64CodeGeneratorTest >> testPushA [
 	
 	assembler perform: #pushA withArguments: #().
 	self 
@@ -4653,7 +4653,7 @@ AssemblerAMD64Test >> testPushA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushE [
+AMD64CodeGeneratorTest >> testPushE [
 	
 	assembler perform: #pushE withArguments: #().
 	self 
@@ -4663,7 +4663,7 @@ AssemblerAMD64Test >> testPushE [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testPushFP [
+AMD64CodeGeneratorTest >> testPushFP [
 	
 	assembler pushFP.
 	self 
@@ -4673,7 +4673,7 @@ AssemblerAMD64Test >> testPushFP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushFalse [
+AMD64CodeGeneratorTest >> testPushFalse [
 	
 	assembler perform: #pushFalse withArguments: #().
 	self 
@@ -4683,7 +4683,7 @@ AssemblerAMD64Test >> testPushFalse [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushG [
+AMD64CodeGeneratorTest >> testPushG [
 	
 	assembler perform: #pushG withArguments: #().
 	self 
@@ -4693,7 +4693,7 @@ AssemblerAMD64Test >> testPushG [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushImmediate__0 [
+AMD64CodeGeneratorTest >> testPushImmediate__0 [
 	
 	assembler perform: #pushImm: withArguments: #(0).
 	self 
@@ -4703,7 +4703,7 @@ AssemblerAMD64Test >> testPushImmediate__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushIndirectR [
+AMD64CodeGeneratorTest >> testPushIndirectR [
 	
 	assembler perform: #pushIndirectR withArguments: #().
 	self 
@@ -4713,7 +4713,7 @@ AssemblerAMD64Test >> testPushIndirectR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushM [
+AMD64CodeGeneratorTest >> testPushM [
 	
 	assembler perform: #pushM withArguments: #().
 	self 
@@ -4723,7 +4723,7 @@ AssemblerAMD64Test >> testPushM [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushNil [
+AMD64CodeGeneratorTest >> testPushNil [
 	
 	assembler perform: #pushNil withArguments: #().
 	self 
@@ -4733,7 +4733,7 @@ AssemblerAMD64Test >> testPushNil [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushR [
+AMD64CodeGeneratorTest >> testPushR [
 	
 	assembler perform: #pushR withArguments: #().
 	self 
@@ -4743,7 +4743,7 @@ AssemblerAMD64Test >> testPushR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushS [
+AMD64CodeGeneratorTest >> testPushS [
 	
 	assembler perform: #pushS withArguments: #().
 	self 
@@ -4753,7 +4753,7 @@ AssemblerAMD64Test >> testPushS [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushSmallInteger__0 [
+AMD64CodeGeneratorTest >> testPushSmallInteger__0 [
 	
 	assembler perform: #pushSmallInteger: withArguments: #(0).
 	self 
@@ -4763,7 +4763,7 @@ AssemblerAMD64Test >> testPushSmallInteger__0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushSmallInteger__1 [
+AMD64CodeGeneratorTest >> testPushSmallInteger__1 [
 	
 	assembler perform: #pushSmallInteger: withArguments: #(1).
 	self 
@@ -4773,7 +4773,7 @@ AssemblerAMD64Test >> testPushSmallInteger__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushSmallInteger__2 [
+AMD64CodeGeneratorTest >> testPushSmallInteger__2 [
 	
 	assembler perform: #pushSmallInteger: withArguments: #(2).
 	self 
@@ -4783,7 +4783,7 @@ AssemblerAMD64Test >> testPushSmallInteger__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushSmallInteger__3 [
+AMD64CodeGeneratorTest >> testPushSmallInteger__3 [
 	
 	assembler perform: #pushSmallInteger: withArguments: #(3).
 	self 
@@ -4793,7 +4793,7 @@ AssemblerAMD64Test >> testPushSmallInteger__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushT [
+AMD64CodeGeneratorTest >> testPushT [
 	
 	assembler perform: #pushT withArguments: #().
 	self 
@@ -4803,7 +4803,7 @@ AssemblerAMD64Test >> testPushT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testPushTrue [
+AMD64CodeGeneratorTest >> testPushTrue [
 	
 	assembler perform: #pushTrue withArguments: #().
 	self 
@@ -4813,7 +4813,7 @@ AssemblerAMD64Test >> testPushTrue [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testReadFPUStatusOnA [
+AMD64CodeGeneratorTest >> testReadFPUStatusOnA [
 	
 	assembler readFPUStatusOnA.
 	self 
@@ -4823,7 +4823,7 @@ AssemblerAMD64Test >> testReadFPUStatusOnA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReserveStackSlots__13 [
+AMD64CodeGeneratorTest >> testReserveStackSlots__13 [
 	
 	assembler perform: #reserveStackSlots: withArguments: #(13).
 	self 
@@ -4833,7 +4833,7 @@ AssemblerAMD64Test >> testReserveStackSlots__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReserveStackSlots__2 [
+AMD64CodeGeneratorTest >> testReserveStackSlots__2 [
 	
 	assembler perform: #reserveStackSlots: withArguments: #(2).
 	self 
@@ -4843,7 +4843,7 @@ AssemblerAMD64Test >> testReserveStackSlots__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReserveStackSlots__3 [
+AMD64CodeGeneratorTest >> testReserveStackSlots__3 [
 	
 	assembler perform: #reserveStackSlots: withArguments: #(3).
 	self 
@@ -4853,7 +4853,7 @@ AssemblerAMD64Test >> testReserveStackSlots__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReserveStackSlots__4 [
+AMD64CodeGeneratorTest >> testReserveStackSlots__4 [
 	
 	assembler perform: #reserveStackSlots: withArguments: #(4).
 	self 
@@ -4863,7 +4863,7 @@ AssemblerAMD64Test >> testReserveStackSlots__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReserveStackSlots__5 [
+AMD64CodeGeneratorTest >> testReserveStackSlots__5 [
 	
 	assembler perform: #reserveStackSlots: withArguments: #(5).
 	self 
@@ -4873,7 +4873,7 @@ AssemblerAMD64Test >> testReserveStackSlots__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testRestoreCallerEnvironment [
+AMD64CodeGeneratorTest >> testRestoreCallerEnvironment [
 	
 	assembler perform: #restoreCallerEnvironment withArguments: #().
 	self 
@@ -4883,7 +4883,7 @@ AssemblerAMD64Test >> testRestoreCallerEnvironment [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testRestoreCallerFrame [
+AMD64CodeGeneratorTest >> testRestoreCallerFrame [
 	
 	assembler perform: #restoreCallerFrame withArguments: #().
 	self 
@@ -4893,7 +4893,7 @@ AssemblerAMD64Test >> testRestoreCallerFrame [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testRestoreCallerM [
+AMD64CodeGeneratorTest >> testRestoreCallerM [
 	
 	assembler perform: #restoreCallerM withArguments: #().
 	self 
@@ -4903,7 +4903,7 @@ AssemblerAMD64Test >> testRestoreCallerM [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testRestoreCallerSelf [
+AMD64CodeGeneratorTest >> testRestoreCallerSelf [
 	
 	assembler perform: #restoreCallerSelf withArguments: #().
 	self 
@@ -4913,7 +4913,7 @@ AssemblerAMD64Test >> testRestoreCallerSelf [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testReturn [
+AMD64CodeGeneratorTest >> testReturn [
 	
 	assembler perform: #return withArguments: #().
 	self 
@@ -4923,7 +4923,7 @@ AssemblerAMD64Test >> testReturn [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSaveCallerFrame [
+AMD64CodeGeneratorTest >> testSaveCallerFrame [
 	
 	assembler perform: #saveCallerFrame withArguments: #().
 	self 
@@ -4933,7 +4933,7 @@ AssemblerAMD64Test >> testSaveCallerFrame [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testShiftLeftRwithT [
+AMD64CodeGeneratorTest >> testShiftLeftRwithT [
 	
 	assembler perform: #shiftLeftRwithT withArguments: #().
 	self 
@@ -4943,7 +4943,7 @@ AssemblerAMD64Test >> testShiftLeftRwithT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testShiftRightRwithT [
+AMD64CodeGeneratorTest >> testShiftRightRwithT [
 	
 	assembler perform: #shiftRightRwithT withArguments: #().
 	self 
@@ -4953,7 +4953,7 @@ AssemblerAMD64Test >> testShiftRightRwithT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testShiftRleft__1 [
+AMD64CodeGeneratorTest >> testShiftRleft__1 [
 	
 	assembler perform: #shiftRleft: withArguments: #(1).
 	self 
@@ -4963,7 +4963,7 @@ AssemblerAMD64Test >> testShiftRleft__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSqrtDoubleX0 [
+AMD64CodeGeneratorTest >> testSqrtDoubleX0 [
 	
 	assembler perform: #sqrtDoubleX0 withArguments: #().
 	self 
@@ -4973,7 +4973,7 @@ AssemblerAMD64Test >> testSqrtDoubleX0 [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testStoreAinThreadVariableAtIndexR [
+AMD64CodeGeneratorTest >> testStoreAinThreadVariableAtIndexR [
 	
 	assembler storeAinThreadVariableAtIndexR.
 	self 
@@ -4983,7 +4983,7 @@ AssemblerAMD64Test >> testStoreAinThreadVariableAtIndexR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreAinTindex__1 [
+AMD64CodeGeneratorTest >> testStoreAinTindex__1 [
 	
 	assembler perform: #storeAinTindex: withArguments: #(1).
 	self 
@@ -4993,7 +4993,7 @@ AssemblerAMD64Test >> testStoreAinTindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreAinTindex__2 [
+AMD64CodeGeneratorTest >> testStoreAinTindex__2 [
 	
 	assembler perform: #storeAinTindex: withArguments: #(2).
 	self 
@@ -5003,7 +5003,7 @@ AssemblerAMD64Test >> testStoreAinTindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreByteTinRatA [
+AMD64CodeGeneratorTest >> testStoreByteTinRatA [
 	
 	assembler perform: #storeByteTinRatA withArguments: #().
 	self 
@@ -5013,7 +5013,7 @@ AssemblerAMD64Test >> testStoreByteTinRatA [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testStoreDoubleResultInRindirect [
+AMD64CodeGeneratorTest >> testStoreDoubleResultInRindirect [
 	
 	assembler storeDoubleResultInRindirect.
 	self 
@@ -5023,7 +5023,7 @@ AssemblerAMD64Test >> testStoreDoubleResultInRindirect [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreEinRindex__3 [
+AMD64CodeGeneratorTest >> testStoreEinRindex__3 [
 	
 	assembler perform: #storeEinRindex: withArguments: #(3).
 	self 
@@ -5033,7 +5033,7 @@ AssemblerAMD64Test >> testStoreEinRindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreEinRindex__4 [
+AMD64CodeGeneratorTest >> testStoreEinRindex__4 [
 	
 	assembler perform: #storeEinRindex: withArguments: #(4).
 	self 
@@ -5043,7 +5043,7 @@ AssemblerAMD64Test >> testStoreEinRindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreEinRindex__5 [
+AMD64CodeGeneratorTest >> testStoreEinRindex__5 [
 	
 	assembler perform: #storeEinRindex: withArguments: #(5).
 	self 
@@ -5053,7 +5053,7 @@ AssemblerAMD64Test >> testStoreEinRindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreLargeX0inA [
+AMD64CodeGeneratorTest >> testStoreLargeX0inA [
 	
 	assembler perform: #storeLargeX0inA withArguments: #().
 	self 
@@ -5063,7 +5063,7 @@ AssemblerAMD64Test >> testStoreLargeX0inA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreLargeX0inT [
+AMD64CodeGeneratorTest >> testStoreLargeX0inT [
 	
 	assembler perform: #storeLargeX0inT withArguments: #().
 	self 
@@ -5073,7 +5073,7 @@ AssemblerAMD64Test >> testStoreLargeX0inT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreLongTinRatA [
+AMD64CodeGeneratorTest >> testStoreLongTinRatA [
 	
 	assembler perform: #storeLongTinRatA withArguments: #().
 	self 
@@ -5083,7 +5083,7 @@ AssemblerAMD64Test >> testStoreLongTinRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreLongTinRatOffsetA [
+AMD64CodeGeneratorTest >> testStoreLongTinRatOffsetA [
 	
 	assembler perform: #storeLongTinRatOffsetA withArguments: #().
 	self 
@@ -5093,7 +5093,7 @@ AssemblerAMD64Test >> testStoreLongTinRatOffsetA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreMXCSRintoA [
+AMD64CodeGeneratorTest >> testStoreMXCSRintoA [
 	
 	assembler perform: #storeMXCSRintoA withArguments: #().
 	self 
@@ -5103,7 +5103,7 @@ AssemblerAMD64Test >> testStoreMXCSRintoA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinAindex__2 [
+AMD64CodeGeneratorTest >> testStoreRinAindex__2 [
 	
 	assembler perform: #storeRinAindex: withArguments: #(2).
 	self 
@@ -5113,7 +5113,7 @@ AssemblerAMD64Test >> testStoreRinAindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinEindex__1 [
+AMD64CodeGeneratorTest >> testStoreRinEindex__1 [
 	
 	assembler perform: #storeRinEindex: withArguments: #(1).
 	self 
@@ -5123,7 +5123,7 @@ AssemblerAMD64Test >> testStoreRinEindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinEindex__2 [
+AMD64CodeGeneratorTest >> testStoreRinEindex__2 [
 	
 	assembler perform: #storeRinEindex: withArguments: #(2).
 	self 
@@ -5133,7 +5133,7 @@ AssemblerAMD64Test >> testStoreRinEindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinEindex__3 [
+AMD64CodeGeneratorTest >> testStoreRinEindex__3 [
 	
 	assembler perform: #storeRinEindex: withArguments: #(3).
 	self 
@@ -5143,7 +5143,7 @@ AssemblerAMD64Test >> testStoreRinEindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinEindex__6 [
+AMD64CodeGeneratorTest >> testStoreRinEindex__6 [
 	
 	assembler perform: #storeRinEindex: withArguments: #(6).
 	self 
@@ -5153,7 +5153,7 @@ AssemblerAMD64Test >> testStoreRinEindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m10 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m10 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-10).
 	self 
@@ -5163,7 +5163,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m11 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m11 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-11).
 	self 
@@ -5173,7 +5173,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m12 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m12 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-12).
 	self 
@@ -5183,7 +5183,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m13 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m13 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-13).
 	self 
@@ -5193,7 +5193,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m14 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m14 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-14).
 	self 
@@ -5203,7 +5203,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m15 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m15 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-15).
 	self 
@@ -5213,7 +5213,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m16 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m16 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-16).
 	self 
@@ -5223,7 +5223,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m17 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m17 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-17).
 	self 
@@ -5233,7 +5233,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m17 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m18 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m18 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-18).
 	self 
@@ -5243,7 +5243,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m19 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m19 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-19).
 	self 
@@ -5253,7 +5253,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m19 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m2 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m2 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-2).
 	self 
@@ -5263,7 +5263,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m20 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m20 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-20).
 	self 
@@ -5273,7 +5273,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m20 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m3 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m3 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-3).
 	self 
@@ -5283,7 +5283,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m4 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m4 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-4).
 	self 
@@ -5293,7 +5293,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m5 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m5 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-5).
 	self 
@@ -5303,7 +5303,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m6 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m6 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-6).
 	self 
@@ -5313,7 +5313,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m7 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m7 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-7).
 	self 
@@ -5323,7 +5323,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m8 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m8 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-8).
 	self 
@@ -5333,7 +5333,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinFPindex__m9 [
+AMD64CodeGeneratorTest >> testStoreRinFPindex__m9 [
 	
 	assembler perform: #storeRinFPindex: withArguments: #(-9).
 	self 
@@ -5343,7 +5343,7 @@ AssemblerAMD64Test >> testStoreRinFPindex__m9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__1 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__1 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(1).
 	self 
@@ -5353,7 +5353,7 @@ AssemblerAMD64Test >> testStoreRinSindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__10 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__10 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(10).
 	self 
@@ -5363,7 +5363,7 @@ AssemblerAMD64Test >> testStoreRinSindex__10 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__11 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__11 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(11).
 	self 
@@ -5373,7 +5373,7 @@ AssemblerAMD64Test >> testStoreRinSindex__11 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__12 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__12 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(12).
 	self 
@@ -5383,7 +5383,7 @@ AssemblerAMD64Test >> testStoreRinSindex__12 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__13 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__13 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(13).
 	self 
@@ -5393,7 +5393,7 @@ AssemblerAMD64Test >> testStoreRinSindex__13 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__14 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__14 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(14).
 	self 
@@ -5403,7 +5403,7 @@ AssemblerAMD64Test >> testStoreRinSindex__14 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__15 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__15 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(15).
 	self 
@@ -5413,7 +5413,7 @@ AssemblerAMD64Test >> testStoreRinSindex__15 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__16 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__16 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(16).
 	self 
@@ -5423,7 +5423,7 @@ AssemblerAMD64Test >> testStoreRinSindex__16 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__17 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__17 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(17).
 	self 
@@ -5433,7 +5433,7 @@ AssemblerAMD64Test >> testStoreRinSindex__17 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__18 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__18 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(18).
 	self 
@@ -5443,7 +5443,7 @@ AssemblerAMD64Test >> testStoreRinSindex__18 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__19 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__19 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(19).
 	self 
@@ -5453,7 +5453,7 @@ AssemblerAMD64Test >> testStoreRinSindex__19 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__2 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__2 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(2).
 	self 
@@ -5463,7 +5463,7 @@ AssemblerAMD64Test >> testStoreRinSindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__3 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__3 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(3).
 	self 
@@ -5473,7 +5473,7 @@ AssemblerAMD64Test >> testStoreRinSindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__4 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__4 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(4).
 	self 
@@ -5483,7 +5483,7 @@ AssemblerAMD64Test >> testStoreRinSindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__5 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__5 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(5).
 	self 
@@ -5493,7 +5493,7 @@ AssemblerAMD64Test >> testStoreRinSindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__6 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__6 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(6).
 	self 
@@ -5503,7 +5503,7 @@ AssemblerAMD64Test >> testStoreRinSindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__7 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__7 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(7).
 	self 
@@ -5513,7 +5513,7 @@ AssemblerAMD64Test >> testStoreRinSindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__8 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__8 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(8).
 	self 
@@ -5523,7 +5523,7 @@ AssemblerAMD64Test >> testStoreRinSindex__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinSindex__9 [
+AMD64CodeGeneratorTest >> testStoreRinSindex__9 [
 	
 	assembler perform: #storeRinSindex: withArguments: #(9).
 	self 
@@ -5533,7 +5533,7 @@ AssemblerAMD64Test >> testStoreRinSindex__9 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinTindex__1 [
+AMD64CodeGeneratorTest >> testStoreRinTindex__1 [
 	
 	assembler perform: #storeRinTindex: withArguments: #(1).
 	self 
@@ -5543,7 +5543,7 @@ AssemblerAMD64Test >> testStoreRinTindex__1 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinTindex__2 [
+AMD64CodeGeneratorTest >> testStoreRinTindex__2 [
 	
 	assembler perform: #storeRinTindex: withArguments: #(2).
 	self 
@@ -5553,7 +5553,7 @@ AssemblerAMD64Test >> testStoreRinTindex__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinTindex__3 [
+AMD64CodeGeneratorTest >> testStoreRinTindex__3 [
 	
 	assembler perform: #storeRinTindex: withArguments: #(3).
 	self 
@@ -5563,7 +5563,7 @@ AssemblerAMD64Test >> testStoreRinTindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinTindex__4 [
+AMD64CodeGeneratorTest >> testStoreRinTindex__4 [
 	
 	assembler perform: #storeRinTindex: withArguments: #(4).
 	self 
@@ -5573,7 +5573,7 @@ AssemblerAMD64Test >> testStoreRinTindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreRinTindex__5 [
+AMD64CodeGeneratorTest >> testStoreRinTindex__5 [
 	
 	assembler perform: #storeRinTindex: withArguments: #(5).
 	self 
@@ -5583,7 +5583,7 @@ AssemblerAMD64Test >> testStoreRinTindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreShortAinRoffset__m8 [
+AMD64CodeGeneratorTest >> testStoreShortAinRoffset__m8 [
 	
 	assembler perform: #storeShortAinRoffset: withArguments: #(-8).
 	self 
@@ -5593,7 +5593,7 @@ AssemblerAMD64Test >> testStoreShortAinRoffset__m8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreShortTinRatOffsetA [
+AMD64CodeGeneratorTest >> testStoreShortTinRatOffsetA [
 	
 	assembler perform: #storeShortTinRatOffsetA withArguments: #().
 	self 
@@ -5603,7 +5603,7 @@ AssemblerAMD64Test >> testStoreShortTinRatOffsetA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreSinRindex__3 [
+AMD64CodeGeneratorTest >> testStoreSinRindex__3 [
 	
 	assembler perform: #storeSinRindex: withArguments: #(3).
 	self 
@@ -5613,7 +5613,7 @@ AssemblerAMD64Test >> testStoreSinRindex__3 [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testStoreTIBatRwithA [
+AMD64CodeGeneratorTest >> testStoreTIBatRwithA [
 	
 	assembler storeTIBatRwithA.
 	self 
@@ -5623,7 +5623,7 @@ AssemblerAMD64Test >> testStoreTIBatRwithA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRatA [
+AMD64CodeGeneratorTest >> testStoreTinRatA [
 	
 	assembler perform: #storeTinRatA withArguments: #().
 	self 
@@ -5633,7 +5633,7 @@ AssemblerAMD64Test >> testStoreTinRatA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRatOffsetA [
+AMD64CodeGeneratorTest >> testStoreTinRatOffsetA [
 	
 	assembler perform: #storeTinRatOffsetA withArguments: #().
 	self 
@@ -5643,7 +5643,7 @@ AssemblerAMD64Test >> testStoreTinRatOffsetA [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRindex__3 [
+AMD64CodeGeneratorTest >> testStoreTinRindex__3 [
 	
 	assembler perform: #storeTinRindex: withArguments: #(3).
 	self 
@@ -5653,7 +5653,7 @@ AssemblerAMD64Test >> testStoreTinRindex__3 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRindex__4 [
+AMD64CodeGeneratorTest >> testStoreTinRindex__4 [
 	
 	assembler perform: #storeTinRindex: withArguments: #(4).
 	self 
@@ -5663,7 +5663,7 @@ AssemblerAMD64Test >> testStoreTinRindex__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRindex__5 [
+AMD64CodeGeneratorTest >> testStoreTinRindex__5 [
 	
 	assembler perform: #storeTinRindex: withArguments: #(5).
 	self 
@@ -5673,7 +5673,7 @@ AssemblerAMD64Test >> testStoreTinRindex__5 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRindex__6 [
+AMD64CodeGeneratorTest >> testStoreTinRindex__6 [
 	
 	assembler perform: #storeTinRindex: withArguments: #(6).
 	self 
@@ -5683,7 +5683,7 @@ AssemblerAMD64Test >> testStoreTinRindex__6 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testStoreTinRindex__7 [
+AMD64CodeGeneratorTest >> testStoreTinRindex__7 [
 	
 	assembler perform: #storeTinRindex: withArguments: #(7).
 	self 
@@ -5693,7 +5693,7 @@ AssemblerAMD64Test >> testStoreTinRindex__7 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubAfromR [
+AMD64CodeGeneratorTest >> testSubAfromR [
 	
 	assembler perform: #subAfromR withArguments: #().
 	self 
@@ -5703,7 +5703,7 @@ AssemblerAMD64Test >> testSubAfromR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubAfromT [
+AMD64CodeGeneratorTest >> testSubAfromT [
 	
 	assembler perform: #subAfromT withArguments: #().
 	self 
@@ -5713,7 +5713,7 @@ AssemblerAMD64Test >> testSubAfromT [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubDoubleX1fromX0 [
+AMD64CodeGeneratorTest >> testSubDoubleX1fromX0 [
 	
 	assembler perform: #subDoubleX1fromX0 withArguments: #().
 	self 
@@ -5723,7 +5723,7 @@ AssemblerAMD64Test >> testSubDoubleX1fromX0 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubFromRconstant__2 [
+AMD64CodeGeneratorTest >> testSubFromRconstant__2 [
 	
 	assembler perform: #subFromRconstant: withArguments: #(2).
 	self 
@@ -5733,7 +5733,7 @@ AssemblerAMD64Test >> testSubFromRconstant__2 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubFromRconstant__4 [
+AMD64CodeGeneratorTest >> testSubFromRconstant__4 [
 	
 	assembler perform: #subFromRconstant: withArguments: #(4).
 	self 
@@ -5743,7 +5743,7 @@ AssemblerAMD64Test >> testSubFromRconstant__4 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubFromRconstant__8 [
+AMD64CodeGeneratorTest >> testSubFromRconstant__8 [
 	
 	assembler perform: #subFromRconstant: withArguments: #(8).
 	self 
@@ -5753,7 +5753,7 @@ AssemblerAMD64Test >> testSubFromRconstant__8 [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testSubFromRconstant__m2 [
+AMD64CodeGeneratorTest >> testSubFromRconstant__m2 [
 	
 	assembler perform: #subFromRconstant: withArguments: #(-2).
 	self 
@@ -5763,7 +5763,7 @@ AssemblerAMD64Test >> testSubFromRconstant__m2 [
 ]
 
 { #category : #'tests - generated' }
-AssemblerAMD64Test >> testSubTslotsToSP [
+AMD64CodeGeneratorTest >> testSubTslotsToSP [
 	
 	assembler subTslotsToSP.
 	self 
@@ -5773,7 +5773,7 @@ AssemblerAMD64Test >> testSubTslotsToSP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testTestRintegerBit [
+AMD64CodeGeneratorTest >> testTestRintegerBit [
 	
 	assembler perform: #testRintegerBit withArguments: #().
 	self 
@@ -5783,7 +5783,7 @@ AssemblerAMD64Test >> testTestRintegerBit [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testTestRwithR [
+AMD64CodeGeneratorTest >> testTestRwithR [
 	
 	assembler perform: #testRwithR withArguments: #().
 	self 
@@ -5793,7 +5793,7 @@ AssemblerAMD64Test >> testTestRwithR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testWriteTslots [
+AMD64CodeGeneratorTest >> testWriteTslots [
 	
 	assembler perform: #writeTslots withArguments: #().
 	self 
@@ -5803,7 +5803,7 @@ AssemblerAMD64Test >> testWriteTslots [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testXorAwithR [
+AMD64CodeGeneratorTest >> testXorAwithR [
 	
 	assembler perform: #xorAwithR withArguments: #().
 	self 
@@ -5813,7 +5813,7 @@ AssemblerAMD64Test >> testXorAwithR [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testXorFPwithFP [
+AMD64CodeGeneratorTest >> testXorFPwithFP [
 	
 	assembler perform: #xorFPwithFP withArguments: #().
 	self 
@@ -5823,7 +5823,7 @@ AssemblerAMD64Test >> testXorFPwithFP [
 ]
 
 { #category : #'tests - generated 2' }
-AssemblerAMD64Test >> testXorRwithA [
+AMD64CodeGeneratorTest >> testXorRwithA [
 	
 	assembler perform: #xorRwithA withArguments: #().
 	self 

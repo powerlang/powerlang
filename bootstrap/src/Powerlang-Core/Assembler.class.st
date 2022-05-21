@@ -3,7 +3,7 @@ I am the JIT assembler frontend. I provide a high-level assembler interface (if 
 and delegate writing of the actual bytes to my backends.
 "
 Class {
-	#name : #Nativizer,
+	#name : #Assembler,
 	#superclass : #Object,
 	#instVars : [
 		'codegen',
@@ -17,7 +17,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-Nativizer class >> forTarget: aNativizationTarger [
+Assembler class >> forTarget: aNativizationTarger [
 	^self basicNew 
 		initialize;
 		target: aNativizationTarger;
@@ -25,7 +25,7 @@ Nativizer class >> forTarget: aNativizationTarger [
 ]
 
 { #category : #initialization }
-Nativizer class >> growIndexedLabelsTo: anInteger [
+Assembler class >> growIndexedLabelsTo: anInteger [
 	| new |
 	new := (IndexedLabels size + 1 to: anInteger)
 		collect: [:i | ('@' , i asString) asSymbol].
@@ -33,60 +33,60 @@ Nativizer class >> growIndexedLabelsTo: anInteger [
 ]
 
 { #category : #initialization }
-Nativizer class >> initialize [
+Assembler class >> initialize [
 	self initializeIndexedLabels
 	
 ]
 
 { #category : #initialization }
-Nativizer class >> initializeIndexedLabels [
+Assembler class >> initializeIndexedLabels [
 	IndexedLabels := #().
 	self growIndexedLabelsTo: 100
 ]
 
 { #category : #'instance creation' }
-Nativizer class >> new [
+Assembler class >> new [
 	^self shouldNotImplement."Use #forTaget: instead"
 ]
 
 { #category : #labels }
-Nativizer >> @ label [
+Assembler >> @ label [
 	self addLabel: label
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> add: source1 to: source2andDest [
+Assembler >> add: source1 to: source2andDest [
 	codegen add: source1 to: source2andDest
 ]
 
 { #category : #arithmetic }
-Nativizer >> addAtoR [
+Assembler >> addAtoR [
 	codegen add: codegen regA to: codegen regR
 ]
 
 { #category : #arithmetic }
-Nativizer >> addDoubleX1toX0 [
+Assembler >> addDoubleX1toX0 [
 	codegen addDouble: codegen regX1 to: codegen regX0
 
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> addImm: imm to: dest [
+Assembler >> addImm: imm to: dest [
 	codegen addImm: imm to: dest
 ]
 
 { #category : #labels }
-Nativizer >> addLabel: aString [
+Assembler >> addLabel: aString [
 	self addLabel: aString to: self currentAddress
 ]
 
 { #category : #labels }
-Nativizer >> addLabel: label to: location [
+Assembler >> addLabel: label to: location [
 	labels at: label put: location
 ]
 
 { #category : #loading }
-Nativizer >> addLiteral: anObject [
+Assembler >> addLiteral: anObject [
 	| index |
 	index := literals
 		identityIndexOf: anObject
@@ -97,138 +97,138 @@ Nativizer >> addLiteral: anObject [
 ]
 
 { #category : #arithmetic }
-Nativizer >> addRwithImmediate: imm [
+Assembler >> addRwithImmediate: imm [
 	codegen addImm: imm to: codegen regR 
 ]
 
 { #category : #logic }
-Nativizer >> addSPwithImmediate: imm [
+Assembler >> addSPwithImmediate: imm [
 	codegen addImm: imm to: codegen regSP
 ]
 
 { #category : #arithmetic }
-Nativizer >> addTtoR [
+Assembler >> addTtoR [
 	codegen add: codegen regT to: codegen regR
 ]
 
 { #category : #logic }
-Nativizer >> addTwithImmediate: imm [
+Assembler >> addTwithImmediate: imm [
 	codegen addImm: imm to: codegen regT
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> alignTo: anInteger [
+Assembler >> alignTo: anInteger [
 	codegen alignTo: anInteger
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> and: source1andDest with: source2 [
+Assembler >> and: source1andDest with: source2 [
 	codegen and: source1andDest with: source2
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> and: source1andDest withImm: imm [
+Assembler >> and: source1andDest withImm: imm [
 	codegen and: source1andDest withImm: imm
 ]
 
 { #category : #logic }
-Nativizer >> andRwithA [
+Assembler >> andRwithA [
 	codegen and: codegen regR with: codegen regA
 ]
 
 { #category : #arithmetic }
-Nativizer >> andRwithImmediate: imm [
+Assembler >> andRwithImmediate: imm [
 	codegen and: codegen regR withImm: imm
 ]
 
 { #category : #relocation }
-Nativizer >> applyFixups [
+Assembler >> applyFixups [
 	codegen memory applyFixupsWith: self
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> breakpoint [
+Assembler >> breakpoint [
 	codegen breakpoint
 ]
 
 { #category : #private }
-Nativizer >> buildFrame [
+Assembler >> buildFrame [
 	self
 		push: codegen regFP;
 		move: codegen regSP to: codegen regFP
 ]
 
 { #category : #private }
-Nativizer >> bytes [
+Assembler >> bytes [
 	^codegen bytes
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> callIndirectA [
+Assembler >> callIndirectA [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: 1.
 	codegen callIndirect: memref
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> callIndirectM [
+Assembler >> callIndirectM [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: 1.
 	codegen callIndirect: memref
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> callR [
+Assembler >> callR [
 	codegen call: codegen regR
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> clearFPUFlags [
+Assembler >> clearFPUFlags [
 	codegen clearFPUFlags
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> clearIntegerBit: srcAndDstReg [
+Assembler >> clearIntegerBit: srcAndDstReg [
 	self clearSafeIntegerBit: srcAndDstReg
 
 ]
 
 { #category : #'push/pop' }
-Nativizer >> clearRhigh32 [
+Assembler >> clearRhigh32 [
 	codegen clearHigh32: codegen regR
 
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> clearRintegerBit [
+Assembler >> clearRintegerBit [
 	self dec: codegen regR
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> clearSafeIntegerBit: srcAndDstReg [
+Assembler >> clearSafeIntegerBit: srcAndDstReg [
 	self and: srcAndDstReg withImm: -2
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> clearSafeRintegerBit [
+Assembler >> clearSafeRintegerBit [
 	self clearSafeIntegerBit: codegen regR
 
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compare: reg1 with: reg2 [
+Assembler >> compare: reg1 with: reg2 [
 	codegen compare: reg1 with: reg2
 ]
 
 { #category : #comparing }
-Nativizer >> compare: register withBoolean: aBoolean [
+Assembler >> compare: register withBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareWithTrue: register ]
 		ifFalse: [ self compareWithFalse: register ]
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compare: register withLiteral: anObject [
+Assembler >> compare: register withLiteral: anObject [
 	| index memref |
 	index := self addLiteral: anObject.
 	memref := codegen memRef: codegen regM indexImm: index.
@@ -236,251 +236,251 @@ Nativizer >> compare: register withLiteral: anObject [
 ]
 
 { #category : #comparing }
-Nativizer >> compareAwithBoolean: aBoolean [
+Assembler >> compareAwithBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareAwithTrue ]
 		ifFalse: [ self compareAwithFalse ]
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareAwithFalse [
+Assembler >> compareAwithFalse [
 	codegen compare: codegen regA with: codegen regFalse
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareAwithTrue [
+Assembler >> compareAwithTrue [
 	codegen compare: codegen regA with: codegen regTrue
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> compareEqualDoubleX0withAindirect [
+Assembler >> compareEqualDoubleX0withAindirect [
 	codegen compareEqualDoubleX0withAindirect
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> compareLessThanDoubleX0withAindirect [
+Assembler >> compareLessThanDoubleX0withAindirect [
 	codegen compareLessThanDoubleX0withAindirect
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareRwithA [
+Assembler >> compareRwithA [
 	codegen compare: codegen regR with: codegen regA
 ]
 
 { #category : #comparing }
-Nativizer >> compareRwithBoolean: aBoolean [
+Assembler >> compareRwithBoolean: aBoolean [
 	aBoolean
 		ifTrue: [ self compareRwithTrue ]
 		ifFalse: [ self compareRwithFalse ]
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareRwithFalse [
+Assembler >> compareRwithFalse [
 	codegen compare: codegen regR with: codegen regFalse
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareRwithImmediate: imm [
+Assembler >> compareRwithImmediate: imm [
 	codegen compare: codegen regR withImm: imm
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareRwithNil [
+Assembler >> compareRwithNil [
 	codegen compare: codegen regR with: codegen regNil
 ]
 
 { #category : #comparing }
-Nativizer >> compareRwithSmallInteger: anInteger [
+Assembler >> compareRwithSmallInteger: anInteger [
 	| smi |
 	smi := self smallInteger: anInteger.
 	self compareRwithImmediate: smi
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareRwithTrue [
+Assembler >> compareRwithTrue [
 	codegen compare: codegen regR with: codegen regTrue
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareSwithTindex: index [
+Assembler >> compareSwithTindex: index [
 	| memref |
 	memref := codegen memRef: codegen regT indexImm: index.
 	codegen compare: codegen regS withMem: memref
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareTwithA [
+Assembler >> compareTwithA [
 	codegen compare: codegen regT with: codegen regA
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareTwithImmediate: imm [
+Assembler >> compareTwithImmediate: imm [
 	codegen compare: codegen regT withImm: imm
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareWithFalse: register [
+Assembler >> compareWithFalse: register [
 	codegen compare: register with: codegen regFalse
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareWithNil: register [
+Assembler >> compareWithNil: register [
 	codegen compare: register with: codegen regNil
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> compareWithTrue: register [
+Assembler >> compareWithTrue: register [
 	codegen compare: register with: codegen regTrue
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertAtoNativeInteger [
+Assembler >> convertAtoNativeInteger [
 	self convertToNativeInteger: codegen regA
 	
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertRtoNativeInteger [
+Assembler >> convertRtoNativeInteger [
 	self convertToNativeInteger: codegen regR
 	
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertRtoSmallInteger [
+Assembler >> convertRtoSmallInteger [
 	self convertToSmallInteger: codegen regR
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertToNativeInteger: srcAndDstReg [
+Assembler >> convertToNativeInteger: srcAndDstReg [
 	codegen shiftRightArithmetic: srcAndDstReg byImm: 1
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertToSmallInteger: srcAndDstReg [ 
+Assembler >> convertToSmallInteger: srcAndDstReg [ 
 	self shiftLeft: srcAndDstReg byImm: 1; inc: srcAndDstReg
 ]
 
 { #category : #arithmetic }
-Nativizer >> convertTtoNativeInteger [
+Assembler >> convertTtoNativeInteger [
 	self convertToNativeInteger: codegen regT
 	
 ]
 
 { #category : #services }
-Nativizer >> currentAddress [
+Assembler >> currentAddress [
 	^ codegen currentAddress
 ]
 
 { #category : #'push/pop' }
-Nativizer >> dec: srcAndDstReg [
+Assembler >> dec: srcAndDstReg [
 	codegen dec: srcAndDstReg
 
 ]
 
 { #category : #private }
-Nativizer >> decRindirect [
+Assembler >> decRindirect [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: 1.
 	codegen decMem: memref
 ]
 
 { #category : #private }
-Nativizer >> discardArguments: anInteger [
+Assembler >> discardArguments: anInteger [
 	anInteger = 0 ifTrue: [^self].
 	codegen addImm: anInteger * codegen wordSize to: codegen regSP
 ]
 
 { #category : #'floting point' }
-Nativizer >> divideDoubleX0byX1 [
+Assembler >> divideDoubleX0byX1 [
 	codegen divDouble: codegen regX0 by: codegen regX1
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> dropTopOfFPU [
+Assembler >> dropTopOfFPU [
 	codegen dropTopOfFPU
 ]
 
 { #category : #'push/pop' }
-Nativizer >> dropTos: count [
+Assembler >> dropTos: count [
 	codegen addImm: (count * codegen addressSize) to: codegen regSP
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> exchangeRindirectWithT [
+Assembler >> exchangeRindirectWithT [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: 1.
 	codegen exchange: codegen regT withMem: memref
 ]
 
 { #category : #storing }
-Nativizer >> extendRtoAandDividebyT [
+Assembler >> extendRtoAandDividebyT [
 	codegen divide: codegen regR extendingTo: codegen regA by: codegen regT
 ]
 
 { #category : #'push/pop' }
-Nativizer >> inc: srcAndDstReg [
+Assembler >> inc: srcAndDstReg [
 	codegen inc: srcAndDstReg
 
 ]
 
 { #category : #'push/pop' }
-Nativizer >> initializeS [
+Assembler >> initializeS [
 	codegen move: codegen regR to: codegen regS
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfEqualTo: label [
+Assembler >> jumpIfEqualTo: label [
 	codegen jumpIfEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfGreaterOrEqualSignedTo: label [
+Assembler >> jumpIfGreaterOrEqualSignedTo: label [
 	codegen jumpIfGreaterOrEqualSignedTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfGreaterSignedTo: label [
+Assembler >> jumpIfGreaterSignedTo: label [
 	codegen jumpIfGreaterSignedTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfLessOrEqualSignedTo: label [
+Assembler >> jumpIfLessOrEqualSignedTo: label [
 	codegen jumpIfLessOrEqualSignedTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfLessSignedTo: label [
+Assembler >> jumpIfLessSignedTo: label [
 	codegen jumpIfLessSignedTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfNotEqualTo: label [
+Assembler >> jumpIfNotEqualTo: label [
 	codegen jumpIfNotEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfNotZeroTo: label [
+Assembler >> jumpIfNotZeroTo: label [
 	codegen jumpIfNotZeroTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfOverflowTo: label [
+Assembler >> jumpIfOverflowTo: label [
 	codegen jumpIfOverflowTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfSignTo: label [
+Assembler >> jumpIfSignTo: label [
 	codegen jumpIfSignTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> jumpIfZeroTo: label [
+Assembler >> jumpIfZeroTo: label [
 	codegen jumpIfZeroTo: label
 ]
 
 { #category : #accessing }
-Nativizer >> jumpOver: aBlock [
+Assembler >> jumpOver: aBlock [
 	| label |
 	label := self newLabel.
 	self jumpTo: label.
@@ -489,19 +489,19 @@ Nativizer >> jumpOver: aBlock [
 ]
 
 { #category : #accessing }
-Nativizer >> jumpTo: label [
+Assembler >> jumpTo: label [
 	codegen jumpTo: label
 ]
 
 { #category : #accessing }
-Nativizer >> jumpToMindex: index [
+Assembler >> jumpToMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen jumpToMem: memref
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerBitTestOf: aRegister [
+Assembler >> labeledIntegerBitTestOf: aRegister [
 	| label |
 	self testIntegerBitOf: aRegister.
 	label := self newLabel.
@@ -510,18 +510,18 @@ Nativizer >> labeledIntegerBitTestOf: aRegister [
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerBitTestOfR [
+Assembler >> labeledIntegerBitTestOfR [
 	^self labeledIntegerBitTestOf: codegen regR
 
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerBitTestOfT [
+Assembler >> labeledIntegerBitTestOfT [
 	^self labeledIntegerBitTestOf: codegen regT byte
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerNativizationOf: aRegister [
+Assembler >> labeledIntegerNativizationOf: aRegister [
 	| label |
 	self convertToNativeInteger: aRegister.
 	label := self newLabel.
@@ -530,22 +530,22 @@ Nativizer >> labeledIntegerNativizationOf: aRegister [
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerNativizationOfA [
+Assembler >> labeledIntegerNativizationOfA [
 	^self labeledIntegerNativizationOf: codegen regA
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerNativizationOfR [
+Assembler >> labeledIntegerNativizationOfR [
 	^self labeledIntegerNativizationOf: codegen regR
 ]
 
 { #category : #integers }
-Nativizer >> labeledIntegerNativizationOfT [
+Assembler >> labeledIntegerNativizationOfT [
 	^self labeledIntegerNativizationOf: codegen regT
 ]
 
 { #category : #integers }
-Nativizer >> labeledNonIntegerBitTestOf: aRegister [
+Assembler >> labeledNonIntegerBitTestOf: aRegister [
 	| label |
 	self testIntegerBitOf: aRegister.
 	label := self newLabel.
@@ -554,30 +554,30 @@ Nativizer >> labeledNonIntegerBitTestOf: aRegister [
 ]
 
 { #category : #integers }
-Nativizer >> labeledNonIntegerBitTestOfR [
+Assembler >> labeledNonIntegerBitTestOfR [
 	^self labeledNonIntegerBitTestOf: codegen regR
 
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> leadingRzeroCount [
+Assembler >> leadingRzeroCount [
 	codegen leadingRzeroCount
 ]
 
 { #category : #'memory - load / store' }
-Nativizer >> load: dstReg fromMem: srcMemRef [
+Assembler >> load: dstReg fromMem: srcMemRef [
 	^codegen load: dstReg fromMem: srcMemRef
 
 ]
 
 { #category : #loading }
-Nativizer >> load:dstReg withImmediate: imm [
+Assembler >> load:dstReg withImmediate: imm [
 	codegen moveImm: imm to: dstReg
 
 ]
 
 { #category : #loading }
-Nativizer >> load: register withLiteral: anObject [
+Assembler >> load: register withLiteral: anObject [
 	| index memref |
 	index := self addLiteral: anObject.
 	memref := codegen memRef: codegen regM indexImm: index.
@@ -587,7 +587,7 @@ Nativizer >> load: register withLiteral: anObject [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithAindex: index [
+Assembler >> loadAwithAindex: index [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: index.
 	codegen
@@ -596,7 +596,7 @@ Nativizer >> loadAwithAindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithEindex: index [
+Assembler >> loadAwithEindex: index [
 	| memref |
 	memref := codegen memRef: codegen regE indexImm: index.
 	codegen
@@ -605,7 +605,7 @@ Nativizer >> loadAwithEindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithFPindex: index [
+Assembler >> loadAwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -614,12 +614,12 @@ Nativizer >> loadAwithFPindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithFalse [
+Assembler >> loadAwithFalse [
 	codegen move: codegen regFalse to: codegen regA
 ]
 
 { #category : #private }
-Nativizer >> loadAwithGindex: index [
+Assembler >> loadAwithGindex: index [
 	| memref |
 	memref := codegen memRef: codegen regG indexImm: index.
 	codegen
@@ -628,31 +628,31 @@ Nativizer >> loadAwithGindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithGlobal: aSymbol [
+Assembler >> loadAwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadAwithGindex: index
 ]
 
 { #category : #integers }
-Nativizer >> loadAwithImmediate: imm [
+Assembler >> loadAwithImmediate: imm [
 	self load: codegen regA withImmediate: imm
 ]
 
 { #category : #arithmetic }
-Nativizer >> loadAwithKnown: anObject [
+Assembler >> loadAwithKnown: anObject [
 	codegen breakpoint
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithLiteral: anObject [
+Assembler >> loadAwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadAwithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithMindex: index [
+Assembler >> loadAwithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -661,17 +661,17 @@ Nativizer >> loadAwithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithNil [
+Assembler >> loadAwithNil [
 	codegen move: codegen regNil to: codegen regA
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithR [
+Assembler >> loadAwithR [
 	codegen move: codegen regR to: codegen regA
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithRoffsetAtA [
+Assembler >> loadAwithRoffsetAtA [
 	| memref |
 	memref := codegen memRef
 				base: codegen regR;
@@ -683,12 +683,12 @@ Nativizer >> loadAwithRoffsetAtA [
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithS [
+Assembler >> loadAwithS [
 	codegen move: codegen regS to: codegen regA
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithSindex: index [
+Assembler >> loadAwithSindex: index [
 	| memref |
 	memref := codegen memRef: codegen regS indexImm: index.
 	codegen
@@ -697,19 +697,19 @@ Nativizer >> loadAwithSindex: index [
 ]
 
 { #category : #integers }
-Nativizer >> loadAwithSmallInteger: anInteger [
+Assembler >> loadAwithSmallInteger: anInteger [
 	| smi |
 	smi := (anInteger bitShift: 1) + 1.
 	self loadAwithImmediate: smi
 ]
 
 { #category : #loading }
-Nativizer >> loadAwithTrue [
+Assembler >> loadAwithTrue [
 	codegen move: codegen regTrue to: codegen regA
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadEwithAddressOfRatA [
+Assembler >> loadEwithAddressOfRatA [
 	| memref |
 	memref := codegen
 		memRef: codegen regR
@@ -719,7 +719,7 @@ Nativizer >> loadEwithAddressOfRatA [
 ]
 
 { #category : #loading }
-Nativizer >> loadEwithFPindex: index [
+Assembler >> loadEwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -728,34 +728,34 @@ Nativizer >> loadEwithFPindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadEwithNil [
+Assembler >> loadEwithNil [
 	codegen move: codegen regNil to: codegen regE
 ]
 
 { #category : #loading }
-Nativizer >> loadEwithR [
+Assembler >> loadEwithR [
 	codegen move: codegen regR to: codegen regE
 ]
 
 { #category : #loading }
-Nativizer >> loadFPwithR [
+Assembler >> loadFPwithR [
 	codegen move: codegen regR to: codegen regFP
 ]
 
 { #category : #loading }
-Nativizer >> loadFPwithSP [
+Assembler >> loadFPwithSP [
 	codegen move: codegen regSP to: codegen regFP
 ]
 
 { #category : #loading }
-Nativizer >> loadFalseWithLiteral: anObject [
+Assembler >> loadFalseWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadFalseWithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadFalseWithMindex: index [
+Assembler >> loadFalseWithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -764,14 +764,14 @@ Nativizer >> loadFalseWithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadGwithLiteral: anObject [
+Assembler >> loadGwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadGwithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadGwithMindex: index [
+Assembler >> loadGwithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -780,26 +780,26 @@ Nativizer >> loadGwithMindex: index [
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadLargeX0withRindirect [
+Assembler >> loadLargeX0withRindirect [
 	| memref |
 	memref := codegen memRef64: codegen regR indexImm: 1.
 	codegen loadDouble: codegen regX0 fromMem: memref
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadLargeX1withAindirect [
+Assembler >> loadLargeX1withAindirect [
 	| memref |
 	memref := codegen memRef64: codegen regA indexImm: 1.
 	codegen loadDouble: codegen regX1 fromMem: memref
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> loadLongMwithIPoffset: anInteger [
+Assembler >> loadLongMwithIPoffset: anInteger [
 	codegen loadLongMwithIPoffset: anInteger
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadLongRwithRatOffsetA [
+Assembler >> loadLongRwithRatOffsetA [
 	| memref |
 	memref := codegen
 		memRef32: codegen regR
@@ -809,7 +809,7 @@ Nativizer >> loadLongRwithRatOffsetA [
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadLongSwithRindex: index [
+Assembler >> loadLongSwithRindex: index [
 	| memref |
 	memref := codegen memRef32: codegen regR indexImm: index.
 	codegen load: codegen regS fromMem: memref
@@ -817,17 +817,17 @@ Nativizer >> loadLongSwithRindex: index [
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> loadMXCSRfromA [
+Assembler >> loadMXCSRfromA [
 	codegen loadMXCSRfromA
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadMwithA [
+Assembler >> loadMwithA [
 	codegen move: codegen regA to: codegen regM
 ]
 
 { #category : #loading }
-Nativizer >> loadMwithFPindex: index [
+Assembler >> loadMwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -836,7 +836,7 @@ Nativizer >> loadMwithFPindex: index [
 ]
 
 { #category : #private }
-Nativizer >> loadMwithGindex: index [
+Assembler >> loadMwithGindex: index [
 	| memref |
 	memref := codegen memRef: codegen regG indexImm: index.
 	codegen
@@ -845,14 +845,14 @@ Nativizer >> loadMwithGindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadMwithGlobal: aSymbol [
+Assembler >> loadMwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadMwithGindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadMwithMindex: index [
+Assembler >> loadMwithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -861,7 +861,7 @@ Nativizer >> loadMwithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadMwithRindex: index [
+Assembler >> loadMwithRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -870,7 +870,7 @@ Nativizer >> loadMwithRindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadMwithTindex: index [
+Assembler >> loadMwithTindex: index [
 	| memref |
 	memref := codegen memRef: codegen regT indexImm: index.
 	codegen
@@ -879,14 +879,14 @@ Nativizer >> loadMwithTindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadNilWithLiteral: anObject [
+Assembler >> loadNilWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadNilWithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadNilWithMindex: index [
+Assembler >> loadNilWithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -895,31 +895,31 @@ Nativizer >> loadNilWithMindex: index [
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadRconvertingDoublePointedByR [
+Assembler >> loadRconvertingDoublePointedByR [
 	| memref |
 	memref := codegen memRef64: codegen regR indexImm: 1.
 	codegen load: codegen regR convertingDoubleToIntegerFromMem: memref
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithA [
+Assembler >> loadRwithA [
 	codegen move: codegen regA to: codegen regR
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadRwithArgPointer [
+Assembler >> loadRwithArgPointer [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: 3.
 	codegen lea: codegen regR withMem: memref
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithE [
+Assembler >> loadRwithE [
 	codegen move: codegen regE to: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithEindex: index [
+Assembler >> loadRwithEindex: index [
 	| memref |
 	memref := codegen memRef: codegen regE indexImm: index.
 	codegen
@@ -928,12 +928,12 @@ Nativizer >> loadRwithEindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithFP [
+Assembler >> loadRwithFP [
 	codegen move: codegen regFP to: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithFPindex: index [
+Assembler >> loadRwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -942,29 +942,29 @@ Nativizer >> loadRwithFPindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithFalse [
+Assembler >> loadRwithFalse [
 	codegen move: codegen regFalse to: codegen regR
 ]
 
 { #category : #integers }
-Nativizer >> loadRwithImmediate: imm [
+Assembler >> loadRwithImmediate: imm [
 	self load: codegen regR withImmediate: imm
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithLiteral: anObject [
+Assembler >> loadRwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadRwithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithM [
+Assembler >> loadRwithM [
 	codegen move: codegen regM to: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithMindex: index [
+Assembler >> loadRwithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -973,12 +973,12 @@ Nativizer >> loadRwithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithNil [
+Assembler >> loadRwithNil [
 	codegen move: codegen regNil to: codegen regR
 ]
 
 { #category : #integers }
-Nativizer >> loadRwithRatA [
+Assembler >> loadRwithRatA [
 	| memref |
 	memref := codegen memRef: codegen regR index: codegen regA.
 	self
@@ -987,7 +987,7 @@ Nativizer >> loadRwithRatA [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithRatOffsetA [
+Assembler >> loadRwithRatOffsetA [
 	| memref |
 	memref := codegen memRef
 				base: codegen regR;
@@ -1000,7 +1000,7 @@ Nativizer >> loadRwithRatOffsetA [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithRindex: index [
+Assembler >> loadRwithRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -1009,12 +1009,12 @@ Nativizer >> loadRwithRindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithS [
+Assembler >> loadRwithS [
 	codegen move: codegen regS to: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithSPindex: index [
+Assembler >> loadRwithSPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regSP indexImm: index.
 	codegen
@@ -1023,7 +1023,7 @@ Nativizer >> loadRwithSPindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithSindex: index [
+Assembler >> loadRwithSindex: index [
 	| memref |
 	memref := codegen memRef: codegen regS indexImm: index.
 	codegen
@@ -1032,39 +1032,39 @@ Nativizer >> loadRwithSindex: index [
 ]
 
 { #category : #integers }
-Nativizer >> loadRwithSmallInteger: anInteger [
+Assembler >> loadRwithSmallInteger: anInteger [
 	| smi |
 	smi := self smallInteger: anInteger.
 	self loadRwithImmediate: smi
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithT [
+Assembler >> loadRwithT [
 	codegen move: codegen regT to: codegen regR
 ]
 
 { #category : #'floting point' }
-Nativizer >> loadRwithTIBatR [
+Assembler >> loadRwithTIBatR [
 	codegen load: codegen regR withTIBat: codegen regR
 ]
 
 { #category : #'floting point' }
-Nativizer >> loadRwithThreadVariableAtR [
+Assembler >> loadRwithThreadVariableAtR [
 	codegen load: codegen regR withThreadVariableAt: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadRwithTrue [
+Assembler >> loadRwithTrue [
 	codegen move: codegen regTrue to: codegen regR
 ]
 
 { #category : #loading }
-Nativizer >> loadSPwithFP [
+Assembler >> loadSPwithFP [
 	codegen move: codegen regFP to: codegen regSP
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadSwithAddressOfSatA [
+Assembler >> loadSwithAddressOfSatA [
 	| memref |
 	memref := codegen
 		memRef: codegen regS
@@ -1074,7 +1074,7 @@ Nativizer >> loadSwithAddressOfSatA [
 ]
 
 { #category : #loading }
-Nativizer >> loadSwithFPindex: index [
+Assembler >> loadSwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -1083,7 +1083,7 @@ Nativizer >> loadSwithFPindex: index [
 ]
 
 { #category : #private }
-Nativizer >> loadSwithGindex: index [
+Assembler >> loadSwithGindex: index [
 	| memref |
 	memref := codegen memRef: codegen regG indexImm: index.
 	codegen
@@ -1092,19 +1092,19 @@ Nativizer >> loadSwithGindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadSwithGlobal: aSymbol [
+Assembler >> loadSwithGlobal: aSymbol [
 	| index |
 	index := NativizationEnvironment indexOfGlobal: aSymbol.
 	self loadSwithGindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadSwithNil [
+Assembler >> loadSwithNil [
 	codegen move: codegen regNil to: codegen regS
 ]
 
 { #category : #loading }
-Nativizer >> loadSwithRindex: index [
+Assembler >> loadSwithRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -1113,14 +1113,14 @@ Nativizer >> loadSwithRindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadTrueWithLiteral: anObject [
+Assembler >> loadTrueWithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadTrueWithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadTrueWithMindex: index [
+Assembler >> loadTrueWithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -1129,12 +1129,12 @@ Nativizer >> loadTrueWithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithA [
+Assembler >> loadTwithA [
 	codegen move: codegen regA to: codegen regT
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithAindex: index [
+Assembler >> loadTwithAindex: index [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: index.
 	codegen
@@ -1143,7 +1143,7 @@ Nativizer >> loadTwithAindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithEindex: index [
+Assembler >> loadTwithEindex: index [
 	| memref |
 	memref := codegen memRef: codegen regE indexImm: index.
 	codegen
@@ -1152,7 +1152,7 @@ Nativizer >> loadTwithEindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithFPindex: index [
+Assembler >> loadTwithFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -1161,19 +1161,19 @@ Nativizer >> loadTwithFPindex: index [
 ]
 
 { #category : #integers }
-Nativizer >> loadTwithImmediate: imm [
+Assembler >> loadTwithImmediate: imm [
 	self load: codegen regT withImmediate: imm
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithLiteral: anObject [
+Assembler >> loadTwithLiteral: anObject [
 	| index |
 	index := self addLiteral: anObject.
 	self loadTwithMindex: index
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithMindex: index [
+Assembler >> loadTwithMindex: index [
 	| memref |
 	memref := codegen memRef: codegen regM indexImm: index.
 	codegen
@@ -1182,45 +1182,45 @@ Nativizer >> loadTwithMindex: index [
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithR [
+Assembler >> loadTwithR [
 	codegen move: codegen regR to: codegen regT
 ]
 
 { #category : #loading }
-Nativizer >> loadTwithTindex: index [
+Assembler >> loadTwithTindex: index [
 	| memref |
 	memref := codegen memRef: codegen regT indexImm: index.
 	codegen load: codegen regT fromMem: memref
 ]
 
 { #category : #loading }
-Nativizer >> loadWithFalse: register [ 
+Assembler >> loadWithFalse: register [ 
 	codegen move: codegen regFalse to: register
 ]
 
 { #category : #loading }
-Nativizer >> loadWithNil: register [ 
+Assembler >> loadWithNil: register [ 
 	codegen move: codegen regNil to: register
 ]
 
 { #category : #loading }
-Nativizer >> loadWithTrue: register [ 
+Assembler >> loadWithTrue: register [ 
 	codegen move: codegen regTrue to: register
 ]
 
 { #category : #'push/pop' }
-Nativizer >> loadX0withRasDouble [
+Assembler >> loadX0withRasDouble [
 	codegen convert: codegen regR toDouble: codegen regX0
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg [
+Assembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg [
 	codegen loadZeroExtendByte: dstReg from: srcBaseReg atIndexAt: srcIndexReg
 
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexImm: indexImm [
+Assembler >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexImm: indexImm [
 
 	codegen
 		loadZeroExtendByte: dstReg
@@ -1229,34 +1229,34 @@ Nativizer >> loadZeroExtendByte: dstReg from: srcBaseReg atIndexImm: indexImm [
 ]
 
 { #category : #jumps }
-Nativizer >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
+Assembler >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 	codegen loadZeroExtendByte: reg1 from: reg2 atOffset: offset
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendByteRwithRatA [
+Assembler >> loadZeroExtendByteRwithRatA [
 	self loadZeroExtendByte: codegen regR from: codegen regR atIndexAt: codegen regA
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendByteRwithRindex: index [
+Assembler >> loadZeroExtendByteRwithRindex: index [
 	#dontOptimize.
 	self loadZeroExtendByte: codegen regR from: codegen regR atIndexImm: index
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendByteRwithSPatA [
+Assembler >> loadZeroExtendByteRwithSPatA [
 	self loadZeroExtendByte: codegen regR from: codegen regSP atIndexAt: codegen regA
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendByteTwithAindex: index [
+Assembler >> loadZeroExtendByteTwithAindex: index [
 	#dontOptimize.
 	self loadZeroExtendByte: codegen regT from: codegen regA atIndexImm: index
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendLongRwithRatA [
+Assembler >> loadZeroExtendLongRwithRatA [
 	| memref |
 	memref := codegen memRef32: codegen regR index: codegen regA.
 	codegen
@@ -1265,7 +1265,7 @@ Nativizer >> loadZeroExtendLongRwithRatA [
 ]
 
 { #category : #integers }
-Nativizer >> loadZeroExtendLongRwithRindex: index [
+Assembler >> loadZeroExtendLongRwithRindex: index [
 	| memref |
 	#dontOptimize.
 	memref := codegen memRef32: codegen regR indexImm: index.
@@ -1275,18 +1275,18 @@ Nativizer >> loadZeroExtendLongRwithRindex: index [
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> loadZeroExtendShortRwithRoffset: offset [
+Assembler >> loadZeroExtendShortRwithRoffset: offset [
 	codegen
 		loadZeroExtendShortRwithRoffset: offset
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> lock [
+Assembler >> lock [
 	codegen lock
 ]
 
 { #category : #jumps }
-Nativizer >> loop: aBlock times: anInteger [
+Assembler >> loop: aBlock times: anInteger [
 	| loop |
 	loop := self newLabel.
 	self loadTwithImmediate: anInteger; @ loop.
@@ -1295,7 +1295,7 @@ Nativizer >> loop: aBlock times: anInteger [
 ]
 
 { #category : #jumps }
-Nativizer >> loopTtimes: aBlock [
+Assembler >> loopTtimes: aBlock [
 	| loop end |
 	loop := self newLabel.
 	end := self newLabel.
@@ -1311,7 +1311,7 @@ Nativizer >> loopTtimes: aBlock [
 ]
 
 { #category : #memory }
-Nativizer >> memRef [
+Assembler >> memRef [
 	"Return clean instance of pointer-sized memory reference"
 
 	^ codegen memRef
@@ -1319,61 +1319,61 @@ Nativizer >> memRef [
 ]
 
 { #category : #memory }
-Nativizer >> memRef32: baseReg indexImm: indexImm [
+Assembler >> memRef32: baseReg indexImm: indexImm [
 	^ codegen memRef32: baseReg indexImm: indexImm
 ]
 
 { #category : #memory }
-Nativizer >> memRef8 [
+Assembler >> memRef8 [
 	"Return clean instance of byte-sized memory reference"
 
 	^ codegen memRef8
 ]
 
 { #category : #memory }
-Nativizer >> memRef8: baseReg index: indexReg [
+Assembler >> memRef8: baseReg index: indexReg [
 	^ codegen memRef8: baseReg index: indexReg
 ]
 
 { #category : #memory }
-Nativizer >> memRef: baseReg index: indexReg [
+Assembler >> memRef: baseReg index: indexReg [
 	^ codegen memRef: baseReg index: indexReg
 ]
 
 { #category : #memory }
-Nativizer >> memRef: baseReg indexImm: indexImm [
+Assembler >> memRef: baseReg indexImm: indexImm [
 	^ codegen memRef: baseReg indexImm: indexImm
 ]
 
 { #category : #services }
-Nativizer >> move: srcReg to: dstReg [
+Assembler >> move: srcReg to: dstReg [
 	^ codegen move: srcReg to: dstReg
 
 ]
 
 { #category : #services }
-Nativizer >> moveImm: imm to: dstReg [
+Assembler >> moveImm: imm to: dstReg [
 	codegen moveImm: imm to: dstReg
 
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> moveTslots [
+Assembler >> moveTslots [
 	codegen moveTslots
 ]
 
 { #category : #'floting point' }
-Nativizer >> moveX0toR [
+Assembler >> moveX0toR [
 	codegen moveDouble: codegen regX0 into: codegen regR
 ]
 
 { #category : #'floting point' }
-Nativizer >> multiplyDoubleX0byX1 [
+Assembler >> multiplyDoubleX0byX1 [
 	codegen mulDouble: codegen regX0 by: codegen regX1
 ]
 
 { #category : #storing }
-Nativizer >> multiplyRbyAwideningToA [
+Assembler >> multiplyRbyAwideningToA [
 	codegen
 		multiply: codegen regR
 		by: codegen regA
@@ -1381,12 +1381,12 @@ Nativizer >> multiplyRbyAwideningToA [
 ]
 
 { #category : #arithmetic }
-Nativizer >> nativeCode [
+Assembler >> nativeCode [
 	^(NativeCode withAll: literals) code: codegen memory bytes
 ]
 
 { #category : #labels }
-Nativizer >> newLabel [
+Assembler >> newLabel [
 	| label next |
 	next := labels size + 1.
 	IndexedLabels size < next ifTrue: [self class growIndexedLabelsTo: next].
@@ -1396,101 +1396,101 @@ Nativizer >> newLabel [
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> or: src1AndDst with: src2 [
+Assembler >> or: src1AndDst with: src2 [
 	^ codegen or: src1AndDst with: src2
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> or: source1andDest withImm: imm [
+Assembler >> or: source1andDest withImm: imm [
 	codegen or: source1andDest withImm: imm
 ]
 
 { #category : #logic }
-Nativizer >> orRwithA [
+Assembler >> orRwithA [
 	codegen or: codegen regR with: codegen regA
 
 ]
 
 { #category : #private }
-Nativizer >> pop: dstReg [
+Assembler >> pop: dstReg [
 	codegen pop: dstReg
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popA [
+Assembler >> popA [
 	codegen pop: codegen regA
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popE [
+Assembler >> popE [
 	codegen pop: codegen regE
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popFP [
+Assembler >> popFP [
 	codegen pop: codegen regFP
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popFalse [
+Assembler >> popFalse [
 	codegen pop: codegen regFalse
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popG [
+Assembler >> popG [
 	codegen pop: codegen regG
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popM [
+Assembler >> popM [
 	codegen pop: codegen regM
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popNil [
+Assembler >> popNil [
 	codegen pop: codegen regNil
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popR [
+Assembler >> popR [
 	codegen pop: codegen regR
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popS [
+Assembler >> popS [
 	codegen pop: codegen regS
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> popSPindirect [
+Assembler >> popSPindirect [
 	| memref |
 	memref := codegen memRef: codegen regSP indexImm: 1.
 	codegen popIntoMem: memref
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popT [
+Assembler >> popT [
 	codegen pop: codegen regT
 ]
 
 { #category : #'push/pop' }
-Nativizer >> popTrue [
+Assembler >> popTrue [
 	codegen pop: codegen regTrue
 ]
 
 { #category : #private }
-Nativizer >> push: srcReg [
+Assembler >> push: srcReg [
 	codegen push: srcReg
 
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushA [
+Assembler >> pushA [
 	codegen push: codegen regA
 ]
 
 { #category : #'floting point' }
-Nativizer >> pushAatToffset: offset [
+Assembler >> pushAatToffset: offset [
 	| memref |
 	memref := codegen memRef: codegen regA index: codegen regT.
 	memref displacement: offset.
@@ -1498,411 +1498,411 @@ Nativizer >> pushAatToffset: offset [
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushE [
+Assembler >> pushE [
 	codegen push: codegen regE
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushFP [
+Assembler >> pushFP [
 	codegen push: codegen regFP
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushFalse [
+Assembler >> pushFalse [
 	codegen push: codegen regFalse
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushG [
+Assembler >> pushG [
 	codegen push: codegen regG
 ]
 
 { #category : #private }
-Nativizer >> pushImm: imm [
+Assembler >> pushImm: imm [
 	codegen pushImm: imm
 
 ]
 
 { #category : #private }
-Nativizer >> pushIndirectR [
+Assembler >> pushIndirectR [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: 1.
 	codegen pushMem: memref
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushM [
+Assembler >> pushM [
 	codegen push: codegen regM
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushNil [
+Assembler >> pushNil [
 	codegen push: codegen regNil
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushR [
+Assembler >> pushR [
 	codegen push: codegen regR
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushS [
+Assembler >> pushS [
 	codegen push: codegen regS
 ]
 
 { #category : #arithmetic }
-Nativizer >> pushSmallInteger: integer [
+Assembler >> pushSmallInteger: integer [
 	| smi |
 	smi := self smallInteger: integer.
 	self pushImm: smi
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushT [
+Assembler >> pushT [
 	codegen push: codegen regT
 ]
 
 { #category : #'push/pop' }
-Nativizer >> pushTrue [
+Assembler >> pushTrue [
 	codegen push: codegen regTrue
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> readFPUStatusOnA [
+Assembler >> readFPUStatusOnA [
 	codegen readFPUStatusOnA
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regA [
+Assembler >> regA [
 	^codegen regA
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regA8 [
+Assembler >> regA8 [
 	^ codegen regA byte
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regE [
+Assembler >> regE [
 	^ codegen regE
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regFP [
+Assembler >> regFP [
 	^ codegen regFP
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regFalse [
+Assembler >> regFalse [
 	^ codegen regFalse
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regG [
+Assembler >> regG [
 	^ codegen regG
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regIP [
+Assembler >> regIP [
 	^ codegen regIP
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regM [
+Assembler >> regM [
 	^ codegen regM
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regNil [
+Assembler >> regNil [
 	^ codegen regNil
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regR [
+Assembler >> regR [
 	^ codegen regR
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regR8 [
+Assembler >> regR8 [
 	^ codegen regR byte
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regS [
+Assembler >> regS [
 	^ codegen regS
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regSP [
+Assembler >> regSP [
 	^ codegen regSP
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regT [
+Assembler >> regT [
 	^ codegen regT
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regT8 [
+Assembler >> regT8 [
 	^ codegen reg byte
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regTrue [
+Assembler >> regTrue [
 	^ codegen regTrue
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regV [
+Assembler >> regV [
 	^ codegen regV
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regX0 [
+Assembler >> regX0 [
 	"IEEE 754 double register"
 	^ codegen regX0
 
 ]
 
 { #category : #'registers - IR' }
-Nativizer >> regX1 [
+Assembler >> regX1 [
 	"IEEE 754 double register"
 	^ codegen regX1
 ]
 
 { #category : #jumps }
-Nativizer >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
+Assembler >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
 	codegen renameByteRegisterIfNeeded: register preserving: preserved during: aBlock
 ]
 
 { #category : #'floting point' }
-Nativizer >> renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock [
+Assembler >> renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock [
 	codegen renameByteRegisterIfNeeded: register preserving: preserved1 preserving: preserved2 during: aBlock
 ]
 
 { #category : #loading }
-Nativizer >> reserveStackSlots: amount [
+Assembler >> reserveStackSlots: amount [
 	codegen subImm: amount * codegen addressSize from: codegen regSP
 ]
 
 { #category : #initialization }
-Nativizer >> reset [
+Assembler >> reset [
 	labels := Dictionary new: 100.
 	literals := OrderedCollection new.
 	codegen reset
 ]
 
 { #category : #labels }
-Nativizer >> resolveLabel: aString [
+Assembler >> resolveLabel: aString [
 	^labels at: aString
 ]
 
 { #category : #epilogue }
-Nativizer >> restoreCallerEnvironment [
+Assembler >> restoreCallerEnvironment [
 	self loadEwithFPindex: -2
 ]
 
 { #category : #epilogue }
-Nativizer >> restoreCallerFrame [
+Assembler >> restoreCallerFrame [
 	codegen
 		move: codegen regFP to: codegen regSP;
 		pop: codegen regFP
 ]
 
 { #category : #epilogue }
-Nativizer >> restoreCallerM [
+Assembler >> restoreCallerM [
 	self loadMwithFPindex: -1
 ]
 
 { #category : #epilogue }
-Nativizer >> restoreCallerSelf [
+Assembler >> restoreCallerSelf [
 	self loadSwithFPindex: 0
 ]
 
 { #category : #jumps }
-Nativizer >> return [
+Assembler >> return [
 	codegen return
 ]
 
 { #category : #'floting point' }
-Nativizer >> roundDoubleX0intoX1 [
+Assembler >> roundDoubleX0intoX1 [
 	codegen roundDouble: codegen regX0 into: codegen regX1
 ]
 
 { #category : #loading }
-Nativizer >> saveCallerFrame [
+Assembler >> saveCallerFrame [
 	self pushFP; loadFPwithSP
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> scaleFloatOnRWithA [
+Assembler >> scaleFloatOnRWithA [
 	codegen scaleFloatOnRWithA
 ]
 
 { #category : #arithmetic }
-Nativizer >> setIntegerBit: srcAndDstReg [
+Assembler >> setIntegerBit: srcAndDstReg [
 	self setSafeIntegerBit: srcAndDstReg
 ]
 
 { #category : #arithmetic }
-Nativizer >> setRintegerBit [
+Assembler >> setRintegerBit [
 	self setIntegerBit: codegen regR
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> setSafeIntegerBit: srcAndDstReg [
+Assembler >> setSafeIntegerBit: srcAndDstReg [
 	self or: srcAndDstReg withImm: 1
 ]
 
 { #category : #arithmetic }
-Nativizer >> setSafeRintegerBit [
+Assembler >> setSafeRintegerBit [
 	self setSafeIntegerBit: codegen regR
 
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftLeft: srcAndDst by: countReg [
+Assembler >> shiftLeft: srcAndDst by: countReg [
 	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftLeft: srcAndDst byImm: count [
+Assembler >> shiftLeft: srcAndDst byImm: count [
 	codegen shiftLeft: srcAndDst byImm: count
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftLeftRwithT [
+Assembler >> shiftLeftRwithT [
 	codegen shiftLeft: codegen regR by: codegen regT
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftLogicalRright: count [
+Assembler >> shiftLogicalRright: count [
 	codegen shiftRight: codegen regR byImm: count
 
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftRight: srcAndDst by: countReg [
+Assembler >> shiftRight: srcAndDst by: countReg [
 	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftRight: srcAndDst byImm: count [
+Assembler >> shiftRight: srcAndDst byImm: count [
 	self subclassResponsibility
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftRightArithmetic: srcAndDst by: countReg [
+Assembler >> shiftRightArithmetic: srcAndDst by: countReg [
 	codegen shiftRightArithmetic: srcAndDst by: countReg
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> shiftRightArithmetic: srcAndDst byImm: count [
+Assembler >> shiftRightArithmetic: srcAndDst byImm: count [
 	codegen shiftRightArithmetic: srcAndDst byImm: count
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftRightRwithT [
+Assembler >> shiftRightRwithT [
 	codegen shiftRightArithmetic: codegen regR by: codegen regT
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftRleft: count [
+Assembler >> shiftRleft: count [
 	 codegen shiftLeft: codegen regR byImm: count
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftRright: count [
+Assembler >> shiftRright: count [
 	codegen shiftRightArithmetic: codegen regR byImm: count
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> shiftTright: count [
+Assembler >> shiftTright: count [
 	codegen shiftRightArithmetic: codegen regT byImm: count
 
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfCarryTo: label [
+Assembler >> shortJumpIfCarryTo: label [
 	codegen shortJumpIfCarryTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfEqualTo: label [
+Assembler >> shortJumpIfEqualTo: label [
 	codegen shortJumpIfEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfNotCarryTo: label [
+Assembler >> shortJumpIfNotCarryTo: label [
 	codegen shortJumpIfNotCarryTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfNotEqualTo: label [
+Assembler >> shortJumpIfNotEqualTo: label [
 	codegen shortJumpIfNotEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfNotZeroTo: label [
+Assembler >> shortJumpIfNotZeroTo: label [
 	self shortJumpIfNotEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfSignTo: label [
+Assembler >> shortJumpIfSignTo: label [
 	codegen shortJumpIfSignTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpIfZeroTo: label [
+Assembler >> shortJumpIfZeroTo: label [
 	self shortJumpIfEqualTo: label
 ]
 
 { #category : #jumps }
-Nativizer >> shortJumpTo: label [
+Assembler >> shortJumpTo: label [
 	codegen shortJumpTo: label
 ]
 
 { #category : #comparing }
-Nativizer >> smallInteger: anInteger [
+Assembler >> smallInteger: anInteger [
 	^(anInteger bitShift: 1) + 1
 ]
 
 { #category : #'floting point' }
-Nativizer >> sqrtDoubleX0 [
+Assembler >> sqrtDoubleX0 [
 	codegen sqrtDouble: codegen regX0 into: codegen regX0
 ]
 
 { #category : #'memory - load / store' }
-Nativizer >> store: srcReg intoMem: dstMemRef [
+Assembler >> store: srcReg intoMem: dstMemRef [
 	^ codegen store: srcReg intoMem: dstMemRef
 ]
 
 { #category : #'floting point' }
-Nativizer >> storeAinThreadVariableAtIndexR [
+Assembler >> storeAinThreadVariableAtIndexR [
 	codegen store: codegen regA intoThreadVariableAt: codegen regR
 ]
 
 { #category : #storing }
-Nativizer >> storeAinTindex: index [
+Assembler >> storeAinTindex: index [
 	| memref |
 	memref := codegen memRef: codegen regT indexImm: index.
 	codegen
@@ -1911,28 +1911,28 @@ Nativizer >> storeAinTindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeByteAinRindex: index [
+Assembler >> storeByteAinRindex: index [
 	| memref |
 	memref := codegen memRef8: codegen regR indexImm: index.
 	codegen store: codegen regA byte intoMem: memref
 ]
 
 { #category : #storing }
-Nativizer >> storeByteTinRatA [
+Assembler >> storeByteTinRatA [
 	| memref |
 	memref := codegen memRef8: codegen regR index: codegen regA.
 	codegen store: codegen regT byte intoMem: memref
 ]
 
 { #category : #'floting point' }
-Nativizer >> storeDoubleResultInRindirect [
+Assembler >> storeDoubleResultInRindirect [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: 1.
 	codegen storeDoubleResultIntoMem:  memref
 ]
 
 { #category : #storing }
-Nativizer >> storeEinRindex: index [
+Assembler >> storeEinRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -1941,7 +1941,7 @@ Nativizer >> storeEinRindex: index [
 ]
 
 { #category : #'memory - load / store' }
-Nativizer >> storeImm: imm intoMem: dstMemRef [
+Assembler >> storeImm: imm intoMem: dstMemRef [
 	"Store constant into memory location `dstMemRef`. 
 
 	 The size of data loaded is specified in `dstMemRef`"
@@ -1952,7 +1952,7 @@ Nativizer >> storeImm: imm intoMem: dstMemRef [
 ]
 
 { #category : #storing }
-Nativizer >> storeLargeX0inA [
+Assembler >> storeLargeX0inA [
 	| memref |
 	memref := codegen memRef64: codegen regA indexImm: 1.
 	codegen storeDouble: codegen regX0 intoMem: memref
@@ -1961,7 +1961,7 @@ Nativizer >> storeLargeX0inA [
 ]
 
 { #category : #storing }
-Nativizer >> storeLargeX0inT [
+Assembler >> storeLargeX0inT [
 	| memref |
 	memref := codegen memRef64: codegen regT indexImm: 1.
 	codegen storeDouble: codegen regX0 intoMem: memref
@@ -1970,7 +1970,7 @@ Nativizer >> storeLargeX0inT [
 ]
 
 { #category : #storing }
-Nativizer >> storeLongTinRatA [
+Assembler >> storeLongTinRatA [
 	| memref |
 	memref := codegen memRef32: codegen regR index: codegen regA.
 	codegen
@@ -1979,20 +1979,20 @@ Nativizer >> storeLongTinRatA [
 ]
 
 { #category : #storing }
-Nativizer >> storeLongTinRatOffsetA [
+Assembler >> storeLongTinRatOffsetA [
 	| memref |
 	memref := codegen memRef32: codegen regR offset: codegen regA.
 	codegen store: codegen regT long intoMem: memref
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> storeMXCSRintoA [
+Assembler >> storeMXCSRintoA [
 	codegen storeMXCSRintoA
 
 ]
 
 { #category : #storing }
-Nativizer >> storeRinAindex: index [
+Assembler >> storeRinAindex: index [
 	| memref |
 	memref := codegen memRef: codegen regA indexImm: index.
 	codegen
@@ -2001,7 +2001,7 @@ Nativizer >> storeRinAindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeRinEindex: index [
+Assembler >> storeRinEindex: index [
 	| memref |
 	memref := codegen memRef: codegen regE indexImm: index.
 	codegen
@@ -2010,7 +2010,7 @@ Nativizer >> storeRinEindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeRinFPindex: index [
+Assembler >> storeRinFPindex: index [
 	| memref |
 	memref := codegen memRef: codegen regFP indexImm: index.
 	codegen
@@ -2019,7 +2019,7 @@ Nativizer >> storeRinFPindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeRinSindex: index [
+Assembler >> storeRinSindex: index [
 	| memref |
 	memref := codegen memRef: codegen regS indexImm: index.
 	codegen
@@ -2028,7 +2028,7 @@ Nativizer >> storeRinSindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeRinTindex: index [
+Assembler >> storeRinTindex: index [
 	| memref |
 	memref := codegen memRef: codegen regT indexImm: index.
 	codegen
@@ -2037,21 +2037,21 @@ Nativizer >> storeRinTindex: index [
 ]
 
 { #category : #storing }
-Nativizer >> storeShortAinRoffset: offset [
+Assembler >> storeShortAinRoffset: offset [
 	|  memref |
 	memref := codegen memRef16: codegen regR offsetImm: offset.
 	codegen store: codegen regA short intoMem: memref
 ]
 
 { #category : #storing }
-Nativizer >> storeShortTinRatOffsetA [
+Assembler >> storeShortTinRatOffsetA [
 	| memref |
 	memref := codegen memRef16: codegen regR offset: codegen regA.
 	codegen store: codegen regT short intoMem: memref
 ]
 
 { #category : #storing }
-Nativizer >> storeSinRindex: index [
+Assembler >> storeSinRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -2060,12 +2060,12 @@ Nativizer >> storeSinRindex: index [
 ]
 
 { #category : #'floting point' }
-Nativizer >> storeTIBatRwithA [
+Assembler >> storeTIBatRwithA [
 	codegen store: codegen regA intoTIBat: codegen regR
 ]
 
 { #category : #storing }
-Nativizer >> storeTinRatA [
+Assembler >> storeTinRatA [
 	| memref |
 	memref := codegen memRef: codegen regR index: codegen regA.
 	codegen
@@ -2074,14 +2074,14 @@ Nativizer >> storeTinRatA [
 ]
 
 { #category : #storing }
-Nativizer >> storeTinRatOffsetA [
+Assembler >> storeTinRatOffsetA [
 	| memref |
 	memref := codegen memRef: codegen regR offset: codegen regA.
 	codegen store: codegen regT intoMem: memref
 ]
 
 { #category : #storing }
-Nativizer >> storeTinRindex: index [
+Assembler >> storeTinRindex: index [
 	| memref |
 	memref := codegen memRef: codegen regR indexImm: index.
 	codegen
@@ -2090,101 +2090,101 @@ Nativizer >> storeTinRindex: index [
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> sub: src2 from: src1AndDst [
+Assembler >> sub: src2 from: src1AndDst [
 	codegen sub: src2  from: src1AndDst
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> subAfromR [
+Assembler >> subAfromR [
 	codegen sub: codegen regA from: codegen regR
 
 ]
 
 { #category : #arithmetic }
-Nativizer >> subAfromT [
+Assembler >> subAfromT [
 	codegen sub: codegen regA from: codegen regT    
 
 ]
 
 { #category : #'floting point' }
-Nativizer >> subDoubleX1fromX0 [
+Assembler >> subDoubleX1fromX0 [
 	codegen subDouble: codegen regX1 from: codegen regX0
 ]
 
 { #category : #arithmetic }
-Nativizer >> subFromRconstant: imm [
+Assembler >> subFromRconstant: imm [
 	codegen subImm: imm from: codegen regR
 
 ]
 
 { #category : #'operations - arithmetic' }
-Nativizer >> subImm: imm from: srcAndDst [
+Assembler >> subImm: imm from: srcAndDst [
 	codegen subImm: imm from: srcAndDst
 
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> subTslotsToSP [
+Assembler >> subTslotsToSP [
 	codegen subTslotsToSP
 ]
 
 { #category : #initialization }
-Nativizer >> target: aNativizationTarget [
+Assembler >> target: aNativizationTarget [
 	codegen := aNativizationTarget newCodeGenerator.
 	self reset
 ]
 
 { #category : #loading }
-Nativizer >> testIntegerBit: aRegister [
+Assembler >> testIntegerBit: aRegister [
 	codegen testIntegerBit: aRegister
 ]
 
 { #category : #loading }
-Nativizer >> testIntegerBitOf: aRegister [
+Assembler >> testIntegerBitOf: aRegister [
 	codegen test: aRegister byte withImm: 1
 ]
 
 { #category : #loading }
-Nativizer >> testRintegerBit [
+Assembler >> testRintegerBit [
 	codegen test: codegen regR byte withImm: 1
 ]
 
 { #category : #loading }
-Nativizer >> testRwithR [
+Assembler >> testRwithR [
 	codegen test: codegen regR with: codegen regR
 ]
 
 { #category : #services }
-Nativizer >> wordSize [
+Assembler >> wordSize [
 	^codegen wordSize
 ]
 
 { #category : #'to-cleanup' }
-Nativizer >> writeTslots [
+Assembler >> writeTslots [
 	codegen writeTslots
 ]
 
 { #category : #'operations - logical' }
-Nativizer >> xor: src1AndDst with: src2 [
+Assembler >> xor: src1AndDst with: src2 [
 	^ self subclassResponsibility
 
 ]
 
 { #category : #logic }
-Nativizer >> xorAwithR [
+Assembler >> xorAwithR [
 	codegen xor: codegen regA with: codegen regR
 
 ]
 
 { #category : #logic }
-Nativizer >> xorFPwithFP [
+Assembler >> xorFPwithFP [
 	codegen xor: codegen regFP with: codegen regFP
 
 ]
 
 { #category : #logic }
-Nativizer >> xorRwithA [
+Assembler >> xorRwithA [
 	codegen xor: codegen regR with: codegen regA
 
 ]

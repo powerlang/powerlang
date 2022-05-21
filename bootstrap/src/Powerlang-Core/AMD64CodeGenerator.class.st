@@ -3,7 +3,7 @@ Copyright (c) 2020 Aucerna.
 	See (MIT) license in root directory.
 "
 Class {
-	#name : #AssemblerAMD64,
+	#name : #AMD64CodeGenerator,
 	#superclass : #CodeGenerator,
 	#instVars : [
 		'instruction',
@@ -21,19 +21,19 @@ Class {
 }
 
 { #category : #'instance creation' }
-AssemblerAMD64 class >> new [
+AMD64CodeGenerator class >> new [
 	^ self basicNew initialize.
 
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> add: src2 to: src1AndDst [
+AMD64CodeGenerator >> add: src2 to: src1AndDst [
 	self assemble: 'add' with: src1AndDst with: src2
 
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> addDouble: source1 to: source2andDest [
+AMD64CodeGenerator >> addDouble: source1 to: source2andDest [
 	self 
 		assemble: 'addsd'
 		with: source2andDest
@@ -42,18 +42,18 @@ AssemblerAMD64 >> addDouble: source1 to: source2andDest [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> addImm: imm to: src2AndDst [
+AMD64CodeGenerator >> addImm: imm to: src2AndDst [
 	self assemble: 'add' with: src2AndDst withImm: imm
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> and: src1AndDst with: source2 [
+AMD64CodeGenerator >> and: src1AndDst with: source2 [
 	self assemble: 'and' with: src1AndDst with: source2
 
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> and: src1AndDst withImm: imm [
+AMD64CodeGenerator >> and: src1AndDst withImm: imm [
 
 	(imm between: -128 and: -1) ifTrue: [ 
 		"When `imm` is a small negative, we can safely
@@ -68,18 +68,18 @@ AssemblerAMD64 >> and: src1AndDst withImm: imm [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble [
+AMD64CodeGenerator >> assemble [
 	encoder reset; writeEncodingOn: memory
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic [
+AMD64CodeGenerator >> assemble: mnemonic [
 	instruction mnemonic: mnemonic; operands: #().
 	self assemble
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic with: op [
+AMD64CodeGenerator >> assemble: mnemonic with: op [
 	| op1 |
 	op1 := op isInteger ifTrue: [immediate value: op] ifFalse: [op].
 	operands1 at: 1 put: op1.
@@ -88,7 +88,7 @@ AssemblerAMD64 >> assemble: mnemonic with: op [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic with: op1 with: op2 [
+AMD64CodeGenerator >> assemble: mnemonic with: op1 with: op2 [
 	| op |
 	op := op2 isInteger ifTrue: [immediate value: op2] ifFalse: [op2].
 	operands2
@@ -99,7 +99,7 @@ AssemblerAMD64 >> assemble: mnemonic with: op1 with: op2 [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic
+AMD64CodeGenerator >> assemble: mnemonic
 with: op1
 with: op2
 with: op3 [
@@ -114,7 +114,7 @@ with: op3 [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic with: op1 withImm64: op2 [
+AMD64CodeGenerator >> assemble: mnemonic with: op1 withImm64: op2 [
 	| v |
 	v := self regV.
 	self
@@ -123,7 +123,7 @@ AssemblerAMD64 >> assemble: mnemonic with: op1 withImm64: op2 [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic with: op1 withImm: imm [
+AMD64CodeGenerator >> assemble: mnemonic with: op1 withImm: imm [
 	immediate value: imm.
 	(immediate length <= 32 or: [mnemonic = 'mov' and: [op1 class == Register]])
 		ifTrue: [self assemble: mnemonic with: op1 with: immediate]
@@ -131,7 +131,7 @@ AssemblerAMD64 >> assemble: mnemonic with: op1 withImm: imm [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic withImm64: op1 [
+AMD64CodeGenerator >> assemble: mnemonic withImm64: op1 [
 	| v |
 	v := self regV.
 	self
@@ -140,7 +140,7 @@ AssemblerAMD64 >> assemble: mnemonic withImm64: op1 [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic withImm: imm [
+AMD64CodeGenerator >> assemble: mnemonic withImm: imm [
 	immediate value: imm.
 	immediate length <= 32
 		ifTrue: [self assemble: mnemonic with: immediate]
@@ -148,7 +148,7 @@ AssemblerAMD64 >> assemble: mnemonic withImm: imm [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic withReg: reg index: index [
+AMD64CodeGenerator >> assemble: mnemonic withReg: reg index: index [
 	pointer
 		reset;
 		length: self addressLength;
@@ -158,7 +158,7 @@ AssemblerAMD64 >> assemble: mnemonic withReg: reg index: index [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assemble: mnemonic
+AMD64CodeGenerator >> assemble: mnemonic
 withReg: dst
 withReg: src
 index: index [
@@ -171,17 +171,17 @@ index: index [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleByte: byte [
+AMD64CodeGenerator >> assembleByte: byte [
 	memory nextBytePut: byte
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleBytes: aByteArray [
+AMD64CodeGenerator >> assembleBytes: aByteArray [
 	memory nextBytesPut: aByteArray
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> assembleBytes: value count: count [
+AMD64CodeGenerator >> assembleBytes: value count: count [
 	self ASSERT: value isInteger.
 	self ASSERT:(count == 4 or:[ count == 8 ]).
 
@@ -194,49 +194,49 @@ AssemblerAMD64 >> assembleBytes: value count: count [
 ]
 
 { #category : #debugging }
-AssemblerAMD64 >> breakpoint [
+AMD64CodeGenerator >> breakpoint [
 	self assemble: 'int' with: 3
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> call: srcReg [ 
+AMD64CodeGenerator >> call: srcReg [ 
 	self assemble: 'call' with: srcReg
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> callIndirect: aMemRef [
+AMD64CodeGenerator >> callIndirect: aMemRef [
 	self assemble: 'call' with: aMemRef 
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> clearFPUFlags [
+AMD64CodeGenerator >> clearFPUFlags [
 	self assemble: 'fnclex'
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> clearHigh32: srcAndDstReg [
+AMD64CodeGenerator >> clearHigh32: srcAndDstReg [
 	self assemble: 'mov' with: srcAndDstReg e with: srcAndDstReg e
 ]
 
 { #category : #services }
-AssemblerAMD64 >> compare: reg1 with: reg2 [
+AMD64CodeGenerator >> compare: reg1 with: reg2 [
 	self assemble: 'cmp' with: reg1 with: reg2
 ]
 
 { #category : #services }
-AssemblerAMD64 >> compare: reg1 withImm: imm [
+AMD64CodeGenerator >> compare: reg1 withImm: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'cmp' with: reg1 withImm: imm
 ]
 
 { #category : #services }
-AssemblerAMD64 >> compare: reg1 withMem: aMemRef [
+AMD64CodeGenerator >> compare: reg1 withMem: aMemRef [
 	self assemble: 'cmp' with: reg1 with: aMemRef
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> compareEqualDoubleX0withAindirect [
+AMD64CodeGenerator >> compareEqualDoubleX0withAindirect [
 	pointer
 		reset;
 		length: 64;
@@ -249,7 +249,7 @@ AssemblerAMD64 >> compareEqualDoubleX0withAindirect [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
+AMD64CodeGenerator >> compareLessThanDoubleX0withAindirect [
 	pointer
 		reset;
 		length: 64;
@@ -262,33 +262,33 @@ AssemblerAMD64 >> compareLessThanDoubleX0withAindirect [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> convert: src toDouble: dst [
+AMD64CodeGenerator >> convert: src toDouble: dst [
 	self assemble: 'cvtsi2sd' with: dst with: src
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> dec: srcAndDstReg [
+AMD64CodeGenerator >> dec: srcAndDstReg [
 	self assemble: 'dec' with: srcAndDstReg
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> decMem: aMemRef [
+AMD64CodeGenerator >> decMem: aMemRef [
 	self assemble: 'dec' with: aMemRef
 
 ]
 
 { #category : #services }
-AssemblerAMD64 >> disassembledText32 [
+AMD64CodeGenerator >> disassembledText32 [
 	^self nativeCode disassembledText32
 ]
 
 { #category : #services }
-AssemblerAMD64 >> disassembledText64 [
+AMD64CodeGenerator >> disassembledText64 [
 	^self nativeCode disassembledText64
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> divDouble: src1andDstReg by: src2reg [ 
+AMD64CodeGenerator >> divDouble: src1andDstReg by: src2reg [ 
 	self 
 		assemble: 'divsd'
 		with: src1andDstReg
@@ -296,7 +296,7 @@ AssemblerAMD64 >> divDouble: src1andDstReg by: src2reg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
+AMD64CodeGenerator >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 	| conversion |
 	self
 		ASSERT: srcAndDstReg r == rax;
@@ -310,7 +310,7 @@ AssemblerAMD64 >> divide: srcAndDstReg extendingTo: extReg by: divisorReg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> dropTopOfFPU [
+AMD64CodeGenerator >> dropTopOfFPU [
 	"
 	fstp st(0)
 	"
@@ -318,22 +318,22 @@ AssemblerAMD64 >> dropTopOfFPU [
 ]
 
 { #category : #services }
-AssemblerAMD64 >> exchange: op1 with: op2 [
+AMD64CodeGenerator >> exchange: op1 with: op2 [
 	self assemble: 'xchg' with: op1 with: op2
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> exchange: srcAndDstReg withMem: aMemRef [
+AMD64CodeGenerator >> exchange: srcAndDstReg withMem: aMemRef [
 	self assemble: 'xchg' with: aMemRef with: srcAndDstReg
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> inc: srcAndDstReg [
+AMD64CodeGenerator >> inc: srcAndDstReg [
 	self assemble: 'inc' with: srcAndDstReg
 ]
 
 { #category : #initialization }
-AssemblerAMD64 >> initialize [
+AMD64CodeGenerator >> initialize [
 	super initialize.
 	instruction := ISAInstruction new.
 	operands1 := Array new: 1.
@@ -346,7 +346,7 @@ AssemblerAMD64 >> initialize [
 ]
 
 { #category : #'private - jumps' }
-AssemblerAMD64 >> jump: mnemonic to: label size: n [
+AMD64CodeGenerator >> jump: mnemonic to: label size: n [
 	| placeholder end |
 	placeholder := 1 bitShift: n - 1 * 8.
 	self assemble: mnemonic with: placeholder.
@@ -360,72 +360,72 @@ AssemblerAMD64 >> jump: mnemonic to: label size: n [
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfEqualTo: label [
+AMD64CodeGenerator >> jumpIfEqualTo: label [
 	self nearJump: 'jz' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfGreaterOrEqualSignedTo: label [
+AMD64CodeGenerator >> jumpIfGreaterOrEqualSignedTo: label [
 	self nearJump: 'jge' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfGreaterSignedTo: label [
+AMD64CodeGenerator >> jumpIfGreaterSignedTo: label [
 	self nearJump: 'jg' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfLessOrEqualSignedTo: label [
+AMD64CodeGenerator >> jumpIfLessOrEqualSignedTo: label [
 	self nearJump: 'jle' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfLessSignedTo: label [
+AMD64CodeGenerator >> jumpIfLessSignedTo: label [
 	self nearJump: 'jl' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfNotEqualTo: label [
+AMD64CodeGenerator >> jumpIfNotEqualTo: label [
 	self nearJump: 'jnz' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfNotZeroTo: label [
+AMD64CodeGenerator >> jumpIfNotZeroTo: label [
 	self jumpIfNotEqualTo: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfOverflowTo: label [
+AMD64CodeGenerator >> jumpIfOverflowTo: label [
 	self nearJump: 'jo' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfSignTo: label [
+AMD64CodeGenerator >> jumpIfSignTo: label [
 	self nearJump: 'js' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpIfZeroTo: label [
+AMD64CodeGenerator >> jumpIfZeroTo: label [
 	self jumpIfEqualTo: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> jumpTo: label [
+AMD64CodeGenerator >> jumpTo: label [
 	self nearJump: 'jmp' to: label
 ]
 
 { #category : #loading }
-AssemblerAMD64 >> jumpToMem: aMemRef [ 
+AMD64CodeGenerator >> jumpToMem: aMemRef [ 
 	self assemble: 'jmp' with: aMemRef
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> lea: dstReg withMem: srcMemRef [
+AMD64CodeGenerator >> lea: dstReg withMem: srcMemRef [
 	self assemble: 'lea' with: dstReg with: srcMemRef
 ]
 
 { #category : #integers }
-AssemblerAMD64 >> leadingRzeroCount [
+AMD64CodeGenerator >> leadingRzeroCount [
 	"
 	lzcnt is a special x64 extension: it puts the REX
 	prefix after the first opcode byte. Our x64 
@@ -441,12 +441,12 @@ AssemblerAMD64 >> leadingRzeroCount [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
+AMD64CodeGenerator >> load: dstReg convertingDoubleToIntegerFromMem: srcMemRef [
 	self assemble: 'cvttsd2si' with: dstReg with: srcMemRef
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
+AMD64CodeGenerator >> load: dstReg fromMem: srcMemRef [
 	| adjusted |
 	adjusted := dstReg forLength: srcMemRef length.
 	self
@@ -456,7 +456,7 @@ AssemblerAMD64 >> load: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> load: dstReg withTIBat: indexReg [
+AMD64CodeGenerator >> load: dstReg withTIBat: indexReg [
 	| seg |
 	seg := wordSize = 8
 		ifTrue: [ gs ]
@@ -471,7 +471,7 @@ AssemblerAMD64 >> load: dstReg withTIBat: indexReg [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> load: dstReg withThreadVariableAt: indexReg [
+AMD64CodeGenerator >> load: dstReg withThreadVariableAt: indexReg [
 	pointer
 		reset;
 		length: self addressLength;
@@ -488,7 +488,7 @@ AssemblerAMD64 >> load: dstReg withThreadVariableAt: indexReg [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> loadDouble: dstReg fromMem: srcMemRef [
+AMD64CodeGenerator >> loadDouble: dstReg fromMem: srcMemRef [
 	self ASSERT: srcMemRef sizeInBits == 64.
 	self 
 		assemble: 'movq'
@@ -498,7 +498,7 @@ AssemblerAMD64 >> loadDouble: dstReg fromMem: srcMemRef [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
+AMD64CodeGenerator >> loadLongMwithIPoffset: anInteger [
 	| instsize |
 	#dontOptimize.
 	instsize := 6.
@@ -511,7 +511,7 @@ AssemblerAMD64 >> loadLongMwithIPoffset: anInteger [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> loadMXCSRfromA [
+AMD64CodeGenerator >> loadMXCSRfromA [
 	pointer
 		reset;
 		length: 32;
@@ -520,7 +520,7 @@ AssemblerAMD64 >> loadMXCSRfromA [
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
+AMD64CodeGenerator >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
 	pointer
 		reset;
 		length: 8;
@@ -531,12 +531,12 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexAt: reg3 [
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atIndexImm: index [
+AMD64CodeGenerator >> loadZeroExtendByte: reg1 from: reg2 atIndexImm: index [
 	self loadZeroExtendByte: reg1 from: reg2 atOffset: index - 1
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
+AMD64CodeGenerator >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 	pointer
 		reset;
 		length: 8;
@@ -546,7 +546,7 @@ AssemblerAMD64 >> loadZeroExtendByte: reg1 from: reg2 atOffset: offset [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
+AMD64CodeGenerator >> loadZeroExtendShortRwithRoffset: offset [
 	pointer
 		reset;
 		length: 16;
@@ -556,25 +556,25 @@ AssemblerAMD64 >> loadZeroExtendShortRwithRoffset: offset [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> lock [
+AMD64CodeGenerator >> lock [
 	self assembleByte: 16rF0
 ]
 
 { #category : #memory }
-AssemblerAMD64 >> memRef [
+AMD64CodeGenerator >> memRef [
 	^ MemoryOperand new
 		length: self addressBitSize
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> move: srcReg to: dstReg [
+AMD64CodeGenerator >> move: srcReg to: dstReg [
 	self ASSERT: (srcReg class = Register and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: srcReg
 
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> moveDouble: srcReg into: dstReg [ 
+AMD64CodeGenerator >> moveDouble: srcReg into: dstReg [ 
 	| mov |
 
 	mov := wordSize = 8 ifTrue: [
@@ -587,14 +587,14 @@ AssemblerAMD64 >> moveDouble: srcReg into: dstReg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> moveImm: imm to: dstReg [
+AMD64CodeGenerator >> moveImm: imm to: dstReg [
 	self ASSERT: (imm isInteger and: [dstReg class = Register]).
 	self assemble: 'mov' with: dstReg with: imm
 
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> moveTslots [
+AMD64CodeGenerator >> moveTslots [
 	| rep mnemonic |
 	rep := 16rF3.
 	mnemonic := wordSize = 8
@@ -606,7 +606,7 @@ AssemblerAMD64 >> moveTslots [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> mulDouble: src1andDstReg by: src2reg [ 
+AMD64CodeGenerator >> mulDouble: src1andDstReg by: src2reg [ 
 	self 
 		assemble: 'mulsd'
 		with: src1andDstReg
@@ -614,7 +614,7 @@ AssemblerAMD64 >> mulDouble: src1andDstReg by: src2reg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
+AMD64CodeGenerator >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 	self
 		ASSERT: src1AndDstLoReg r == rax;
 		ASSERT: dstHiReg r == rdx.
@@ -622,57 +622,57 @@ AssemblerAMD64 >> multiply: src1AndDstLoReg by: src2reg wideningTo: dstHiReg [
 ]
 
 { #category : #'private - jumps' }
-AssemblerAMD64 >> nearJump: mnemonic to: label [
+AMD64CodeGenerator >> nearJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 4
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop [
+AMD64CodeGenerator >> nop [
 	self assemble: 'nop'
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop2 [
+AMD64CodeGenerator >> nop2 [
 	memory nextPutAll: #[16r66 16r90]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop3 [
+AMD64CodeGenerator >> nop3 [
 	memory nextPutAll: #[16r0F 16r1F 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop4 [
+AMD64CodeGenerator >> nop4 [
 	memory nextPutAll: #[16r0F 16r1F 16r40 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop5 [
+AMD64CodeGenerator >> nop5 [
 	memory nextPutAll: #[16r0F 16r1F 16r44 16r00 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop6 [
+AMD64CodeGenerator >> nop6 [
 	memory nextPutAll: #[16r66 16r0F 16r1F 16r44 16r00 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop7 [
+AMD64CodeGenerator >> nop7 [
 	memory nextPutAll: #[16r0F 16r1F 16r80 16r00 16r00 16r00 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop8 [
+AMD64CodeGenerator >> nop8 [
 	memory nextPutAll: #[16r0F 16r1F 16r84 16r00 16r00 16r00 16r00 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop9 [
+AMD64CodeGenerator >> nop9 [
 	memory nextPutAll: #[16r66 16r0F 16r1F 16r84 16r00 16r00 16r00 16r00 16r00]
 ]
 
 { #category : #alignment }
-AssemblerAMD64 >> nop: count [
+AMD64CodeGenerator >> nop: count [
 	"
 	ShellDLL current openWebPage: 'http://www.felixcloutier.com/x86/NOP.html'
 	"
@@ -693,13 +693,13 @@ AssemblerAMD64 >> nop: count [
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> or: src1AndDst with: src2 [
+AMD64CodeGenerator >> or: src1AndDst with: src2 [
 	self assemble: 'or' with: src1AndDst with: src2
 
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> or: src1AndDst withImm: imm [
+AMD64CodeGenerator >> or: src1AndDst withImm: imm [
 
 	(imm between: 0 and: 127) ifTrue: [ 
 		"When `imm` is a small POSITIVE, we can safely
@@ -714,54 +714,54 @@ AssemblerAMD64 >> or: src1AndDst withImm: imm [
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> pop: dstReg [
+AMD64CodeGenerator >> pop: dstReg [
 	self assemble: 'pop' with: dstReg
 
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> popIntoMem: dstMemRef [
+AMD64CodeGenerator >> popIntoMem: dstMemRef [
 	self assemble: 'pop' with: dstMemRef
 ]
 
 { #category : #'printing & storing' }
-AssemblerAMD64 >> printOn: aStream [
+AMD64CodeGenerator >> printOn: aStream [
 	aStream print: self class; cr; cr;
 		nextPutAll: memory bytes disassembledAmd64
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> push: srcReg [
+AMD64CodeGenerator >> push: srcReg [
 	self assemble: 'push' with: srcReg
 
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> pushAOnFPUStack [
+AMD64CodeGenerator >> pushAOnFPUStack [
 	pointer reset; length: 64; base: self regA.
 	self assemble: 'fld' with: pointer
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> pushImm: imm [
+AMD64CodeGenerator >> pushImm: imm [
 	#imm8.
 	#imm32.
 	self assemble: 'push' withImm: imm
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> pushMem: aMemRef [
+AMD64CodeGenerator >> pushMem: aMemRef [
 	self push: aMemRef
 ]
 
 { #category : #'push/pop' }
-AssemblerAMD64 >> pushROnFPUStack [
+AMD64CodeGenerator >> pushROnFPUStack [
 	pointer reset; length: 64; base: self regR.
 	self assemble: 'fld' with: pointer
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> readFPUStatusOnA [
+AMD64CodeGenerator >> readFPUStatusOnA [
 	pointer
 		reset;
 		length: 16;
@@ -770,7 +770,7 @@ AssemblerAMD64 >> readFPUStatusOnA [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
+AMD64CodeGenerator >> renameByteRegisterIfNeeded: register preserving: preserved during: aBlock [
 	self
 		renameByteRegisterIfNeeded: register
 		preserving: preserved
@@ -779,7 +779,7 @@ AssemblerAMD64 >> renameByteRegisterIfNeeded: register preserving: preserved dur
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> renameByteRegisterIfNeeded: register
+AMD64CodeGenerator >> renameByteRegisterIfNeeded: register
 preserving: preserved1
 preserving: preserved2
 during: aBlock [
@@ -794,7 +794,7 @@ during: aBlock [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> renameRegisterPreserving: preserved1 preserving: preserved2 [
+AMD64CodeGenerator >> renameRegisterPreserving: preserved1 preserving: preserved2 [
 	preserved1 == self regR
 		ifTrue: [preserved2 == self regA
 			ifTrue: [^self regT]
@@ -807,19 +807,19 @@ AssemblerAMD64 >> renameRegisterPreserving: preserved1 preserving: preserved2 [
 ]
 
 { #category : #calls }
-AssemblerAMD64 >> return [
+AMD64CodeGenerator >> return [
 	self assemble: 'ret'
 ]
 
 { #category : #calls }
-AssemblerAMD64 >> return: anInteger [
+AMD64CodeGenerator >> return: anInteger [
 	anInteger = 0
 		ifTrue: [self assemble: 'ret']
 		ifFalse: [self assemble: 'ret' with: anInteger * self addressSize]
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> roundDouble: srcReg into: dstReg [ 
+AMD64CodeGenerator >> roundDouble: srcReg into: dstReg [ 
 	self 
 		assemble: 'roundsd'
 		with: dstReg
@@ -828,7 +828,7 @@ AssemblerAMD64 >> roundDouble: srcReg into: dstReg [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> scaleFloatOnRWithA [
+AMD64CodeGenerator >> scaleFloatOnRWithA [
 	self
 		pushAOnFPUStack;
 		pushROnFPUStack;
@@ -843,78 +843,78 @@ AssemblerAMD64 >> scaleFloatOnRWithA [
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> shiftLeft: srcAndDst by: countReg [
+AMD64CodeGenerator >> shiftLeft: srcAndDst by: countReg [
 	self ASSERT: countReg r = rcx.
 	self assemble: 'sal' with: srcAndDst with: countReg b
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> shiftLeft: srcAndDst byImm: count [
+AMD64CodeGenerator >> shiftLeft: srcAndDst byImm: count [
 	self ASSERT: (count between: 0 and: srcAndDst length - 1).
 	self assemble: 'sal' with: srcAndDst withImm: count
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> shiftRight: srcAndDst by: countReg [
+AMD64CodeGenerator >> shiftRight: srcAndDst by: countReg [
 	self ASSERT: countReg r = rcx.
 	self assemble: 'sar' with: srcAndDst with: countReg b
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> shiftRight: srcAndDst byImm: count [
+AMD64CodeGenerator >> shiftRight: srcAndDst byImm: count [
 	self ASSERT: (count between: 0 and: srcAndDst length - 1).
 	self assemble: 'shr' with: srcAndDst withImm: count
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> shiftRightArithmetic: srcAndDst by: countReg [
+AMD64CodeGenerator >> shiftRightArithmetic: srcAndDst by: countReg [
 	self ASSERT: countReg r = rcx.
 	self assemble: 'sar' with: srcAndDst with: countReg b
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> shiftRightArithmetic: srcAndDst byImm: count [
+AMD64CodeGenerator >> shiftRightArithmetic: srcAndDst byImm: count [
 	self ASSERT: (count between: 0 and: srcAndDst length - 1).
 	self assemble: 'sar' with: srcAndDst withImm: count
 ]
 
 { #category : #'private - jumps' }
-AssemblerAMD64 >> shortJump: mnemonic to: label [
+AMD64CodeGenerator >> shortJump: mnemonic to: label [
 	self jump: mnemonic to: label size: 1
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfCarryTo: label [
+AMD64CodeGenerator >> shortJumpIfCarryTo: label [
 	self shortJump: 'jc' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfEqualTo: label [
+AMD64CodeGenerator >> shortJumpIfEqualTo: label [
 	self shortJump: 'jz' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotCarryTo: label [
+AMD64CodeGenerator >> shortJumpIfNotCarryTo: label [
 	self shortJump: 'jnc' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfNotEqualTo: label [
+AMD64CodeGenerator >> shortJumpIfNotEqualTo: label [
 	self shortJump: 'jnz' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpIfSignTo: label [
+AMD64CodeGenerator >> shortJumpIfSignTo: label [
 	self shortJump: 'js' to: label
 ]
 
 { #category : #jumps }
-AssemblerAMD64 >> shortJumpTo: label [
+AMD64CodeGenerator >> shortJumpTo: label [
 	self shortJump: 'jmp' to: label
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> sqrtDouble: srcReg into: dstReg [
+AMD64CodeGenerator >> sqrtDouble: srcReg into: dstReg [
 	self 
 		assemble: 'sqrtsd'
 		with: srcReg
@@ -922,7 +922,7 @@ AssemblerAMD64 >> sqrtDouble: srcReg into: dstReg [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
+AMD64CodeGenerator >> store: srcReg intoMem: dstMemRef [
 	| adjusted |
 	adjusted := srcReg forLength: dstMemRef length.
 	self
@@ -932,7 +932,7 @@ AssemblerAMD64 >> store: srcReg intoMem: dstMemRef [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> store: srcReg intoTIBat: indexReg [
+AMD64CodeGenerator >> store: srcReg intoTIBat: indexReg [
 	| seg |
 	seg := wordSize = 8
 		ifTrue: [ gs ]
@@ -947,7 +947,7 @@ AssemblerAMD64 >> store: srcReg intoTIBat: indexReg [
 ]
 
 { #category : #basic }
-AssemblerAMD64 >> store: srcReg intoThreadVariableAt: indexReg [
+AMD64CodeGenerator >> store: srcReg intoThreadVariableAt: indexReg [
 	pointer
 		reset;
 		length: self addressLength;
@@ -964,7 +964,7 @@ AssemblerAMD64 >> store: srcReg intoThreadVariableAt: indexReg [
 ]
 
 { #category : #storing }
-AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
+AMD64CodeGenerator >> storeByte: byte in: reg2 offset: offset [
 	pointer
 		reset;
 		length: 8;
@@ -974,7 +974,7 @@ AssemblerAMD64 >> storeByte: byte in: reg2 offset: offset [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> storeDouble: srcReg intoMem: dstMemRef [
+AMD64CodeGenerator >> storeDouble: srcReg intoMem: dstMemRef [
 	self ASSERT: dstMemRef sizeInBits == 64.
 	self 
 		assemble: 'movq'
@@ -984,7 +984,7 @@ AssemblerAMD64 >> storeDouble: srcReg intoMem: dstMemRef [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> storeDoubleResultIntoMem: dstMemRef [
+AMD64CodeGenerator >> storeDoubleResultIntoMem: dstMemRef [
 	wordSize = 8
 		ifTrue:
 			[ self assemble: 'movq' with: dstMemRef  with: self regX0 ]
@@ -992,7 +992,7 @@ AssemblerAMD64 >> storeDoubleResultIntoMem: dstMemRef [
 ]
 
 { #category : #'memory - load / store' }
-AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
+AMD64CodeGenerator >> storeImm: imm intoMem: dstMemRef [
 	self
 		assemble: 'mov'
 		with: dstMemRef
@@ -1001,7 +1001,7 @@ AssemblerAMD64 >> storeImm: imm intoMem: dstMemRef [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> storeMXCSRintoA [
+AMD64CodeGenerator >> storeMXCSRintoA [
 	pointer
 		reset;
 		length: 32;
@@ -1010,13 +1010,13 @@ AssemblerAMD64 >> storeMXCSRintoA [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> sub: src1 from: src2AndDst [
+AMD64CodeGenerator >> sub: src1 from: src2AndDst [
 	self assemble: 'sub' with: src2AndDst with:  src1
 
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> subDouble: src1 from: src2AndDst [ 
+AMD64CodeGenerator >> subDouble: src1 from: src2AndDst [ 
 	self 
 		assemble: 'subsd'
 		with: src2AndDst
@@ -1024,13 +1024,13 @@ AssemblerAMD64 >> subDouble: src1 from: src2AndDst [
 ]
 
 { #category : #'operations - arithmetic' }
-AssemblerAMD64 >> subImm: imm from: srcAndDst [
+AMD64CodeGenerator >> subImm: imm from: srcAndDst [
 	self assemble: 'sub' with: srcAndDst withImm: imm
 
 ]
 
 { #category : #'to-cleanup' }
-AssemblerAMD64 >> subTslotsToSP [
+AMD64CodeGenerator >> subTslotsToSP [
 	self assemble: 'neg' with: self regT.
 	pointer
 		reset;
@@ -1044,17 +1044,17 @@ AssemblerAMD64 >> subTslotsToSP [
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> test: src1Reg with: src2Reg [
+AMD64CodeGenerator >> test: src1Reg with: src2Reg [
 	self assemble: 'test' with: src1Reg with: src2Reg
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> test: srcReg withImm: imm [
+AMD64CodeGenerator >> test: srcReg withImm: imm [
 	self assemble: 'test' with: srcReg with: imm
 ]
 
 { #category : #services }
-AssemblerAMD64 >> testIntegerBit: op1 [
+AMD64CodeGenerator >> testIntegerBit: op1 [
 	| op |
 	op := op1 byte.
 	(self addressSize = 4 and: [op isLongModeOld8BitRegister])
@@ -1063,13 +1063,13 @@ AssemblerAMD64 >> testIntegerBit: op1 [
 ]
 
 { #category : #accessing }
-AssemblerAMD64 >> wordSize: anInteger [
+AMD64CodeGenerator >> wordSize: anInteger [
 	super wordSize: anInteger.
 	encoder wordSize: anInteger
 ]
 
 { #category : #'to-cleanup' }
-AssemblerAMD64 >> writeTslots [
+AMD64CodeGenerator >> writeTslots [
 	| rep mnemonic |
 	rep := 16rF3.
 	mnemonic := wordSize = 8
@@ -1081,7 +1081,7 @@ AssemblerAMD64 >> writeTslots [
 ]
 
 { #category : #'operations - logical' }
-AssemblerAMD64 >> xor: src1AndDst with: src2 [
+AMD64CodeGenerator >> xor: src1AndDst with: src2 [
 	self assemble: 'xor' with: src1AndDst with: src2
 
 ]
