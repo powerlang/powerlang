@@ -13,7 +13,7 @@ Class {
 	#classVars : [
 		'IndexedLabels'
 	],
-	#category : #'Powerlang-Core-Assembler'
+	#category : #'Powerlang-Core-Assembly'
 }
 
 { #category : #'instance creation' }

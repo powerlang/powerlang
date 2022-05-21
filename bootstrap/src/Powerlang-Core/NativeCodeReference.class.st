@@ -7,7 +7,7 @@ Class {
 		'target',
 		'absolute'
 	],
-	#category : #'Powerlang-Core-Assembler'
+	#category : #'Powerlang-Core-Assembly'
 }
 
 { #category : #'as yet unclassified' }

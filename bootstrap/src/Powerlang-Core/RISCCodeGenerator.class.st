@@ -1,7 +1,7 @@
 Class {
 	#name : #RISCCodeGenerator,
 	#superclass : #CodeGenerator,
-	#category : #'Powerlang-Core-Assembler'
+	#category : #'Powerlang-Core-Assembly'
 }
 
 { #category : #jumps }
