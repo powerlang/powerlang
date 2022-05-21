@@ -4,5 +4,5 @@ Class {
 	#pools : [
 		'RegistersRISCV'
 	],
-	#category : #'Powerlang-Core-Assembler-RISCV'
+	#category : #'Powerlang-Core-Assembly-RISCV'
 }
