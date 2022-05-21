@@ -10,7 +10,7 @@ Class {
 		'rex',
 		'vex'
 	],
-	#category : #'Powerlang-Core-Assembler-Intel-Tools'
+	#category : #'Powerlang-Core-Assembly-Intel-Tools'
 }
 
 { #category : #private }

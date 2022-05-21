@@ -8,7 +8,7 @@ Class {
 	#instVars : [
 		'byte'
 	],
-	#category : #'Powerlang-Core-Assembler-Intel-Tools'
+	#category : #'Powerlang-Core-Assembly-Intel-Tools'
 }
 
 { #category : #'instance creation' }

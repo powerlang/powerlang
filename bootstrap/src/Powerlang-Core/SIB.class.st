@@ -5,7 +5,7 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #SIB,
 	#superclass : #OctalStructure,
-	#category : #'Powerlang-Core-Assembler-Intel-Tools'
+	#category : #'Powerlang-Core-Assembly-Intel-Tools'
 }
 
 { #category : #accessing }
