@@ -11,7 +11,7 @@ Class {
 		'source',
 		'parser'
 	],
-	#category : #'Powerlang-Core-Assembler-Intel-Parser'
+	#category : #'Powerlang-Core-Assembly-Intel-Parser'
 }
 
 { #category : #'instance creation' }

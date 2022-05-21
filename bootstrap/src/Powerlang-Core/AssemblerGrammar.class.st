@@ -5,7 +5,7 @@ Copyright (c) 2020 Aucerna.
 Class {
 	#name : #AssemblerGrammar,
 	#superclass : #PPCompositeParser,
-	#category : #'Powerlang-Core-Assembler-Intel-Parser'
+	#category : #'Powerlang-Core-Assembly-Intel-Parser'
 }
 
 { #category : #accessing }
