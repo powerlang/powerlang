@@ -23,6 +23,11 @@ LMRObject >> at: index put: value [
 ]
 
 { #category : #accessing }
+LMRObject >> isBytes [
+	^ false
+]
+
+{ #category : #accessing }
 LMRObject >> isImmediate [
 	^false
 ]

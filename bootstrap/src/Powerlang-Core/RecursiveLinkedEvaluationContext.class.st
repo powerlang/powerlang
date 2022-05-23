@@ -11,7 +11,7 @@ Class {
 RecursiveLinkedEvaluationContext >> evaluateFor: interpreter [
 	| sexpressions result |
 	nonLocalReturn := [ :value | 
-	interpreter context: self home parent.
+	interpreter context: self homeContext parent.
 	^ value ].
 	sexpressions := system sexpressionsOf: method.
 	result := interpreter visitMethod: sexpressions.

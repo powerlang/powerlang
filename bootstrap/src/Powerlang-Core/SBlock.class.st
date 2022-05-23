@@ -35,11 +35,6 @@ SBlock >> capturesHome [
 ]
 
 { #category : #accessing }
-SBlock >> compiledCode [
-	^ compiledCode ifNil: [ compiledCode := SCompiledBlock new ]
-]
-
-{ #category : #accessing }
 SBlock >> index [
 	^index
 ]
@@ -71,17 +66,11 @@ SBlock >> isBlock [
 
 { #category : #initialization }
 SBlock >> isInlined [
-	^ compiledCode isNil or: [ compiledCode method isNil ]
+	^ compiledCode isNil
 ]
 
 { #category : #accessing }
 SBlock >> offsetOfCurrentEnvironment [
-	^ 2
-]
-
-{ #category : #accessing }
-SBlock >> offsetOfEnvironment: anInteger [
-	(anInteger = 1 and: [ self capturesHome ]) ifTrue: [ ^ 0 ].
 	^ 2
 ]
 

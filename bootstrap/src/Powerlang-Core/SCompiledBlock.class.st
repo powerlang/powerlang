@@ -33,26 +33,26 @@ SCompiledBlock >> argumentCount: anInteger [
 
 { #category : #constants }
 SCompiledBlock >> capturesHome [
-	^ format anyMask: CapturesHome
+	^ format anyMask: BlockCapturesHome
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
-				  ifTrue: [ format bitOr: CapturesHome ]
-				  ifFalse: [ format bitClear: CapturesHome ]
+				  ifTrue: [ format bitOr: BlockCapturesHome ]
+				  ifFalse: [ format bitClear: BlockCapturesHome ]
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesSelf [
-	^format anyMask: CapturesSelf
+	^format anyMask: BlockCapturesSelf
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesSelf: aBoolean [
 	format := aBoolean
-		ifTrue: [ format bitOr: CapturesSelf ]
-		ifFalse: [ format bitClear: CapturesSelf ]
+		ifTrue: [ format bitOr: BlockCapturesSelf ]
+		ifFalse: [ format bitClear: BlockCapturesSelf ]
 ]
 
 { #category : #constants }
@@ -72,12 +72,12 @@ SCompiledBlock >> format [
 
 { #category : #constants }
 SCompiledBlock >> id [
-	^format bitsAt: Id
+	^format bitsAt: BlockId
 ]
 
 { #category : #constants }
 SCompiledBlock >> id: anInteger [
-	format := format bitsAt: Id put: anInteger
+	format := format bitsAt: BlockId put: anInteger
 ]
 
 { #category : #constants }

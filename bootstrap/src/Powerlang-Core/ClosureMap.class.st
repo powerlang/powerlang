@@ -2,9 +2,7 @@ Class {
 	#name : #ClosureMap,
 	#superclass : #SlotObjectMap,
 	#instVars : [
-		'block',
-		'builder',
-		'astcodes'
+		'block'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
@@ -12,17 +10,6 @@ Class {
 { #category : #'instance creation' }
 ClosureMap class >> classFor: anRGBehavior [
 	^ self
-]
-
-{ #category : #accessing }
-ClosureMap >> astcodes [ ^
-	astcodes
-]
-
-{ #category : #accessing }
-ClosureMap >> astcodes: anSBlock [
-
-	astcodes := anSBlock
 ]
 
 { #category : #accessing }
@@ -36,13 +23,19 @@ ClosureMap >> block: anSCompiledBlock [
 ]
 
 { #category : #accessing }
-ClosureMap >> builder [
-	^ builder
+ClosureMap >> executionTree [
+	^ block optimizedCode
 ]
 
 { #category : #accessing }
-ClosureMap >> builder: aMethodEvaluator [
-	builder := aMethodEvaluator
+ClosureMap >> home [
+	block capturesHome ifFalse: [ self error: 'closure has no home' ].
+	^block capturesSelf ifTrue: [ self at: 2 ] ifFalse: [ self at: 1 ]
+]
+
+{ #category : #accessing }
+ClosureMap >> isClosure [ 
+	^true
 ]
 
 { #category : #accessing }

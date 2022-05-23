@@ -40,15 +40,11 @@ PowertalkLinkedLinearInterpreter >> prepareDispatch: dispatch [
 ]
 
 { #category : #private }
-PowertalkLinkedLinearInterpreter >> prepareFor: anSCompiledMethod [
-	| operations array |
-	operations := runtime sexpressionsOf: anSCompiledMethod.
-	operations isCollection
-		ifFalse: [ linearizer visitMethod: operations.
-			array := linearizer operations asArray.
-			operations optimizedCode: array.
-			operations := array].
-	context work: operations
+PowertalkLinkedLinearInterpreter >> prepareFor: method [
+	| operations |
+	operations := self
+		prepareForExecution: method. context
+		work: operations
 ]
 
 { #category : #visiting }
@@ -57,6 +53,18 @@ PowertalkLinkedLinearInterpreter >> prepareForBlock: sblock [
 	operations := sblock optimizedCode.
 	context work: operations; restart .
 	^ nilObj
+]
+
+{ #category : #private }
+PowertalkLinkedLinearInterpreter >> prepareForExecution: anSCompiledMethod [
+	| operations array |
+	operations := runtime sexpressionsOf: anSCompiledMethod.
+	operations isCollection
+		ifTrue: [ ^ operations ].
+	linearizer visitMethod: operations.
+	array := linearizer operations asArray.
+	runtime methodOptimizedCode: operations put: array.
+	^array
 ]
 
 { #category : #initializing }

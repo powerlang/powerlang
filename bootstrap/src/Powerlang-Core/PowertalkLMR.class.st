@@ -32,7 +32,9 @@ Class {
 		'classModuleIndex',
 		'moduleNamespaceIndex',
 		'byteArrayClass',
-		'stringClass'
+		'stringClass',
+		'closureBlockIndex',
+		'closureClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -51,6 +53,14 @@ PowertalkLMR >> addSymbol: aSymbol [
 { #category : #initialization }
 PowertalkLMR >> arrayClass: anLMRObject [
 	arrayClass := anLMRObject 
+]
+
+{ #category : #initialization }
+PowertalkLMR >> arrayedSizeOf: anLMRObject [
+	| species ivars |
+	species := self speciesFor: anLMRObject.
+	ivars := self speciesInstanceSize: species.
+	^anLMRObject size - ivars
 ]
 
 { #category : #initialization }
@@ -96,8 +106,44 @@ PowertalkLMR >> blockArgumentCount: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> blockCapturesHome: block [
+	| flags |
+	flags := block slotAt: methodFlagsIndex.
+	^ flags value anyMask: BlockCapturesHome
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockCapturesSelf: block [
+	| flags |
+	flags := block slotAt: methodFlagsIndex.
+	^ flags value anyMask: BlockCapturesSelf
+]
+
+{ #category : #initialization }
 PowertalkLMR >> blockClass: anLMRObject [
 	blockClass := anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockEnvironmentCount: anLMRObject [
+	| flags |
+	flags := anLMRObject slotAt: methodFlagsIndex.
+	^ flags value bitsAt: BlockEnvCount
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockExecutionTree: anLMRObject [
+	^ anLMRObject slotAt: methodOptimizedCodeIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockOptimizedCode: anLMRObject [
+	^ anLMRObject slotAt: methodOptimizedCodeIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockOptimizedCode: anLMRObject put: anObject [
+	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject
 ]
 
 { #category : #initialization }
@@ -140,6 +186,32 @@ PowertalkLMR >> className: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> classNameIndex: anInteger [
 	classNameIndex := anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureBlock: closure [ 
+	^closure slotAt: closureBlockIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureBlockIndex: anInteger [
+	closureBlockIndex := anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureClass: anLMRObject [
+	closureClass := anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> closureHome: closure [
+	| block |
+	block := self closureBlock: closure.
+	(self blockCapturesHome: block)
+		ifFalse: [ self error: 'closure has no home' ].
+	^ (self blockCapturesSelf: block)
+		ifTrue: [ closure at: 2 ]
+		ifFalse: [ closure at: 1 ]
 ]
 
 { #category : #initialization }
@@ -273,10 +345,13 @@ PowertalkLMR >> methodFlagsIndex: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> methodFor: aSymbol in: behavior [
-	| md table |
+	| md table  |
+	overrides at: behavior -> aSymbol ifPresent: [ :m | ^ m ].
 	md := self behaviorMethodDictionary: behavior.
 	table := self dictionaryTable: md.
-	2 to: table size by: 2 do: [:index | (table slotAt: index) == aSymbol ifTrue: [^table slotAt: index + 1]].
+	2 to: table size by: 2 do: [ :index | 
+		(table slotAt: index) == aSymbol
+			ifTrue: [ ^ table slotAt: index + 1 ] ].
 	^ nil
 ]
 
@@ -355,6 +430,29 @@ PowertalkLMR >> newByteArray: aByteArray [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newBytes: class size: anInteger [
+	| behavior header |
+	behavior := self speciesInstanceBehavior: class.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: anInteger;
+		hash: 0.
+	^ LMRByteObject new
+		header: header;
+		bytes: (ByteArray new: anInteger)
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newClosureFor: compiledBlock [
+	| size closure |
+	size := self blockEnvironmentCount: compiledBlock.
+	closure := self newSlots: closureClass size:  size.
+	closure slotAt: closureBlockIndex put: compiledBlock.
+	^ closure
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newCompiledMethod [
 	| behavior header method |
 	behavior := self speciesInstanceBehavior: methodClass.
@@ -384,6 +482,13 @@ PowertalkLMR >> newInteger: anInteger [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newOf: aSpecies sized: anInteger [
+	^(self speciesIsBytes: aSpecies)
+		ifTrue: [ self newBytes: aSpecies size: anInteger ]
+		ifFalse: [ self newSlots: aSpecies size: anInteger ]
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newSlots: class [
 	^self newSlots: class size: 0
 ]
@@ -398,7 +503,12 @@ PowertalkLMR >> newSlots: class size: anInteger [
 		bytes: false arrayed: false named: true;
 		size: ivars + anInteger;
 		hash: 0.
-	^ LMRSlotObject new header: header
+	^ LMRSlotObject new header: header; nilSlots: nilObj
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newSlotsOf: class [
+	^ self newSlots: class size: 0
 ]
 
 { #category : #initialization }
@@ -408,16 +518,17 @@ PowertalkLMR >> newSmallInteger: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> newString: aString [
-	| behavior header |
+	| behavior header bytes |
 	behavior := self speciesInstanceBehavior: stringClass.
+	bytes := aString asByteArray copyWith: 0.
 	header := LMRObjectHeader new
 		behavior: behavior;
 		bytes: false arrayed: true named: false;
-		size: aString size + 1;
+		size: bytes size;
 		hash: 0.
 	^ LMRByteObject new
 		header: header;
-		bytes: aString, (String value: 0)
+		bytes: bytes
 ]
 
 { #category : #initialization }
@@ -425,6 +536,11 @@ PowertalkLMR >> nil: n true: t false: f [
 	nilObj := n.
 	trueObj := t.
 	falseObj := f
+]
+
+{ #category : #initialization }
+PowertalkLMR >> override: assoc with: method [
+	overrides at: assoc put: method
 ]
 
 { #category : #initialization }
@@ -529,6 +645,11 @@ PowertalkLMR >> speciesInstanceClass: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> speciesInstanceSize: anLMRObject [
 	^ (anLMRObject slotAt: speciesFormatIndex) value bitAnd: 16r7F.
+]
+
+{ #category : #initialization }
+PowertalkLMR >> speciesIsBytes: anLMRObject [
+	^ (anLMRObject slotAt: speciesFormatIndex) value noMask: 16r4000
 ]
 
 { #category : #initialization }

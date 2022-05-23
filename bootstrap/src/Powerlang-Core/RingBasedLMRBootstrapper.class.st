@@ -14,7 +14,8 @@ Class {
 		'falseObj',
 		'behaviors',
 		'mapping',
-		'stack'
+		'stack',
+		'closureMethods'
 	],
 	#category : #'Powerlang-Core-Execution-LMR'
 }
@@ -25,6 +26,24 @@ RingBasedLMRBootstrapper class >> new [
 
 	^ self basicNew initialize.
 
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
+	| method index spec species table s selector m |
+	method := anSCompiledBlock method.
+	selector := source newSymbol: method selector.
+	index := method indexOf: anSCompiledBlock.
+	spec := source specs at: method classBinding name.
+	species := source speciesFor: spec.
+	table := species instanceBehavior methods table.
+	2 to: table size by: 2 do: [ :i | 
+		s := table basicAt: i.
+		s == selector
+			ifTrue: [ m := table basicAt: i + 1.
+				closureMethods add: m.
+				^ m at: index ] ].
+	^ self halt
 ]
 
 { #category : #initialization }
@@ -78,13 +97,16 @@ RingBasedLMRBootstrapper >> convertClosure [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> convertSlotsOf: ringObj in: lmrObj [
-	| mapped |
+	| mapped block |
 	ringObj isPointers
 		ifFalse: [ ^ self ].
 	ringObj slots
 		withIndexDo: [ :slot :index | 
 			mapped := mapping at: slot ifAbsentPut: [ self newMapping: slot ].
-			lmrObj basicAt: index put: mapped ]
+			lmrObj basicAt: index put: mapped ].
+	ringObj isClosure ifFalse: [^self]. block := self closureCompiledBlock: ringObj block.
+			mapped := mapping at: block ifAbsentPut: [ self newMapping: block ].
+			lmrObj basicAt: 1 put: mapped
 ]
 
 { #category : #initialization }
@@ -133,7 +155,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #Class) allInstVarNames indexOf: 'name'.
 	dest classNameIndex: index.
 	index := (source => #Class) allInstVarNames indexOf: 'module'.
-	dest classModuleIndex: index.	
+	dest classModuleIndex: index.
 	index := (source => #Metaclass) allInstVarNames indexOf: 'class'.
 	dest metaclassInstanceClassIndex: index.
 	index := (source => #Species) allInstVarNames
@@ -159,6 +181,8 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #MethodDictionary) allInstVarNames
 		indexOf: 'table'.
 	dest dictionaryTableIndex: index.
+	index := (source => #Closure) allInstVarNames indexOf: 'block'.
+	dest closureBlockIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'format'.
 	dest methodFlagsIndex: index.
@@ -166,7 +190,7 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 		indexOf: 'astcodes'.
 	dest methodAstcodesIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'classBinding'.
+		indexOf: 'class'.
 	dest methodClassBindingIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'optimizedCode'.
@@ -180,7 +204,8 @@ RingBasedLMRBootstrapper >> initialize [
 	dest := PowertalkLMR new.
 	mapping := IdentityDictionary new.
 	behaviors := IdentityDictionary new.
-	stack := OrderedCollection new
+	stack := OrderedCollection new.
+	closureMethods := OrderedCollection new
 ]
 
 { #category : #building }
@@ -191,8 +216,19 @@ RingBasedLMRBootstrapper >> initializeBehavior: anLMRHeapObject spec: anRGBehavi
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> initializeEmulationOverrides [
+	| classes |
+	classes := source vmPrimitivesSpec allClasses select: #isRingResolved.
+	classes
+		do: [ :class | 
+			class methods do: [ :m | self override: class name with: m ].
+			class metaclass methods
+				do: [ :m | self override: class metaclass name with: m ] ]
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string |
+	| map symbols array method smi block metaclass kernel byteArray string closure |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
@@ -202,6 +238,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	byteArray := mapping at: (source classNamed: #ByteArray).
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
+	closure := mapping at: (source classNamed: #Closure).
 	smi := mapping at: (source classNamed: #SmallInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
@@ -211,13 +248,17 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		byteArrayClass: byteArray;
 		methodClass: method;
 		blockClass: block;
+		closureClass: closure;
 		smallIntegerClass: smi;
 		stringClass: string;
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
 		wordSize: source wordSize;
 		initializeInterpreter;
-		kernel: kernel
+		kernel: kernel.
+	self
+		prepareClosuresForExecution;
+		initializeEmulationOverrides
 ]
 
 { #category : #initialization }
@@ -309,6 +350,27 @@ RingBasedLMRBootstrapper >> newMethod: anAstcode selector: aSymbol in: classname
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> override: classname with: rgMethod [
+	| spec species behavior smethod rmethod lmrmethod selector |
+	spec := source specs at: classname.
+	species := (source speciesFor: spec).
+	behavior := mapping at: species instanceBehavior.
+	smethod := (SCompiler forClass: species) compile: rgMethod sourceCode.
+	rmethod := source transferMethod: smethod in: species. 
+	lmrmethod := self newMapping: rmethod.
+	self convertClosure.
+	selector := dest symbolFromLocal: rgMethod selector.
+	dest override: behavior -> selector with: lmrmethod
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> prepareClosuresForExecution [
+	| mapped |
+	closureMethods
+		do: [ :method | mapped := mapping at: method. dest interpreter prepareForExecution: mapped ]
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
 	source := aPowertalkRingImage
 ]
@@ -337,10 +399,4 @@ RingBasedLMRBootstrapper >> transferAstcodesFrom: anArray [
 				ifFalse: [ self transferAstcodesFrom: elem ].
 			copy at: i put: transferred ].
 	^ copy
-]
-
-{ #category : #initialization }
-RingBasedLMRBootstrapper >> undermethods [
-	^ (self => #ProtoObject) methods
-		select: [ :m | m category = 'header access' ]
 ]

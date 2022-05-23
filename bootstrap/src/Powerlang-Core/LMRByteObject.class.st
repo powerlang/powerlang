@@ -13,6 +13,14 @@ LMRByteObject >> asLocalString [
 ]
 
 { #category : #accessing }
+LMRByteObject >> at: index put: anLMRObject [
+	| value |
+	value := anLMRObject value.
+	bytes at: index put: value.
+	^ anLMRObject
+]
+
+{ #category : #accessing }
 LMRByteObject >> bytes [
 	^bytes
 ]
@@ -20,6 +28,7 @@ LMRByteObject >> bytes [
 { #category : #accessing }
 LMRByteObject >> bytes: aByteArray [
 	self ASSERT: aByteArray size = header size.
+	self ASSERT: aByteArray class == ByteArray.
 	bytes := aByteArray
 ]
 
@@ -27,4 +36,9 @@ LMRByteObject >> bytes: aByteArray [
 LMRByteObject >> header: anLMRObjectHeader [
 	super header: anLMRObjectHeader.
 	bytes := ByteArray new: header size
+]
+
+{ #category : #accessing }
+LMRByteObject >> isBytes [
+	^true
 ]

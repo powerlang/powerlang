@@ -8,7 +8,7 @@ Class {
 PowertalkIterativeLinkedInterpreter >> evaluateClosure: closure withArgs: arguments [
 	| frame sblock |
 	frame := closure builder.
-	sblock := closure astcodes.
+	sblock := closure executionTree.
 	context := frame copy
 		beBlock;
 		parent: context;
@@ -75,7 +75,7 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 
 { #category : #accessing }
 PowertalkIterativeLinkedInterpreter >> visitOpNonLocalReturn: anSOpReturn [
-	context := context home parent
+	context := context homeContext parent
 ]
 
 { #category : #accessing }

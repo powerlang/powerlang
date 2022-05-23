@@ -118,13 +118,17 @@ LinkedEvaluationContext >> framesCount [
 ]
 
 { #category : #visiting }
-LinkedEvaluationContext >> home [
+LinkedEvaluationContext >> homeContext [
 	| frame searched |
-	isBlock ifFalse: [ ^self ].
+	isBlock
+		ifFalse: [ ^ self ].
 	frame := parent.
-	searched := (system isClosure: environment) ifTrue: [ environment builder environment] ifFalse: [ environment ].
-	[frame notNil] whileTrue: [ frame environment == searched ifTrue: [^frame home]. frame := frame parent.].
-self error: 'cannot return from this closure'
+	searched := system closureHome: environment.
+	[ frame notNil ]
+		whileTrue: [ frame environment == searched
+				ifTrue: [ ^ frame ].
+			frame := frame parent ].
+	self error: 'home context not found'
 ]
 
 { #category : #visiting }
@@ -168,6 +172,11 @@ LinkedEvaluationContext >> method [
 LinkedEvaluationContext >> method: anSCompiledMethod [
 	method := anSCompiledMethod.
 	temporaries := Array new: anSCompiledMethod tempCount
+]
+
+{ #category : #visiting }
+LinkedEvaluationContext >> methodArguments [
+	^ arguments
 ]
 
 { #category : #visiting }

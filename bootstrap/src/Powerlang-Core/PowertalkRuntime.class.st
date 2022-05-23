@@ -6,7 +6,8 @@ Class {
 		'falseObj',
 		'trueObj',
 		'nilObj',
-		'interpreter'
+		'interpreter',
+		'overrides'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -50,9 +51,17 @@ PowertalkRuntime >> false [
 	^ falseObj
 ]
 
+{ #category : #accessing }
+PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
+	| behavior |
+	behavior := self speciesInstanceBehavior: class.
+	^ methodCache removeKey: aSymbol -> behavior ifAbsent: nil
+]
+
 { #category : #initialization }
 PowertalkRuntime >> initialize [
-	methodCache := Dictionary new
+	methodCache := Dictionary new.
+		overrides := Dictionary new
 ]
 
 { #category : #initialization }
@@ -93,7 +102,7 @@ PowertalkRuntime >> literalFor: anObject [
 
 { #category : #accessing }
 PowertalkRuntime >> localSymbolFrom: anObject [
-	^ anObject bytes asString asSymbol
+	^ anObject bytes allButLast asString asSymbol
 ]
 
 { #category : #accessing }
@@ -122,7 +131,7 @@ PowertalkRuntime >> newBytesOf: receiver sized: size [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> newClosure: anInteger [
+PowertalkRuntime >> newClosureFor: compiledBlock [
 	^ self subclassResponsibility
 ]
 
@@ -155,12 +164,6 @@ PowertalkRuntime >> nil [
 ]
 
 { #category : #accessing }
-PowertalkRuntime >> override: assoc with: primitiveName [
-	^self subclassResponsibility
-
-]
-
-{ #category : #accessing }
 PowertalkRuntime >> sendLocal: aSymbol to: receiver [
 	^ self sendLocal: aSymbol to: receiver with: {}
 ]
@@ -178,6 +181,11 @@ PowertalkRuntime >> sexpressionsOf: aMethod [
 { #category : #accessing }
 PowertalkRuntime >> speciesFor: anObject [
 	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> speciesInstanceBehavior: class [
+^	self subclassResponsibility 
 ]
 
 { #category : #accessing }
