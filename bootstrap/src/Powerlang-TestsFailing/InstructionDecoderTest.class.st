@@ -6,7 +6,7 @@ Class {
 	#name : #InstructionDecoderTest,
 	#superclass : #TestCase,
 	#pools : [
-		'Registers'
+		'AnObsoleteRegisters'
 	],
 	#category : #'Powerlang-TestsFailing-Assembler-Intel'
 }

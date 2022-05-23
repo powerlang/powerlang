@@ -50,6 +50,14 @@ SpeciesMap >> lookupInModule: aSymbol [
 ]
 
 { #category : #accessing }
+SpeciesMap >> printOn: aStream [
+	aStream
+		nextPutAll: '<<';
+		nextPutAll: self name asString;
+		nextPutAll: '>>'
+]
+
+{ #category : #accessing }
 SpeciesMap >> storeCvar: aSymbol with: anObject [
 	| species cvars |
 	species := self. 

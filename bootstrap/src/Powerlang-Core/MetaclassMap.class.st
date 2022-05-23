@@ -48,9 +48,6 @@ MetaclassMap >> module [
 ]
 
 { #category : #'accessing - parallel hierarchy' }
-MetaclassMap >> printOn: aStream [
-	aStream
-		nextPutAll: '<<';
-		nextPutAll: self instanceSide name asString;
-		nextPutAll: ' class>>'
+MetaclassMap >> name [
+	^ self instanceSide name asString , ' class'
 ]
