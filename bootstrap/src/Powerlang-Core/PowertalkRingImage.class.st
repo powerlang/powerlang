@@ -32,10 +32,17 @@ Class {
 	],
 	#classInstVars : [
 		'KernelSpec',
-		'VMPrimitivesSpec'
+		'VMPrimitivesSpec',
+		'LMRBootstrapperSpec'
 	],
 	#category : #'Powerlang-Core-Execution-Ring'
 }
+
+{ #category : #accessing }
+PowertalkRingImage class >> LMRBootstrapperSpec [
+	^ LMRBootstrapperSpec
+		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: 'LMR' ]
+]
 
 { #category : #accessing }
 PowertalkRingImage class >> fromSpec [
@@ -44,7 +51,7 @@ PowertalkRingImage class >> fromSpec [
 
 { #category : #accessing }
 PowertalkRingImage class >> kernelSpec [
-	^ KernelSpec ifNil: [ KernelSpec := self newKernelSpec ]
+	^ KernelSpec ifNil: [ KernelSpec := self readSpec: #Kernel at: '.' ]
 ]
 
 { #category : #'instance creation' }
@@ -56,26 +63,14 @@ PowertalkRingImage class >> new [
 ]
 
 { #category : #accessing }
-PowertalkRingImage class >> newKernelSpec [
-	| root current repo spec |
-
-	root := (Smalltalk getPackageDirectoryForPackage: self package) / '..' / '..'.	
-	current := (root / 'specs' / 'current') contents asString trim.
-	repo := TonelRepository new
-		directory: (root / 'specs' / current).
-	spec := repo asRingEnvironmentWith: #(Kernel).
-	^ spec clean
-
-]
-
-{ #category : #accessing }
-PowertalkRingImage class >> newVMPrimitivesSpec [
+PowertalkRingImage class >> readSpec: specName at: path [
 	| root current repo spec |
 	root := (Smalltalk getPackageDirectoryForPackage: self package)
 		/ '..' / '..'.
 	current := (root / 'specs' / 'current') contents asString trim.
-	repo := TonelRepository new directory: root / 'specs' / current / 'Kernel'.
-	spec := repo asRingEnvironmentWith: #(VM).
+	repo := TonelRepository new
+		directory: root / 'specs' / current / path .
+	spec := repo asRingEnvironmentWith: {specName}.
 	^ spec clean
 ]
 
@@ -87,7 +82,8 @@ PowertalkRingImage class >> resetSpecs [
 
 { #category : #accessing }
 PowertalkRingImage class >> vmPrimitivesSpec [
-	^ VMPrimitivesSpec ifNil: [ VMPrimitivesSpec := self newVMPrimitivesSpec ]
+	^ VMPrimitivesSpec
+		ifNil: [ VMPrimitivesSpec := self readSpec: #VM at: 'Kernel' ]
 ]
 
 { #category : #initialization }
