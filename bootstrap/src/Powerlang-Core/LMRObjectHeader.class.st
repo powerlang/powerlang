@@ -40,6 +40,11 @@ LMRObjectHeader >> flags [
 ]
 
 { #category : #accessing }
+LMRObjectHeader >> hash [
+	^hash
+]
+
+{ #category : #accessing }
 LMRObjectHeader >> hash: anInteger [
 	hash := anInteger
 ]

@@ -145,7 +145,7 @@ RingBasedLMRBootstrapper >> headerFor: aRingObject [
 			arrayed: aRingObject spec isVariable
 			named: aRingObject spec instSize > 0;
 		size: aRingObject size;
-		hash: aRingObject hash
+		hash: aRingObject headerHash
 ]
 
 { #category : #initialization }
@@ -183,14 +183,15 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	dest dictionaryTableIndex: index.
 	index := (source => #Closure) allInstVarNames indexOf: 'block'.
 	dest closureBlockIndex: index.
+	index := (source => #CompiledBlock) allInstVarNames indexOf: 'method'.
+	dest blockMethodIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'format'.
 	dest methodFlagsIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'astcodes'.
 	dest methodAstcodesIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'class'.
+	index := (source => #CompiledMethod) allInstVarNames indexOf: 'class'.
 	dest methodClassBindingIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames
 		indexOf: 'optimizedCode'.
@@ -228,7 +229,7 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string closure |
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
@@ -239,6 +240,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	method := mapping at: (source classNamed: #CompiledMethod).
 	block := mapping at: (source classNamed: #CompiledBlock).
 	closure := mapping at: (source classNamed: #Closure).
+	behavior := mapping at: (source classNamed: #Behavior).
 	smi := mapping at: (source classNamed: #SmallInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
@@ -249,6 +251,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		methodClass: method;
 		blockClass: block;
 		closureClass: closure;
+		behaviorClass_: behavior;
 		smallIntegerClass: smi;
 		stringClass: string;
 		metaclassClass: metaclass;

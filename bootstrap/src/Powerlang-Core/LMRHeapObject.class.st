@@ -33,6 +33,11 @@ LMRHeapObject >> headerHash [
 ]
 
 { #category : #accessing }
+LMRHeapObject >> headerHash: anInteger [
+	header hash: anInteger
+]
+
+{ #category : #accessing }
 LMRHeapObject >> isSmall [
 	^ header isSmall
 ]

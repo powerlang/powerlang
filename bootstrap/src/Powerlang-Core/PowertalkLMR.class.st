@@ -34,7 +34,10 @@ Class {
 		'byteArrayClass',
 		'stringClass',
 		'closureBlockIndex',
-		'closureClass'
+		'closureClass',
+		'lastHash',
+		'blockMethodIndex',
+		'behaviorClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -137,6 +140,16 @@ PowertalkLMR >> blockExecutionTree: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> blockMethod: anLMRObject [
+	^ anLMRObject slotAt: blockMethodIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> blockMethodIndex: anInteger [
+	blockMethodIndex := anInteger
+]
+
+{ #category : #initialization }
 PowertalkLMR >> blockOptimizedCode: anLMRObject [
 	^ anLMRObject slotAt: methodOptimizedCodeIndex
 ]
@@ -233,6 +246,28 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 	behavior := self behaviorNext: behavior.
 	behavior != nilObj ] whileTrue.
 	^ nil
+]
+
+{ #category : #initialization }
+PowertalkLMR >> hashFor: anLMRObject [
+	| shifted hash current |
+	anLMRObject isImmediate
+		ifTrue: [ ^ anLMRObject value ].
+	current := anLMRObject headerHash.
+	current != 0
+		ifTrue: [ ^ current ].
+	shifted := lastHash bitShift: -1.
+	hash := (lastHash bitAnd: 1) = 0
+		ifTrue: [ shifted ]
+		ifFalse: [ shifted bitXor: 16rB9C8 ].
+	anLMRObject headerHash: hash.
+	^ lastHash := hash
+]
+
+{ #category : #initialization }
+PowertalkLMR >> initialize [
+	lastHash := 1.
+	super initialize
 ]
 
 { #category : #initialization }

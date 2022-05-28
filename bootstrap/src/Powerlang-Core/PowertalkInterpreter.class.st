@@ -117,6 +117,7 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #Class put: self primitiveClass;
 		at: #UnderSize put: self primitiveUnderSize;
 		at: #Size put: self primitiveSize;
+		at: #Hash put: self primitiveHash;
 		at: #At put: self primitiveAt;
 		at: #AtPut put: self primitiveAtPut;
 		at: #New put: self primitiveNew;
@@ -323,6 +324,11 @@ PowertalkInterpreter >> primitiveFlushDispatchCaches [
 { #category : #accessing }
 PowertalkInterpreter >> primitiveFor: aSymbol [
 	^primitives at: aSymbol
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveHash [
+	^ [ runtime newInteger: (runtime hashFor: context self) ]
 ]
 
 { #category : #primitives }

@@ -93,6 +93,11 @@ EvaluationContext >> loadAssociationValue: anObject [
 ]
 
 { #category : #visiting }
+EvaluationContext >> method [
+	^ self subclassResponsibility
+]
+
+{ #category : #visiting }
 EvaluationContext >> method: anSCompiledMethod [
 	^ self subclassResponsibility
 ]
@@ -154,7 +159,7 @@ EvaluationContext >> staticBindingFor: aSymbol [
 { #category : #accessing }
 EvaluationContext >> staticBindingForCvar: aSymbol [
 	| species cvars namespace nilObj |
-	species := system speciesFor: self receiver.
+	species := system methodClassBinding: self method.
 	nilObj := system nil.
 	[ cvars := system speciesClassVariables: species.
 	cvars = nilObj
@@ -178,7 +183,7 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 { #category : #accessing }
 EvaluationContext >> staticBindingForMvar: aSymbol [
 	| species module namespace assoc |
-	species := system speciesFor: self receiver.
+	species := system methodClassBinding: self method.
 	module := system speciesModule: species.
 	namespace := system moduleNamespace: module.
 	assoc := system lookupAssociationFor: aSymbol in: namespace.

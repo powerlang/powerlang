@@ -54,6 +54,11 @@ PowertalkRingRuntime >> blockExecutionTree: block [
 ]
 
 { #category : #services }
+PowertalkRingRuntime >> blockMethod: anObjectMap [
+	^ anObjectMap method
+]
+
+{ #category : #services }
 PowertalkRingRuntime >> blockOptimizedCode: block [
 	^block optimizedCode
 ]
