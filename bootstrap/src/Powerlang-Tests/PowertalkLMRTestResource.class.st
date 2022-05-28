@@ -2,14 +2,21 @@ Class {
 	#name : #PowertalkLMRTestResource,
 	#superclass : #TestResource,
 	#instVars : [
-		'runtime'
+		'image',
+		'bootstrapper'
 	],
 	#category : #'Powerlang-Tests-Bootstrap'
 }
 
 { #category : #running }
-PowertalkLMRTestResource >> runtime [ ^
-	runtime 
+PowertalkLMRTestResource >> bootstrapper [
+	^bootstrapper ifNil: [ bootstrapper := image generateLMR ]
+
+]
+
+{ #category : #running }
+PowertalkLMRTestResource >> runtime [
+	^ self bootstrapper result
 ]
 
 { #category : #running }

@@ -29,6 +29,13 @@ RingBasedLMRBootstrapper class >> new [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> => aSymbol [
+	| classmap |
+	classmap := source classNamed: aSymbol.
+	^mapping at: classmap
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
 	| method index spec species table s selector m |
 	method := anSCompiledBlock method.
@@ -62,7 +69,7 @@ RingBasedLMRBootstrapper >> convert [
 		convertClosure;
 		initializeSymbolTable;
 		initializeRuntime.
-	^ dest
+
 ]
 
 { #category : #initialization }
@@ -110,8 +117,86 @@ RingBasedLMRBootstrapper >> convertSlotsOf: ringObj in: lmrObj [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createLoadAction [
-	^ nilObj
+RingBasedLMRBootstrapper >> createNewBlock: sblock [
+	| format transferred method literal tliteral |
+	format := dest newInteger: sblock format.
+	transferred := dest
+		sendLocal: #new:
+		to: self => #CompiledBlock
+		with: {(dest newInteger: sblock size)}.
+	method := mapping at: sblock method.
+	dest
+		sendLocal: #format: to: transferred with: {format};
+		sendLocal: #method: to: transferred with: {method}.
+	1 to: sblock size do: [ :i | 
+		literal := sblock at: i.
+		tliteral := self transferLiteral: literal.
+		transferred at: i put: tliteral ].
+	^ transferred
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> createNewClassFrom: spec [
+	| superclass metaclass class instanceBehavior classBehavior |
+	superclass := self => spec superclass name.
+	metaclass := dest
+		sendLocal: #newSubclassOf:
+		to: self => #Class
+		with: {superclass}.
+	class := dest sendLocal: #instanceClass to: metaclass.
+	dest sendLocal: #name: to: class with: {(dest newString: spec name)}.
+	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
+	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
+	behaviors
+		at: spec put: instanceBehavior;
+		at: spec metaclass put: classBehavior.
+	spec methods do: [ :m | self createNewMethod: m in: class ].
+	spec metaclass methods
+		do: [ :m | self createNewMethod: m in: metaclass ].
+	^ class
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> createNewMethod: m in: species [
+	| smethod size transferred astcodes selector format tliteral md |
+	smethod := SCompiler new compile: m sourceCode.
+	smethod classBinding: species.
+	size := dest newInteger: smethod size.
+	transferred := dest
+		sendLocal: #new:
+		to: self => #CompiledMethod
+		with: {size}.
+	mapping at: smethod put: transferred.
+	astcodes := dest newByteArray: smethod astcodes.
+	selector := dest addSymbol: smethod selector.
+	format := dest newInteger: smethod format.
+	dest
+		sendLocal: #astcodes: to: transferred with: {astcodes};
+		sendLocal: #classBinding: to: transferred with: {species};
+		sendLocal: #selector: to: transferred with: {selector};
+		sendLocal: #format: to: transferred with: {format}.
+	smethod withIndexDo: [ :literal :i | 
+		tliteral := self transferLiteral: literal.
+		transferred at: i put: tliteral ].
+	md := dest sendLocal: #methodDictionary to: species.
+	dest
+		sendLocal: #at:put:
+		to: md
+		with:
+			{selector.
+			transferred}.
+	^ transferred
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
+	| behavior class module |
+	behavior := behaviors at: spec.
+	class := dest behaviorClass: behavior.
+	module := dest sendLocal: #new to: class.
+	dest sendLocal: #bindKernelExports to: module.
+	classes do: [ :c | dest sendLocal: #module: to: c with: {module} ].
+	^ module
 ]
 
 { #category : #building }
@@ -125,7 +210,7 @@ RingBasedLMRBootstrapper >> fixBehaviors [
 	behaviorspec := source => #Behavior.
 	source classes values
 		with: source metaclasses values
-		do: [ :class :metaclass | 
+		do: [ :class :metaclass |
 			mclass := mapping at: class.
 			mmetaclass := mapping at: metaclass.
 			self
@@ -336,21 +421,8 @@ RingBasedLMRBootstrapper >> newMapping: aRingObject [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> newMethod: anAstcode selector: aSymbol in: classname format: anInteger literals: anArray [
-	| method astcodes class selector format |
-	method := source newSlots: 'CompiledMethod'.
-	astcodes := self transferAstcodesFrom: anAstcode.
-	class := source classNamed: classname.
-	selector := source newSymbol: aSymbol.
-	format := source newInteger: anInteger.
-	method
-		optimizedCode: source nil;
-		astcodes: astcodes;
-		class: class;
-		selector: selector;
-		format: format;
-		source: source nil.
-	^ method
+RingBasedLMRBootstrapper >> outputDirectory [
+	^'./specs/bee-dmr/build' asFileReference
 ]
 
 { #category : #initialization }
@@ -385,32 +457,30 @@ RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> result [
+	^dest
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> source: aPowertalkRingImage [
 	source := aPowertalkRingImage
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> transferArrayDeep: anArray [
-	| copy transferred |
-	copy := source newSlots: 'Array' sized: anArray size.
-	anArray
-		withIndexDo: [ :elem :i | 
-			transferred := elem isInteger
-				ifTrue: [ source newInteger: elem ]
-				ifFalse: [ self transferArrayDeep: elem ].
-			copy at: i put: transferred ].
-	^ copy
-]
-
-{ #category : #initialization }
-RingBasedLMRBootstrapper >> transferAstcodesFrom: anArray [
-	| copy transferred |
-	copy := source newSlots: 'Array' sized: anArray size.
-	anArray
-		withIndexDo: [ :elem :i | 
-			transferred := elem isInteger
-				ifTrue: [ source newInteger: elem ]
-				ifFalse: [ self transferAstcodesFrom: elem ].
-			copy at: i put: transferred ].
-	^ copy
+RingBasedLMRBootstrapper >> transferLiteral: anObject [
+	| transferred |
+	anObject isInteger
+		ifTrue: [ ^ dest newInteger: anObject ].
+	anObject class == ByteArray
+		ifTrue: [ ^ dest newByteArray: anObject ].
+	anObject isSymbol
+		ifTrue: [ ^ dest addSymbol: anObject ].
+	anObject isString
+		ifTrue: [ ^ dest newString: anObject ].
+	anObject class == SCompiledBlock
+		ifTrue: [ ^self createNewBlock: anObject ].
+	anObject class == Array ifTrue: [ 
+		transferred := anObject collect: [ :o | self transferLiteral: o ].
+		^dest newArray: transferred ].
+	self ASSERT: false
 ]

@@ -77,6 +77,11 @@ PowertalkLMR >> behaviorClassIndex: anInteger [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> behaviorClass_: anLMRObject [
+	behaviorClass := anLMRObject
+]
+
+{ #category : #initialization }
 PowertalkLMR >> behaviorMethodDictionary: anLMRObject [
 	^ anLMRObject slotAt: behaviorMethodDictionaryIndex
 ]
@@ -441,6 +446,14 @@ PowertalkLMR >> nativizeForLMR [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newArray: anArray [
+| result |
+result := 	self newArraySized: anArray size.
+	anArray withIndexDo: [ :elem :i | result at: i put: elem ].
+	^result
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newArraySized: anInteger [
 	| behavior header |
 	behavior := self speciesInstanceBehavior: arrayClass.
@@ -465,9 +478,9 @@ PowertalkLMR >> newByteArray: aByteArray [
 ]
 
 { #category : #initialization }
-PowertalkLMR >> newBytes: class size: anInteger [
+PowertalkLMR >> newBytes: species size: anInteger [
 	| behavior header |
-	behavior := self speciesInstanceBehavior: class.
+	behavior := self speciesInstanceBehavior: species.
 	header := LMRObjectHeader new
 		behavior: behavior;
 		bytes: false arrayed: true named: false;
@@ -476,6 +489,11 @@ PowertalkLMR >> newBytes: class size: anInteger [
 	^ LMRByteObject new
 		header: header;
 		bytes: (ByteArray new: anInteger)
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newBytesOf: species sized: size [
+	^ self newBytes: species size: size
 ]
 
 { #category : #initialization }
@@ -530,7 +548,7 @@ PowertalkLMR >> newSlots: class [
 
 { #category : #initialization }
 PowertalkLMR >> newSlots: class size: anInteger [
-	| ivars behavior header |
+	| ivars behavior header result |
 	ivars := self speciesInstanceSize: class.
 	behavior := self speciesInstanceBehavior: class.
 	header := LMRObjectHeader new
@@ -538,7 +556,12 @@ PowertalkLMR >> newSlots: class size: anInteger [
 		bytes: false arrayed: false named: true;
 		size: ivars + anInteger;
 		hash: 0.
-	^ LMRSlotObject new header: header; nilSlots: nilObj
+	result := class == behaviorClass
+		ifTrue: [ LMRBehaviorObject new runtime: self]
+		ifFalse: [ LMRSlotObject new ].
+	^ result
+		header: header;
+		nilSlots: nilObj
 ]
 
 { #category : #initialization }
