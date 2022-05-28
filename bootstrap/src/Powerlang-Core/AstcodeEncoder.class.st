@@ -71,55 +71,14 @@ AstcodeEncoder >> encodeFalse [
 ]
 
 { #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithArg: anInteger env: environment [
-	| encoded |
-	encoded := self encodedEnvironment: environment.
-	stream
-		nextPut: LoadAwithArgumentId;
-		nextPut: anInteger;
-		nextPut: encoded
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithDynamicVar: name [
-	| index |
-	index := method indexOf: name ifAbsent: [ self ASSERT: false ].
-	stream
-		nextPut: LoadAwithDynamicVarId;
-		nextPut: index
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithLiteral: value [
-	| index |
-	index := method indexOf: value.
-	stream nextPut: LoadAwithLiteralId; nextPut: index.
-	index = 0 ifTrue: [stream nextPut: value]
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithNil [
-	stream nextPut: LoadAwithNilId
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithSelf [
-	stream nextPut: LoadAwithSelfId
-]
-
-{ #category : #visiting }
-AstcodeEncoder >> encodeLoadAwithTemp: anInteger env: environment [
-	| encoded |
-	encoded := self encodedEnvironment: environment.
-	stream
-		nextPut: LoadAwithTemporaryId;
-		nextPut: anInteger;
-		nextPut: encoded
-]
-
-{ #category : #visiting }
 AstcodeEncoder >> encodeLoadRvisitingReceiver [
 	stream nextPut: LoadRvisitingReceiverId
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> encodeNestedDynamicVar: name [
+	stream nextPut: NestedDynamicVarId.
+	self nextSymbolPut: name
 ]
 
 { #category : #visiting }

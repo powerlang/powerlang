@@ -19,11 +19,6 @@ DynamicBinding >> beReferencedFrom: aScriptNode [
 ]
 
 { #category : #testing }
-DynamicBinding >> emitLoadAusing: anAstcodeEncoder [
-	anAstcodeEncoder encodeLoadAwithDynamicVar: name
-]
-
-{ #category : #testing }
 DynamicBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeDynamicVar: name
 ]

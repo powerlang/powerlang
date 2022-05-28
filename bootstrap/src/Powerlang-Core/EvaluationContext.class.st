@@ -157,6 +157,15 @@ EvaluationContext >> staticBindingFor: aSymbol [
 ]
 
 { #category : #accessing }
+EvaluationContext >> staticBindingFor: symbol inModule: module [
+	|  namespace assoc |
+	namespace := system moduleNamespace: module.
+	assoc := system lookupAssociationFor: symbol in: namespace.
+	assoc ifNil: [ self error: 'unbound variable: ' , symbol asString ].
+	^ SAssociationBinding new association: assoc
+]
+
+{ #category : #accessing }
 EvaluationContext >> staticBindingForCvar: aSymbol [
 	| species cvars namespace nilObj |
 	species := system methodClassBinding: self method.
@@ -181,14 +190,11 @@ EvaluationContext >> staticBindingForIvar: aSymbol [
 ]
 
 { #category : #accessing }
-EvaluationContext >> staticBindingForMvar: aSymbol [
-	| species module namespace assoc |
+EvaluationContext >> staticBindingForMvar: symbol [
+	| species module |
 	species := system methodClassBinding: self method.
 	module := system speciesModule: species.
-	namespace := system moduleNamespace: module.
-	assoc := system lookupAssociationFor: aSymbol in: namespace.
-	assoc ifNil: [ self error: 'unbound variable: ' , aSymbol asString ].
-	^ SAssociationBinding new association: assoc
+	^ self staticBindingFor: symbol inModule: module
 ]
 
 { #category : #services }

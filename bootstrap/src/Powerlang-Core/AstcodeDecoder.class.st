@@ -37,13 +37,8 @@ AstcodeDecoder class >> initialize [
 		at: TemporaryId put: STemporaryBinding;
 		at: SelfId put: SSelfBinding;
 		at: SuperId put: SSuperBinding;
-		at: InstVarId put: SInstVarBinding;
 		at: DynamicVarId put: SDynamicBinding;
-		at: ClassVarId put: SClassVarBinding;
-		at: GlobalValueId put: SGlobalBinding;
-		at: GlobalClassId put: SClassBinding;
-		at: PoolVarId put: SPoolVarBinding;
-		at: ConstantPoolId put: SConstantPoolBinding
+		at: NestedDynamicVarId put: SNestedDynamicBinding
 ]
 
 { #category : #'instance creation' }
@@ -125,49 +120,9 @@ AstcodeDecoder >> decodeCascadeMessage [
 		arguments: arguments
 ]
 
-{ #category : #initialization }
-AstcodeDecoder >> decodeClassBinding [
-	| index assoc |
-	index := self nextInteger.
-	assoc := self literalAt: index.
-	^ SClassBinding new
-		index: index;
-		association: assoc
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeClassVar [
-	| index assoc |
-	index := self nextInteger.
-	assoc := self literalAt: index.
-	^ SClassVarBinding new
-		index: index;
-		association: assoc
-]
-
-{ #category : #public }
-AstcodeDecoder >> decodeConstantPoolVar [
-	| index assoc |
-	index := self nextInteger.
-	assoc := self literalAt: index.
-	^ SConstantPoolBinding new
-		index: index;
-		association: assoc
-]
-
 { #category : #public }
 AstcodeDecoder >> decodeDynamicVar [
 	^ SDynamicBinding new name: self nextSymbol
-]
-
-{ #category : #initialization }
-AstcodeDecoder >> decodeGlobalBinding [
-	| index assoc |
-	index := self nextInteger.
-	assoc := self literalAt: index.
-	^ SGlobalBinding new
-		index: index;
-		association: assoc
 ]
 
 { #category : #public }
@@ -176,11 +131,6 @@ AstcodeDecoder >> decodeIdentifier [
 	type := self bindingTypeOf: self nextInteger.
 	binding := type decodeUsing: self.
 	^ SIdentifier new binding: binding
-]
-
-{ #category : #initialization }
-AstcodeDecoder >> decodeInstVar [
-	^SInstVarBinding new index: self nextInteger
 ]
 
 { #category : #public }
@@ -228,13 +178,8 @@ AstcodeDecoder >> decodeMethod [
 ]
 
 { #category : #public }
-AstcodeDecoder >> decodePoolVar [
-	| index assoc |
-	index := self nextInteger.
-	assoc := self literalAt: index.
-	^ SPoolVarBinding new
-		index: index;
-		association: assoc
+AstcodeDecoder >> decodeNestedDynamicVar [
+	^ SNestedDynamicBinding new name: {self nextSymbol. self nextSymbol}
 ]
 
 { #category : #public }

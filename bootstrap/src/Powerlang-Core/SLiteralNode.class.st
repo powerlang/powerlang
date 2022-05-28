@@ -17,11 +17,6 @@ SLiteralNode >> beSymbol [
 	value := value asSymbol
 ]
 
-{ #category : #'as yet unclassified' }
-SLiteralNode >> emitLoadAusing: anSExpressionNativizer [
-	anSExpressionNativizer encodeLoadAwithLiteral: value
-]
-
 { #category : #testing }
 SLiteralNode >> hasSymbol [
 	^value isSymbol

@@ -58,11 +58,6 @@ SIdentifierNode >> defineTemporaryIn: scope [
 	binding declaration: self
 ]
 
-{ #category : #private }
-SIdentifierNode >> emitLoadAusing: anAstcodeEncoder [
-	binding emitLoadAusing: anAstcodeEncoder
-]
-
 { #category : #accessing }
 SIdentifierNode >> initialize [
 	super initialize.

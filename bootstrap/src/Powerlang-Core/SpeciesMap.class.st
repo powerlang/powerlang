@@ -39,17 +39,6 @@ SpeciesMap >> localPools [
 ]
 
 { #category : #accessing }
-SpeciesMap >> lookupInModule: aSymbol [
-	| species |
-	species := self.
-	[ (species spec module includesKey: aSymbol)
-		ifTrue: [ ^SGlobalBinding new name: aSymbol; dictionary: species ].
-	species := species superclass.
-	species notNil ] whileTrue.
-	^nil
-]
-
-{ #category : #accessing }
 SpeciesMap >> storeCvar: aSymbol with: anObject [
 	| species cvars |
 	species := self. 
