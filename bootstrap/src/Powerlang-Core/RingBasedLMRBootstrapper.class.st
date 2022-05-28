@@ -376,6 +376,18 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> loadBootstrapModule [
+	| spec  classes moduleSpec |
+	spec := PowertalkRingModule lmrBootstrapperSpec.
+	classes := spec allClasses.
+	classes := classes
+		collect: [ :classSpec | self createNewClassFrom: classSpec ].
+	moduleSpec := spec at: #BootstrapModule.
+	^self createNewModule: moduleSpec with: classes.
+
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> map: aRingObject to: anLMRObject [
 	mapping at: aRingObject put: anLMRObject
 ]

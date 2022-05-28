@@ -22,11 +22,10 @@ PowertalkLMRTestResource >> runtime [
 { #category : #running }
 PowertalkLMRTestResource >> setUp [
 	super setUp.
-	runtime := PowertalkRingImage fromSpec
+	image := PowertalkRingImage fromSpec
 		wordSize: 8;
 		genesis;
 		bootstrap;
 		fillClasses;
-		fillSymbols;
-		generateLMR
+		fillSymbols
 ]
