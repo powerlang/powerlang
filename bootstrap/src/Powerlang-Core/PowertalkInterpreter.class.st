@@ -228,7 +228,7 @@ PowertalkInterpreter >> nil [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveAt [
 	| receiver index value |
-	^ [ receiver := context receiver.
+	^ [ receiver := context self.
 	index := context firstArgument value.
 	value := receiver at: index.
 	receiver isBytes
@@ -240,84 +240,83 @@ PowertalkInterpreter >> primitiveAt [
 PowertalkInterpreter >> primitiveAtPut [
 	| index |
 	^ [ index := context firstArgument value.
-	context receiver at: index put: context secondArgument ]
+	context self at: index put: context secondArgument ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBehavior [
 	| receiver |
-	^[ receiver := context receiver. receiver isImmediate
-				ifTrue: [ self smallintBehavior ]
-				ifFalse: [ receiver behavior ] ].
-
+	^ [ receiver := context self.
+	receiver isImmediate
+		ifTrue: [ self smallintBehavior ]
+		ifFalse: [ receiver behavior ] ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictAt [
 	| string |
 	^ [ string := context firstArgument asString.
-	context receiver at: string ]
+	context self at: string ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictAtPut [
 	| string |
 	^ [ string := context firstArgument asString.
-	context receiver at: string put: context secondArgument ]
+	context self at: string put: context secondArgument ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictBeConstant [
-	^[ context receiver beConstant ].
-
+	^ [ context self beConstant ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictKeys [
-	^[ context receiver keys ].
-
+	^ [ context self keys ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictNew [
-	^ [ runtime newBootstrapDictionaryOf: context receiver ]
+	^ [ runtime newBootstrapDictionaryOf: context self ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveClass [
-	^ [ runtime speciesFor: context receiver ]
+	^ [ runtime speciesFor: context self ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveClosureArgumentCount [
-	^ [ runtime newInteger: context receiver block argumentCount ]
+	^ [ runtime newInteger: context self block argumentCount ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveClosureValue [
-	^ [ self evaluateClosure: context receiver ]
+	^ [ self evaluateClosure: context self ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveClosureValueWithArgs [
-	^[ self evaluateClosure: context receiver withArgs: context methodArguments ].
-
+	^ [ self
+		evaluateClosure: context self
+		withArgs: context methodArguments ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveEqual [
-	^ [ runtime booleanFor: context receiver = context firstArgument ]
+	^ [ runtime booleanFor: context self = context firstArgument ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveFloatNew [
-	^ [ runtime newBytesOf: context receiver sized: 8 ]
+	^ [ runtime newBytesOf: context self sized: 8 ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveFlushDispatchCaches [
 	^ [ runtime
-		flushDispatchCache: context receiver
+		flushDispatchCache: context self
 		in: context firstArgument ]
 ]
 
@@ -328,14 +327,14 @@ PowertalkInterpreter >> primitiveFor: aSymbol [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveNew [
-	^ [ runtime newSlotsOf: context receiver ]
+	^ [ runtime newSlotsOf: context self ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveNewBytes [
 	| size |
 	^ [ size := context firstArgument value.
-	runtime newBytesOf: context receiver sized: size ]
+	runtime newBytesOf: context self sized: size ]
 ]
 
 { #category : #primitives }
@@ -347,7 +346,7 @@ PowertalkInterpreter >> primitiveNewObjectHeap [
 PowertalkInterpreter >> primitiveNewSized [
 	| size |
 	^ [ size := context firstArgument value.
-	runtime newOf: context receiver sized: size ]
+	runtime newOf: context self sized: size ]
 ]
 
 { #category : #primitives }
@@ -367,101 +366,102 @@ PowertalkInterpreter >> primitivePrimeFor: anInteger [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitAnd [
 	^ [ runtime
-		newInteger: (context receiver value bitAnd: context firstArgument value) ]
+		newInteger: (context self value bitAnd: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitShift [
 	^ [ runtime
-		newInteger: (context receiver value bitShift: context firstArgument value) ]
+		newInteger: (context self value bitShift: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitXor [
 	^ [ runtime
-		newInteger: (context receiver value bitXor: context firstArgument value) ]
+		newInteger: (context self value bitXor: context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIEqual [
 	^ [ runtime
-		booleanFor: context receiver value = context firstArgument value ]
+		booleanFor: context self value = context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterEqualThan [
 	^ [ runtime
-		booleanFor: context receiver value >= context firstArgument value ]
+		booleanFor: context self value >= context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterThan [
 	^ [ runtime
-		booleanFor: context receiver value > context firstArgument value ]
+		booleanFor: context self value > context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIHighBit [
-	^ [ runtime newInteger: context receiver value highBit ]
+	^ [ runtime newInteger: context self value highBit ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntDiv [
 	^ [ runtime
-		newInteger: context receiver value // context firstArgument value ]
+		newInteger: context self value // context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntQuot [
 	^ [ runtime
-		newInteger: context receiver value \\ context firstArgument value ]
+		newInteger: context self value \\ context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIMinus [
 	^ [ runtime
-		newInteger: context receiver value - context firstArgument value ]
+		newInteger: context self value - context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMINotEqual [
 	^ [ runtime
-		booleanFor: context receiver value != context firstArgument value ]
+		booleanFor: context self value != context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIPlus [
 	^ [ runtime
-		newInteger: context receiver value + context firstArgument value ]
+		newInteger: context self value + context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMISize [
-	^ [ runtime newInteger: context receiver value bytesCount ]
+	^ [ runtime newInteger: context self value bytesCount ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMITimes [
 	^ [ runtime
-		newInteger: context receiver value * context firstArgument value ]
+		newInteger: context self value * context firstArgument value ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSetBehavior [
 	| receiver |
-	^ [ receiver := context receiver.
-	receiver behavior: context firstArgument. receiver ]
+	^ [ receiver := context self.
+	receiver behavior: context firstArgument.
+	receiver ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSize [
-	^ [ runtime newInteger: (runtime arrayedSizeOf: context receiver) ]
+	^ [ runtime newInteger: (runtime arrayedSizeOf: context self) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveStringReplaceFromToWithStartingAt [
 	| receiver |
-	^ [ receiver := context receiver.
+	^ [ receiver := context self.
 	receiver bytes
 		replaceFrom: context firstArgument value
 		to: context secondArgument value
@@ -472,7 +472,7 @@ PowertalkInterpreter >> primitiveStringReplaceFromToWithStartingAt [
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveUnderSize [
-	^ [ runtime newInteger: context receiver size ]
+	^ [ runtime newInteger: context self size ]
 ]
 
 { #category : #initializing }

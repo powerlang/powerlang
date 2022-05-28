@@ -4,11 +4,11 @@ Class {
 	#instVars : [
 		'parent',
 		'method',
-		'receiver',
 		'arguments',
 		'temporaries',
 		'environment',
-		'isBlock'
+		'isBlock',
+		'_self'
 	],
 	#category : #'Powerlang-Core-Execution'
 }
@@ -58,11 +58,11 @@ LinkedEvaluationContext >> backtrace [
 	| bt next |
 	bt := OrderedCollection new.
 	next := self.
-	([ next notNil and: [next method notNil]])
+	[ next notNil and: [ next method notNil ] ]
 		whileTrue: [ bt
 				add:
 					{next method signature.
-					next receiver} , next arguments.
+					next self} , next arguments.
 			next := next parent ].
 	^ bt
 ]
@@ -193,17 +193,22 @@ LinkedEvaluationContext >> parent: anEvaluationContext [
 
 { #category : #visiting }
 LinkedEvaluationContext >> receiver [
-	^receiver
-]
-
-{ #category : #visiting }
-LinkedEvaluationContext >> receiver: anObject [
-	receiver := anObject
+	^_self
 ]
 
 { #category : #accessing }
 LinkedEvaluationContext >> secondArgument [
 	^ arguments at: 2
+]
+
+{ #category : #visiting }
+LinkedEvaluationContext >> self [
+	^ _self
+]
+
+{ #category : #visiting }
+LinkedEvaluationContext >> self: anObject [
+	_self := anObject
 ]
 
 { #category : #visiting }

@@ -298,6 +298,11 @@ StackedEvaluationContext >> secondArgument [
 ]
 
 { #category : #initialization }
+StackedEvaluationContext >> self [
+	^ regS
+]
+
+{ #category : #initialization }
 StackedEvaluationContext >> stackTemporaryAt: index [
 	^ stack at: regBP - self tempOffset - index
 ]

@@ -98,7 +98,7 @@ PowertalkIterativeInterpreter >> visitOpLoadRwithNil: anSOpLoadRwithNil [
 
 { #category : #accessing }
 PowertalkIterativeInterpreter >> visitOpLoadRwithSelf: anSOpLoadRwithSelf [
-	regR := context receiver
+	regR := context self
 ]
 
 { #category : #accessing }

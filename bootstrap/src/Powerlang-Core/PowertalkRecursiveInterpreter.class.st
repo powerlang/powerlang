@@ -45,7 +45,7 @@ PowertalkRecursiveInterpreter >> evaluateMethodStatements: anSMethod [
 			result := node acceptVisitor: self ].
 	^ (last notNil and: [ last isReturn ])
 		ifTrue: [ result ]
-		ifFalse: [ context receiver ]
+		ifFalse: [ context self ]
 ]
 
 { #category : #visiting }
@@ -63,16 +63,15 @@ PowertalkRecursiveInterpreter >> initializePrimitives [
 
 { #category : #visiting }
 PowertalkRecursiveInterpreter >> primitiveClosureWhileFalse [
-	^[ self
-				evaluateClosure: context receiver
-				whileFalse: context arguments first ].
-
+	^ [ self
+		evaluateClosure: context self
+		whileFalse: context arguments first ]
 ]
 
 { #category : #visiting }
 PowertalkRecursiveInterpreter >> primitiveClosureWhileTrue [
 	^ [ self
-		evaluateClosure: context receiver
+		evaluateClosure: context self
 		whileTrue: context arguments first ]
 ]
 
@@ -108,7 +107,7 @@ PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments supe
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	context := RecursiveLinkedEvaluationContext new
-		receiver: receiver;
+		self: receiver;
 		arguments: arguments;
 		environment: environment;
 		parent: context;
@@ -145,7 +144,7 @@ PowertalkRecursiveInterpreter >> visitBlock: anSBlock [
 
 { #category : #visiting }
 PowertalkRecursiveInterpreter >> visitCascade: anSCascade [
-	| recv args selector last |
+	| recv args  last |
 	recv := anSCascade receiver acceptVisitor: self.
 	anSCascade messages
 		do: [ :msg | 

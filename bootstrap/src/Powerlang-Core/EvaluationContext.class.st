@@ -32,14 +32,14 @@ EvaluationContext >> backtrace [
 
 { #category : #visiting }
 EvaluationContext >> captureClosure: anSBlock [
-	|  closure s i type env arg |
+	| closure s i type env arg |
 	closure := system newClosureFor: anSBlock compiledCode.
 	s := anSBlock capturedVariables readStream.
 	i := 1.
 	[ s atEnd ]
 		whileFalse: [ type := s next.
 			type = Self
-				ifTrue: [ closure at: i put: self receiver ].
+				ifTrue: [ closure at: i put: self self ].
 			type = Environment
 				ifTrue: [ closure at: i put: self environment ].
 			type = EnvironmentValue
@@ -79,12 +79,12 @@ EvaluationContext >> fourthArgument [
 
 { #category : #visiting }
 EvaluationContext >> instanceVarAt: index [
-	^ system instanceVarOf: self receiver at: index
+	^ system instanceVarOf: self self at: index
 ]
 
 { #category : #visiting }
 EvaluationContext >> instanceVarAt: index put: value [
-	^ system instanceVarOf: self receiver at: index put: value
+	^ system instanceVarOf: self self at: index put: value
 ]
 
 { #category : #services }
@@ -128,6 +128,11 @@ EvaluationContext >> secondArgument [
 ]
 
 { #category : #visiting }
+EvaluationContext >> self [
+	^ self subclassResponsibility
+]
+
+{ #category : #visiting }
 EvaluationContext >> stackTemporaryAt: index [
 	^ self subclassResponsibility
 ]
@@ -165,7 +170,7 @@ EvaluationContext >> staticBindingForCvar: aSymbol [
 { #category : #accessing }
 EvaluationContext >> staticBindingForIvar: aSymbol [
 	| ivar |
-	ivar := system staticBindingForIvar: aSymbol in: self receiver.
+	ivar := system staticBindingForIvar: aSymbol in: self self.
 	^ ivar > 0
 		ifTrue: [ SInstVarBinding new index: ivar ]
 ]

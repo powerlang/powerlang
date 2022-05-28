@@ -64,7 +64,7 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.
 	context := self evaluationContextClass new
-		receiver: regR;
+		self: regR;
 		arguments: arguments;
 		environment: environment;
 		method: method;
