@@ -84,6 +84,11 @@ SCascadeMessage >> receiver [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> registerCacheWith: runtime [
+	cache ifNil: [ runtime registerCache: self for: selector ]
+]
+
+{ #category : #accessing }
 SCascadeMessage >> selector [
 	^selector
 ]

@@ -7,7 +7,8 @@ Class {
 		'trueObj',
 		'nilObj',
 		'interpreter',
-		'overrides'
+		'overrides',
+		'symbolCache'
 	],
 	#pools : [
 		'ClosureElementTypes'
@@ -55,13 +56,15 @@ PowertalkRuntime >> false [
 PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.
+	symbolCache at: aSymbol ifPresent: [ :messages | messages do: #flushCache ].
 	^ methodCache removeKey: aSymbol -> behavior ifAbsent: nil
 ]
 
 { #category : #initialization }
 PowertalkRuntime >> initialize [
 	methodCache := Dictionary new.
-		overrides := Dictionary new
+	symbolCache := Dictionary new.
+	overrides := Dictionary new
 ]
 
 { #category : #initialization }
@@ -161,6 +164,13 @@ PowertalkRuntime >> newSlotsOf: receiver [
 PowertalkRuntime >> nil [
 	^nilObj
 	
+]
+
+{ #category : #accessing }
+PowertalkRuntime >> registerCache: anSMessage for: symbol [
+	| messages |
+	messages := symbolCache at: symbol ifAbsentPut: [OrderedCollection new].
+	messages add: anSMessage 
 ]
 
 { #category : #accessing }

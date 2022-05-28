@@ -207,8 +207,7 @@ PowertalkInterpreter >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessa
 	| method symbol |
 	method := anSMessage methodFor: aBehavior.
 	method
-		ifNil: [ 
-			undermessages
+		ifNil: [ undermessages
 				at: aSymbol
 				ifPresent: [ :block | 
 					anSMessage cacheUndermessage: block.
@@ -216,7 +215,9 @@ PowertalkInterpreter >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessa
 			symbol := runtime symbolFrom: aSymbol.
 			method := runtime lookup: symbol startingAt: aBehavior.
 			self ASSERT: method notNil.
-			anSMessage cache: method when: aBehavior ].
+			anSMessage
+				registerCacheWith: runtime;
+				cache: method when: aBehavior ].
 	^ method
 ]
 

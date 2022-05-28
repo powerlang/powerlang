@@ -66,6 +66,11 @@ SMessage >> cachedUndermessage [
 ]
 
 { #category : #printing }
+SMessage >> flushCache [
+	cache := nil
+]
+
+{ #category : #printing }
 SMessage >> initialize [
 	super initialize.
 	arguments := #().
@@ -117,6 +122,11 @@ SMessage >> receiver [
 { #category : #printing }
 SMessage >> receiver: anSExpression [
 	receiver := anSExpression
+]
+
+{ #category : #printing }
+SMessage >> registerCacheWith: runtime [
+	cache ifNil: [ runtime registerCache: self for: selector ]
 ]
 
 { #category : #printing }

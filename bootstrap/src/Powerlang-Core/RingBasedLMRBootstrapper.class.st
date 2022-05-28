@@ -219,12 +219,13 @@ RingBasedLMRBootstrapper >> initializeBehavior: anLMRHeapObject spec: anRGBehavi
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 	| classes |
-	classes := source vmPrimitivesSpec allClasses select: #isRingResolved.
+	classes := source vmPrimitivesSpec allExtensionClasses.
 	classes
 		do: [ :class | 
 			class methods do: [ :m | self override: class name with: m ].
 			class metaclass methods
-				do: [ :m | self override: class metaclass name with: m ] ]
+				do: [ :m | self override: class metaclass name with: m ] ].
+	self removeBootstrapDictionaryNewOverride
 ]
 
 { #category : #initialization }
@@ -371,6 +372,16 @@ RingBasedLMRBootstrapper >> prepareClosuresForExecution [
 	| mapped |
 	closureMethods
 		do: [ :method | mapped := mapping at: method. dest interpreter prepareForExecution: mapped ]
+]
+
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
+	| spec species behavior selector |
+	spec := source specs at: #'Namespace class'.
+	species := source speciesFor: spec.
+	behavior := mapping at: species instanceBehavior.
+	selector := dest symbolFromLocal: #new.
+	dest removeOverride: behavior -> selector
 ]
 
 { #category : #initialization }

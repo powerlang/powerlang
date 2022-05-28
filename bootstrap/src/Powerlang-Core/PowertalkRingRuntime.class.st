@@ -132,7 +132,7 @@ PowertalkRingRuntime >> image: aPowertalkImage [
 { #category : #initialization }
 PowertalkRingRuntime >> initializeEmulationOverrides [
 	| classes |
-	classes := image vmPrimitivesSpec allClasses select: #isRingResolved.
+	classes := image vmPrimitivesSpec allExtensionClasses.
 	classes
 		do: [ :class | 
 			class methods do: [ :m | self override: class name with: m ].
@@ -315,13 +315,15 @@ self
 
 { #category : #accessing }
 PowertalkRingRuntime >> removeOverride: assoc [
-	| species selector |
+	| species selector symbol |
 	species := image specs at: assoc key.
 	selector := assoc value.
-	
 	overrides removeKey: species -> selector.
-	methodCache removeKey: selector -> species ifAbsent: nil
-
+	methodCache removeKey: selector -> species ifAbsent: nil.
+	symbol := self symbolFromLocal: selector.
+	symbolCache
+		at: symbol
+		ifPresent: [ :messages | messages do: #flushCache ]
 ]
 
 { #category : #accessing }

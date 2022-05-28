@@ -166,7 +166,7 @@ StackedEvaluationContext >> isBlock [
 { #category : #initialization }
 StackedEvaluationContext >> method [
 	^ self isBlock
-		ifTrue: [ regM method ]
+		ifTrue: [ system blockMethod: regM ]
 		ifFalse: [ regM ]
 ]
 

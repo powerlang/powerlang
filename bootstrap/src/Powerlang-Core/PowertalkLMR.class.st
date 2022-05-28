@@ -614,6 +614,18 @@ PowertalkLMR >> readKernel [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> removeOverride: assoc [
+	| species selector |
+	species := assoc key.
+	selector := assoc value.
+	overrides removeKey: species -> selector.
+	methodCache removeKey: selector -> species ifAbsent: nil.
+	symbolCache
+		at: selector
+		ifPresent: [ :messages | messages do: #flushCache ]
+]
+
+{ #category : #initialization }
 PowertalkLMR >> sexpressionsOf: method [
 	| expressions astcodes decoder |
 	expressions := self methodOptimizedCode: method.
