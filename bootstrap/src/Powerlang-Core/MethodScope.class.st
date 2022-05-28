@@ -49,9 +49,9 @@ MethodScope >> initializePseudoVars [
 
 { #category : #services }
 MethodScope >> resolve: aString [
-	(self resolveLocal: aString) ifNotNil: [:binding | ^binding].
-	(self resolvePseudo: aString) ifNotNil: [:binding | ^binding ].
-	^DynamicBinding new name: aString
+	(self resolveLocal: aString) ifNotNil: [ :binding | ^ binding ].
+	(self resolvePseudo: aString) ifNotNil: [ :binding | ^ binding ].
+	^ DynamicBinding named: aString
 ]
 
 { #category : #'as yet unclassified' }

@@ -198,6 +198,13 @@ EvaluationContext >> staticBindingForMvar: symbol [
 ]
 
 { #category : #services }
+EvaluationContext >> staticBindingForNested: name [ 
+	| module |
+	module := self staticBindingFor: (name at: 1).
+	^self staticBindingFor: (name at: 2) inModule: module
+]
+
+{ #category : #services }
 EvaluationContext >> storeAssociation: association value: anObject [ 
 	system storeAssociation: association value: anObject 
 ]

@@ -11,3 +11,13 @@ Class {
 NestedDynamicBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeNestedDynamicVar: name
 ]
+
+{ #category : #testing }
+NestedDynamicBinding >> literal [
+	^name collect: [ :n | n asSymbol]
+]
+
+{ #category : #testing }
+NestedDynamicBinding >> printNameOn: aStream [
+	name do: [ :n | aStream nextPutAll: n ] separatedBy: [ aStream nextPut: $. ]
+]

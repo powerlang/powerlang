@@ -11,7 +11,5 @@ SNestedDynamicBinding class >> decodeUsing: anAstcodeDecoder [
 
 { #category : #accessing }
 SNestedDynamicBinding >> lookupWithin: anEvaluationContext [
-	| module |
-	module := anEvaluationContext staticBindingFor: name first.
-	cache := anEvaluationContext staticBindingFor: name second inModule: module
+	cache := anEvaluationContext staticBindingForNested: name
 ]

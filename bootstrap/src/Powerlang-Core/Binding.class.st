@@ -118,8 +118,17 @@ Binding >> name: aString [
 ]
 
 { #category : #printing }
+Binding >> printNameOn: aStream [
+		aStream
+		print: name
+
+]
+
+{ #category : #printing }
 Binding >> printOn: aStream [
-	aStream nextPutAll: name; nextPutAll: ' ('.
+	self printNameOn: aStream.
+	aStream
+		nextPutAll: ' ('.
 	super printOn: aStream.
 	aStream nextPutAll: ')'
 ]

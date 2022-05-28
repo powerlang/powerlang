@@ -27,6 +27,7 @@ AstBindingTypes class >> initialize [
 	SelfId := 6.
 	SuperId := 7.
 	DynamicVarId := 14.
+	NestedDynamicVarId := 15.
 	PushRid := 50.
 	PopRid := 51
 ]

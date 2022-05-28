@@ -179,7 +179,10 @@ AstcodeDecoder >> decodeMethod [
 
 { #category : #public }
 AstcodeDecoder >> decodeNestedDynamicVar [
-	^ SNestedDynamicBinding new name: {self nextSymbol. self nextSymbol}
+	^ SNestedDynamicBinding new
+		name:
+			self nextSymbol.
+
 ]
 
 { #category : #public }

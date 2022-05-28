@@ -78,7 +78,7 @@ AstcodeEncoder >> encodeLoadRvisitingReceiver [
 { #category : #visiting }
 AstcodeEncoder >> encodeNestedDynamicVar: name [
 	stream nextPut: NestedDynamicVarId.
-	self nextSymbolPut: name
+	self nextLiteralPut: name 
 ]
 
 { #category : #visiting }
@@ -164,6 +164,15 @@ AstcodeEncoder >> nextIntegerPut: anInteger [
 		ifTrue: [ anInteger ]
 		ifFalse: [ anInteger + 16r100 ].
 	stream nextPut: value
+]
+
+{ #category : #visiting }
+AstcodeEncoder >> nextLiteralPut: anObject [
+	| index |
+	index := method
+		indexOf: anObject
+		ifAbsent: [ self ASSERT: false ].
+	self nextIntegerPut: index
 ]
 
 { #category : #visiting }
