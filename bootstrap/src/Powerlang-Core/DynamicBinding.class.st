@@ -13,6 +13,12 @@ DynamicBinding class >> default [
 ]
 
 { #category : #testing }
+DynamicBinding >> beReferencedFrom: aScriptNode [
+	"a dynamic binding could refer to an ivar, so we have to be conservative"
+	aScriptNode useSelf
+]
+
+{ #category : #testing }
 DynamicBinding >> emitLoadAusing: anAstcodeEncoder [
 	anAstcodeEncoder encodeLoadAwithDynamicVar: name
 ]

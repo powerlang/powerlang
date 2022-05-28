@@ -85,11 +85,6 @@ BlockScope >> capturesHome [
 	^self home notNil
 ]
 
-{ #category : #services }
-BlockScope >> capturesSelf [
-	^captureSelf
-]
-
 { #category : #private }
 BlockScope >> copyLocal: binding [
 	^script isInlined ifTrue: [binding] ifFalse: [binding copy beInArray]
