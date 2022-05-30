@@ -150,31 +150,6 @@ ScriptScopeTest >> test010resolveClass [
 ]
 
 { #category : #private }
-ScriptScopeTest >> test010resolveClassVariables [
-	| scope |
-	scope := self scopeFor: Symbol.
-	self checkClassVarsOf: Symbol in: scope
-]
-
-{ #category : #private }
-ScriptScopeTest >> test010resolveGlobal [
-	| binding |
-	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Smalltalk'.
-	self
-		assert: binding isGlobal;
-		deny: binding isClassBinding;
-		assert: binding name = #Smalltalk;
-		assert: binding association == (Smalltalk globals associationAt: #Smalltalk)
-]
-
-{ #category : #private }
-ScriptScopeTest >> test010resolveInstanceVariables [
-	| scope |
-	scope := self scopeFor: Point.
-	self checkInstVarsOf: Point in: scope
-]
-
-{ #category : #private }
 ScriptScopeTest >> test010resolveSelf [
 	| scope receiver sup |
 	scope := self scopeFor: Object.

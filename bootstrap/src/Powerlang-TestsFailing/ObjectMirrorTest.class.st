@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'storage'
 	],
-	#category : #'Powerlang-Tests-Metaphysics'
+	#category : #'Powerlang-TestsFailing-Metaphysics'
 }
 
 { #category : #accessing }
