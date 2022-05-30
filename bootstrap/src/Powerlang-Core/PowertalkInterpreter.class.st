@@ -151,6 +151,8 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
+		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
+
 		at: #PrimeFor put: self primitivePrimeFor
 ]
 
@@ -281,6 +283,11 @@ PowertalkInterpreter >> primitiveBootstrapDictKeys [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictNew [
 	^ [ runtime newBootstrapDictionaryOf: context self ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveBootstrapLoadModule [
+	^ [ runtime loadModule: context firstArgument]
 ]
 
 { #category : #primitives }

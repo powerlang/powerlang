@@ -63,6 +63,11 @@ SCascadeMessage >> cascade: anSCascade [
 ]
 
 { #category : #accessing }
+SCascadeMessage >> flushCache [
+	cache := nil
+]
+
+{ #category : #accessing }
 SCascadeMessage >> isCascadeMessage [
 	^true
 ]

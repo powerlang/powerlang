@@ -84,22 +84,16 @@ PowertalkIterativeStackedInterpreter >> prepareForExecution: method [
 
 { #category : #initializing }
 PowertalkIterativeStackedInterpreter >> runtime: aPowertalkRuntime [
-	| launcher code |
 	super runtime: aPowertalkRuntime.
 	linearizer
 		runtime: aPowertalkRuntime;
 		dropsArguments.
-	launcher := runtime newCompiledMethod.
-	code := runtime newArraySized: 0.
-	runtime methodOptimizedCode: launcher put: code.
-	context
-		system: runtime;
-		buildMethodFrameFor: nilObj code: launcher environment: nilObj
+	context system: runtime
 ]
 
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: anArray [
-	| symbol literal dummy message dispatch |
+	| symbol literal dummy message dispatch prevWork prevPC |
 	symbol := runtime symbolFromLocal: aSymbol.
 	literal := SLiteral new value: nilObj.
 	dummy := Array new: anArray size withAll: nil.
@@ -108,6 +102,9 @@ PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: an
 		receiver: literal;
 		arguments: dummy.
 	dispatch := SOpDispatchMessage new message: message.
+	prevWork := work.
+	prevPC := context regPC.
+	context buildLaunchFrame.
 	regR := receiver.
 	anArray isEmpty
 		ifFalse: [ context pushOperand: receiver ].
@@ -115,6 +112,9 @@ PowertalkIterativeStackedInterpreter >> sendLocal: aSymbol to: receiver with: an
 	work := {dispatch}.
 	context regPC: 0.
 	self evaluate.
+	context popLaunchFrame.
+	work := prevWork.
+	context regPC: prevPC.
 	^ regR
 ]
 
@@ -142,8 +142,6 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 	environment := runtime newEnvironmentSized: size.
 	self prepareFor: method.
 	work := runtime methodOptimizedCode: method.
-	"(runtime symbolFrom: message selector) == #foo
-		ifTrue: [ self halt ]."
 	context
 		buildMethodFrameFor: regR
 		code: method

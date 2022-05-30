@@ -199,8 +199,9 @@ EvaluationContext >> staticBindingForMvar: symbol [
 
 { #category : #services }
 EvaluationContext >> staticBindingForNested: name [ 
-	| module |
-	module := self staticBindingFor: (name at: 1).
+	| binding module |
+	binding := self staticBindingFor: (name at: 1).
+	module := binding valueWithin: self.
 	^self staticBindingFor: (name at: 2) inModule: module
 ]
 

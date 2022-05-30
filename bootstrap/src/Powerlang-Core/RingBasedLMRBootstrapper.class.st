@@ -195,8 +195,21 @@ RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
 	class := dest behaviorClass: behavior.
 	module := dest sendLocal: #new to: class.
 	dest sendLocal: #bindKernelExports to: module.
-	classes do: [ :c | dest sendLocal: #module: to: c with: {module} ].
+	classes
+		do: [ :c | 
+			dest
+				sendLocal: #exportClass: to: module with: {c};
+				sendLocal: #module: to: c with: {module} ].
 	^ module
+]
+
+{ #category : #paths }
+RingBasedLMRBootstrapper >> findModulePath: aSymbol [
+	| matches |
+	matches := self rootDirectory allDirectoriesMatching: aSymbol.
+	matches
+		ifEmpty: [ self error: 'module ' , aSymbol , ' couldn''t be found' ].
+	^ matches first relativeTo: self rootDirectory asAbsolute 
 ]
 
 { #category : #building }
@@ -237,6 +250,7 @@ RingBasedLMRBootstrapper >> headerFor: aRingObject [
 RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	| index |
 	source := aPowertalkRingImage.
+	dest bootstrapper: self.
 	index := (source => #Class) allInstVarNames indexOf: 'name'.
 	dest classNameIndex: index.
 	index := (source => #Class) allInstVarNames indexOf: 'module'.
@@ -352,10 +366,10 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeSymbolTable [
-	| symbol namespace cvars table mapped |
+	| symbol namespaces cvars table mapped |
 	symbol := source classNamed: #Symbol.
-	namespace := symbol classVariables.
-	cvars := namespace at: 1.
+	namespaces := symbol classVariables.
+	cvars := namespaces at: 1.
 	table := cvars at: #SymbolTable.
 	mapped := mapping at: table.
 	dest symbolTable: mapped
@@ -377,14 +391,28 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> loadBootstrapModule [
-	| spec  classes moduleSpec |
+	| spec classes moduleSpec bootstrapper |
 	spec := PowertalkRingModule lmrBootstrapperSpec.
 	classes := spec allClasses.
 	classes := classes
 		collect: [ :classSpec | self createNewClassFrom: classSpec ].
 	moduleSpec := spec at: #BootstrapModule.
-	^self createNewModule: moduleSpec with: classes.
+	bootstrapper := self createNewModule: moduleSpec with: classes.
+	dest sendLocal: #loadRequiredModules to: bootstrapper.
+	^bootstrapper
+]
 
+{ #category : #initialization }
+RingBasedLMRBootstrapper >> loadModule: symbol [
+	| spec classes moduleSpec module |
+	spec := self readModuleSpec: symbol.
+	classes := spec allClasses.
+	classes := classes
+		collect: [ :classSpec | self createNewClassFrom: classSpec ].
+	moduleSpec := spec at: symbol , #Module.
+	module := self createNewModule: moduleSpec with: classes.
+	dest sendLocal: #loadRequiredModules to: module.
+	^ module
 ]
 
 { #category : #initialization }
@@ -432,9 +460,9 @@ RingBasedLMRBootstrapper >> newMapping: aRingObject [
 	^ mapped
 ]
 
-{ #category : #initialization }
+{ #category : #paths }
 RingBasedLMRBootstrapper >> outputDirectory [
-	^'./specs/bee-dmr/build' asFileReference
+	^ self rootDirectory / 'build' 
 ]
 
 { #category : #initialization }
@@ -459,6 +487,15 @@ RingBasedLMRBootstrapper >> prepareClosuresForExecution [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> readModuleSpec: aSymbol [
+	| path |
+	path := self findModulePath: aSymbol.
+	^PowertalkRingModule readSpec: aSymbol at: path parent
+
+	
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
 	| spec species behavior selector |
 	spec := source specs at: #'Namespace class'.
@@ -471,6 +508,11 @@ RingBasedLMRBootstrapper >> removeBootstrapDictionaryNewOverride [
 { #category : #initialization }
 RingBasedLMRBootstrapper >> result [
 	^dest
+]
+
+{ #category : #paths }
+RingBasedLMRBootstrapper >> rootDirectory [
+	^ './specs/bee-dmr' asFileReference
 ]
 
 { #category : #initialization }

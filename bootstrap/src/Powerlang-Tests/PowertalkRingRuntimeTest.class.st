@@ -650,6 +650,7 @@ PowertalkRingRuntimeTest >> test210addAssociationToDictionary [
 	class := image classNamed: #Dictionary.
 	assoc := image newAssociation: #foo -> nil.
 	d := runtime sendLocal: #new to: class with: {}.
+	self assertNoLeftoverFrames.
 	runtime sendLocal: #add: to: d with: {assoc}.
 	self
 		assert: d spec name equals: 'Dictionary';

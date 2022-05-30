@@ -4,6 +4,7 @@ Class {
 	#instVars : [
 		'kernel',
 		'wordSize',
+		'bootstrapper',
 		'behaviorNextIndex',
 		'behaviorMethodDictionaryIndex',
 		'behaviorClassIndex',
@@ -172,6 +173,11 @@ PowertalkLMR >> blockTempCount: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> bootstrapper: aBootstrapper [
+	bootstrapper := aBootstrapper
+]
+
+{ #category : #initialization }
 PowertalkLMR >> byteArrayClass: anLMRObject [
 	byteArrayClass := anLMRObject
 ]
@@ -305,6 +311,11 @@ PowertalkLMR >> knownSymbols: associations [
 PowertalkLMR >> loadAssociationValue: association [
 	^ association slotAt: 2.
 
+]
+
+{ #category : #initialization }
+PowertalkLMR >> loadModule: symbol [
+	^ bootstrapper loadModule: symbol asLocalString
 ]
 
 { #category : #initialization }

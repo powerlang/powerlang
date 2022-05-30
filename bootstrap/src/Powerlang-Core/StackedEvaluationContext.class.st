@@ -75,6 +75,18 @@ StackedEvaluationContext >> buildFrameFor: receiver code: code environment: envi
 ]
 
 { #category : #initialization }
+StackedEvaluationContext >> buildLaunchFrame [
+	| launcher code |
+	launcher := system newCompiledMethod.
+	code := system newArraySized: 0.
+	system methodOptimizedCode: launcher put: code.
+	self
+		buildMethodFrameFor: system nil
+		code: launcher
+		environment: system nil
+]
+
+{ #category : #initialization }
 StackedEvaluationContext >> buildMethodFrameFor: receiver code: code environment: environment [
 	| temps |
 	temps := system methodTempCount: code.
@@ -139,7 +151,7 @@ StackedEvaluationContext >> fourthArgument [
 
 { #category : #initialization }
 StackedEvaluationContext >> hasFinished [
-	^ (stack at: regBP) = 0
+	^ regBP = 0 and: [ regSP = (stack size + 1) ]
 ]
 
 { #category : #initialization }
@@ -149,13 +161,11 @@ StackedEvaluationContext >> incRegPC [
 
 { #category : #initialization }
 StackedEvaluationContext >> initialize [
-
 	super initialize.
 	stack := Array new: 64 * 1024.
 	regSP := stack size + 1.
 	regBP := 0.
-	pc := 0.
-
+	pc := 0
 ]
 
 { #category : #initialization }
@@ -202,9 +212,23 @@ StackedEvaluationContext >> popFrame [
 	regSP := regBP.
 	regE := stack at: regBP - 3.
 	regBP := self pop.
+	pc := self pop.
+		regM := stack at: regBP - 2.
+	regS := stack at: regBP - 1.
+
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> popLaunchFrame [
+	regSP := regBP.
+	regE := stack at: regBP - 3.
+	regBP := self pop.
+	pc := self pop.
+	regBP = 0
+		ifTrue: [ ^ self ].
 	regM := stack at: regBP - 2.
 	regS := stack at: regBP - 1.
-	pc := self pop
+
 ]
 
 { #category : #initialization }
@@ -262,6 +286,11 @@ StackedEvaluationContext >> pushOperand: anObject [
 { #category : #initialization }
 StackedEvaluationContext >> receiver [
 	^ regS
+]
+
+{ #category : #initialization }
+StackedEvaluationContext >> regBP [
+	^ regBP
 ]
 
 { #category : #accessing }

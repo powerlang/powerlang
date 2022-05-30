@@ -63,12 +63,13 @@ PowertalkRingModule class >> new [
 
 { #category : #accessing }
 PowertalkRingModule class >> readSpec: specName at: path [
-	| root current repo spec |
+	| root current repo spec subdir |
 	root := (Smalltalk getPackageDirectoryForPackage: self package)
 		/ '..' / '..'.
 	current := (root / 'specs' / 'current') contents asString trim.
+	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	repo := TonelRepository new
-		directory: root / 'specs' / current / path .
+		directory: root / 'specs' / current / subdir.
 	spec := repo asRingEnvironmentWith: {specName}.
 	^ spec clean
 ]
