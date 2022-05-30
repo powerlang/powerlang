@@ -18,7 +18,11 @@ all: $(KERNEL) $(LAUNCHER) $(LAUNCHER)-gdb.py
 
 $(KERNEL): bootstrap/specs/current bootstrap/bootstrap.image bootstrap/pharo | $(BUILD)
 	cd bootstrap && ./pharo bootstrap.image eval \
-		"KernelSegmentBuilder new initialize64BitImage generateModule bootstrapModule fillClasses nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'../$@'"
+		"| bootstrapper | 
+		bootstrapper := PowertalkRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateLMR.
+		module := bootstrapper loadBootstrapModule"
+#		runtime sendLocal: #writeModules to: module.		
+#		nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'../$@'"
 
 $(LAUNCHER): bootstrap/specs/current $(BUILD)/Makefile
 	make -C $(BUILD)
