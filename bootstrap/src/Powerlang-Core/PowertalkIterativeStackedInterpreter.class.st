@@ -11,12 +11,8 @@ Class {
 { #category : #initialization }
 PowertalkIterativeStackedInterpreter >> evaluate [
 	| operation |
-	[ 
-	operation := self nextOperation.
+	[ operation := self nextOperation.
 	operation notNil ] whileTrue: [ operation acceptVisitor: self ].
-	Transcript
-		print: 'MessageCount: ' , messageCount asString;
-		cr.
 	^ regR
 ]
 
