@@ -41,7 +41,7 @@ bootstrap/bootstrap.image bootstrap/pharo:
 
 test: $(KERNEL) $(LAUNCHER)
 	make -C bootstrap test
-	($(LAUNCHER) $(KERNEL) ; test $$? -eq 3)
+#	($(LAUNCHER) $(KERNEL) ; test $$? -eq 3)
 
 
 $(BUILD):
