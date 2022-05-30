@@ -18,8 +18,8 @@ all: $(KERNEL) $(LAUNCHER) $(LAUNCHER)-gdb.py
 
 $(KERNEL): bootstrap/specs/current bootstrap/bootstrap.image bootstrap/pharo | $(BUILD)
 	cd bootstrap && ./pharo bootstrap.image eval \
-		"| bootstrapper | 
-		bootstrapper := PowertalkRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateLMR.
+		"| bootstrapper | \
+		bootstrapper := PowertalkRingImage fromSpec wordSize: 8; genesis; bootstrap; fillClasses; fillSymbols; generateLMR. \
 		module := bootstrapper loadBootstrapModule"
 #		runtime sendLocal: #writeModules to: module.		
 #		nativizeForDMR addGenesisObjects writer base: $(BASEADDR); writeToFile:'../$@'"
