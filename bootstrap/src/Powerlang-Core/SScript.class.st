@@ -36,6 +36,11 @@ SScript >> initialize [
 	statements := #()
 ]
 
+{ #category : #accessing }
+SScript >> optimizedCode: anObject [
+	^ self compiledCode optimizedCode: anObject
+]
+
 { #category : #printing }
 SScript >> printOn: aStream indent: anInteger [
 	statements

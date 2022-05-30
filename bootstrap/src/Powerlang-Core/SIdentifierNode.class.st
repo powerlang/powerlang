@@ -58,15 +58,10 @@ SIdentifierNode >> defineTemporaryIn: scope [
 	binding declaration: self
 ]
 
-{ #category : #private }
-SIdentifierNode >> emitLoadAusing: anAstcodeEncoder [
-	binding emitLoadAusing: anAstcodeEncoder
-]
-
 { #category : #accessing }
 SIdentifierNode >> initialize [
 	super initialize.
-	binding := UnresolvedBinding default
+	binding := DynamicBinding default
 ]
 
 { #category : #testing }
@@ -81,7 +76,7 @@ SIdentifierNode >> isIdentifier [
 
 { #category : #testing }
 SIdentifierNode >> isIdentifierLiteral [
-	binding isUnresolved ifFalse: [^binding isLiteral].
+	binding isDynamic ifFalse: [^binding isLiteral].
 	^self ast ifNil: [false] ifNotNil: [:ast | | b |
 		b := ast scope resolve: name.
 		b isLiteral]
@@ -90,6 +85,11 @@ SIdentifierNode >> isIdentifierLiteral [
 { #category : #testing }
 SIdentifierNode >> isImmediate [
 	^true
+]
+
+{ #category : #testing }
+SIdentifierNode >> isLocal [
+	^binding isLocal
 ]
 
 { #category : #testing }
@@ -125,14 +125,37 @@ SIdentifierNode >> name: aString [
 	name := aString reduced
 ]
 
+{ #category : #private }
+SIdentifierNode >> printOn: aStream [
+	aStream nextPut: $<;
+	nextPutAll: name;
+	nextPutAll: '> ('.
+	super printOn: aStream.
+	aStream nextPut: $)
+]
+
 { #category : #binding }
 SIdentifierNode >> resolveAssigning: aBoolean [
-	| scope |
-	scope := compiler activeScope.
-	binding := scope resolve: name.
-	binding isUnresolved ifFalse: [^binding].
-	(scope hasMultipleBindingsFor: name)
-		ifTrue: [self compileError: 'variable belongs in multiple pools'].
-	compiler undeclaredErrorAt: self stretch assignment: aBoolean.
-	^binding := scope resolve: name
+	binding := compiler activeScope resolve: name.
+	^binding
+
+]
+
+{ #category : #testing }
+SIdentifierNode >> sourceIntervals [
+	| stretchs declaration ast string code index |
+	stretchs := OrderedCollection new.
+	declaration := binding declaration.
+	ast := self ast.
+	ast allNodesDo: [:node | 
+		(node class == self class and: [node binding declaration == declaration])
+			ifTrue: [stretchs add: node stretch]].
+	string := self source.
+	code := compiler sourceCode.
+	index := ast stretch end.
+	[
+		index := code indexOfString: string startingAt: index + 1.
+		index > 0]
+		whileTrue: [stretchs add: (index to: index + string size - 1)].
+	^stretchs
 ]

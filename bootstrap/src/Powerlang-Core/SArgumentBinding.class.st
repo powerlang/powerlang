@@ -13,7 +13,7 @@ SArgumentBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #testing }
-SArgumentBinding >> assign: value within: evaluator [
+SArgumentBinding >> assign: value within: anEvaluationContext [
 	self halt
 ]
 
@@ -37,6 +37,6 @@ SArgumentBinding >> printOn: aStream [
 ]
 
 { #category : #testing }
-SArgumentBinding >> valueWithin: evaluator [
-	^evaluator argumentAt: position in: environment
+SArgumentBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext argumentAt: position in: environment
 ]

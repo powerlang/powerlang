@@ -594,10 +594,11 @@ SSmalltalkParser >> missingToken: aString [
 { #category : #private }
 SSmalltalkParser >> namedPrimitive [
 	| name pragma |
-	token isNameToken ifFalse: [self invalidPragma].
+	token isNameToken
+		ifFalse: [ self invalidPragma ].
 	name := token value.
 	pragma := self buildNode: compiler pragmaNode at: token position.
-	^pragma primitive: 0 name: name
+	^ pragma primitive: 0 name: name asSymbol
 ]
 
 { #category : #private }

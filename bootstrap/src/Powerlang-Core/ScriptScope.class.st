@@ -135,7 +135,7 @@ ScriptScope >> resolveLocal: aString [
 
 { #category : #binding }
 ScriptScope >> resolves: aString [
-	^(self resolve: aString) isUnresolved not
+	^(self resolve: aString) isDynamic not
 ]
 
 { #category : #services }

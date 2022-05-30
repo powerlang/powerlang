@@ -4,7 +4,7 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'nativeCode',
+		'optimizedCode',
 		'method'
 	],
 	#pools : [
@@ -23,46 +23,46 @@ SCompiledBlock class >> new [
 
 { #category : #constants }
 SCompiledBlock >> argumentCount [
-	^format bitsAt: ArgCount
+	^format bitsAt: BlockArgCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> argumentCount: anInteger [
-	format := format bitsAt: ArgCount put: anInteger
+	format := format bitsAt: BlockArgCount put: anInteger
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesHome [
-	^ format anyMask: CapturesHome
+	^ format anyMask: BlockCapturesHome
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesHome: aBoolean [
 	format := aBoolean
-				  ifTrue: [ format bitOr: CapturesHome ]
-				  ifFalse: [ format bitClear: CapturesHome ]
+				  ifTrue: [ format bitOr: BlockCapturesHome ]
+				  ifFalse: [ format bitClear: BlockCapturesHome ]
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesSelf [
-	^format anyMask: CapturesSelf
+	^format anyMask: BlockCapturesSelf
 ]
 
 { #category : #constants }
 SCompiledBlock >> capturesSelf: aBoolean [
 	format := aBoolean
-		ifTrue: [ format bitOr: CapturesSelf ]
-		ifFalse: [ format bitClear: CapturesSelf ]
+		ifTrue: [ format bitOr: BlockCapturesSelf ]
+		ifFalse: [ format bitClear: BlockCapturesSelf ]
 ]
 
 { #category : #constants }
 SCompiledBlock >> environmentCount [
-	^ format bitsAt: EnvCount
+	^ format bitsAt: BlockEnvCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> environmentCount: anInteger [
-	format := format bitsAt: EnvCount put: anInteger
+	format := format bitsAt: BlockEnvCount put: anInteger
 ]
 
 { #category : #constants }
@@ -72,12 +72,12 @@ SCompiledBlock >> format [
 
 { #category : #constants }
 SCompiledBlock >> id [
-	^format bitsAt: Id
+	^format bitsAt: BlockId
 ]
 
 { #category : #constants }
 SCompiledBlock >> id: anInteger [
-	format := format bitsAt: Id put: anInteger
+	format := format bitsAt: BlockId put: anInteger
 ]
 
 { #category : #constants }
@@ -102,16 +102,6 @@ SCompiledBlock >> method: aCompiledMethod [
 ]
 
 { #category : #constants }
-SCompiledBlock >> nativeCode [
-	^nativeCode
-]
-
-{ #category : #constants }
-SCompiledBlock >> nativeCode: code [
-	nativeCode := code
-]
-
-{ #category : #constants }
 SCompiledBlock >> newClosure [
 	| closure |
 	closure := SClosure new: self environmentCount.
@@ -119,13 +109,35 @@ SCompiledBlock >> newClosure [
 ]
 
 { #category : #constants }
+SCompiledBlock >> optimizedCode [
+	^optimizedCode
+]
+
+{ #category : #constants }
+SCompiledBlock >> optimizedCode: anObject [
+	optimizedCode := anObject
+]
+
+{ #category : #constants }
+SCompiledBlock >> printOn: aStream [
+	aStream
+		print: method classBinding;
+		nextPutAll: '>>';
+		print: method selector;
+		nextPutAll: ' [block ';
+		print: self id;
+		nextPutAll: ']'
+
+]
+
+{ #category : #constants }
 SCompiledBlock >> tempCount [
-	^format bitsAt: TempCount
+	^format bitsAt: BlockTempCount
 ]
 
 { #category : #constants }
 SCompiledBlock >> tempCount: anInteger [
-	format := format bitsAt: TempCount put: anInteger
+	format := format bitsAt: BlockTempCount put: anInteger
 ]
 
 { #category : #constants }

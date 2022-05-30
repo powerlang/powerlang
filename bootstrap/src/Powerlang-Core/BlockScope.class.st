@@ -85,11 +85,6 @@ BlockScope >> capturesHome [
 	^self home notNil
 ]
 
-{ #category : #services }
-BlockScope >> capturesSelf [
-	^captureSelf
-]
-
 { #category : #private }
 BlockScope >> copyLocal: binding [
 	^script isInlined ifTrue: [binding] ifFalse: [binding copy beInArray]
@@ -126,14 +121,6 @@ BlockScope >> environments [
 	environments isEmpty ifTrue: [^#()].
 	first := environments first.
 	^first isMethod ifTrue: [environments allButFirst] ifFalse: [environments]
-]
-
-{ #category : #testing }
-BlockScope >> hasMultipleBindingsFor: aString [
-	"
-	temporal compatibility
-	"
-	^self parent hasMultipleBindingsFor: aString
 ]
 
 { #category : #services }

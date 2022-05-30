@@ -25,7 +25,7 @@ SLocalBinding >> index [
 
 { #category : #testing }
 SLocalBinding >> index: anInteger [
-	^position := anInteger
+	position := anInteger
 ]
 
 { #category : #testing }

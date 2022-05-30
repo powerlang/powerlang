@@ -5,11 +5,6 @@ Class {
 }
 
 { #category : #accessing }
-NilBinding >> emitLoadAusing: anSExpressionNativizer [
-	anSExpressionNativizer encodeLoadAwithNil
-]
-
-{ #category : #accessing }
 NilBinding >> encodeUsing: anAstcodeEmitter [
 	anAstcodeEmitter encodeNil
 ]

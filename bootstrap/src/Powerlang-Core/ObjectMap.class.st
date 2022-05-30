@@ -2,10 +2,9 @@ Class {
 	#name : #ObjectMap,
 	#superclass : #Object,
 	#instVars : [
-		'behavior',
 		'spec'
 	],
-	#category : #'Powerlang-Core-Building'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }
@@ -24,42 +23,19 @@ ObjectMap class >> new: anRGBehavior [
 { #category : #'instance creation' }
 ObjectMap class >> new: anRGBehavior size: size [
 	| class |
-	self assert: (anRGBehavior isVariable or: [ size == 0 ]).
+	"self assert: (anRGBehavior isVariable or: [ size == 0 ]). isVariable too slow to assert"
 	class := self classFor: anRGBehavior.
 	^ class new initializeAs: anRGBehavior sized: size
+]
+
+{ #category : #services }
+ObjectMap >> allSlotNames [
+	^#()
 ]
 
 { #category : #accessing }
 ObjectMap >> arrayedSize [
 	^self size
-]
-
-{ #category : #accessing }
-ObjectMap >> at: index [
-	"Return indexed value at given index, starting with 1. This CANNOT be 
-	 used for accessing named slots (aka, instance variables), to access 
-	 them use #instVarAt:"
-	
-	self subclassResponsibility  
-]
-
-{ #category : #accessing }
-ObjectMap >> at: index put: value [
-	"Set indexed value at given `index` to `value`. This CANNOT be used for 
-	 setting named slots (aka, instance variables), to access them use 
-	 #instVarAt:put:"
-	
-	self subclassResponsibility  
-]
-
-{ #category : #accessing }
-ObjectMap >> behavior [
-	^behavior
-]
-
-{ #category : #accessing }
-ObjectMap >> behavior: anObjectMap [
-	behavior := anObjectMap.
 ]
 
 { #category : #accessing }
@@ -104,8 +80,23 @@ ObjectMap >> isBytes [
 ]
 
 { #category : #testing }
+ObjectMap >> isClosure [
+	^ false
+]
+
+{ #category : #testing }
+ObjectMap >> isDictionaryMap [ 
+	^ false
+]
+
+{ #category : #testing }
 ObjectMap >> isImmediate [ 
 	^false
+]
+
+{ #category : #testing }
+ObjectMap >> isNil [
+	^ spec notNil and: [spec name = #UndefinedObject]
 ]
 
 { #category : #testing }
@@ -116,6 +107,11 @@ ObjectMap >> isPointers [
 { #category : #testing }
 ObjectMap >> isSmall [
 	^self size < 256
+]
+
+{ #category : #testing }
+ObjectMap >> loadIvar: aSymbol [
+	^nil
 ]
 
 { #category : #initialization }
@@ -167,7 +163,7 @@ ObjectMap >> slotNamed: name [
 	"Get a named slot with given `name`"
 
 	| index |
-	index := self allInstVarNames indexOf: name.
+	index := self allSlotNames indexOf: name.
 	index == 0
 		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
 	^ self slotAt: index
@@ -178,7 +174,7 @@ ObjectMap >> slotNamed: name put: value [
 	"Set a named slot with given `name` to `value`"
 
 	| index |
-	index := self allInstVarNames indexOf: name.
+	index := self allSlotNames indexOf: name.
 	index == 0
 		ifTrue: [ ^ self error: 'No slot named "' , name , '"' ].
 	^ self slotAt: index put: value
@@ -194,9 +190,9 @@ ObjectMap >> spec [
 	^ spec
 ]
 
-{ #category : #validation }
-ObjectMap >> validate [
-	self assert: behavior notNil
+{ #category : #testing }
+ObjectMap >> storeIvar: aSymbol with: anObjectMap [
+	^ nil
 ]
 
 { #category : #accessing }

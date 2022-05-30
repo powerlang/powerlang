@@ -18,14 +18,14 @@ Class {
 
 { #category : #'class initialization' }
 AstNodeTypes class >> initialize [
-	MethodId := 1.
-	BlockId := 2.
-	IdentifierId := 3.
-	LiteralId := 4.
-	MessageId := 5.
-	CascadeId := 6.
-	BraceId := 7.
-	AssignmentId := 8.
-	ReturnId := 9.
-	PragmaId := 10
+	MethodId := 101.
+	BlockId := 102.
+	IdentifierId := 103.
+	LiteralId := 104.
+	MessageId := 105.
+	CascadeId := 106.
+	BraceId := 107.
+	AssignmentId := 108.
+	ReturnId := 109.
+	PragmaId := 110
 ]

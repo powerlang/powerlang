@@ -1,6 +1,46 @@
 Extension { #name : #PositionableStream }
 
 { #category : #'*Powerlang-Compatibility-Pharo' }
+PositionableStream >> int64 [
+	"Answer the next signed, 64-bit integer from this (binary) stream."
+
+	"Details: As a fast check for negative number, check the high bit of the first digit"
+
+	| n firstDigit |
+	n := firstDigit := self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	n := (n bitShift: 8) + self next.
+	firstDigit >= 128
+		ifTrue: [ n := -16r10000000000000000 + n ].	"decode negative 64-bit integer"
+	^ n
+]
+
+{ #category : #'*Powerlang-Compatibility-Pharo' }
+PositionableStream >> int64: anInteger [
+	"Store the given signed, 64-bit integer on this (binary) stream."
+
+	| n |
+	(anInteger < -16r8000000000000000 or: [ anInteger >= 16r8000000000000000 ])
+		ifTrue: [ self error: 'outside 32-bit integer range' ].
+	n := anInteger < 0
+		ifTrue: [ 16r10000000000000000 + anInteger ]
+		ifFalse: [ anInteger ].
+	self nextPut: (n byteAt: 8).
+	self nextPut: (n byteAt: 7).
+	self nextPut: (n byteAt: 6).
+	self nextPut: (n byteAt: 5).
+	self nextPut: (n byteAt: 4).
+	self nextPut: (n byteAt: 3).
+	self nextPut: (n byteAt: 2).
+	self nextPut: (n byteAt: 1)
+]
+
+{ #category : #'*Powerlang-Compatibility-Pharo' }
 PositionableStream >> peekForAll: aCollection [
 	| n |
 	n := aCollection size.

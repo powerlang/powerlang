@@ -18,7 +18,7 @@ import sphinx_rtd_theme
 # -- Project information -----------------------------------------------------
 
 project = 'Powerlang'
-copyright = '2020, Javier Pimás'
+copyright = '2020-2022, Javier Pimás'
 author = 'Javier Pimás'
 
 # The full version, including alpha/beta/rc tags

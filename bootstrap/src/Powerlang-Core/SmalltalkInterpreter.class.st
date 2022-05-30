@@ -146,10 +146,12 @@ SmalltalkInterpreter >> visitPrimitive: primitive [
 	gate := receiver _gate.
 	runtime := gate handle runtime.
 	primitive = #Behavior
-		ifTrue: [ class := runtime bridge globalNamed: gate handle oid spec name.
-			^ returnValue := self subjectOn: (gate handleOn: class instanceBehavior)].
+		ifTrue: [ class := runtime bridge objectNamed: gate handle oid spec name.
+			^ returnValue := self
+				subjectOn: (gate handleOn: class instanceBehavior) ].
 	primitive = #UnderSize
-		ifTrue: [ ^ returnValue := self subjectOnInteger: gate handle size in: runtime ].
+		ifTrue:
+			[ ^ returnValue := self subjectOnInteger: gate handle size in: runtime ].
 	primitive = #Size
 		ifTrue: [ ^ returnValue := self
 				subjectOnInteger: gate handle arrayedSize
@@ -157,12 +159,13 @@ SmalltalkInterpreter >> visitPrimitive: primitive [
 	primitive = #At
 		ifTrue:
 			[ value := gate handle at: arguments first _gate handle asLocalInteger.
-			^ returnValue := self subjectOn: value].
+			^ returnValue := self subjectOn: value ].
 	primitive = #AtPut
-		ifTrue:
-			[ value := arguments second.
-			gate handle at: arguments first _gate handle asLocalInteger put: value _gate handle oid.
-			^ returnValue := value].
+		ifTrue: [ value := arguments second.
+			gate handle
+				at: arguments first _gate handle asLocalInteger
+				put: value _gate handle oid.
+			^ returnValue := value ].
 	primitive = #New
 		ifTrue: [ new := gate handle runtime new: gate handle oid.
 			^ returnValue := self subjectOn: new ].

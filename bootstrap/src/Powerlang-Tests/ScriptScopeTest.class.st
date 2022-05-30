@@ -137,7 +137,7 @@ ScriptScopeTest >> precondition: aBoolean [
 
 { #category : #private }
 ScriptScopeTest >> scopeFor: aSpecies [
-	^MethodScope new species: aSpecies
+	^MethodScope new
 ]
 
 { #category : #private }
@@ -145,35 +145,8 @@ ScriptScopeTest >> test010resolveClass [
 	| binding |
 	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Point'.
 	self
-		assert: binding isGlobal;
-		assert: binding isClassBinding;
-		assert: binding name = #Point;
-		assert: binding association == (Smalltalk globals associationAt: #Point)
-]
-
-{ #category : #private }
-ScriptScopeTest >> test010resolveClassVariables [
-	| scope |
-	scope := self scopeFor: Symbol.
-	self checkClassVarsOf: Symbol in: scope
-]
-
-{ #category : #private }
-ScriptScopeTest >> test010resolveGlobal [
-	| binding |
-	binding := SCompiler new smalltalkCompiler methodNode scope resolve: 'Smalltalk'.
-	self
-		assert: binding isGlobal;
-		deny: binding isClassBinding;
-		assert: binding name = #Smalltalk;
-		assert: binding association == (Smalltalk globals associationAt: #Smalltalk)
-]
-
-{ #category : #private }
-ScriptScopeTest >> test010resolveInstanceVariables [
-	| scope |
-	scope := self scopeFor: Point.
-	self checkInstVarsOf: Point in: scope
+		assert: binding isDynamic;
+		assert: binding name = #Point
 ]
 
 { #category : #private }
@@ -194,10 +167,10 @@ ScriptScopeTest >> test011resolveUnknownGlobal [
 	| binding point |
 	self precondition: (Smalltalk includesKey: 'Foo678' existingSymbol) not.
 	binding := MethodScope new resolve: 'Foo678'.
-	self assert: binding isUnresolved.
+	self assert: binding isDynamic.
 	point := self scopeFor: Point.
 	binding := point resolve: 'Foo678'.
-	self assert: binding isUnresolved
+	self assert: binding isDynamic
 ]
 
 { #category : #private }
@@ -208,9 +181,7 @@ ScriptScopeTest >> test020resolveMethodArguments [
 		defineArgument: 'arg1';
 		defineArgument: 'arg2';
 		positionDefinedLocals.
-	self
-		checkArgs: #('arg1' 'arg2') in: scope;
-		checkInstVarsOf: Point in: scope
+	self checkArgs: #('arg1' 'arg2') in: scope
 ]
 
 { #category : #private }
@@ -218,9 +189,7 @@ ScriptScopeTest >> test021resolveMethodTemporaries [
 	| scope |
 	scope := self scopeFor: Point.
 	scope defineTemporary: 't1'; defineTemporary: 't2'; positionDefinedLocals.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope
+	self checkTemps: #('t1' 't2') in: scope
 ]
 
 { #category : #private }
@@ -241,9 +210,7 @@ ScriptScopeTest >> test040declareMethodArguments [
 	| ast scope |
 	ast := self compile: 'foo: anArg bar: anotherArg' in: Point.
 	scope := ast scope.
-	self
-		checkArgs: #('anArg' 'anotherArg') in: scope;
-		checkInstVarsOf: Point in: scope
+	self checkArgs: #('anArg' 'anotherArg') in: scope
 ]
 
 { #category : #private }
@@ -251,9 +218,7 @@ ScriptScopeTest >> test041declareMethodTemporaries [
 	| ast scope |
 	ast := self compile: 'foo | t1 t2 | ' in: Point.
 	scope := ast scope.
-	self
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope
+	self checkTemps: #('t1' 't2') in: scope
 ]
 
 { #category : #private }
@@ -263,8 +228,7 @@ ScriptScopeTest >> test042declareMethodTempsWithArgs [
 	scope := ast scope.
 	self
 		checkArgs: #('arg1' 'arg2') in: scope;
-		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope
+		checkTemps: #('t1' 't2') in: scope
 ]
 
 { #category : #private }
@@ -276,7 +240,6 @@ ScriptScopeTest >> test050useMethodTemps [
 	t2 := ast statements second binding.
 	self
 		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope;
 		assert: t1 isTemporary;
 		assert: t1 isInStack;
 		assert: t1 name = 't1';
@@ -296,7 +259,6 @@ ScriptScopeTest >> test051useMethodArgs [
 	a2 := ast statements second binding.
 	self
 		checkArgs: #('a1' 'a2') in: scope;
-		checkInstVarsOf: Point in: scope;
 		assert: a1 isArgument;
 		assert: a1 isInStack;
 		assert: a1 name = 'a1';
@@ -319,7 +281,6 @@ ScriptScopeTest >> test052useMethodTempsAndArgs [
 	self
 		checkArgs: #('a1' 'a2') in: scope;
 		checkTemps: #('t1' 't2') in: scope;
-		checkInstVarsOf: Point in: scope;
 		assert: t1 isTemporary;
 		assert: t1 isInStack;
 		assert: t1 name = 't1';
@@ -387,9 +348,8 @@ ScriptScopeTest >> test055methodUseGlobal [
 	ast := self compile: 'foo Collection' in: Point.
 	global := ast statements first binding.
 	self
-		assert: global isClassBinding;
-		assert: global name = #Collection;
-		assert: global association = (Smalltalk globals associationAt: #Collection)
+		assert: global isDynamic;
+		assert: global name = #Collection
 ]
 
 { #category : #private }
@@ -727,7 +687,7 @@ ScriptScopeTest >> test120inlineEnvironmentTemp [
 	b2t2 := block2 scope resolve: 't2'.
 	self
 		checkTemps: #('t1') in: ast scope;
-		assert: mt2 isUnresolved;
+		assert: mt2 isDynamic;
 		assert: mt1 isStackTemp: 't1' at: 1;
 		assert: b1t1 isStackTemp: 't1' at: 1;
 		assert: b1t2

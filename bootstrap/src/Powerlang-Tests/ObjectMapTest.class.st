@@ -4,13 +4,13 @@ Class {
 	#instVars : [
 		'kernel'
 	],
-	#category : #'Powerlang-Tests-Building'
+	#category : #'Powerlang-Tests-Bootstrap'
 }
 
 { #category : #running }
 ObjectMapTest >> setUp [
 	super setUp.
-	kernel := VirtualSmalltalkImage kernelSpec
+	kernel := PowertalkRingImage kernelSpec
 ]
 
 { #category : #running }

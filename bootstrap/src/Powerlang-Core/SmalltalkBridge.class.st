@@ -26,15 +26,17 @@ SmalltalkBridge >> findRootObjects [
 ]
 
 { #category : #initialization }
-SmalltalkBridge >> nil [
-	^nilObj
+SmalltalkBridge >> kernel [
+	^ self
+		objectNamed: #kernel
+		ifAbsent: [ self
+				update;
+				objectNamed: #kernel ]
 ]
 
 { #category : #initialization }
-SmalltalkBridge >> smalltalk [
-	^self
-		globalNamed: #Smalltalk
-		ifAbsent: [self update; globalNamed: #Smalltalk]
+SmalltalkBridge >> nil [
+	^nilObj
 ]
 
 { #category : #initialization }

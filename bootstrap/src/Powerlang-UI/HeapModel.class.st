@@ -21,14 +21,15 @@ HeapModel class >> defaultSpec [
 { #category : #specs }
 HeapModel class >> forSimulatedPst [
 	<example>
-	| builder writer labels |
-	builder := KernelSegmentBuilder new
-		initialize64BitImage;
-		generateModule;
-		bootstrapModule;
+	| vimage builder writer labels |
+	vimage := PowertalkRingImage fromSpec
+		wordSize: 8;
+		genesis;
+		bootstrap.
+	builder := vimage builder.
+	builder
 		fillClasses;
-		nativizeForDMR;
-		addGenesisObjects.
+		nativizeForLMR.
 	writer := builder writer write.
 	labels := Dictionary new.
 	builder classes
@@ -121,7 +122,7 @@ HeapModel >> initialize [
 	| start |
 	super initialize.
 	names := Dictionary new.
-	start := ImageSegmentWriter objectsOffset.
+	start := #ImageSegmentWriter objectsOffset.
 	names
 		at: start + 16r8 put: 'nil';
 		at: start + 16r10 put: 'true';

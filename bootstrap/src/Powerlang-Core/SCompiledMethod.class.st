@@ -4,7 +4,7 @@ Class {
 	#type : #variable,
 	#instVars : [
 		'format',
-		'nativeCode',
+		'optimizedCode',
 		'astcodes',
 		'class',
 		'selector',
@@ -100,10 +100,15 @@ SCompiledMethod >> copyWithLiterals: aCollection [
 		astcodes: astcodes;
 		classBinding: class;
 		format: format;
-		nativeCode: nativeCode;
+		optimizedCode: optimizedCode;
 		selector: selector;
 		source: source;
 		yourself
+]
+
+{ #category : #constants }
+SCompiledMethod >> dynamicVariableNamed: aSymbol [
+	^class dynamicVariableNamed: aSymbol
 ]
 
 { #category : #constants }
@@ -195,13 +200,13 @@ SCompiledMethod >> literals [
 ]
 
 { #category : #accessing }
-SCompiledMethod >> nativeCode [
-	^nativeCode
+SCompiledMethod >> optimizedCode [
+	^optimizedCode
 ]
 
 { #category : #accessing }
-SCompiledMethod >> nativeCode: aNativeCode [ 
-	nativeCode := aNativeCode 
+SCompiledMethod >> optimizedCode: anObject [
+	optimizedCode := anObject
 ]
 
 { #category : #constants }
@@ -209,9 +214,19 @@ SCompiledMethod >> pragma: aPragmaNode [
 
 ]
 
+{ #category : #accessing }
+SCompiledMethod >> prepareForExecution [
+	optimizedCode ifNil: [ optimizedCode := self sexpressions ].
+	^ optimizedCode
+]
+
 { #category : #printing }
 SCompiledMethod >> printOn: aStream [
-	aStream nextPutAll: self classBinding name; nextPutAll: '>>'; print: selector; cr.
+	aStream
+		print: self classBinding;
+		nextPutAll: '>>';
+		print: selector;
+		cr.
 	source
 		ifNotNil: [ aStream
 				cr;

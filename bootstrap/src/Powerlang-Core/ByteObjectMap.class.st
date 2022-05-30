@@ -5,7 +5,7 @@ Class {
 		'bytes',
 		'hash'
 	],
-	#category : #'Powerlang-Core-Building'
+	#category : #'Powerlang-Core-Execution-Ring'
 }
 
 { #category : #'instance creation' }
@@ -31,7 +31,9 @@ ByteObjectMap class >> new: anRGBehavior valued: bytes [
 
 { #category : #testing }
 ByteObjectMap >> asString [
-	^ bytes allButLast asString
+	| string |
+	string := bytes allButLast asString.
+	^spec name = #String ifTrue: [ string ] ifFalse: [ string asSymbol ]
 ]
 
 { #category : #accessing }

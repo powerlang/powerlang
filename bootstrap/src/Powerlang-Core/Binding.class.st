@@ -48,6 +48,11 @@ Binding >> isConstantBinding [
 ]
 
 { #category : #testing }
+Binding >> isDynamic [
+	^false
+]
+
+{ #category : #testing }
 Binding >> isGlobal [
 	^false
 ]
@@ -98,11 +103,6 @@ Binding >> isTemporary [
 ]
 
 { #category : #testing }
-Binding >> isUnresolved [
-	^false
-]
-
-{ #category : #testing }
 Binding >> literal [
 	^nil
 ]
@@ -118,8 +118,17 @@ Binding >> name: aString [
 ]
 
 { #category : #printing }
+Binding >> printNameOn: aStream [
+		aStream
+		print: name
+
+]
+
+{ #category : #printing }
 Binding >> printOn: aStream [
-	aStream nextPutAll: name; nextPutAll: ' ('.
+	self printNameOn: aStream.
+	aStream
+		nextPutAll: ' ('.
 	super printOn: aStream.
 	aStream nextPutAll: ')'
 ]

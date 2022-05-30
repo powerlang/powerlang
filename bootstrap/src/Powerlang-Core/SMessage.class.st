@@ -5,7 +5,8 @@ Class {
 		'selector',
 		'receiver',
 		'arguments',
-		'opcodes'
+		'cache',
+		'inlined'
 	],
 	#category : #'Powerlang-Core-SExpressions'
 }
@@ -28,6 +29,11 @@ SMessage >> acceptVisitor: visitor [
 	^visitor visitMessage: self
 ]
 
+{ #category : #accessing }
+SMessage >> argumentCount [
+	^arguments size
+]
+
 { #category : #printing }
 SMessage >> arguments [
 	^arguments
@@ -39,14 +45,46 @@ SMessage >> arguments: aCollection [
 ]
 
 { #category : #printing }
+SMessage >> cache: anSCompiledMethod when: type [
+	cache
+		ifNil: [ ^ cache := Array with: type with:
+			anSCompiledMethod].
+	cache := cache
+		,
+			(Array with: type with: 
+			anSCompiledMethod)
+]
+
+{ #category : #printing }
+SMessage >> cacheUndermessage: aBlockClosure [
+	cache := aBlockClosure
+]
+
+{ #category : #printing }
+SMessage >> cachedUndermessage [
+	^cache class == BlockClosure ifTrue: [ cache ]
+]
+
+{ #category : #printing }
+SMessage >> flushCache [
+	cache := nil
+]
+
+{ #category : #printing }
 SMessage >> initialize [
 	super initialize.
-	arguments := #()
+	arguments := #().
+	inlined := false
+]
+
+{ #category : #private }
+SMessage >> inlined: aBoolean [
+	inlined := aBoolean
 ]
 
 { #category : #printing }
 SMessage >> isInlined [
-	^opcodes = #inlined
+	^ inlined
 ]
 
 { #category : #printing }
@@ -55,18 +93,14 @@ SMessage >> isMessage [
 ]
 
 { #category : #printing }
-SMessage >> isOptimized [
-	^opcodes notNil
-]
-
-{ #category : #private }
-SMessage >> opcodes [
-	^opcodes
-]
-
-{ #category : #private }
-SMessage >> opcodes: aCollection [
-	opcodes := aCollection
+SMessage >> methodFor: requiredType [
+	| type |
+	cache ifNil: [ ^ nil ].
+	1 to: cache size by: 2 do: [ :i | 
+		type := cache at: i.
+		type == requiredType
+			ifTrue: [ ^ cache at: i + 1 ] ].
+	^ nil
 ]
 
 { #category : #printing }
@@ -88,6 +122,11 @@ SMessage >> receiver [
 { #category : #printing }
 SMessage >> receiver: anSExpression [
 	receiver := anSExpression
+]
+
+{ #category : #printing }
+SMessage >> registerCacheWith: runtime [
+	cache ifNil: [ runtime registerCache: self for: selector ]
 ]
 
 { #category : #printing }

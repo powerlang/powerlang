@@ -45,7 +45,7 @@ SMethod >> primitive [
 { #category : #printing }
 SMethod >> printOn: aStream indent: anInteger [
 	aStream nextPutAll: '{MethodId. '; cr.
-	pragma ifNotNil: [ pragma printOn: aStream indent: anInteger + 1 ].
+	pragma ifNotNil: [ (pragma isKindOf: SExpression) ifTrue: [ pragma printOn: aStream indent: anInteger + 1] ifFalse: [ aStream tab: anInteger + 1; print: pragma ] ].
 	super printOn: aStream indent: anInteger.
 	aStream nextPutAll: '}'
 ]

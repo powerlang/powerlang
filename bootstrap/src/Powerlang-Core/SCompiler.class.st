@@ -4,9 +4,7 @@ Class {
 	#instVars : [
 		'errorHandler',
 		'result',
-		'class',
-		'pools',
-		'namespace'
+		'class'
 	],
 	#category : #'Powerlang-Core-SCompiler'
 }
@@ -24,35 +22,10 @@ SCompiler class >> forClass: aClass [
 ]
 
 { #category : #services }
-SCompiler class >> namespace: aDictionary [
-	^self basicNew initialize: aDictionary
-]
-
-{ #category : #'instance creation' }
-SCompiler class >> new [
-	^self namespace: Smalltalk globals
-]
-
-{ #category : #services }
 SCompiler class >> parse: aString in: aClass [
 	| compiler |
 	compiler := self forClass: aClass.
 	^compiler parse: aString
-]
-
-{ #category : #initialization }
-SCompiler >> addPool: aPoolDictionary [
-	| dict |
-	dict := DynamicBinder on: aPoolDictionary.
-	pools add: dict
-
-]
-
-{ #category : #initialization }
-SCompiler >> addPool: aDictionary of: type [
-	| dict |
-	dict := DynamicBinder on: aDictionary of: type.
-	pools add: dict
 ]
 
 { #category : #testing }
@@ -63,6 +36,11 @@ SCompiler >> canBeInIdentifier: aCharacter [
 { #category : #testing }
 SCompiler >> canStartIdentifier: aCharacter [
 	^aCharacter isLetter or: [aCharacter = $_]
+]
+
+{ #category : #initialization }
+SCompiler >> classBinding [
+	 ^class
 ]
 
 { #category : #initialization }
@@ -89,23 +67,7 @@ SCompiler >> forClass: aClass [
 
 { #category : #initialization }
 SCompiler >> initialize: aDictionary [
-	namespace := aDictionary.
-	class := aDictionary at: #UndefinedObject ifAbsent: nil.
-	pools := OrderedCollection new
-]
-
-{ #category : #initialization }
-SCompiler >> namespace: aDictionary [
-	namespace := aDictionary
-]
-
-{ #category : #initialization }
-SCompiler >> newScope [
-	^MethodScope new
-		namespace: namespace;
-		species: class;
-		addPoolBinders: pools
-
+	class := aDictionary at: #UndefinedObject ifAbsent: nil
 ]
 
 { #category : #services }

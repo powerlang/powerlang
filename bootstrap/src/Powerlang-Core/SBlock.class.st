@@ -60,8 +60,13 @@ SBlock >> inlinedArgs: anArray [
 ]
 
 { #category : #initialization }
+SBlock >> isBlock [
+	^true
+]
+
+{ #category : #initialization }
 SBlock >> isInlined [
-	^compiledCode isNil
+	^ compiledCode isNil
 ]
 
 { #category : #accessing }
@@ -70,9 +75,8 @@ SBlock >> offsetOfCurrentEnvironment [
 ]
 
 { #category : #accessing }
-SBlock >> offsetOfEnvironment: anInteger [
-	(anInteger = 1 and: [ self capturesHome ]) ifTrue: [ ^ 0 ].
-	^ 2
+SBlock >> optimizedCode [
+	^compiledCode optimizedCode
 ]
 
 { #category : #unclassified }

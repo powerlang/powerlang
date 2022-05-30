@@ -80,13 +80,13 @@ CompiledMethodMirror >> isValid [
 ]
 
 { #category : #constants }
-CompiledMethodMirror >> nativeCode [
-	^self getInstVarNamed: #nativeCode
+CompiledMethodMirror >> nativeCodeBytes [
+	^self optimizedCode slotAt: 1
 ]
 
 { #category : #constants }
-CompiledMethodMirror >> nativeCodeBytes [
-	^self nativeCode slotAt: 1
+CompiledMethodMirror >> optimizedCode [
+	^self getInstVarNamed: #optimizedCode
 ]
 
 { #category : #printing }

@@ -15,6 +15,6 @@ STrueBinding >> value [
 ]
 
 { #category : #printing }
-STrueBinding >> valueWithin: evaluator [
-	^evaluator trueLiteral
+STrueBinding >> valueWithin: anEvaluationContext [
+	^ anEvaluationContext true
 ]

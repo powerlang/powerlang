@@ -10,8 +10,8 @@ SBinding class >> decodeUsing: anAstcodeDecoder [
 ]
 
 { #category : #testing }
-SBinding >> assign: value within: evaluator [
-	^self subclassResponsibility
+SBinding >> assign: value within: aPowertalkRuntime [
+	^ self subclassResponsibility
 ]
 
 { #category : #testing }
@@ -32,6 +32,11 @@ SBinding >> isClassBinding [
 { #category : #testing }
 SBinding >> isClassVar [
 	^false
+]
+
+{ #category : #testing }
+SBinding >> isDynamic [
+	^ false
 ]
 
 { #category : #testing }
@@ -70,6 +75,6 @@ SBinding >> name [
 ]
 
 { #category : #testing }
-SBinding >> valueWithin: evaluator [
-	^self subclassResponsibility
+SBinding >> valueWithin: anEvaluationContext [
+	^ self subclassResponsibility
 ]
