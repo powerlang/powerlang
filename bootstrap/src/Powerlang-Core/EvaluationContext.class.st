@@ -167,15 +167,14 @@ EvaluationContext >> staticBindingFor: symbol inModule: module [
 
 { #category : #accessing }
 EvaluationContext >> staticBindingForCvar: aSymbol [
-	| species cvars namespace nilObj |
+	| species namespaces namespace nilObj |
 	species := system methodClassBinding: self method.
 	nilObj := system nil.
-	[ cvars := system speciesClassVariables: species.
-	cvars = nilObj
-		ifFalse: [ 1 to: cvars size do: [ :i | 
-				namespace := cvars at: i.
-				(system lookupAssociationFor: aSymbol in: namespace)
-					ifNotNil: [ :assoc | ^ SAssociationBinding new association: assoc ] ] ].
+	[ namespaces := system speciesNamespaces: species.
+	1 to: namespaces size do: [ :i | 
+		namespace := namespaces at: i. 
+		(system lookupAssociationFor: aSymbol in: namespace)
+			ifNotNil: [ :assoc | ^ SAssociationBinding new association: assoc ] ].
 	species := system speciesSuperclass: species.
 	species = nilObj ] whileFalse.
 	^ nil

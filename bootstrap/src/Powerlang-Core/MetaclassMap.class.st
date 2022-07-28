@@ -16,11 +16,6 @@ MetaclassMap >> class: aClassMap [
 ]
 
 { #category : #'accessing - parallel hierarchy' }
-MetaclassMap >> classVariables [
-	^ self instanceSide classVariables
-]
-
-{ #category : #'accessing - parallel hierarchy' }
 MetaclassMap >> computeAllSlotNames [
 	| c |
 	c := spec environment at: #Metaclass.
@@ -38,13 +33,13 @@ MetaclassMap >> instanceSide [
 ]
 
 { #category : #'accessing - parallel hierarchy' }
-MetaclassMap >> localPools [
-	^ self instanceSide localPools
+MetaclassMap >> module [
+	^ self instanceSide module
 ]
 
 { #category : #'accessing - parallel hierarchy' }
-MetaclassMap >> module [
-	^ self instanceSide module
+MetaclassMap >> namespaces [
+	^ self instanceSide namespaces
 ]
 
 { #category : #'accessing - parallel hierarchy' }

@@ -230,11 +230,12 @@ PowertalkRingModule >> fillSpecies: species with: classDefinition [
 
 { #category : #initialization }
 PowertalkRingModule >> fillSymbols [
-	| table namespace cvars |
-	namespace := (self classNamed: #Symbol) classVariables.
-	cvars := namespace at: 1.
+	| table namespaces cvars |
+	namespaces := (self classNamed: #Symbol) namespaces.
+	cvars := namespaces at: 1.
 	table := cvars at: 'SymbolTable'.
-	symbols do: [ :sym | kernel runtime sendLocal: #add: to: table with: {sym} ]
+	symbols
+		do: [ :sym | kernel runtime sendLocal: #add: to: table with: {sym} ]
 ]
 
 { #category : #initialization }
@@ -293,8 +294,7 @@ PowertalkRingModule >> initializeBehavior: anObjectMap [
 
 { #category : #building }
 PowertalkRingModule >> initializeClass: definition superclass: superclass superbehavior: superbehavior [
-	| class name flag ivars cvars poolnames pools subclasses format |
-
+	| class name flag ivars namespaces subclasses format |
 	class := classes at: definition.
 	class instanceBehavior next: superbehavior.
 	subclasses := definition subclasses
@@ -304,18 +304,15 @@ PowertalkRingModule >> initializeClass: definition superclass: superclass superb
 	flag := self formatOfClass: definition.
 	format := kernel newInteger: flag.
 	ivars := kernel newStringArray: definition instVarNames.
-	cvars := kernel createBootstrapCVars: definition.
-	poolnames := definition sharedPools collect: #name.
-	pools := kernel newStringArray: poolnames.
+	namespaces := kernel createClassNamespaces: definition.
 	class
 		superclass: superclass;
 		format: format;
 		instanceVariables: ivars;
-		classVariables: cvars;
+		namespaces: namespaces;
 		organization: nilObj;
 		name: name;
 		subclasses: subclasses;
-		sharedPools: pools;
 		module: module.
 	definition metaclass allInstVarNames
 		do: [ :ivar | class slotNamed: ivar put: nilObj ]

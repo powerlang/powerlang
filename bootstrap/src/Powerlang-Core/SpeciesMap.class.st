@@ -34,22 +34,16 @@ SpeciesMap >> instanceSpec: anRGBehavior [
 ]
 
 { #category : #accessing }
-SpeciesMap >> localPools [
-	^self subclassResponsibility
-]
-
-{ #category : #accessing }
 SpeciesMap >> storeCvar: aSymbol with: anObject [
-	| species cvars |
+	| species namespaces |
 	species := self. 
-	[ cvars := species classVariables.
-	cvars isNil ifFalse: [ 
-	(cvars includesKey: aSymbol)
-		ifTrue: [ ^ cvars at: aSymbol put: anObject ].
-	species localPools
-		do: [ :pool | pool at: aSymbol ifPresent: [ :value | ^ value ] ]].
+	[ namespaces := species namespaces.
+	namespaces slotsDo: [ :namespace |
+	(namespace includesKey: aSymbol)
+		ifTrue: [ ^ namespace at: aSymbol put: anObject ]].
 	species := species superclass.
-	species isNil ] whileFalse.
+	species isNil 
+	] whileFalse.
 	^ nil
 
 
