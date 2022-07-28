@@ -36,7 +36,7 @@ JSTranspiler >> outputDirectory [
 		self new outputDirectory path pathString
 	"
 
-	^ self rootDirectory / 'LMRjs'
+	^ self rootDirectory / 'LMRjs' / 'interpreter'
 ]
 
 { #category : #'as yet unclassified' }
@@ -46,16 +46,21 @@ JSTranspiler >> rootDirectory [
 
 { #category : #transpiling }
 JSTranspiler >> transpileClass: aClass [
-	| filename |
-	filename := self outputDirectory / (aClass name, '.js').
-	filename writeStreamDo: [:ws | ws truncate. self transpileClass: aClass into: ws]
+	| filename ws |
+	filename := self outputDirectory / (aClass name , '.js').
+	filename
+		writeStreamDo: [ :s | 
+			s truncate.
+			ws := ZnNewLineWriterStream on: s.
+			self transpileClass: aClass into: ws ]
 ]
 
 { #category : #transpiling }
 JSTranspiler >> transpileClass: aClass into: ws [
 	self transpileClassDefinition: aClass into: ws.
 	aClass methods
-		do: [ :m | 
+		reject: [ :m | m selector beginsWith: #print ]
+		thenDo: [ :m |
 			JSMethodTranspiler new
 				method: m;
 				stream: ws;
@@ -64,13 +69,25 @@ JSTranspiler >> transpileClass: aClass into: ws [
 		nextPutAll: '}';
 		cr;
 		cr;
-		nextPutAll: 'module.exports = ';
-		nextPutAll: aClass name; cr
+		nextPutAll: 'export default ';
+		nextPutAll: aClass name;
+		cr
 ]
 
 { #category : #transpiling }
 JSTranspiler >> transpileClassDefinition: aClass into: ws [
-	ws cr;
+	| supername |
+	supername := aClass superclass name.
+	supername != 'Object'
+		ifTrue: [ ws
+				cr;
+				nextPutAll: 'import ';
+				nextPutAll: supername;
+				nextPutAll: ' from ''./';
+				nextPutAll: supername;
+				nextPutAll: '.js'';';
+				cr ].
+	ws cr
 		nextPutAll: 'let ';
 		nextPutAll: aClass name;
 		nextPutAll: ' = class '.
