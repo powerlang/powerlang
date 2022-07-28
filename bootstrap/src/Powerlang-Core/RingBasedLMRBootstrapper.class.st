@@ -137,7 +137,7 @@ RingBasedLMRBootstrapper >> createNewBlock: sblock [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> createNewClassFrom: spec [
-	| superclass metaclass class instanceBehavior classBehavior |
+	| superclass metaclass class instanceBehavior classBehavior ivars |
 	superclass := self => spec superclass name.
 	metaclass := dest
 		sendLocal: #newSubclassOf:
@@ -145,6 +145,8 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec [
 		with: {superclass}.
 	class := dest sendLocal: #instanceClass to: metaclass.
 	dest sendLocal: #name: to: class with: {(dest newString: spec name)}.
+	ivars := self transferLiteral: spec instVarNames.
+	dest sendLocal: #instVarNames: to: class with:  { ivars }.
 	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
 	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
 	behaviors
@@ -265,8 +267,8 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	index := (source => #Species) allInstVarNames
 		indexOf: 'instanceBehavior'.
 	dest speciesInstanceBehaviorIndex: index.
-	index := (source => #Class) allInstVarNames indexOf: 'classVariables'.
-	dest classClassVariablesIndex: index.
+	index := (source => #Class) allInstVarNames indexOf: 'namespaces'.
+	dest classNamespacesIndex: index.
 	index := (source => #Species) allInstVarNames indexOf: 'format'.
 	dest speciesFormatIndex: index.
 	index := (source => #Module) allInstVarNames indexOf: 'namespace'.
@@ -368,7 +370,7 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 RingBasedLMRBootstrapper >> initializeSymbolTable [
 	| symbol namespaces cvars table mapped |
 	symbol := source classNamed: #Symbol.
-	namespaces := symbol classVariables.
+	namespaces := symbol namespaces.
 	cvars := namespaces at: 1.
 	table := cvars at: #SymbolTable.
 	mapped := mapping at: table.

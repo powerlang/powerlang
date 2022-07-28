@@ -28,7 +28,6 @@ Class {
 		'blockClass',
 		'speciesIvarsIndex',
 		'dictionaryTableIndex',
-		'classClassVariablesIndex',
 		'metaclassInstanceClassIndex',
 		'classModuleIndex',
 		'moduleNamespaceIndex',
@@ -38,7 +37,8 @@ Class {
 		'closureClass',
 		'lastHash',
 		'blockMethodIndex',
-		'behaviorClass'
+		'behaviorClass',
+		'classNamespacesIndex'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -183,11 +183,6 @@ PowertalkLMR >> byteArrayClass: anLMRObject [
 ]
 
 { #category : #initialization }
-PowertalkLMR >> classClassVariablesIndex: anInteger [
-	classClassVariablesIndex := anInteger
-]
-
-{ #category : #initialization }
 PowertalkLMR >> classIvars: anLMRObject [
 	^ anLMRObject slotAt: speciesIvarsIndex
 ]
@@ -210,6 +205,11 @@ PowertalkLMR >> className: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> classNameIndex: anInteger [
 	classNameIndex := anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> classNamespacesIndex: anInteger [
+	classNamespacesIndex := anInteger
 ]
 
 { #category : #initialization }
@@ -619,6 +619,8 @@ PowertalkLMR >> print: anLMRObject on: aStream [
 	name := self speciesLocalName: species.
 	name = 'Symbol'
 		ifTrue: [ ^ aStream nextPutAll: '<#' , anLMRObject asLocalString , '>' ].
+	name = 'String'
+		ifTrue: [ ^ aStream nextPutAll: '<''' , anLMRObject asLocalString , '''>' ].
 	aStream
 		nextPut: $<;
 		nextPutAll: name withArticle;
@@ -681,13 +683,6 @@ PowertalkLMR >> smallIntegerBehavior [
 { #category : #initialization }
 PowertalkLMR >> smallIntegerClass: anLMRObject [
 	smallIntegerClass := anLMRObject
-]
-
-{ #category : #initialization }
-PowertalkLMR >> speciesClassVariables: anLMRObject [
-	| class |
-	class := self speciesInstanceClass: anLMRObject.
-	^class slotAt: classClassVariablesIndex
 ]
 
 { #category : #initialization }
@@ -757,6 +752,13 @@ PowertalkLMR >> speciesModule: species [
 		ifFalse: [ ^ self classModule: species ].
 	class := self metaclassInstanceClass: species.
 	^ self classModule: class
+]
+
+{ #category : #initialization }
+PowertalkLMR >> speciesNamespaces: anLMRObject [
+	| class |
+	class := self speciesInstanceClass: anLMRObject.
+	^class slotAt: classNamespacesIndex
 ]
 
 { #category : #initialization }

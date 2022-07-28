@@ -10,16 +10,6 @@ ClassMap >> allInstVarNames [
 ]
 
 { #category : #accessing }
-ClassMap >> classVariables [
-	^ self slotNamed: #classVariables
-]
-
-{ #category : #accessing }
-ClassMap >> classVariables: aDictionaryMap [
-	^ self slotNamed: #classVariables put: aDictionaryMap
-]
-
-{ #category : #accessing }
 ClassMap >> computeAllSlotNames [
 	| c |
 	c := spec environment at: #Class.
@@ -32,24 +22,18 @@ ClassMap >> instanceSide [
 ]
 
 { #category : #accessing }
-ClassMap >> localPools [
-	| pools dict name vars |
-	dict := Dictionary new.
-	vars := self classVariables.
-	vars isNil
-		ifTrue: [ ^ dict ].
-	pools := vars associations
-		select: [ :assoc | assoc value isDictionaryMap ].
-	pools
-		do: [ :assoc | 
-			name := assoc key asString.
-			dict at: name put: assoc value ].
-	^ dict
+ClassMap >> name [
+	^instanceSpec name
 ]
 
 { #category : #accessing }
-ClassMap >> name [
-	^instanceSpec name
+ClassMap >> namespaces [
+	^ self slotNamed: #namespaces
+]
+
+{ #category : #accessing }
+ClassMap >> namespaces: array [
+	^ self slotNamed: #namespaces put: array
 ]
 
 { #category : #accessing }

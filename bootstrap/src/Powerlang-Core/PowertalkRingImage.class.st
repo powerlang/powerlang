@@ -32,19 +32,6 @@ PowertalkRingImage >> builder [
 ]
 
 { #category : #accessing }
-PowertalkRingImage >> createBootstrapCVars: spec [
-	| names cvars array |
-	names := spec classVariables.
-	names isEmpty
-		ifTrue: [ ^ nilObj ].
-	cvars := self newBootstrapDictionaryOf: self => #Dictionary.
-	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
-	array := self newArraySized: 1.
-	array at: 1 put: cvars.
-	^ array
-]
-
-{ #category : #accessing }
 PowertalkRingImage >> createBootstrapNamespace [
 	| namespace |
 	namespace := self newBootstrapDictionaryOf: self => #Namespace.
@@ -53,6 +40,19 @@ PowertalkRingImage >> createBootstrapNamespace [
 		at: #WordSize put: wordSize;
 		at: #LastHash put: 1.
 	classes do: [ :c | namespace at: c name asSymbol put: c ]
+]
+
+{ #category : #accessing }
+PowertalkRingImage >> createClassNamespaces: spec [
+	| names cvars array |
+	names := spec classVariables.
+	names isEmpty
+		ifTrue: [ ^ self newArraySized: 0 ].
+	cvars := self newBootstrapDictionaryOf: self => #Namespace.
+	names do: [ :rgVar | cvars at: rgVar name put: nilObj ].
+	array := self newArraySized: 1.
+	array at: 1 put: cvars.
+	^ array
 ]
 
 { #category : #building }

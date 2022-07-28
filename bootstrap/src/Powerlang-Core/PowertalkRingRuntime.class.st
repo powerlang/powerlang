@@ -332,11 +332,6 @@ PowertalkRingRuntime >> sexpressionsOf: anSCompiledMethod [
 ]
 
 { #category : #accessing }
-PowertalkRingRuntime >> speciesClassVariables: aSpeciesMap [
-	^ aSpeciesMap classVariables
-]
-
-{ #category : #accessing }
 PowertalkRingRuntime >> speciesFor: anObjectMap [
 	^ image speciesFor: anObjectMap spec
 ]
@@ -344,6 +339,11 @@ PowertalkRingRuntime >> speciesFor: anObjectMap [
 { #category : #accessing }
 PowertalkRingRuntime >> speciesModule: aSpeciesMap [
 	^ aSpeciesMap module
+]
+
+{ #category : #accessing }
+PowertalkRingRuntime >> speciesNamespaces: aSpeciesMap [
+	^ aSpeciesMap namespaces
 ]
 
 { #category : #accessing }
