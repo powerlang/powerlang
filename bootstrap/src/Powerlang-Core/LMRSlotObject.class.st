@@ -34,6 +34,11 @@ LMRSlotObject >> nilSlots: nilObj [
 ]
 
 { #category : #accessing }
+LMRSlotObject >> pointersSize [
+	^ header size
+]
+
+{ #category : #accessing }
 LMRSlotObject >> size [
 	^header size
 ]

@@ -79,8 +79,8 @@ PowertalkRingRuntime >> closureBlock: aClosureMap [
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> closureHome: aClosureMap [
-	^ aClosureMap home
+PowertalkRingRuntime >> closureHome: anObjectMap [
+	^ anObjectMap home
 ]
 
 { #category : #accessing }

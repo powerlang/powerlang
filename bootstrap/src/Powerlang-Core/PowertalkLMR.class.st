@@ -64,6 +64,7 @@ PowertalkLMR >> arrayClass: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> arrayedSizeOf: anLMRObject [
 	| species ivars |
+	anLMRObject isImmediate ifTrue: [ ^0 ].
 	species := self speciesFor: anLMRObject.
 	ivars := self speciesInstanceSize: species.
 	^anLMRObject size - ivars
@@ -159,12 +160,13 @@ PowertalkLMR >> blockMethodIndex: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> blockOptimizedCode: anLMRObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex
+
+	^ self methodOptimizedCode: anLMRObject
 ]
 
 { #category : #initialization }
 PowertalkLMR >> blockOptimizedCode: anLMRObject put: anObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject
+	^ self methodOptimizedCode: anLMRObject put: anObject
 ]
 
 { #category : #initialization }
@@ -437,12 +439,23 @@ PowertalkLMR >> methodInstSize: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex
+	| slot |
+	slot := anLMRObject slotAt: methodOptimizedCodeIndex.
+	^ slot == nilObj ifTrue: [ slot ] ifFalse: [ slot code ]
 ]
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject put: anObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject
+	| behavior header code |
+	behavior := self speciesInstanceBehavior: arrayClass.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: 0;
+		hash: 0.
+
+	code := LMRExecutableCode new header: header; code: anObject.
+	^ anLMRObject slotAt: methodOptimizedCodeIndex put: code
 ]
 
 { #category : #initialization }
@@ -529,6 +542,14 @@ PowertalkLMR >> newBytes: species size: anInteger [
 { #category : #initialization }
 PowertalkLMR >> newBytesOf: species sized: size [
 	^ self newBytes: species size: size
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newCharacter: aCharacter [
+	| value |
+	value := self newInteger: aCharacter asInteger.
+	^self sendLocal: #asCharacter to: value.
+
 ]
 
 { #category : #initialization }

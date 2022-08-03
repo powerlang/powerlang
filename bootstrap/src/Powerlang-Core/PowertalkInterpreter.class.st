@@ -115,6 +115,9 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #Behavior put: self primitiveBehavior;
 		at: #SetBehavior put: self primitiveSetBehavior;
 		at: #Class put: self primitiveClass;
+		at: #UnderHash put: self primitiveUnderHash;
+		at: #UnderIsBytes put: self primitiveUnderIsBytes;
+		at: #UnderPointersSize put: self primitiveUnderPointersSize;
 		at: #UnderSize put: self primitiveUnderSize;
 		at: #Size put: self primitiveSize;
 		at: #Hash put: self primitiveHash;
@@ -152,7 +155,6 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
 		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
-
 		at: #PrimeFor put: self primitivePrimeFor
 ]
 
@@ -489,6 +491,21 @@ PowertalkInterpreter >> primitiveStringReplaceFromToWithStartingAt [
 ]
 
 { #category : #primitives }
+PowertalkInterpreter >> primitiveUnderHash [
+	^ [ runtime newInteger: context self headerHash ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveUnderIsBytes [
+	^ [ runtime booleanFor: context self isBytes ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveUnderPointersSize [
+	^ [ runtime newInteger: context self pointersSize ]
+]
+
+{ #category : #primitives }
 PowertalkInterpreter >> primitiveUnderSize [
 	^ [ runtime newInteger: context self size ]
 ]
@@ -553,6 +570,16 @@ PowertalkInterpreter >> underprimitiveByteAt [
 	^ [ :receiver :arguments | 
 	result := receiver bytes at: arguments first value.
 	runtime newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveByteAtPut [
+
+	^ [ :receiver :arguments | 
+	receiver bytes
+		at: arguments first value
+		put: arguments second value.
+	arguments second ]
 ]
 
 { #category : #accessing }

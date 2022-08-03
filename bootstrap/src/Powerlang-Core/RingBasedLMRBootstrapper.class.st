@@ -331,7 +331,7 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string closure behavior |
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
@@ -344,6 +344,8 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	closure := mapping at: (source classNamed: #Closure).
 	behavior := mapping at: (source classNamed: #Behavior).
 	smi := mapping at: (source classNamed: #SmallInteger).
+	lpi := mapping at: (source classNamed: #LargePositiveInteger).
+	lni := mapping at: (source classNamed: #LargeNegativeInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
 	kernel := mapping at: source kernel.
@@ -355,6 +357,8 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		closureClass: closure;
 		behaviorClass_: behavior;
 		smallIntegerClass: smi;
+		largePositiveIntegerClass: lpi;
+		largeNegativeIntegerClass: lni;
 		stringClass: string;
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
@@ -538,5 +542,7 @@ RingBasedLMRBootstrapper >> transferLiteral: anObject [
 	anObject class == Array ifTrue: [ 
 		transferred := anObject collect: [ :o | self transferLiteral: o ].
 		^dest newArray: transferred ].
+	anObject isCharacter
+		ifTrue: [ ^ dest newCharacter: anObject ].
 	self ASSERT: false
 ]

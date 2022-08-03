@@ -39,6 +39,13 @@ ObjectMap >> arrayedSize [
 ]
 
 { #category : #accessing }
+ObjectMap >> behavior: aSlotObjectMap [
+	| class |
+	class := aSlotObjectMap slotAt: 1.
+	spec := class instanceSpec
+]
+
+{ #category : #accessing }
 ObjectMap >> bodySizeInBytes [
 	"Return the size of object body(s) in bytes,
 	 padded if a byte object"
