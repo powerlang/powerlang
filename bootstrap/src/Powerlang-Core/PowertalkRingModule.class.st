@@ -50,7 +50,7 @@ PowertalkRingModule class >> lmrBootstrapper [
 { #category : #accessing }
 PowertalkRingModule class >> lmrBootstrapperSpec [
 	^ LMRBootstrapperSpec
-		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: 'LMR' ]
+		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: 'Core' ]
 ]
 
 { #category : #'instance creation' }
@@ -70,7 +70,8 @@ PowertalkRingModule class >> readSpec: specName at: path [
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	repo := TonelRepository new
 		directory: root / 'specs' / current / subdir.
-	spec := repo asRingEnvironmentWith: {specName}.
+		
+	spec := repo asRingEnvironmentWith: {('.' split: specName) last}.
 	^ spec clean
 ]
 

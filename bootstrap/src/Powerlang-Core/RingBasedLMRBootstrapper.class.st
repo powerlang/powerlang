@@ -206,12 +206,16 @@ RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
 ]
 
 { #category : #paths }
-RingBasedLMRBootstrapper >> findModulePath: aSymbol [
-	| matches |
-	matches := self rootDirectory allDirectoriesMatching: aSymbol.
-	matches
-		ifEmpty: [ self error: 'module ' , aSymbol , ' couldn''t be found' ].
-	^ matches first relativeTo: self rootDirectory asAbsolute 
+RingBasedLMRBootstrapper >> findModulePath: moduleName [
+	| parts path candidates dir |
+	parts := '.' split: moduleName.
+	path := ('/' join: parts) asFileReference path.
+	candidates := self rootDirectory allDirectoriesMatching: parts first.
+	candidates do: [:match | 
+		dir := match parent / path pathString.
+		dir exists ifTrue: [ 	^dir relativeTo: self rootDirectory asAbsolute ]].
+	self error: 'module ' , moduleName , ' couldn''t be found'
+
 ]
 
 { #category : #building }
@@ -416,6 +420,7 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 	classes := classes
 		collect: [ :classSpec | self createNewClassFrom: classSpec ].
 	moduleSpec := spec at: symbol , #Module.
+	moduleSpec ifNil: [moduleSpec := source specs at: #Module].
 	module := self createNewModule: moduleSpec with: classes.
 	dest sendLocal: #loadRequiredModules to: module.
 	^ module
