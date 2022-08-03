@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Tests-Bootstrap'
 }
 
+{ #category : #accessing }
+PowertalkLMRBootstrapTest class >> defaultTimeLimit [
+	^ 1000 seconds
+]
+
 { #category : #tests }
 PowertalkLMRBootstrapTest >> setUp [
 	bootstrapper := PowertalkLMRTestResource new
@@ -25,4 +30,15 @@ PowertalkLMRBootstrapTest >> test010GenenerateKernelSegment [
 	module := bootstrapper loadBootstrapModule.
 	"runtime sendLocal: #writeModules to: module.
 	self assert: output exists"
+]
+
+{ #category : #tests }
+PowertalkLMRBootstrapTest >> test010WriteKernelAsJSON [
+	| output module result |
+	output := bootstrapper rootDirectory / 'LMRjs' / 'Kernel.json'.
+	output exists
+		ifTrue: [ output delete ].
+	module := bootstrapper loadBootstrapModule.
+	result := runtime sendLocal: #writeJSONKernel to: module.
+	self assert: output exists
 ]
