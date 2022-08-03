@@ -169,6 +169,7 @@ PowertalkInterpreter >> initializeUndermessages [
 		at: #_basicFlags put: self underprimitiveBasicFlags;
 		at: #_basicAt: put: self underprimitiveBasicAt;
 		at: #_byteAt: put: self underprimitiveByteAt;
+		at: #_byteAt:put: put: self underprimitiveByteAtPut;
 		at: #_basicHash put: self underprimitiveBasicHash;
 		at: #_basicHash: put: self underprimitiveBasicHashPut;
 		at: #_smallIntegerByteAt:
