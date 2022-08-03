@@ -140,6 +140,16 @@ PowertalkRingRuntime >> initializeEmulationOverrides [
 				do: [ :m | self override: class metaclass name with: m ] ]
 ]
 
+{ #category : #services }
+PowertalkRingRuntime >> integerFrom: anObjectMap [
+	anObjectMap isImmediate
+		ifTrue: [ ^ anObjectMap value ].
+		self halt.
+	^ anObjectMap spec name == #LargePositiveInteger
+		ifTrue: [ anObjectMap bytes asLittleEndianPositiveInteger ]
+		ifFalse: [ anObjectMap bytes asLittleEndianNegativeInteger ]
+]
+
 { #category : #accessing }
 PowertalkRingRuntime >> isBlock: anSCompiledMethod [
 	^anSCompiledMethod isBlock

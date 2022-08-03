@@ -38,7 +38,9 @@ Class {
 		'lastHash',
 		'blockMethodIndex',
 		'behaviorClass',
-		'classNamespacesIndex'
+		'classNamespacesIndex',
+		'largePositiveIntegerClass',
+		'largeNegativeIntegerClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -282,6 +284,18 @@ PowertalkLMR >> initialize [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> integerFrom: anLMRObject [
+	| behavior class |
+	anLMRObject isImmediate
+		ifTrue: [ ^ anLMRObject value].
+	behavior := self behaviorOf: anLMRObject.
+	class := self behaviorClass: behavior.
+	^ class == largePositiveIntegerClass
+		ifTrue: [ anLMRObject bytes asLittleEndianPositiveInteger ]
+		ifFalse: [ anLMRObject bytes asLittleEndianNegativeInteger ]
+]
+
+{ #category : #initialization }
 PowertalkLMR >> isBlock: compiledCode [
 	^ (self behaviorClass: compiledCode behavior) ==
 	blockClass 
@@ -305,6 +319,16 @@ PowertalkLMR >> kernel: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> knownSymbols: associations [
 	knownSymbols := Dictionary withAll: associations
+]
+
+{ #category : #initialization }
+PowertalkLMR >> largeNegativeIntegerClass: anLMRObject [
+	largeNegativeIntegerClass := anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> largePositiveIntegerClass: anLMRObject [
+	largePositiveIntegerClass := anLMRObject
 ]
 
 { #category : #initialization }
@@ -543,6 +567,30 @@ PowertalkLMR >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
 
 	^ LMRSmallInteger new value: anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newLargeNegativeInteger: anInteger [
+	| size bytes byte result |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	bytes := ByteArray new: size withAll: 16rFF.
+	1 to: anInteger bytesCount do: [ :i | 
+		byte := anInteger byteAt: i.
+		byte > 0
+			ifTrue: [ byte := 256 - byte ].
+		bytes at: i put: byte ].
+	result := self newBytes: largeNegativeIntegerClass size: size.
+	^result bytes: bytes
+
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newLargePositiveInteger: anInteger [
+	| size bytes result |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	bytes := anInteger asByteArrayOfSize: size.
+	result := self newBytes: largePositiveIntegerClass size: size.
+	^ result bytes: bytes
 ]
 
 { #category : #initialization }

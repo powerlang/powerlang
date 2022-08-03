@@ -433,7 +433,9 @@ PowertalkInterpreter >> primitiveSMIIntQuot [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIMinus [
 	^ [ runtime
-		newInteger: context self value - context firstArgument value ]
+		newInteger:
+			context self value
+				- (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
@@ -445,7 +447,9 @@ PowertalkInterpreter >> primitiveSMINotEqual [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIPlus [
 	^ [ runtime
-		newInteger: context self value + context firstArgument value ]
+		newInteger:
+			context self value
+				+ (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
