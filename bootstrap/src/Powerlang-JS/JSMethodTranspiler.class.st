@@ -5,14 +5,22 @@ Class {
 		'stream',
 		'method',
 		'tabs',
-		'currentBlock'
+		'currentBlock',
+		'imports'
 	],
 	#category : #'Powerlang-JS'
 }
 
+{ #category : #visiting }
+JSMethodTranspiler >> imports [
+	^ imports
+]
+
 { #category : #initialization }
 JSMethodTranspiler >> initialize [
-	tabs := 2
+	tabs := 2.
+	stream := '' writeStream.
+	imports := OrderedCollection new
 ]
 
 { #category : #accessing }
@@ -45,6 +53,11 @@ JSMethodTranspiler >> methodSignatureFrom: anRBMethodNode [
 			s nextPutAll: ')' ]
 ]
 
+{ #category : #visiting }
+JSMethodTranspiler >> result [
+	^stream contents
+]
+
 { #category : #accessing }
 JSMethodTranspiler >> stream [
 	^ stream
@@ -57,9 +70,22 @@ JSMethodTranspiler >> stream: aWriteStream [
 
 { #category : #visiting }
 JSMethodTranspiler >> translateIdentifier: aString [
-	aString = 'arguments' ifTrue: [ ^'_arguments' ].
-	aString = 'class' ifTrue: [ ^'_class' ].
-	^aString
+	aString = 'arguments'
+		ifTrue: [ ^ '_arguments' ].
+	aString = 'class'
+		ifTrue: [ ^ '_class' ].
+	aString = 'Dictionary'
+		ifTrue: [ ^ 'Map' ].
+	aString = 'IdentityDictionary'
+		ifTrue: [ ^ 'Map' ].
+		
+	aString = 'OrderedCollection'
+		ifTrue: [ ^ 'Array' ].
+	aString = 'ByteArray'
+		ifTrue: [ ^ 'Array' ].
+	aString = 'BlockClosure'
+		ifTrue: [ ^ 'Function' ].
+	^ aString
 ]
 
 { #category : #accessing }
@@ -110,8 +136,7 @@ JSMethodTranspiler >> transpileSelector: selector [
 						ifTrue: [ token ]
 						ifFalse: [ token capitalized ].
 					s nextPutAll: part.
-					first := false ].
-			]
+					first := false ]. (selector last == $:) ifTrue: [s nextPut: $_]]
 ]
 
 { #category : #visiting }
@@ -137,22 +162,30 @@ JSMethodTranspiler >> visitAssignmentNode: anRBAssignmentNode [
 
 { #category : #visiting }
 JSMethodTranspiler >> visitBlockNode: anRBBlockNode [
-	| prev translated |
+	| prev translated statements last |
 	prev := currentBlock.
 	currentBlock := anRBBlockNode.
 	tabs := tabs + 1.
-	stream nextPutAll: 'function ('.
+	stream nextPutAll: '('.
 	anRBBlockNode arguments
-		do: [ :arg | translated := self translateIdentifier: arg name. stream nextPutAll: translated ]
+		do: [ :arg | 
+			translated := self translateIdentifier: arg name.
+			stream nextPutAll: translated ]
 		separatedBy: [ stream nextPutAll: ', ' ].
 	stream
-		nextPutAll: ') {';
+		nextPutAll: ') => {';
 		crtab: tabs.
-	anRBBlockNode statements
-		do: [ :statement | 
-			statement acceptVisitor: self.
-			stream nextPut: $; ]
-		separatedBy: [ stream crtab: tabs ].
+	statements := anRBBlockNode statements.
+	statements isEmpty
+		ifFalse: [ statements allButLast
+				do: [ :statement | 
+					statement acceptVisitor: self.
+					stream nextPut: $; ; crtab: tabs].
+			last := statements last.
+			last isReturn
+				ifFalse: [ stream nextPutAll: 'return ' ].
+			last acceptVisitor: self.
+			stream nextPut: $; ].
 	tabs := tabs - 1.
 	stream
 		crtab: tabs;
@@ -203,17 +236,16 @@ JSMethodTranspiler >> visitCascadeNode: anRBCascadeNode [
 JSMethodTranspiler >> visitGlobalNode: anRBGlobalNode [
 	| translated |
 	translated := self translateIdentifier: anRBGlobalNode name.
-
+	anRBGlobalNode binding isClassVariable ifFalse: [imports  add: translated].
 	stream nextPutAll: translated
 ]
 
 { #category : #visiting }
 JSMethodTranspiler >> visitInstanceVariableNode: anRBInstanceVariableNode [
 	| translated |
-	translated := self translateIdentifier: anRBInstanceVariableNode  name.
-
+	translated := self translateIdentifier: anRBInstanceVariableNode name.
 	stream
-		nextPutAll: 'this.';
+		nextPutAll: 'this._';
 		nextPutAll: translated
 ]
 
@@ -252,32 +284,46 @@ JSMethodTranspiler >> visitMessageNode: anRBMessageNode [
 
 { #category : #visiting }
 JSMethodTranspiler >> visitMethodNode: anRBMethodNode [
-	| signature nonlocal |
+	| signature nonlocal temps statements |
 	signature := self methodSignatureFrom: anRBMethodNode.
 	stream
 		tab: 1;
 		nextPutAll: signature;
 		nextPutAll: ' {';
 		crtab: tabs.
+	temps := anRBMethodNode temporaries.
+	temps isEmpty
+		ifFalse: [ stream nextPutAll: 'let '.
+			temps
+				do: [ :t | stream nextPutAll: (self translateIdentifier: t name) ]
+				separatedBy: [ stream nextPutAll: ', ' ].
+			stream
+				nextPut: $;;
+				crtab: tabs ].
 	nonlocal := self methodHasNonLocal: anRBMethodNode.
 	nonlocal
 		ifTrue: [ stream
-				nextPutAll: '_home =  {};';
+				nextPutAll: 'const _home =  {};';
 				crtab: tabs;
 				nextPutAll: 'try {'.
 			tabs := tabs + 1.
 			stream crtab: tabs ].
-	anRBMethodNode statements
+	statements := anRBMethodNode statements.
+	statements
 		do: [ :s | 
 			s acceptVisitor: self.
 			stream nextPut: $; ]
 		separatedBy: [ stream crtab: tabs ].
+	statements isEmpty
+		ifFalse: [ statements last isReturn
+				ifFalse: [ stream
+						crtab: tabs;
+						nextPutAll: 'return this;' ] ].
 	nonlocal
 		ifTrue: [ tabs := tabs - 1.
 			stream
 				crtab: tabs;
-				nextPutAll: '} catch(e) { if (e[0] == _home) return e[1]; else throw(e); }'.
-			 ].
+				nextPutAll: '} catch(e) { if (e[0] == _home) return e[1]; else throw(e); }' ].
 	stream
 		crtab: 1;
 		nextPutAll: '}';
@@ -296,7 +342,7 @@ JSMethodTranspiler >> visitReturnNode: anRBReturnNode [
 ]
 
 { #category : #visiting }
-JSMethodTranspiler >> visitSelfNode: aRBSelfNode [ 
+JSMethodTranspiler >> visitSelfNode: aRBSelfNode [
 	stream nextPutAll: 'this'
 ]
 
