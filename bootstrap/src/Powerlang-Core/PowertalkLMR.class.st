@@ -591,15 +591,15 @@ PowertalkLMR >> newInteger: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> newLargeNegativeInteger: anInteger [
-	| size bytes byte result |
+	| size bytes byte result complement |
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	complement := anInteger negated - 1.
 	bytes := ByteArray new: size withAll: 16rFF.
 	1 to: anInteger bytesCount do: [ :i | 
-		byte := anInteger byteAt: i.
-		byte > 0
-			ifTrue: [ byte := 256 - byte ].
+		byte := 255 - (complement byteAt: i).
 		bytes at: i put: byte ].
-	result := self newBytes: largeNegativeIntegerClass size: size.
+	(bytes at: size) < 128 ifTrue: [ bytes := bytes, #[16rFF 16rFF] ].
+	result := self newBytes: largeNegativeIntegerClass size: bytes size.
 	^result bytes: bytes
 
 ]
@@ -610,7 +610,7 @@ PowertalkLMR >> newLargePositiveInteger: anInteger [
 	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
 	bytes := anInteger asByteArrayOfSize: size.
 	result := self newBytes: largePositiveIntegerClass size: size.
-	^ result bytes: bytes
+	^ result bytes: bytes reversed
 ]
 
 { #category : #initialization }
