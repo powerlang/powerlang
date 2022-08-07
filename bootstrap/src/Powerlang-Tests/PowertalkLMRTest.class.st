@@ -413,3 +413,74 @@ PowertalkLMRTest >> test210addAssociationToDictionary [
 		assert: d localClassName equals: 'Dictionary';
 		assertNoLeftoverFrames
 ]
+
+{ #category : #tests }
+PowertalkLMRTest >> test300smallIntegerPrintString [
+	| result |
+	self
+		compile: 'foo | result | result := 16r1000 printString. ^result'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self
+				assert: result isBytes;
+				assert: result value asLocalString equals: 16r1000 printString ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test301smallIntegerPrintString [
+	| result |
+	self
+		compile: 'foo | result | result := 4611686018427387903 printString. ^result'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self
+				assert: result isBytes;
+				assert: result value asLocalString equals: 4611686018427387903 printString ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test302smallIntegerPrintString [
+	| result |
+	self
+		compile: 'foo | result | result := -4. ^result printString'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self
+				assert: result isBytes;
+				assert: result value asLocalString
+					equals: -4 printString ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test310smiFallbackToLNI [
+	| result |
+	self
+		compile:
+			'foo | result | result := (16r100000000 * -16r100000000) printString. ^result'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			self
+				assert: result isBytes;
+				assert: result value asLocalString
+					equals: (16r100000000 * -16r100000000) printString ].
+	self assertNoLeftoverFrames
+]
+
+{ #category : #tests }
+PowertalkLMRTest >> test310smiFallbackToLPI [
+	| result expected |
+	self
+		compile:
+			'foo | result | result := 1. 18 timesRepeat: [result := result * 10]. ^result printString'
+		in: #ProtoObject
+		during: [ result := runtime sendLocal: #foo to: runtime true.
+			expected := 1.
+			18 timesRepeat: [ expected := expected * 10 ].
+			self
+				assert: result isBytes;
+				assert: result value asLocalString equals: expected printString ].
+	self assertNoLeftoverFrames
+]
