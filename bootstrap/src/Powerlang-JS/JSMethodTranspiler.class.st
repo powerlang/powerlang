@@ -13,6 +13,26 @@ Class {
 }
 
 { #category : #visiting }
+JSMethodTranspiler class >> translateIdentifier: aString [
+	aString = 'arguments'
+		ifTrue: [ ^ '_arguments' ].
+	aString = 'class'
+		ifTrue: [ ^ '_class' ].
+	aString = 'Dictionary'
+		ifTrue: [ ^ 'Map' ].
+	aString = 'IdentityDictionary'
+		ifTrue: [ ^ 'Map' ].
+		
+	aString = 'OrderedCollection'
+		ifTrue: [ ^ 'Array' ].
+	aString = 'ByteArray'
+		ifTrue: [ ^ 'Array' ].
+	aString = 'BlockClosure'
+		ifTrue: [ ^ 'Function' ].
+	^ aString
+]
+
+{ #category : #visiting }
 JSMethodTranspiler >> imports [
 	^ imports
 ]
@@ -70,24 +90,9 @@ JSMethodTranspiler >> stream: aWriteStream [
 	stream := aWriteStream
 ]
 
-{ #category : #visiting }
+{ #category : #accessing }
 JSMethodTranspiler >> translateIdentifier: aString [
-	aString = 'arguments'
-		ifTrue: [ ^ '_arguments' ].
-	aString = 'class'
-		ifTrue: [ ^ '_class' ].
-	aString = 'Dictionary'
-		ifTrue: [ ^ 'Map' ].
-	aString = 'IdentityDictionary'
-		ifTrue: [ ^ 'Map' ].
-		
-	aString = 'OrderedCollection'
-		ifTrue: [ ^ 'Array' ].
-	aString = 'ByteArray'
-		ifTrue: [ ^ 'Array' ].
-	aString = 'BlockClosure'
-		ifTrue: [ ^ 'Function' ].
-	^ aString
+	^self class translateIdentifier: aString
 ]
 
 { #category : #accessing }
@@ -272,7 +277,10 @@ JSMethodTranspiler >> visitLiteralArrayNode: anRBLiteralArrayNode [
 
 { #category : #visiting }
 JSMethodTranspiler >> visitLiteralValueNode: anRBLiteralValueNode [
-	STONJSON put: anRBLiteralValueNode value onStream: stream
+ 	| v |
+	v := anRBLiteralValueNode value.
+	v ifNil: [ ^stream nextPutAll: 'nil' ].
+	STONJSON put: v onStream: stream
 ]
 
 { #category : #visiting }
