@@ -214,6 +214,21 @@ PowertalkRingImage >> transferBlock: anSCompiledBlock [
 	^ transferred
 ]
 
+{ #category : #accessing }
+PowertalkRingImage >> transferCharacter: aCharacter [
+	| class bytechars value transferred int |
+	identityMap at: aCharacter ifPresent: [ :c | ^ c ].
+	class := self classNamed: #Character.
+	bytechars := class namespaces slots first at: #ByteCharacters.
+	value := aCharacter asInteger.
+	transferred := bytechars slots
+		at: value + 1
+		ifAbsent: [ int := self newInteger: value.
+			(self newSlots: 'Character') value: int ].
+	identityMap at: aCharacter put: transferred.
+	^ transferred
+]
+
 { #category : #initialization }
 PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
 	| size classname transferred astcodes selector format literal tliteral |

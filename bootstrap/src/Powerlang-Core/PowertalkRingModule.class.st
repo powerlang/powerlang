@@ -488,18 +488,19 @@ PowertalkRingModule >> transferLiteralDeep: anObject [
 	anObject == true
 		ifTrue: [ ^ trueObj ].
 	identityMap at: anObject ifPresent: [ :existing | ^ existing ].
-	(class == Symbol or:[class inheritsFrom: Symbol])
+	(class == Symbol or: [ class inheritsFrom: Symbol ])
 		ifTrue: [ ^ self newSymbol: anObject ].
-	(anObject isString)
+	anObject isString
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
-	(class == Float or:[class inheritsFrom: Float])
+	(class == Float or: [ class inheritsFrom: Float ])
 		ifTrue: [ ^ self newFloatFrom: anObject ].
 	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].
 	class == SCompiledBlock
 		ifTrue: [ ^ self transferBlock: anObject ].
+	class == Character ifTrue: [ ^self transferCharacter: anObject ].
 	size := class isVariable
 		ifTrue: [ anObject size ]
 		ifFalse: [ 0 ].
