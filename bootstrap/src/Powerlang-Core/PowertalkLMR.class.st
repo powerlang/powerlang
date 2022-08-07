@@ -689,6 +689,13 @@ PowertalkLMR >> print: anLMRObject on: aStream [
 		ifTrue: [ ^ aStream nextPutAll: '<#' , anLMRObject asLocalString , '>' ].
 	name = 'String'
 		ifTrue: [ ^ aStream nextPutAll: '<''' , anLMRObject asLocalString , '''>' ].
+	name = 'CompiledMethod'
+		ifTrue: [ ^ aStream
+				nextPutAll: '<';
+				print: (self methodClassBinding: anLMRObject);
+				nextPutAll: '>>#';
+				nextPutAll: (anLMRObject slotAt: 5) asLocalString;
+				nextPutAll: '>' ].
 	aStream
 		nextPut: $<;
 		nextPutAll: name withArticle;
