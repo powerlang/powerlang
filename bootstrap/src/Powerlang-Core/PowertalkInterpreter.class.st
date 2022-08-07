@@ -175,6 +175,9 @@ PowertalkInterpreter >> initializeUndermessages [
 		at: #_smallIntegerByteAt:
 			put: self underprimitiveSmallIntegerByteAt;
 		at: #_bitShiftLeft: put: self underprimitiveBitShiftLeft;
+		at: #_primitiveULongAtOffset: put: self underprimitiveULongAtOffset;
+		at: #_primitiveULongAtOffset:put:
+			put: self underprimitiveULongAtOffsetPut;
 		at: #_uShortAtOffset: put: self underprimitiveUShortAtOffset;
 		at: #_uShortAtOffset:put: put: self underprimitiveUShortAtOffsetPut;
 		at: #_smiPlus: put: self underprimitiveSMIPlus;
@@ -196,7 +199,8 @@ PowertalkInterpreter >> initializeUndermessages [
 		at: #_bitShiftLeft: put: self underprimitiveSMIBitShiftLeft;
 		at: #_bitShiftRight: put: self underprimitiveSMIBitShiftRight;
 		at: #_smiBitAnd: put: self underprimitiveSMIBitAnd;
-		at: #_smiBitOr: put: self underprimitiveSMIBitOr
+		at: #_smiBitOr: put: self underprimitiveSMIBitOr;
+		at: #_halt put: self underprimitiveHalt
 ]
 
 { #category : #accessing }
@@ -610,6 +614,11 @@ PowertalkInterpreter >> underprimitiveByteAtPut [
 ]
 
 { #category : #accessing }
+PowertalkInterpreter >> underprimitiveHalt [
+	^ [ :receiver :arguments | self halt ]
+]
+
+{ #category : #accessing }
 PowertalkInterpreter >> underprimitiveIdentityEquals [
 	^ [ :receiver :arguments | runtime booleanFor: (self isIdentical: receiver to: arguments first)]
 ]
@@ -733,6 +742,25 @@ PowertalkInterpreter >> underprimitiveSmallSize [
 	receiver isSmall
 		ifFalse: [ self error ].
 	runtime newInteger: receiver size ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveULongAtOffset [
+	| result |
+	^ [ :receiver :arguments | 
+	result := receiver bytes unsignedLongAt: arguments second value + 1.
+	runtime newInteger: result ]
+]
+
+{ #category : #accessing }
+PowertalkInterpreter >> underprimitiveULongAtOffsetPut [
+	| value |
+	^ [ :receiver :arguments | 
+	value := arguments second.
+	receiver bytes
+		unsignedLongAt: arguments first value + 1
+		put: value value.
+	value ]
 ]
 
 { #category : #accessing }
