@@ -383,37 +383,55 @@ PowertalkInterpreter >> primitivePrimeFor: anInteger [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitAnd [
 	^ [ runtime
-		newInteger: (context self value bitAnd: context firstArgument value) ]
+		newInteger:
+			(context self value
+				bitAnd: (runtime integerFrom: context firstArgument)) ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveSMIBitOr [
+	^ [ runtime
+		newInteger:
+			(context self value
+				bitOr: (runtime integerFrom: context firstArgument)) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitShift [
 	^ [ runtime
-		newInteger: (context self value bitShift: context firstArgument value) ]
+		newInteger:
+			(context self value
+				bitShift: (runtime integerFrom: context firstArgument)) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIBitXor [
 	^ [ runtime
-		newInteger: (context self value bitXor: context firstArgument value) ]
+		newInteger:
+			(context self value
+				bitXor: (runtime integerFrom: context firstArgument)) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIEqual [
 	^ [ runtime
-		booleanFor: context self value = context firstArgument value ]
+		booleanFor: (
+			context self value = 
+				context firstArgument value) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterEqualThan [
 	^ [ runtime
-		booleanFor: context self value >= context firstArgument value ]
+		booleanFor:
+			context self value
+				>= (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIGreaterThan [
 	^ [ runtime
-		booleanFor: context self value > context firstArgument value ]
+		booleanFor: context self value > (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
@@ -424,13 +442,17 @@ PowertalkInterpreter >> primitiveSMIHighBit [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntDiv [
 	^ [ runtime
-		newInteger: context self value // context firstArgument value ]
+		newInteger:
+			context self value
+				// (runtime integerFrom: context firstArgument ) ]
 ]
 
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMIIntQuot [
 	^ [ runtime
-		newInteger: context self value \\ context firstArgument value ]
+		newInteger:
+			context self value
+				\\ (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
@@ -444,7 +466,9 @@ PowertalkInterpreter >> primitiveSMIMinus [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMINotEqual [
 	^ [ runtime
-		booleanFor: context self value != context firstArgument value ]
+		booleanFor:
+			context self value
+				!= (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }
@@ -463,7 +487,9 @@ PowertalkInterpreter >> primitiveSMISize [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveSMITimes [
 	^ [ runtime
-		newInteger: context self value * context firstArgument value ]
+		newInteger:
+			context self value
+				* (runtime integerFrom: context firstArgument) ]
 ]
 
 { #category : #primitives }

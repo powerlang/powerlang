@@ -289,7 +289,7 @@ PowertalkLMR >> initialize [
 PowertalkLMR >> integerFrom: anLMRObject [
 	| behavior class |
 	anLMRObject isImmediate
-		ifTrue: [ ^ anLMRObject value].
+		ifTrue: [ ^ anLMRObject value ].
 	behavior := self behaviorOf: anLMRObject.
 	class := self behaviorClass: behavior.
 	^ class == largePositiveIntegerClass
@@ -586,7 +586,6 @@ PowertalkLMR >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
-
 	^ LMRSmallInteger new value: anInteger
 ]
 
