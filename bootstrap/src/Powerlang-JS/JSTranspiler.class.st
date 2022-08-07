@@ -65,7 +65,7 @@ JSTranspiler >> rootDirectory [
 { #category : #transpiling }
 JSTranspiler >> transpileClass: aClass [
 	| filename ws |
-	self transpileMethods: aClass methods.
+	self transpileClassMethods: aClass class methods; transpileMethods: aClass methods.
 	filename := self outputDirectory / (aClass name , '.js').
 	filename
 		writeStreamDo: [ :s | 
@@ -75,23 +75,34 @@ JSTranspiler >> transpileClass: aClass [
 ]
 
 { #category : #transpiling }
-JSTranspiler >> transpileMethods: methods [
+JSTranspiler >> transpileClassMethods: methods [
 	transpilers := methods asArray
 		sort: [ :a :b | a selector < b selector ];
 		reject: [ :m | m selector beginsWith: #print ]
 			thenCollect: [ :m | 
 			JSMethodTranspiler new
 				method: m;
-				transpile ].
+				transpileClassMethod ]
+]
 
+{ #category : #transpiling }
+JSTranspiler >> transpileMethods: methods [
+	| t |
+	t := methods asArray
+		sort: [ :a :b | a selector < b selector ];
+		reject: [ :m | m selector beginsWith: #print ]
+			thenCollect: [ :m | 
+			JSMethodTranspiler new
+				method: m;
+				transpile ].
+	transpilers := transpilers , t
 ]
 
 { #category : #transpiling }
 JSTranspiler >> writeClass: aClass into: ws [
 	| imports |
-		aClass superclass == PSharedPool
+	aClass superclass == PSharedPool
 		ifTrue: [ ^ self writeSharedPool: aClass into: ws ].
-
 	imports := self classImports: aClass.
 	imports asArray sort
 		do: [ :name | 
@@ -109,9 +120,38 @@ JSTranspiler >> writeClass: aClass into: ws [
 	ws
 		nextPutAll: '}';
 		cr;
-		cr;
-		nextPutAll: 'export default ';
+		cr.
+	(aClass class methods anySatisfy: [ :m | m selector = #initialize ]) ifTrue: [ ws nextPutAll: aClass name; nextPutAll: '.initialize();'; cr; cr ].
+		ws nextPutAll: 'export default ';
 		nextPutAll: aClass name;
+		cr
+]
+
+{ #category : #transpiling }
+JSTranspiler >> writeClassConstructor: aClass into: ws [
+	| ivars translated  |
+	ivars := aClass instVarNames.
+	ivars isEmpty
+		ifTrue: [ ^ self ].
+	ws
+		crtab;
+		nextPutAll: 'constructor() {'.
+	aClass superclass == Object
+		ifFalse: [ ws
+				crtab: 2;
+				nextPutAll: 'super();' ].
+	ivars
+		do: [ :name | 
+			translated := JSMethodTranspiler translateIdentifier: name.
+			ws
+				crtab: 2;
+				nextPutAll: 'this._';
+				nextPutAll: translated;
+				nextPutAll: ' = nil;' ].
+	ws
+		crtab;
+		nextPut: $};
+		cr;
 		cr
 ]
 
@@ -127,7 +167,25 @@ JSTranspiler >> writeClassDefinition: aClass into: ws [
 				nextPutAll: aClass superclass name ].
 	ws
 		nextPutAll: '{';
-		cr
+		cr.
+	self writeClassVariables: aClass into: ws; writeClassConstructor: aClass into: ws
+]
+
+{ #category : #transpiling }
+JSTranspiler >> writeClassVariables: aClass into: ws [
+	| cvars translated |
+	cvars := aClass classVarNames.
+	cvars isEmpty
+		ifTrue: [ ^ self ].
+	cvars
+		do: [ :name | 
+			translated := JSMethodTranspiler translateIdentifier: name.
+			ws
+				crtab;
+				nextPutAll: 'static _';
+				nextPutAll: translated;
+				nextPutAll: ' = nil;' ].
+	ws cr
 ]
 
 { #category : #transpiling }

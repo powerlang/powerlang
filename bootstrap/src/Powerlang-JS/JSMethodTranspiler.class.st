@@ -6,7 +6,8 @@ Class {
 		'method',
 		'tabs',
 		'currentBlock',
-		'imports'
+		'imports',
+		'classMethod'
 	],
 	#category : #'Powerlang-JS'
 }
@@ -20,7 +21,8 @@ JSMethodTranspiler >> imports [
 JSMethodTranspiler >> initialize [
 	tabs := 2.
 	stream := '' writeStream.
-	imports := OrderedCollection new
+	imports := OrderedCollection new.
+	classMethod  := false
 ]
 
 { #category : #accessing }
@@ -118,6 +120,12 @@ JSMethodTranspiler >> transpileBinarySelector: selector [
 
 
 	self ASSERT: false
+]
+
+{ #category : #accessing }
+JSMethodTranspiler >> transpileClassMethod [
+	classMethod := true.
+	self transpile
 ]
 
 { #category : #private }
@@ -234,9 +242,15 @@ JSMethodTranspiler >> visitCascadeNode: anRBCascadeNode [
 
 { #category : #visiting }
 JSMethodTranspiler >> visitGlobalNode: anRBGlobalNode [
-	| translated |
+	| translated binding |
 	translated := self translateIdentifier: anRBGlobalNode name.
-	anRBGlobalNode binding isClassVariable ifFalse: [imports  add: translated].
+	binding := anRBGlobalNode binding .
+	binding
+	 isClassVariable
+		ifTrue: [ binding isFromSharedPool ifFalse: [classMethod
+				ifTrue: [ stream nextPutAll: 'this._' ]
+				ifFalse: [ stream nextPutAll: 'this.constructor._' ]] ]
+		ifFalse: [ imports add: translated ].
 	stream nextPutAll: translated
 ]
 
@@ -287,7 +301,9 @@ JSMethodTranspiler >> visitMethodNode: anRBMethodNode [
 	| signature nonlocal temps statements |
 	signature := self methodSignatureFrom: anRBMethodNode.
 	stream
-		tab: 1;
+		tab: 1.
+		classMethod ifTrue: [ stream nextPutAll: 'static '].
+		stream
 		nextPutAll: signature;
 		nextPutAll: ' {';
 		crtab: tabs.
