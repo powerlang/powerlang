@@ -228,10 +228,16 @@ SExpressionLinearizer >> inline: anSMessage unitaryWhile: aBoolean [
 
 { #category : #initialization }
 SExpressionLinearizer >> inlineAnd: anSMessage [
-	| branch |
+	| branches |
 	anSMessage receiver acceptVisitor: self.
-	branch := self branchIf: false.
-	self visitStatements: anSMessage arguments first statements; branchTargetOf: branch
+	branches := OrderedCollection new.
+	anSMessage arguments
+		do: [ :block | 
+			branches add: (self branchIf: false).
+	
+	self
+		visitStatements: block statements].
+	branches do: [ :branch | self branchTargetOf: branch ]
 ]
 
 { #category : #initialization }
@@ -250,11 +256,13 @@ SExpressionLinearizer >> inlineAndNot: anSMessage [
 
 { #category : #initialization }
 SExpressionLinearizer >> inlineOr: anSMessage [
-	| branch |
+	|  branches |
 	anSMessage receiver acceptVisitor: self.
-	branch := self branchIf: true.
-	self visitStatements: anSMessage arguments first statements.
-	self branchTargetOf: branch
+	branches := OrderedCollection new.
+	 anSMessage arguments do: [ :block | 
+		branches add: (self branchIf: true).
+		self visitStatements: block statements].
+	branches do: [:branch | self branchTargetOf: branch]
 ]
 
 { #category : #initialization }
