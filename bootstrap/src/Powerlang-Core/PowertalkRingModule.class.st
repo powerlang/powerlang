@@ -50,7 +50,7 @@ PowertalkRingModule class >> lmrBootstrapper [
 { #category : #accessing }
 PowertalkRingModule class >> lmrBootstrapperSpec [
 	^ LMRBootstrapperSpec
-		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: 'LMR' ]
+		ifNil: [ LMRBootstrapperSpec := self readSpec: #Bootstrapper at: 'Core' ]
 ]
 
 { #category : #'instance creation' }

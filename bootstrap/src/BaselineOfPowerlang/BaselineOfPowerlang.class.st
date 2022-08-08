@@ -25,10 +25,23 @@ BaselineOfPowerlang >> baseline: spec [
 			spec requires: 'PetitParser'
 		].
 		spec package: 'Powerlang-Tests'.
-		spec	package: 'Powerlang-TestsFailing'.
-		spec	package: 'Powerlang-UI' with:[
+		spec package: 'Powerlang-TestsFailing'.
+		spec package: 'Powerlang-UI' with:[
 			spec requires: 'Roassal3'
-		]
+		].
+
+		"base group: just core boostrapping code and tests"
+		spec group: 'base' with: #('Powerlang-Compatibility-Pharo'
+								   'Powerlang-Core'
+		                           'Powerlang-Tests'
+		                           'Powerlang-TestsFailing').
+
+		"devel group: base, tests and custom dev tools"
+		spec group: 'devel' with: #('base'
+		                            'Powerlang-UI').
+
+		"default group: loaded when group is not specified"
+		spec group: 'default' with: #('devel').
 	]
 ]
 
