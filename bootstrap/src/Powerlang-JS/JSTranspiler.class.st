@@ -23,10 +23,16 @@ JSTranspiler class >> powerlangInterpreterClasses [
 			SCompiledBlockFlags.
 			SCompiledMethodFlags.
 			ClosureElementTypes.
-			PowertalkInterpreter.
+			PowertalkEvaluator.
 			PowertalkIterativeInterpreter.
 			PowertalkIterativeStackedInterpreter} , SBinding withAllSubclasses
 		, SExpression withAllSubclasses
+		,
+			{JSNativeCode.
+			JSSExpressionTranspiler.
+			PowertalkNativeJSEvaluator.
+			LinkedEvaluationContext.
+			NativeJSEvaluationContext}
 ]
 
 { #category : #'as yet unclassified' }
