@@ -542,6 +542,12 @@ PowertalkInterpreter >> primitiveUnderSize [
 ]
 
 { #category : #initializing }
+PowertalkInterpreter >> runtime [
+	^runtime
+
+]
+
+{ #category : #initializing }
 PowertalkInterpreter >> runtime: aPowertalkRuntime [
 	runtime := aPowertalkRuntime.
 	nilObj := runtime nil.
