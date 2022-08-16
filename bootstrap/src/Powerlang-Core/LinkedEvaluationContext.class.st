@@ -14,15 +14,6 @@ Class {
 }
 
 { #category : #'instance creation' }
-LinkedEvaluationContext class >> initialize [
-	"
-	self initialize
-	"
-
-	Undermessages := #(_basicAt: #_basicAt:put: _bitShiftLeft: _byteAt: #_byteAt:put: _smallSize _largeSize _isSmallInteger _basicHash _basicHash: _smallIntegerByteAt: _uShortAtOffset: _uShortAtOffset:put:)
-]
-
-{ #category : #'instance creation' }
 LinkedEvaluationContext class >> new [
 	"return an initialized instance"
 
