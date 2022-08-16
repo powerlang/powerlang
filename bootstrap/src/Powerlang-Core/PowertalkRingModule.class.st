@@ -202,8 +202,8 @@ PowertalkRingModule >> false [
 { #category : #initialization }
 PowertalkRingModule >> fillClasses [
 	| class meta |
-	specs allClasses	do: [ :def | 
-			self log: 'filling ' , def name , '...'.
+	specs allClasses
+		do: [ :def | 
 			class := self classFor: def.
 			meta := self metaclassFor: def metaclass.
 			self
