@@ -33,6 +33,29 @@ JSMethodTranspiler class >> translateIdentifier: aString [
 ]
 
 { #category : #visiting }
+JSMethodTranspiler >> basicVisitMessageNode: anRBMessageNode [
+	| recv parentheses selector signature |
+	
+	recv := anRBMessageNode receiver.
+	parentheses := recv isBlock or: [ recv isLiteralNode ].
+	parentheses
+		ifTrue: [ stream nextPut: $( ].
+	recv acceptVisitor: self.
+	parentheses
+		ifTrue: [ stream nextPut: $) ].
+			selector := anRBMessageNode selector.
+	signature := self transpileSelector: selector.
+	stream
+		nextPut: $.;
+		nextPutAll: signature;
+		nextPut: $(.
+	anRBMessageNode arguments
+		do: [ :arg | arg acceptVisitor: self ]
+		separatedBy: [ stream nextPutAll: ', ' ].
+	stream nextPut: $)
+]
+
+{ #category : #visiting }
 JSMethodTranspiler >> imports [
 	^ imports
 ]
@@ -43,6 +66,13 @@ JSMethodTranspiler >> initialize [
 	stream := '' writeStream.
 	imports := OrderedCollection new.
 	classMethod  := false
+]
+
+{ #category : #visiting }
+JSMethodTranspiler >> isSpecialSelector: selector [
+	"	^ #(ifTrue: ifFalse: #ifTrue:ifFalse: whileTrue whileFalse whileTrue: whileFalse:)"
+
+	^ #(#bitsAt: + - * / & | << >> bitAnd: bitOr: ) includes: selector	" #(ifTrue: ifFalse:) includes: selector"
 ]
 
 { #category : #accessing }
@@ -174,8 +204,27 @@ JSMethodTranspiler >> visitAssignmentNode: anRBAssignmentNode [
 ]
 
 { #category : #visiting }
+JSMethodTranspiler >> visitBitsAt: message [
+	| argument stretch offset |
+	argument := message arguments first.
+	self ASSERT: argument isGlobal.
+	stretch := argument binding value.
+	self ASSERT: stretch class == Stretch.
+	stream nextPutAll: '(('. message receiver acceptVisitor: self.
+	offset := stretch start - 1.
+	offset > 0
+		ifTrue: [ stream
+				nextPutAll: ' >> ';
+				print: offset ].
+	stream
+		nextPutAll: ') & 0x';
+		nextPutAll: ((1 << stretch length) - 1) printStringHex;
+		nextPutAll: ')'
+]
+
+{ #category : #visiting }
 JSMethodTranspiler >> visitBlockNode: anRBBlockNode [
-	| prev translated statements last |
+	| prev translated |
 	prev := currentBlock.
 	currentBlock := anRBBlockNode.
 	tabs := tabs + 1.
@@ -188,22 +237,29 @@ JSMethodTranspiler >> visitBlockNode: anRBBlockNode [
 	stream
 		nextPutAll: ') => {';
 		crtab: tabs.
-	statements := anRBBlockNode statements.
-	statements isEmpty
-		ifFalse: [ statements allButLast
-				do: [ :statement | 
-					statement acceptVisitor: self.
-					stream nextPut: $; ; crtab: tabs].
-			last := statements last.
-			last isReturn
-				ifFalse: [ stream nextPutAll: 'return ' ].
-			last acceptVisitor: self.
-			stream nextPut: $; ].
+	self visitBlockStatements: anRBBlockNode statements inline: false.
 	tabs := tabs - 1.
 	stream
 		crtab: tabs;
 		nextPut: $}.
 	currentBlock := prev
+]
+
+{ #category : #visiting }
+JSMethodTranspiler >> visitBlockStatements: statements inline: aBoolean [
+	| last |
+	statements isEmpty ifTrue: [aBoolean ifFalse: [ stream nextPutAll: 'return ' ]. ^stream nextPutAll: 'nil' ].
+	statements allButLast
+				do: [ :statement | 
+					statement acceptVisitor: self.
+					stream
+						nextPut: $;;
+						crtab: tabs ].
+			last := statements last.
+			(last isReturn or: [ aBoolean ])
+				ifFalse: [ stream nextPutAll: 'return ' ].
+			last acceptVisitor: self.
+			stream nextPut: $;
 ]
 
 { #category : #visiting }
@@ -260,6 +316,25 @@ JSMethodTranspiler >> visitGlobalNode: anRBGlobalNode [
 ]
 
 { #category : #visiting }
+JSMethodTranspiler >> visitIf: message true: aBoolean [
+	
+	| block statements |
+	block := message arguments first.
+	block isBlock ifFalse: [^self basicVisitMessageNode: message]. 
+	statements := block statements.
+	statements size > 1 ifTrue: [ ^self basicVisitMessageNode: message ].
+	stream nextPutAll: 'if ('.
+	aBoolean ifFalse: [ stream nextPut: $! ].
+	message receiver acceptVisitor: self.
+	stream nextPut: $); crtab: tabs; nextPut: ${.
+	tabs := tabs + 1.
+	self visitBlockStatements: statements inline: true. 
+	tabs := tabs - 1.
+	stream nextPut: $}; crtab: tabs.
+
+]
+
+{ #category : #visiting }
 JSMethodTranspiler >> visitInstanceVariableNode: anRBInstanceVariableNode [
 	| translated |
 	translated := self translateIdentifier: anRBInstanceVariableNode name.
@@ -280,38 +355,28 @@ JSMethodTranspiler >> visitLiteralValueNode: anRBLiteralValueNode [
  	| v |
 	v := anRBLiteralValueNode value.
 	v ifNil: [ ^stream nextPutAll: 'nil' ].
+	v isCharacter ifTrue: [^ stream nextPut: $"; nextPut: v; nextPut: $" ].
 	STONJSON put: v onStream: stream
 ]
 
 { #category : #visiting }
 JSMethodTranspiler >> visitMessageNode: anRBMessageNode [
-	| recv parentheses signature |
-	recv := anRBMessageNode receiver.
-	parentheses := recv isBlock or: [ recv isLiteralNode ].
-	parentheses
-		ifTrue: [ stream nextPut: $( ].
-	recv acceptVisitor: self.
-	parentheses
-		ifTrue: [ stream nextPut: $) ].
-	signature := self transpileSelector: anRBMessageNode selector.
-	stream
-		nextPut: $.;
-		nextPutAll: signature;
-		nextPut: $(.
-	anRBMessageNode arguments
-		do: [ :arg | arg acceptVisitor: self ]
-		separatedBy: [ stream nextPutAll: ', ' ].
-	stream nextPut: $)
+
+	| selector |
+	selector := anRBMessageNode selector.
+	(self isSpecialSelector: selector)
+		ifTrue: [ self visitSpecialMessage: anRBMessageNode  ]
+		ifFalse: [ self basicVisitMessageNode: anRBMessageNode  ]
 ]
 
 { #category : #visiting }
 JSMethodTranspiler >> visitMethodNode: anRBMethodNode [
 	| signature nonlocal temps statements |
 	signature := self methodSignatureFrom: anRBMethodNode.
+	stream tab: 1.
+	classMethod
+		ifTrue: [ stream nextPutAll: 'static ' ].
 	stream
-		tab: 1.
-		classMethod ifTrue: [ stream nextPutAll: 'static '].
-		stream
 		nextPutAll: signature;
 		nextPutAll: ' {';
 		crtab: tabs.
@@ -368,6 +433,50 @@ JSMethodTranspiler >> visitReturnNode: anRBReturnNode [
 { #category : #visiting }
 JSMethodTranspiler >> visitSelfNode: aRBSelfNode [
 	stream nextPutAll: 'this'
+]
+
+{ #category : #visiting }
+JSMethodTranspiler >> visitSpecialIntegerBinaryMessage: message [
+self visitSpecialIntegerBinaryMessage: message selector: message selector
+]
+
+{ #category : #visiting }
+JSMethodTranspiler >> visitSpecialIntegerBinaryMessage: message selector: operand [
+	stream nextPutAll: '('.
+	message receiver acceptVisitor: self.
+	stream nextPutAll: operand.
+	message arguments first acceptVisitor: self.
+	stream	nextPutAll: ')'
+]
+
+{ #category : #visiting }
+JSMethodTranspiler >> visitSpecialMessage: message [
+	| selector |
+	selector := message selector.
+	selector == #+ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #- ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #* ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #/ ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #| ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #& ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message].
+	selector == #bitOr: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '|'].
+	selector == #bitAnd: ifTrue: [ ^self visitSpecialIntegerBinaryMessage: message selector: '&'].
+	selector == #bitsAt:
+		ifTrue: [ ^ self visitBitsAt: message ].
+	selector == #ifTrue:
+		ifTrue: [ ^ self visitIf: message true: true ].
+	selector == #ifFalse:
+		ifTrue: [ self visitIf: message true: false ].
+	selector == #ifTrue:ifFalse:
+		ifTrue: [ self visitIfTrueIfFalse: message ].
+	selector == #whileTrue
+		ifTrue: [ self visitWhileTrue: message ].
+	selector == #whileFalse
+		ifTrue: [ self visitWhileFalse: message ].
+	selector == #whileTrue:
+		ifTrue: [ self visitWhileTrue_: message ].
+	selector == #whileFalse:
+		ifTrue: [ self visitWhileFalse_: message ]
 ]
 
 { #category : #visiting }
