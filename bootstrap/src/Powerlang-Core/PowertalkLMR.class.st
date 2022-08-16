@@ -264,6 +264,21 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> fixOverrides [
+	| selector md |
+	overrides
+		keysAndValuesDo: [ :assoc :method | 
+			selector := assoc value.
+			md := self behaviorMethodDictionary: assoc key.
+			self
+				sendLocal: #at:put:
+				to: md
+				with:
+					{selector.
+					method} ]
+]
+
+{ #category : #initialization }
 PowertalkLMR >> hashFor: anLMRObject [
 	| shifted hash current |
 	anLMRObject isImmediate
