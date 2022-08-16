@@ -1,6 +1,6 @@
 Class {
 	#name : #PowertalkRecursiveInterpreter,
-	#superclass : #PowertalkInterpreter,
+	#superclass : #PowertalkEvaluator,
 	#category : #'Powerlang-Core-Execution'
 }
 
