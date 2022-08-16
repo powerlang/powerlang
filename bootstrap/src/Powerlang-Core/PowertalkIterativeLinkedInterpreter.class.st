@@ -67,9 +67,9 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 		self: regR;
 		arguments: arguments;
 		environment: environment;
-		method: method;
-		parent: context;
-		system: runtime.
+		system: runtime; method: method;
+		parent: context
+		.
 	self prepareFor: method
 ]
 
