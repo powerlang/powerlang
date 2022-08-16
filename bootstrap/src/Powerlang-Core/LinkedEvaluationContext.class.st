@@ -160,9 +160,11 @@ LinkedEvaluationContext >> method [
 ]
 
 { #category : #accessing }
-LinkedEvaluationContext >> method: anSCompiledMethod [
-	method := anSCompiledMethod.
-	temporaries := Array new: anSCompiledMethod tempCount
+LinkedEvaluationContext >> method: aMethod [
+	| count |
+	method := aMethod.
+	count := system methodTempCount: aMethod.
+	temporaries := Array new: count
 ]
 
 { #category : #visiting }
