@@ -133,6 +133,7 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #SMIIntDiv put: self primitiveSMIIntDiv;
 		at: #SMIIntQuot put: self primitiveSMIIntQuot;
 		at: #SMIBitAnd put: self primitiveSMIBitAnd;
+		at: #SMIBitOr put: self primitiveSMIBitOr;
 		at: #SMIBitXor put: self primitiveSMIBitXor;
 		at: #SMIBitShift put: self primitiveSMIBitShift;
 		at: #SMIHighBit put: self primitiveSMIHighBit;
@@ -155,6 +156,7 @@ PowertalkInterpreter >> initializePrimitives [
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
 		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
+		at: #BootstrapFixOverrides put: self primitiveBootstrapFixOverrides;
 		at: #PrimeFor put: self primitivePrimeFor
 ]
 
@@ -290,6 +292,11 @@ PowertalkInterpreter >> primitiveBootstrapDictKeys [
 { #category : #primitives }
 PowertalkInterpreter >> primitiveBootstrapDictNew [
 	^ [ runtime newBootstrapDictionaryOf: context self ]
+]
+
+{ #category : #primitives }
+PowertalkInterpreter >> primitiveBootstrapFixOverrides [
+	^ [ runtime fixOverrides ]
 ]
 
 { #category : #primitives }
