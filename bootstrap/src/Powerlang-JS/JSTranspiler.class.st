@@ -172,9 +172,11 @@ JSTranspiler >> writeClassDefinition: aClass into: ws [
 				nextPutAll: 'extends ';
 				nextPutAll: aClass superclass name ].
 	ws
-		nextPutAll: '{';
+		nextPutAll: ' {';
 		cr.
-	self writeClassVariables: aClass into: ws; writeClassConstructor: aClass into: ws
+	self
+		writeClassVariables: aClass into: ws;
+		writeClassConstructor: aClass into: ws
 ]
 
 { #category : #transpiling }
