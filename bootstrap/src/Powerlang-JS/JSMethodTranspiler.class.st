@@ -247,19 +247,22 @@ JSMethodTranspiler >> visitBlockNode: anRBBlockNode [
 
 { #category : #visiting }
 JSMethodTranspiler >> visitBlockStatements: statements inline: aBoolean [
-	| last |
-	statements isEmpty ifTrue: [aBoolean ifFalse: [ stream nextPutAll: 'return ' ]. ^stream nextPutAll: 'nil' ].
-	statements allButLast
-				do: [ :statement | 
-					statement acceptVisitor: self.
-					stream
-						nextPut: $;;
-						crtab: tabs ].
-			last := statements last.
-			(last isReturn or: [ aBoolean ])
+	| last separator |
+	statements isEmpty
+		ifTrue: [ aBoolean
 				ifFalse: [ stream nextPutAll: 'return ' ].
-			last acceptVisitor: self.
-			stream nextPut: $;
+			^ stream nextPutAll: 'nil' ].
+	separator := aBoolean ifTrue: [ $, ] ifFalse: [ $; ].
+	statements allButLast
+		do: [ :statement | 
+			statement acceptVisitor: self.
+			stream
+				nextPut: separator;
+				crtab: tabs ].
+	last := statements last.
+	(last isReturn or: [ aBoolean ])
+		ifFalse: [ stream nextPutAll: 'return ' ].
+	last acceptVisitor: self
 ]
 
 { #category : #visiting }

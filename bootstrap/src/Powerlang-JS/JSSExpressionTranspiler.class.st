@@ -453,7 +453,7 @@ JSSExpressionTranspiler >> visitIdentifier: anSIdentifier [
 
 { #category : #accessing }
 JSSExpressionTranspiler >> visitLiteral: anSLiteral [
-	self loadLiteral: anSLiteral
+	self loadLiteral: anSLiteral value
 ]
 
 { #category : #accessing }
