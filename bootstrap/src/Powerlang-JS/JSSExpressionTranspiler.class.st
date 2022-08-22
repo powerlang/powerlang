@@ -59,7 +59,9 @@ JSSExpressionTranspiler >> argumentAt: index in: environmentIndex [
 
 { #category : #'as yet unclassified' }
 JSSExpressionTranspiler >> assign: value [
-	stream nextPutAll: ' = '; print: value
+	stream
+		nextPutAll: ' = ';
+		print: value
 ]
 
 { #category : #'as yet unclassified' }
@@ -80,6 +82,11 @@ JSSExpressionTranspiler >> evaluator: aJSPowertalkEvaluator [
 	self runtime: evaluator runtime
 ]
 
+{ #category : #services }
+JSSExpressionTranspiler >> false [
+	stream nextPutAll: 'evaluator._falseObj'
+]
+
 { #category : #'as yet unclassified' }
 JSSExpressionTranspiler >> index: anInteger [
 	stream
@@ -93,6 +100,33 @@ JSSExpressionTranspiler >> initialize [
 	tabs := 2.
 	stream := '' writeStream.
 	literals := OrderedCollection new
+]
+
+{ #category : #accessing }
+JSSExpressionTranspiler >> inline: anSMessage binaryWhile: aBoolean [
+	"we put while in a lambda to be able to use it as a js expression"
+	stream nextPutAll: '( () => {while ('.
+	aBoolean
+		ifTrue: [ stream nextPutAll: 'evaluator._trueObj===' ]
+		ifFalse: [ stream nextPutAll: 'evaluator._falseObj===' ].
+	stream nextPut: $(.
+	self visitStatements: anSMessage receiver statements.
+	stream nextPutAll: ')) {'.
+	self visitStatements: anSMessage arguments first statements.
+	stream nextPutAll: '} })()'
+]
+
+{ #category : #accessing }
+JSSExpressionTranspiler >> inline: anSMessage ifTrue: aBoolean [
+	stream nextPut: $(.
+	aBoolean
+		ifTrue: [ stream nextPutAll: 'evaluator._trueObj===' ]
+		ifFalse: [ stream nextPutAll: 'evaluator._falseObj===' ].
+	stream nextPut: $(.
+	anSMessage receiver acceptVisitor: self.
+	stream nextPutAll: ') ? ('.
+	self visitStatements: anSMessage arguments first statements.
+	stream nextPutAll: ') : evaluator._nilObj)'
 ]
 
 { #category : #accessing }
@@ -110,17 +144,59 @@ JSSExpressionTranspiler >> inline: anSMessage ifTrueIfFalse: aBoolean [
 	stream nextPutAll: '))'
 ]
 
-{ #category : #'as yet unclassified' }
-JSSExpressionTranspiler >> inline: anSMessage ifTrueIfFalse: aBoolean with: nativizer [
-	stream nextPut: $(.
-	aBoolean
-		ifFalse: [ stream nextPut: $! ].
+{ #category : #accessing }
+JSSExpressionTranspiler >> inlineToDo: anSMessage [
+	"we put while in a lambda to be able to use it as a js expression"
+
+	| compare cindex increment incindex args limit block ipos |
+	compare := SMessage new selector: greaterThan.
+	cindex := self addLiteral: compare.
+	increment := SMessage new selector: plus.
+	incindex := self addLiteral: increment.
+	args := anSMessage arguments.
+	limit := args first.
+	block := args second.
+	ipos := block inlinedArgs first.
+	stream nextPutAll: '( () => { for ('.
+	tabs := tabs + 1.
+	stream crtab: tabs.
+	self
+		temps;
+		index: ipos.
+	stream nextPutAll: ' = '.
 	anSMessage receiver acceptVisitor: self.
-	stream nextPutAll: ' ? '.
-	nativizer visitStatements: anSMessage arguments first statements.
-	stream nextPutAll: ' : '.
-	nativizer visitStatements: anSMessage arguments second statements.
-	stream nextPut: $)
+	stream
+		nextPut: $;;
+		crtab: tabs;
+		nextPutAll: 'evaluator._falseObj===evaluator.sendSuperToWith_('.
+	self literalAt: cindex.
+	stream nextPutAll: ', false, '.
+	self stackTemporaryAt: ipos.
+	stream nextPutAll: ', [('.
+	limit acceptVisitor: self.
+	stream
+		nextPutAll: ')]);';
+		crtab: tabs.
+	self
+		temps;
+		index: ipos.
+	stream nextPutAll: ' = '.
+	stream nextPutAll: 'evaluator.sendSuperToWith_('.
+	self literalAt: incindex.
+	stream nextPutAll: ', false,'.
+	self stackTemporaryAt: ipos.
+	stream nextPutAll: ', ['.
+	self loadLiteral: one.
+	stream
+		nextPutAll: ']))';
+		crtab: tabs - 1;
+		nextPutAll: '{';
+		crtab: tabs.
+	self visitStatements: block statements.
+	tabs := tabs - 1.
+	stream
+		crtab: tabs;
+		nextPutAll: '}}) ()'
 ]
 
 { #category : #accessing }
@@ -128,7 +204,21 @@ JSSExpressionTranspiler >> inlinedMessage: anSMessage with: nativizer [
 	| selector |
 	selector := anSMessage selector.
 	selector == ifTrueIfFalse
-		ifTrue: [ ^self inline: anSMessage ifTrueIfFalse: true ].
+		ifTrue: [ ^ self inline: anSMessage ifTrueIfFalse: true ].
+	selector == ifTrue
+		ifTrue: [ ^ self inline: anSMessage ifTrue: true ].
+	selector == ifFalse
+		ifTrue: [ ^ self inline: anSMessage ifTrue: false ].
+	selector == toDo
+		ifTrue: [ ^ self inlineToDo: anSMessage ].
+	selector == whileTrue
+		ifTrue: [ ^ self inline: anSMessage unitaryWhile: true ].
+	selector == whileFalse
+		ifTrue: [ ^ self inline: anSMessage unitaryWhile: true ].
+	selector == whileTrue_
+		ifTrue: [ ^ self inline: anSMessage binaryWhile: true ].
+	selector == whileFalse_
+		ifTrue: [ ^ self inline: anSMessage binaryWhile: true ].
 	self ASSERT: false
 ]
 
@@ -159,9 +249,9 @@ JSSExpressionTranspiler >> loadEnvironmentFor: anInteger [
 ]
 
 { #category : #'as yet unclassified' }
-JSSExpressionTranspiler >> loadLiteral: anSLiteral [
-	| value index |
-	value := anSLiteral value.
+JSSExpressionTranspiler >> loadLiteral: value [
+	| index |
+
 	"runtime isSmallInteger: value"
 	value isImmediate
 		ifTrue: [ ^ self smallInteger: value value ].
@@ -169,48 +259,33 @@ JSSExpressionTranspiler >> loadLiteral: anSLiteral [
 	self literalAt: index
 ]
 
+{ #category : #'as yet unclassified' }
+JSSExpressionTranspiler >> loadVMLiteral: value [
+	| index |
+	index := self addLiteral: value.
+	self literalAt: index
+]
+
 { #category : #accessing }
 JSSExpressionTranspiler >> message: anSMessage super: aBoolean [
-	| args index |
+	| args |
 	args := anSMessage arguments.
 	stream nextPutAll: 'evaluator.sendSuperToWith'.
 	stream nextPutAll: '_('.
-	index := self addLiteral: anSMessage.
-	self literalAt: index.
+	self loadVMLiteral: anSMessage.
 	stream
 		nextPutAll: ', ';
 		print: aBoolean;
 		nextPutAll: ', '.
 	anSMessage receiver acceptVisitor: self.
 	stream nextPutAll: ', ['.
-	tabs := tabs + 1.
+
 	args
 		do: [ :code | 
-			stream crtab: tabs.
 			code acceptVisitor: self ]
 		separatedBy: [ stream nextPutAll: ', ' ].
 	stream nextPutAll: '])'.
-	tabs := tabs - 1
-]
 
-{ #category : #'as yet unclassified' }
-JSSExpressionTranspiler >> message: anSMessage super: aBoolean with: nativizer [
-	| args index |
-	args := anSMessage arguments.
-	stream nextPutAll: 'evaluator.sendSuperToWith'.
-	stream nextPutAll: '_('.
-	index := self addLiteral: anSMessage.
-	self literalAt: index.
-	stream
-		nextPutAll: ', ';
-		print: aBoolean;
-		nextPutAll: ', '.
-	anSMessage receiver acceptVisitor: nativizer.
-	stream nextPutAll: ', ['.
-	args
-		do: [ :code | stream crtab: 2. code acceptVisitor: nativizer ]
-		separatedBy: [ stream nextPutAll: ', ' ].
-	stream nextPutAll: '])'
 ]
 
 { #category : #services }
@@ -219,6 +294,11 @@ JSSExpressionTranspiler >> nativize: anSMethod [
 	^ JSNativeCode new
 		source: self result;
 		literals: self literals
+]
+
+{ #category : #services }
+JSSExpressionTranspiler >> nil [
+	stream nextPutAll: 'evaluator._nilObj'
 ]
 
 { #category : #services }
@@ -238,17 +318,13 @@ JSSExpressionTranspiler >> return [
 
 { #category : #'as yet unclassified' }
 JSSExpressionTranspiler >> returnSelf [
-	stream
-		nextPutAll: 'return frame.__self;';
-		cr
+	stream return: [stream nextPutAll: 'frame.__self']
 ]
 
 { #category : #accessing }
 JSSExpressionTranspiler >> runtime: aPowertalkRuntime [
-	| literal |
 	runtime := aPowertalkRuntime.
-	literal := runtime newInteger: 1.
-	one := SLiteral new value: literal.
+	one := runtime newInteger: 1.
 	plus := runtime symbolFromLocal: #+.
 	greaterThan := runtime symbolFromLocal: #>.
 	equalsEquals := runtime symbolFromLocal: #==.
@@ -332,34 +408,47 @@ JSSExpressionTranspiler >> temporaryAt: index in: environmentIndex put: value [
 
 { #category : #'as yet unclassified' }
 JSSExpressionTranspiler >> temps [
-	stream
-		nextPutAll: 'frame.temps'
+	stream nextPutAll: 'frame._temporaries'
+]
+
+{ #category : #services }
+JSSExpressionTranspiler >> true [
+	stream nextPutAll: 'evaluator._trueObj'
 ]
 
 { #category : #accessing }
 JSSExpressionTranspiler >> visitAssignment: anSAssignment [
+	| result assignees |
+	result := self collect: [ 	anSAssignment expression acceptVisitor: self ].
+	assignees := anSAssignment assignees.
+	assignees size = 1 ifTrue: [ 
+		^assignees first binding assign: result within: self.
+		 ].
+	
 	stream nextPutAll: '_cascade('.
-	anSAssignment expression acceptVisitor: self.
+
 	stream nextPutAll: ', (__result) => {'.
-	anSAssignment assignees
-		do:
-			[ :identifier | identifier binding assign: '__result' within: self ]
+	assignees
+		do: [ :identifier | identifier binding assign: '__result' within: self ]
 		separatedBy: [ stream nextPutAll: '; ' ].
 	stream nextPutAll: '})'
 ]
 
 { #category : #accessing }
 JSSExpressionTranspiler >> visitBlock: anSBlock [
-	| index |
-	index := self addLiteral: anSBlock.
 	stream nextPutAll: 'frame.captureClosure_('.
-	self literalAt: index.
+	self loadVMLiteral: anSBlock.
 	stream nextPut: $)
 ]
 
 { #category : #accessing }
 JSSExpressionTranspiler >> visitIdentifier: anSIdentifier [
-	anSIdentifier binding valueWithin: self
+	| binding |
+	binding := anSIdentifier binding.
+	binding isDynamic
+		ifTrue: [ self loadVMLiteral: anSIdentifier.
+			stream nextPutAll: '._binding.valueWithin_(frame)' ]
+		ifFalse: [ binding valueWithin: self ]
 ]
 
 { #category : #accessing }
@@ -403,5 +492,7 @@ JSSExpressionTranspiler >> visitReturn: anSReturn [
 
 { #category : #accessing }
 JSSExpressionTranspiler >> visitStatements: aCollection [
-		aCollection do: [ :sexpression | sexpression acceptVisitor: self ] separatedBy: [ stream nextPutAll: ', ' ]
+	aCollection
+		do: [ :sexpression | sexpression acceptVisitor: self ]
+		separatedBy: [ stream nextPutAll: ','; crtab: tabs ]
 ]

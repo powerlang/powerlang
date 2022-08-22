@@ -15,9 +15,9 @@ JSSExpressionTranspilerTest >> test010emptyMethod [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
-	return frame.self;
-}
+					'(function (evaluator, frame, literals) {
+	return frame.__self;
+})
 '
 ]
 
@@ -29,9 +29,9 @@ JSSExpressionTranspilerTest >> test020returnSelf [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
-	return frame.self;
-}
+					'(function (evaluator, frame, literals) {
+	return frame.__self;
+})
 '
 ]
 
@@ -43,9 +43,9 @@ JSSExpressionTranspilerTest >> test030returnOne [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
+					'(function (evaluator, frame, literals) {
 	return LMRSmallInteger.new().value_(1);
-}
+})
 '
 ]
 
@@ -57,9 +57,9 @@ JSSExpressionTranspilerTest >> test031returnArgument [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
-	return frame.args[0];
-}
+					'(function (evaluator, frame, literals) {
+	return frame.__arguments[0];
+})
 '
 ]
 
@@ -71,9 +71,9 @@ JSSExpressionTranspilerTest >> test032returnTemporary [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
-	return frame.temps[0];
-}
+					'(function (evaluator, frame, literals) {
+	return frame._temporaries[0];
+})
 '
 ]
 
@@ -85,9 +85,9 @@ JSSExpressionTranspilerTest >> test040returnOnePlusOne [
 		assert:
 			code
 				=
-					'function (evaluator, frame, literals) {
-	return evaluator.sendSuperWith_(literals[0], false, LMRSmallInteger.new().value_(1), LMRSmallInteger.new().value_(1));
-}
+					'(function (evaluator, frame, literals) {
+	return evaluator.sendSuperToWith_(literals[0], false, LMRSmallInteger.new().value_(1), [LMRSmallInteger.new().value_(1)]);
+})
 '
 ]
 
@@ -96,5 +96,5 @@ JSSExpressionTranspilerTest >> transpile: aString [
 	| method |
 	method := SCompiler new compile: aString.
 	^ (JSSExpressionTranspiler new
-				nativize: method sexpressions) source
+				nativize: method sexpressions) code
 ]
