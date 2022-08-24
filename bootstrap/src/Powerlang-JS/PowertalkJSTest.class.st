@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-JS'
 }
 
+{ #category : #accessing }
+PowertalkJSTest class >> defaultTimeLimit [
+	^ 1000 seconds
+]
+
 { #category : #tests }
 PowertalkJSTest >> setUp [
 	bootstrapper := PowertalkLMRTestResource new
