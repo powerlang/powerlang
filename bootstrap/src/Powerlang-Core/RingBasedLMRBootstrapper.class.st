@@ -206,12 +206,16 @@ RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
 ]
 
 { #category : #paths }
-RingBasedLMRBootstrapper >> findModulePath: aSymbol [
-	| matches |
-	matches := self rootDirectory allDirectoriesMatching: aSymbol.
-	matches
-		ifEmpty: [ self error: 'module ' , aSymbol , ' couldn''t be found' ].
-	^ matches first relativeTo: self rootDirectory asAbsolute 
+RingBasedLMRBootstrapper >> findModulePath: moduleName [
+	| parts path candidates dir |
+	parts := '.' split: moduleName.
+	path := ('/' join: parts) asFileReference path.
+	candidates := self rootDirectory allDirectoriesMatching: parts first.
+	candidates do: [:match | 
+		dir := match parent / path pathString.
+		dir exists ifTrue: [ 	^dir relativeTo: self rootDirectory asAbsolute ]].
+	self error: 'module ' , moduleName , ' couldn''t be found'
+
 ]
 
 { #category : #building }
@@ -331,7 +335,7 @@ RingBasedLMRBootstrapper >> initializeEmulationOverrides [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> initializeRuntime [
-	| map symbols array method smi block metaclass kernel byteArray string closure behavior |
+	| map symbols array method smi block metaclass kernel byteArray string closure behavior lpi lni |
 	symbols := Dictionary new.
 	#(+ - < > <= >= = == not)
 		do: [ :symbol | 
@@ -344,6 +348,8 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 	closure := mapping at: (source classNamed: #Closure).
 	behavior := mapping at: (source classNamed: #Behavior).
 	smi := mapping at: (source classNamed: #SmallInteger).
+	lpi := mapping at: (source classNamed: #LargePositiveInteger).
+	lni := mapping at: (source classNamed: #LargeNegativeInteger).
 	string := mapping at: (source classNamed: #String).
 	metaclass := mapping at: (source classNamed: #Metaclass).
 	kernel := mapping at: source kernel.
@@ -355,6 +361,8 @@ RingBasedLMRBootstrapper >> initializeRuntime [
 		closureClass: closure;
 		behaviorClass_: behavior;
 		smallIntegerClass: smi;
+		largePositiveIntegerClass: lpi;
+		largeNegativeIntegerClass: lni;
 		stringClass: string;
 		metaclassClass: metaclass;
 		knownSymbols: symbols;
@@ -412,6 +420,7 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 	classes := classes
 		collect: [ :classSpec | self createNewClassFrom: classSpec ].
 	moduleSpec := spec at: symbol , #Module.
+	moduleSpec ifNil: [moduleSpec := source specs at: #Module].
 	module := self createNewModule: moduleSpec with: classes.
 	dest sendLocal: #loadRequiredModules to: module.
 	^ module
@@ -538,5 +547,7 @@ RingBasedLMRBootstrapper >> transferLiteral: anObject [
 	anObject class == Array ifTrue: [ 
 		transferred := anObject collect: [ :o | self transferLiteral: o ].
 		^dest newArray: transferred ].
+	anObject isCharacter
+		ifTrue: [ ^ dest newCharacter: anObject ].
 	self ASSERT: false
 ]

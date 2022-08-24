@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Tests-Bootstrap'
 }
 
+{ #category : #accessing }
+PowertalkLMRBootstrapTest class >> defaultTimeLimit [
+	^ 1000 seconds
+]
+
 { #category : #tests }
 PowertalkLMRBootstrapTest >> setUp [
 	bootstrapper := PowertalkLMRTestResource new

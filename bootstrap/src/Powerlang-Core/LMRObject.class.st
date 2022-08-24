@@ -31,3 +31,8 @@ LMRObject >> isBytes [
 LMRObject >> isImmediate [
 	^false
 ]
+
+{ #category : #accessing }
+LMRObject >> pointersSize [
+	^0
+]

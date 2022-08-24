@@ -70,7 +70,8 @@ PowertalkRingModule class >> readSpec: specName at: path [
 	subdir := path isString ifTrue: [ path ] ifFalse: [ path asPath pathString ].
 	repo := TonelRepository new
 		directory: root / 'specs' / current / subdir.
-	spec := repo asRingEnvironmentWith: {specName}.
+		
+	spec := repo asRingEnvironmentWith: {('.' split: specName) last}.
 	^ spec clean
 ]
 
@@ -201,8 +202,8 @@ PowertalkRingModule >> false [
 { #category : #initialization }
 PowertalkRingModule >> fillClasses [
 	| class meta |
-	specs allClasses	do: [ :def | 
-			self log: 'filling ' , def name , '...'.
+	specs allClasses
+		do: [ :def | 
 			class := self classFor: def.
 			meta := self metaclassFor: def metaclass.
 			self
@@ -487,18 +488,19 @@ PowertalkRingModule >> transferLiteralDeep: anObject [
 	anObject == true
 		ifTrue: [ ^ trueObj ].
 	identityMap at: anObject ifPresent: [ :existing | ^ existing ].
-	(class == Symbol or:[class inheritsFrom: Symbol])
+	(class == Symbol or: [ class inheritsFrom: Symbol ])
 		ifTrue: [ ^ self newSymbol: anObject ].
-	(anObject isString)
+	anObject isString
 		ifTrue: [ ^ self newString: anObject ].
 	class = ByteArray
 		ifTrue: [ ^ self newBytesFrom: anObject ].
-	(class == Float or:[class inheritsFrom: Float])
+	(class == Float or: [ class inheritsFrom: Float ])
 		ifTrue: [ ^ self newFloatFrom: anObject ].
 	(class inheritsFrom: ObjectMap)
 		ifTrue: [ ^ anObject ].
 	class == SCompiledBlock
 		ifTrue: [ ^ self transferBlock: anObject ].
+	class == Character ifTrue: [ ^self transferCharacter: anObject ].
 	size := class isVariable
 		ifTrue: [ anObject size ]
 		ifFalse: [ 0 ].

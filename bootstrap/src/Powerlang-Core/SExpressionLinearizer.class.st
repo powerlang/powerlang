@@ -228,10 +228,16 @@ SExpressionLinearizer >> inline: anSMessage unitaryWhile: aBoolean [
 
 { #category : #initialization }
 SExpressionLinearizer >> inlineAnd: anSMessage [
-	| branch |
+	| branches |
 	anSMessage receiver acceptVisitor: self.
-	branch := self branchIf: false.
-	self visitStatements: anSMessage arguments first statements; branchTargetOf: branch
+	branches := OrderedCollection new.
+	anSMessage arguments
+		do: [ :block | 
+			branches add: (self branchIf: false).
+	
+	self
+		visitStatements: block statements].
+	branches do: [ :branch | self branchTargetOf: branch ]
 ]
 
 { #category : #initialization }
@@ -250,11 +256,13 @@ SExpressionLinearizer >> inlineAndNot: anSMessage [
 
 { #category : #initialization }
 SExpressionLinearizer >> inlineOr: anSMessage [
-	| branch |
+	|  branches |
 	anSMessage receiver acceptVisitor: self.
-	branch := self branchIf: true.
-	self visitStatements: anSMessage arguments first statements.
-	self branchTargetOf: branch
+	branches := OrderedCollection new.
+	 anSMessage arguments do: [ :block | 
+		branches add: (self branchIf: true).
+		self visitStatements: block statements].
+	branches do: [:branch | self branchTargetOf: branch]
 ]
 
 { #category : #initialization }
@@ -269,6 +277,48 @@ SExpressionLinearizer >> inlineOrNot: anSMessage [
 		visitStatements: anSMessage arguments first statements;
 		dispatch: message;
 		branchTargetOf: branch
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineRepeat: anSMessage [
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| start |
+	start := self currentPC.
+	self
+		visitStatements: anSMessage receiver statements;
+		jumpTo: start
+]
+
+{ #category : #initialization }
+SExpressionLinearizer >> inlineTimesRepeat: anSMessage [
+	"TODO: cleanup block locals to nil after each cycle"
+
+	| current limit start end compare increment |
+	operations add: one.
+	self pushR.
+	current := SOpLoadRfromFrame new index: stackTop.
+	anSMessage receiver acceptVisitor: self.
+	self pushR.
+	limit := SOpLoadRfromFrame new index: stackTop.
+	start := self currentPC.
+	compare := SMessage new
+		receiver: current;
+		selector: greaterThan;
+		arguments: {limit}.
+	self visitMessage: compare.
+	end := self branchIf: true.
+	self visitStatements: anSMessage arguments first statements.
+	increment := SMessage new
+		receiver: current;
+		selector: plus;
+		arguments: {one}.
+	self
+		visitMessage: increment;
+		storeRintoFrameAt: current index;
+		jumpTo: start;
+		branchTargetOf: end;
+		dropToS: 2
 ]
 
 { #category : #initialization }
@@ -402,15 +452,16 @@ SExpressionLinearizer >> runtime: aPowertalkRuntime [
 	ifNotNil := runtime symbolFromLocal: #ifNotNil:.
 	ifNilIfNotNil := runtime symbolFromLocal: #ifNil:ifNotNil:.
 	ifNotNilIfNil := runtime symbolFromLocal: #ifNotNil:ifNil:.
+	repeat := runtime symbolFromLocal: #repeat.
 	whileTrue := runtime symbolFromLocal: #whileTrue.
 	whileFalse := runtime symbolFromLocal: #whileFalse.
 	whileTrue_ := runtime symbolFromLocal: #whileTrue:.
 	whileFalse_ := runtime symbolFromLocal: #whileFalse:.
+	timesRepeat := runtime symbolFromLocal: #timesRepeat:.
 	toDo := runtime symbolFromLocal: #to:do:.
 	toByDo := runtime symbolFromLocal: #to:by:do:.
 	andNot := runtime symbolFromLocal: #andNot:.
-	orNot	:= runtime symbolFromLocal: #orNot:.
-
+	orNot := runtime symbolFromLocal: #orNot:
 ]
 
 { #category : #initialization }

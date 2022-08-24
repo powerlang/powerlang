@@ -38,7 +38,9 @@ Class {
 		'lastHash',
 		'blockMethodIndex',
 		'behaviorClass',
-		'classNamespacesIndex'
+		'classNamespacesIndex',
+		'largePositiveIntegerClass',
+		'largeNegativeIntegerClass'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -62,6 +64,7 @@ PowertalkLMR >> arrayClass: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> arrayedSizeOf: anLMRObject [
 	| species ivars |
+	anLMRObject isImmediate ifTrue: [ ^0 ].
 	species := self speciesFor: anLMRObject.
 	ivars := self speciesInstanceSize: species.
 	^anLMRObject size - ivars
@@ -157,12 +160,13 @@ PowertalkLMR >> blockMethodIndex: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> blockOptimizedCode: anLMRObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex
+
+	^ self methodOptimizedCode: anLMRObject
 ]
 
 { #category : #initialization }
 PowertalkLMR >> blockOptimizedCode: anLMRObject put: anObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject
+	^ self methodOptimizedCode: anLMRObject put: anObject
 ]
 
 { #category : #initialization }
@@ -260,6 +264,21 @@ PowertalkLMR >> doLookup: aSymbol startingAt: aBehavior [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> fixOverrides [
+	| selector md |
+	overrides
+		keysAndValuesDo: [ :assoc :method | 
+			selector := assoc value.
+			md := self behaviorMethodDictionary: assoc key.
+			self
+				sendLocal: #at:put:
+				to: md
+				with:
+					{selector.
+					method} ]
+]
+
+{ #category : #initialization }
 PowertalkLMR >> hashFor: anLMRObject [
 	| shifted hash current |
 	anLMRObject isImmediate
@@ -279,6 +298,18 @@ PowertalkLMR >> hashFor: anLMRObject [
 PowertalkLMR >> initialize [
 	lastHash := 1.
 	super initialize
+]
+
+{ #category : #initialization }
+PowertalkLMR >> integerFrom: anLMRObject [
+	| behavior class |
+	anLMRObject isImmediate
+		ifTrue: [ ^ anLMRObject value ].
+	behavior := self behaviorOf: anLMRObject.
+	class := self behaviorClass: behavior.
+	^ class == largePositiveIntegerClass
+		ifTrue: [ anLMRObject bytes asLittleEndianPositiveInteger ]
+		ifFalse: [ anLMRObject bytes asLittleEndianNegativeInteger ]
 ]
 
 { #category : #initialization }
@@ -305,6 +336,16 @@ PowertalkLMR >> kernel: anLMRObject [
 { #category : #initialization }
 PowertalkLMR >> knownSymbols: associations [
 	knownSymbols := Dictionary withAll: associations
+]
+
+{ #category : #initialization }
+PowertalkLMR >> largeNegativeIntegerClass: anLMRObject [
+	largeNegativeIntegerClass := anLMRObject
+]
+
+{ #category : #initialization }
+PowertalkLMR >> largePositiveIntegerClass: anLMRObject [
+	largePositiveIntegerClass := anLMRObject
 ]
 
 { #category : #initialization }
@@ -413,12 +454,23 @@ PowertalkLMR >> methodInstSize: anInteger [
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex
+	| slot |
+	slot := anLMRObject slotAt: methodOptimizedCodeIndex.
+	^ slot == nilObj ifTrue: [ slot ] ifFalse: [ slot code ]
 ]
 
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCode: anLMRObject put: anObject [
-	^ anLMRObject slotAt: methodOptimizedCodeIndex put: anObject
+	| behavior header code |
+	behavior := self speciesInstanceBehavior: arrayClass.
+	header := LMRObjectHeader new
+		behavior: behavior;
+		bytes: false arrayed: true named: false;
+		size: 0;
+		hash: 0.
+
+	code := LMRExecutableCode new header: header; code: anObject.
+	^ anLMRObject slotAt: methodOptimizedCodeIndex put: code
 ]
 
 { #category : #initialization }
@@ -508,6 +560,14 @@ PowertalkLMR >> newBytesOf: species sized: size [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> newCharacter: aCharacter [
+	| value |
+	value := self newInteger: aCharacter asInteger.
+	^self sendLocal: #asCharacter to: value.
+
+]
+
+{ #category : #initialization }
 PowertalkLMR >> newClosureFor: compiledBlock [
 	| size closure |
 	size := self blockEnvironmentCount: compiledBlock.
@@ -541,8 +601,31 @@ PowertalkLMR >> newInteger: anInteger [
 		ifTrue: [ ^ self newLargePositiveInteger: anInteger ].
 	anInteger < minSMI
 		ifTrue: [ ^ self newLargeNegativeInteger: anInteger ].
-
 	^ LMRSmallInteger new value: anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newLargeNegativeInteger: anInteger [
+	| size bytes byte result complement |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	complement := anInteger negated - 1.
+	bytes := ByteArray new: size withAll: 16rFF.
+	1 to: anInteger bytesCount do: [ :i | 
+		byte := 255 - (complement byteAt: i).
+		bytes at: i put: byte ].
+	(bytes at: size) < 128 ifTrue: [ bytes := bytes, #[16rFF 16rFF] ].
+	result := self newBytes: largeNegativeIntegerClass size: bytes size.
+	^result bytes: bytes
+
+]
+
+{ #category : #initialization }
+PowertalkLMR >> newLargePositiveInteger: anInteger [
+	| size bytes result |
+	size := (anInteger bytesCount alignedTo: 2) max: wordSize.
+	bytes := anInteger asByteArrayOfSize: size.
+	result := self newBytes: largePositiveIntegerClass size: size.
+	^ result bytes: bytes reversed
 ]
 
 { #category : #initialization }
@@ -621,6 +704,13 @@ PowertalkLMR >> print: anLMRObject on: aStream [
 		ifTrue: [ ^ aStream nextPutAll: '<#' , anLMRObject asLocalString , '>' ].
 	name = 'String'
 		ifTrue: [ ^ aStream nextPutAll: '<''' , anLMRObject asLocalString , '''>' ].
+	name = 'CompiledMethod'
+		ifTrue: [ ^ aStream
+				nextPutAll: '<';
+				print: (self methodClassBinding: anLMRObject);
+				nextPutAll: '>>#';
+				nextPutAll: (anLMRObject slotAt: 5) asLocalString;
+				nextPutAll: '>' ].
 	aStream
 		nextPut: $<;
 		nextPutAll: name withArticle;

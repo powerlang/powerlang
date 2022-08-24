@@ -1,6 +1,6 @@
 Class {
 	#name : #PowertalkIterativeInterpreter,
-	#superclass : #PowertalkInterpreter,
+	#superclass : #PowertalkEvaluator,
 	#instVars : [
 		'regR'
 	],

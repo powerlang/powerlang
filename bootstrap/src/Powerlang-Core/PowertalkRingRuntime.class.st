@@ -79,8 +79,8 @@ PowertalkRingRuntime >> closureBlock: aClosureMap [
 ]
 
 { #category : #services }
-PowertalkRingRuntime >> closureHome: aClosureMap [
-	^ aClosureMap home
+PowertalkRingRuntime >> closureHome: anObjectMap [
+	^ anObjectMap home
 ]
 
 { #category : #accessing }
@@ -138,6 +138,16 @@ PowertalkRingRuntime >> initializeEmulationOverrides [
 			class methods do: [ :m | self override: class name with: m ].
 			class metaclass methods
 				do: [ :m | self override: class metaclass name with: m ] ]
+]
+
+{ #category : #services }
+PowertalkRingRuntime >> integerFrom: anObjectMap [
+	anObjectMap isImmediate
+		ifTrue: [ ^ anObjectMap value ].
+		self halt.
+	^ anObjectMap spec name == #LargePositiveInteger
+		ifTrue: [ anObjectMap bytes asLittleEndianPositiveInteger ]
+		ifFalse: [ anObjectMap bytes asLittleEndianNegativeInteger ]
 ]
 
 { #category : #accessing }
