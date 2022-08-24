@@ -31,14 +31,3 @@ PowertalkLMRBootstrapTest >> test010GenenerateKernelSegment [
 	"runtime sendLocal: #writeModules to: module.
 	self assert: output exists"
 ]
-
-{ #category : #tests }
-PowertalkLMRBootstrapTest >> test010WriteKernelAsJSON [
-	| output module result |
-	output := bootstrapper rootDirectory / 'LMRjs' / 'Kernel.json'.
-	output exists
-		ifTrue: [ output delete ].
-	module := bootstrapper loadBootstrapModule.
-	result := runtime sendLocal: #writeJSONKernel to: module.
-	self assert: output exists
-]
