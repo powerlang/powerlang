@@ -45,7 +45,7 @@ Pharo (that is, @janvrany) and to allow experimentation with [libgdbs][4]
 
         "Load Powerlang"
         ParserFlags allowInheritedPools: true.
-        Smalltalk packagePath add: '/where/you/cloned/powerlang/bootstrap/src'.
+        Smalltalk packagePath add: '/where/you/cloned/powerlang/src'.
         Smalltalk loadPackage: 'Powerlang-Compatibility-SmalltalkX'.
         Smalltalk loadPackage: 'Powerlang-Core'.
         Smalltalk loadPackage: 'Powerlang-Tests'.
@@ -59,7 +59,7 @@ Pharo (that is, @janvrany) and to allow experimentation with [libgdbs][4]
        1. switch browser to package view - *View* ▷ *Package*
        2. then select modified package(s)
        3. and file them out in Tonel format - *Package* ▷ *File out* ▷ *Special Formats* ▷ *Tonel as...*.
-       4. In file dialog, select directory where you want to file out packages (each package as a subdirectory). For example, if you cloned Powerlang to `/where/you/cloned/powerlang` then select `/where/you/cloned/powerlang/bootstrap/src`. In most cases, the correct directory should be pre-selected. but better check.
+       4. In file dialog, select directory where you want to file out packages (each package as a subdirectory). For example, if you cloned Powerlang to `/where/you/cloned/powerlang` then select `/where/you/cloned/powerlang/src`. In most cases, the correct directory should be pre-selected. but better check.
 
 3.  Use your favorite GIT client to commit changes to repository.
 
