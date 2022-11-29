@@ -1,7 +1,6 @@
 
 # Metacello group to load.
 GROUP ?= base
-KERNEL  = $(BUILD)/$(shell cat specs/current || echo 'bee-dmr')
 
 all: pharo-ui bootstrap.image
 
