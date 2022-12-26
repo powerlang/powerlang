@@ -1,13 +1,11 @@
-bootstrap/Pharo*
-bootstrap/pharo*
-bootstrap/icon-packs
-bootstrap/*.changes
-bootstrap/*.image
-bootstrap/*.fuel
-bootstrap/*-Test.xml
-bootstrap/PharoDebug.log
-bootstrap/specs
+Pharo*
+pharo*
+icon-packs
+*.changes
+*.image
+*.fuel
+*-Test.xml
+PharoDebug.log
+specs
 *.log
-pst/vm/build
 
-build

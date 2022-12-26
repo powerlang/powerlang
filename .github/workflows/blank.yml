@@ -6,9 +6,9 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -36,7 +36,7 @@ jobs:
 
     - name: Compile - bootstrap only
       if: matrix.os == 'macos-latest'
-      run: make -C bootstrap
+      run: make
 
     - name: Run tests
       if: matrix.os != 'macos-latest'
@@ -44,7 +44,7 @@ jobs:
 
     - name: Run tests - bootstrap only
       if: matrix.os == 'macos-latest'
-      run: make -C bootstrap test
+      run: make test
 
     - name: XUnit Viewer
       if: matrix.os == 'ubuntu-latest'
@@ -52,7 +52,7 @@ jobs:
       uses: AutoModality/action-xunit-viewer@v1.0.1
       with:
         # File/Folder of test results
-        results: bootstrap/test-reports # default is test-reports
+        results: test-reports # default is test-reports
 
     - name: Attach the report
       if: matrix.os == 'ubuntu-latest'
