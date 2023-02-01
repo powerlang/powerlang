@@ -200,7 +200,7 @@ RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
 	classes
 		do: [ :c | 
 			dest
-				sendLocal: #exportClass: to: module with: {c};
+				sendLocal: #addClass: to: module with: {c};
 				sendLocal: #module: to: c with: {module} ].
 	^ module
 ]
