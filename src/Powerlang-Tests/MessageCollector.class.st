@@ -7,7 +7,7 @@ Class {
 	#classVars : [
 		'Messages'
 	],
-	#category : #'Powerlang-Tests'
+	#category : #'Powerlang-Tests-Collector'
 }
 
 { #category : #'instance creation' }
