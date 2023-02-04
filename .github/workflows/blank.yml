@@ -23,40 +23,30 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Fetch at least 2 commits so that Iceberg doesn't break
       run: git fetch --unshallow
 
     - name: Compile
-      if: matrix.os != 'macos-latest'
-      run: make
-      env:
-        CMAKE_GENERATOR: Unix Makefiles
-
-    - name: Compile - bootstrap only
-      if: matrix.os == 'macos-latest'
       run: make
 
     - name: Run tests
-      if: matrix.os != 'macos-latest'
       run: make test
-
-    - name: Run tests - bootstrap only
-      if: matrix.os == 'macos-latest'
-      run: make test
-
-    - name: XUnit Viewer
-      if: matrix.os == 'ubuntu-latest'
-      id: xunit-viewer
-      uses: AutoModality/action-xunit-viewer@v1.0.1
-      with:
-        # File/Folder of test results
-        results: test-reports # default is test-reports
 
     - name: Attach the report
-      if: matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v1
+      if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
+      uses: actions/upload-artifact@v3
       with:
-        name: upload-result
-        path: ${{ steps.xunit-viewer.outputs.report-dir }}
+        name: test-results
+        path: test-reports/Powerlang-Tests-Test.xml
+
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: always() && matrix.os == 'ubuntu-latest'
+      with:
+        name: SUnit Test Report            # Name of the check run which will be created
+        path: test-reports/*.xml    # Path to test results
+        reporter: java-junit        # Format of test results
+        fail-on-error: true
+
