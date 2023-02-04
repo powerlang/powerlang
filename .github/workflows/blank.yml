@@ -34,19 +34,19 @@ jobs:
     - name: Run tests
       run: make test
 
+    - name: Attach the report
+      if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
+      uses: actions/upload-artifact@v3
+      with:
+        name: upload-result
+        path: test-reports/Powerlang-Tests-Test.xml
+
     - name: Test Report
       uses: dorny/test-reporter@v1
-      if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
+      if: always() && matrix.os == 'ubuntu-latest'
       with:
         name: SUnit Test Report            # Name of the check run which will be created
         path: test-reports/*.xml    # Path to test results
         reporter: java-junit        # Format of test results
         fail-on-error: true
-          
 
-    - name: Attach the report
-      if: always() && matrix.os == 'ubuntu-latest'
-      uses: actions/upload-artifact@v1
-      with:
-        name: upload-result
-        path: ${{ steps.xunit-viewer.outputs.report-dir }}
