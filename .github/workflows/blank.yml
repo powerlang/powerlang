@@ -29,33 +29,22 @@ jobs:
       run: git fetch --unshallow
 
     - name: Compile
-      if: matrix.os != 'macos-latest'
-      run: make
-      env:
-        CMAKE_GENERATOR: Unix Makefiles
-
-    - name: Compile - bootstrap only
-      if: matrix.os == 'macos-latest'
       run: make
 
     - name: Run tests
-      if: matrix.os != 'macos-latest'
       run: make test
 
-    - name: Run tests - bootstrap only
-      if: matrix.os == 'macos-latest'
-      run: make test
-
-    - name: XUnit Viewer
-      if: matrix.os == 'ubuntu-latest'
-      id: xunit-viewer
-      uses: AutoModality/action-xunit-viewer@v1.0.1
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: ( success() || failure() ) && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
       with:
-        # File/Folder of test results
-        results: test-reports # default is test-reports
+        name: JEST Tests            # Name of the check run which will be created
+        path: test-reports/*.xml    # Path to test results
+        reporter: jest-junit        # Format of test results
+          
 
     - name: Attach the report
-      if: matrix.os == 'ubuntu-latest'
+      if: (success() || failure() ) && matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v1
       with:
         name: upload-result
