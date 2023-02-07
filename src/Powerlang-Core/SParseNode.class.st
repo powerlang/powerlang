@@ -118,7 +118,7 @@ SParseNode >> nodesDo: aBlock [
 
 { #category : #enumerating }
 SParseNode >> nodesDo: aBlock includingDeclarations: aBoolean [
-	aBlock evaluateWith: self
+	aBlock value: self
 ]
 
 { #category : #printing }
