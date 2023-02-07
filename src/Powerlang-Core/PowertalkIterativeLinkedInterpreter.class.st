@@ -59,7 +59,7 @@ PowertalkIterativeLinkedInterpreter >> visitOpDispatchMessage: anSOpDispatchMess
 		lookup: message selector
 		startingAt: behavior
 		sendSite: message.
-	method class == BlockClosure
+	method isBlock
 		ifTrue: [ ^ regR := method value: regR value: arguments ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.

@@ -48,7 +48,7 @@ SCascadeMessage >> cacheUndermessage: aBlockClosure [
 
 { #category : #accessing }
 SCascadeMessage >> cachedUndermessage [
-	^ cache class == BlockClosure
+	^ cache isBlock
 		ifTrue: [ cache ]
 ]
 

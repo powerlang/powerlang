@@ -20,12 +20,6 @@ SClosure >> block: aPCompiledMethod [
 ]
 
 { #category : #accessing }
-SClosure >> evaluateWith: anObject [
-	^self value: anObject
-	
-]
-
-{ #category : #accessing }
 SClosure >> evaluateWith: anObject with: anotherObject [
 	block argumentCount = 2
 		ifFalse: [^super evaluateWith: anObject with: anotherObject].

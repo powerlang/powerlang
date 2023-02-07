@@ -6,6 +6,6 @@ Dictionary >> removeAllSuchThat: aBlock [
 	the receiver for that aBlock evaluates to true.  Use a copy to enumerate 
 	collections whose order changes when an element is removed (i.e. Sets)."
 	self copy
-		keysAndValuesDo: [:key :each | (aBlock evaluateWith: each)
+		keysAndValuesDo: [:key :each | (aBlock value: each)
 			ifTrue: [self removeKey: key]]
 ]
