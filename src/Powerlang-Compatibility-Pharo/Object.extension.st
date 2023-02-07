@@ -26,11 +26,6 @@ Object >> evaluate [
 ]
 
 { #category : #'*Powerlang-Compatibility-Pharo' }
-Object >> evaluateWith: anObject [
-	^self evaluateWithArguments: {anObject}
-]
-
-{ #category : #'*Powerlang-Compatibility-Pharo' }
 Object >> evaluateWithArguments: anArray [
 	^self evaluate
 ]

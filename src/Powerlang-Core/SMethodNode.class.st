@@ -134,7 +134,7 @@ SMethodNode >> needsFrame [
 { #category : #enumerating }
 SMethodNode >> nodesDo: aBlock includingDeclarations: aBoolean [
 	super nodesDo: aBlock includingDeclarations: aBoolean.
-	(aBoolean and: [selector notNil]) ifTrue: [aBlock evaluateWith: selector]
+	(aBoolean and: [selector notNil]) ifTrue: [aBlock value: selector]
 ]
 
 { #category : #accessing }

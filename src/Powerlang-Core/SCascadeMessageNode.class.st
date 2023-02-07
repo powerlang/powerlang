@@ -35,6 +35,6 @@ SCascadeMessageNode >> isCascadeMessage [
 
 { #category : #enumerating }
 SCascadeMessageNode >> nodesDo: aBlock includingDeclarations: aBoolean [
-	aBlock evaluateWith: self.
+	aBlock value: self.
 	arguments do: [:arg | arg nodesDo: aBlock includingDeclarations: aBoolean]
 ]
