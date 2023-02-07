@@ -132,7 +132,7 @@ PowertalkIterativeStackedInterpreter >> visitOpDispatchMessage: anSOpDispatchMes
 		lookup: message selector
 		startingAt: behavior
 		sendSite: message.
-	method class == BlockClosure
+	method isBlock
 		ifTrue: [ ^ self evaluateUndermessage: message with: method ].
 	size := runtime methodEnvironmentSize: method.
 	environment := runtime newEnvironmentSized: size.

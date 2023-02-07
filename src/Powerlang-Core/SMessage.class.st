@@ -62,7 +62,7 @@ SMessage >> cacheUndermessage: aBlockClosure [
 
 { #category : #printing }
 SMessage >> cachedUndermessage [
-	^cache class == BlockClosure ifTrue: [ cache ]
+	^cache isBlock ifTrue: [ cache ]
 ]
 
 { #category : #printing }

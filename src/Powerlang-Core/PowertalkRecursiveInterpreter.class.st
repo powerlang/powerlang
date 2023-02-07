@@ -101,7 +101,7 @@ PowertalkRecursiveInterpreter >> send: aSymbol to: receiver with: arguments supe
 		lookup: aSymbol
 		startingAt: behavior
 		sendSite: anSMessage.
-	method class == BlockClosure
+	method isBlock
 		ifTrue: [ ^ method value: receiver value: arguments ].
 	self ASSERT: method notNil.
 	size := runtime methodEnvironmentSize: method.
