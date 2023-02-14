@@ -231,24 +231,26 @@ PowertalkRingImage >> transferCharacter: aCharacter [
 
 { #category : #initialization }
 PowertalkRingImage >> transferMethod: anSCompiledMethod in: species [
-	| size classname transferred astcodes selector format literal tliteral |
-	(identityMap includesKey: anSCompiledMethod)
-		ifTrue: [ self ASSERT: false ].
+
+	| size classname transferred astcodes selector format literal tliteral source |
+	(identityMap includesKey: anSCompiledMethod) ifTrue: [ 
+		self ASSERT: false ].
 	size := anSCompiledMethod size.
 	classname := anSCompiledMethod isCallback
-		ifTrue: [ 'CallbackMethod' ]
-		ifFalse: [ 'CompiledMethod' ].
+		             ifTrue: [ 'CallbackMethod' ]
+		             ifFalse: [ 'CompiledMethod' ].
 	transferred := self newSlots: classname sized: size.
 	identityMap at: anSCompiledMethod put: transferred.
 	astcodes := self transferLiteralDeep: anSCompiledMethod astcodes.
 	selector := self newSymbol: anSCompiledMethod selector.
 	format := self newInteger: anSCompiledMethod format.
+	source := self newString: anSCompiledMethod source.
 	transferred
 		astcodes: astcodes;
 		class: species;
 		selector: selector;
 		format: format;
-		source: nilObj.
+		source: source.
 	1 to: size do: [ :i | 
 		literal := anSCompiledMethod at: i.
 		tliteral := self transferLiteralDeep: literal.
