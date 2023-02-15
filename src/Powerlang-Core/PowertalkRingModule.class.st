@@ -212,20 +212,22 @@ PowertalkRingModule >> fillClasses [
 
 { #category : #initialization }
 PowertalkRingModule >> fillSpecies: species with: classDefinition [
-	| dictionary smethod transferred |
+
+	| dictionary smethod transferred tags organization category |
 	dictionary := self
-		createMethodDictionary: species
-		sized: classDefinition methods size.
-	classDefinition methods
-		do: [ :methodDefinition | 
-			smethod := runtime compile: methodDefinition.
-			transferred := kernel transferMethod: smethod in: species.
-			runtime
-				sendLocal: #basicAt:put:
-				to: dictionary
-				with:
-					{transferred selector.
-					transferred} ]
+		              createMethodDictionary: species
+		              sized: classDefinition methods size.
+	classDefinition methods do: [ :methodDefinition | 
+		smethod := runtime compile: methodDefinition.
+		transferred := kernel transferMethod: smethod in: species.
+		runtime sendLocal: #basicAt:put: to: dictionary with: { 
+				transferred selector.
+				transferred }.
+		tags := methodDefinition tags.
+		tags notEmpty ifTrue: [ 
+		organization := runtime sendLocal: #organization to: species.
+		category := runtime newSymbol: tags anyone.
+		runtime sendLocal: #classify:under: to: organization with: { transferred selector. category } ]]
 ]
 
 { #category : #initialization }
