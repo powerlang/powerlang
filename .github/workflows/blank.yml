@@ -32,7 +32,7 @@ jobs:
       run: make
 
     - name: Run tests
-      run: make test
+      run: make test-ci
 
     - name: Attach the report
       if: always() && matrix.os == 'ubuntu-latest' # run this step even if previous step failed (only on ubuntu)
