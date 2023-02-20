@@ -23,6 +23,11 @@ test: bootstrap.image pharo specs/current
 	mkdir -p test-reports
 	mv Powerlang-Tests-Test.xml test-reports
 
+test-ci: bootstrap.image pharo specs/current
+	./pharo $< test --junit-xml-output Powerlang-Tests
+	mkdir -p test-reports
+	mv Powerlang-Tests-Test.xml test-reports
+
 specs/current: specs/bee-dmr
 	echo "bee-dmr" > specs/current
 

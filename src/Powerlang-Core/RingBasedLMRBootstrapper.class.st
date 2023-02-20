@@ -160,33 +160,33 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> createNewMethod: m in: species [
-	| smethod size transferred astcodes selector format tliteral md |
+
+	| smethod size transferred astcodes selector format tliteral md code |
 	smethod := SCompiler new compile: m sourceCode.
 	smethod classBinding: species.
 	size := dest newInteger: smethod size.
 	transferred := dest
-		sendLocal: #new:
-		to: self => #CompiledMethod
-		with: {size}.
+		               sendLocal: #new:
+		               to: self => #CompiledMethod
+		               with: { size }.
 	mapping at: smethod put: transferred.
 	astcodes := dest newByteArray: smethod astcodes.
 	selector := dest addSymbol: smethod selector.
 	format := dest newInteger: smethod format.
+	code := dest newString: smethod source.
 	dest
-		sendLocal: #astcodes: to: transferred with: {astcodes};
-		sendLocal: #classBinding: to: transferred with: {species};
-		sendLocal: #selector: to: transferred with: {selector};
-		sendLocal: #format: to: transferred with: {format}.
+		sendLocal: #astcodes: to: transferred with: { astcodes };
+		sendLocal: #classBinding: to: transferred with: { species };
+		sendLocal: #selector: to: transferred with: { selector };
+		sendLocal: #format: to: transferred with: { format };
+		sendLocal: #sourceObject: to: transferred with: { code }.
 	smethod withIndexDo: [ :literal :i | 
 		tliteral := self transferLiteral: literal.
 		transferred at: i put: tliteral ].
 	md := dest sendLocal: #methodDictionary to: species.
-	dest
-		sendLocal: #at:put:
-		to: md
-		with:
-			{selector.
-			transferred}.
+	dest sendLocal: #at:put: to: md with: { 
+			selector.
+			transferred }.
 	^ transferred
 ]
 

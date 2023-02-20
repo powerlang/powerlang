@@ -177,6 +177,11 @@ PowertalkLMR >> blockTempCount: anLMRObject [
 ]
 
 { #category : #initialization }
+PowertalkLMR >> bootstrapper [
+	^bootstrapper
+]
+
+{ #category : #initialization }
 PowertalkLMR >> bootstrapper: aBootstrapper [
 	bootstrapper := aBootstrapper
 ]
