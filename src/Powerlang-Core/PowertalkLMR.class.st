@@ -40,7 +40,8 @@ Class {
 		'behaviorClass',
 		'classNamespacesIndex',
 		'largePositiveIntegerClass',
-		'largeNegativeIntegerClass'
+		'largeNegativeIntegerClass',
+		'methodSelectorIndex'
 	],
 	#pools : [
 		'SCompiledBlockFlags',
@@ -481,6 +482,18 @@ PowertalkLMR >> methodOptimizedCode: anLMRObject put: anObject [
 { #category : #initialization }
 PowertalkLMR >> methodOptimizedCodeIndex: anInteger [
 	methodOptimizedCodeIndex := anInteger
+]
+
+{ #category : #initialization }
+PowertalkLMR >> methodSelector: anLMRObject [
+
+	^ anLMRObject slotAt: methodSelectorIndex
+]
+
+{ #category : #initialization }
+PowertalkLMR >> methodSelectorIndex: anInteger [
+
+	methodSelectorIndex := anInteger
 ]
 
 { #category : #initialization }
