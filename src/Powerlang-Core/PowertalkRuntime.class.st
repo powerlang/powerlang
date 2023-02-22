@@ -53,6 +53,15 @@ PowertalkRuntime >> false [
 ]
 
 { #category : #accessing }
+PowertalkRuntime >> flushDispatchCache: aSymbol [
+
+	symbolCache
+		at: aSymbol
+		ifPresent: [ :messages | messages do: #flushCache ].
+	^ methodCache keys select: [ :key |  key key == aSymbol ] thenDo: [ :key | self removeKey: key]
+]
+
+{ #category : #accessing }
 PowertalkRuntime >> flushDispatchCache: aSymbol in: class [
 	| behavior |
 	behavior := self speciesInstanceBehavior: class.

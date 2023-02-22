@@ -110,6 +110,7 @@ PowertalkEvaluator >> initialize [
 
 { #category : #initializing }
 PowertalkEvaluator >> initializePrimitives [
+
 	primitives := IdentityDictionary new.
 	primitives
 		at: #Behavior put: self primitiveBehavior;
@@ -146,18 +147,19 @@ PowertalkEvaluator >> initializePrimitives [
 		at: #ClosureValueWithArgs put: self primitiveClosureValueWithArgs;
 		at: #ClosureArgumentCount put: self primitiveClosureArgumentCount;
 		at: #StringReplaceFromToWithStartingAt
-			put: self primitiveStringReplaceFromToWithStartingAt;
+		put: self primitiveStringReplaceFromToWithStartingAt;
 		at: #FloatNew put: self primitiveFloatNew;
 		at: #DictionaryNew put: self primitiveBootstrapDictNew;
 		at: #FlushDispatchCaches put: self primitiveFlushDispatchCaches;
 		at: #BootstrapDictBeConstant
-			put: self primitiveBootstrapDictBeConstant;
+		put: self primitiveBootstrapDictBeConstant;
 		at: #BootstrapDictKeys put: self primitiveBootstrapDictKeys;
 		at: #BootstrapDictAt put: self primitiveBootstrapDictAt;
 		at: #BootstrapDictAtPut put: self primitiveBootstrapDictAtPut;
 		at: #BootstrapLoadModule put: self primitiveBootstrapLoadModule;
 		at: #BootstrapFixOverrides put: self primitiveBootstrapFixOverrides;
-		at: #PrimeFor put: self primitivePrimeFor
+		at: #PrimeFor put: self primitivePrimeFor;
+		at: #FlushFromCaches put: self primitiveFlushFromCaches 
 ]
 
 { #category : #initializing }
@@ -341,6 +343,12 @@ PowertalkEvaluator >> primitiveFlushDispatchCaches [
 	^ [ runtime
 		flushDispatchCache: context self
 		in: context firstArgument ]
+]
+
+{ #category : #primitives }
+PowertalkEvaluator >> primitiveFlushFromCaches [
+
+	^ [ runtime flushDispatchCache: (runtime methodSelector: context self)]
 ]
 
 { #category : #accessing }

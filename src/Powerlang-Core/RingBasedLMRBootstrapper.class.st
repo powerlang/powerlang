@@ -254,6 +254,7 @@ RingBasedLMRBootstrapper >> headerFor: aRingObject [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
+
 	| index |
 	source := aPowertalkRingImage.
 	dest bootstrapper: self.
@@ -263,13 +264,13 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	dest classModuleIndex: index.
 	index := (source => #Metaclass) allInstVarNames indexOf: 'class'.
 	dest metaclassInstanceClassIndex: index.
-	index := (source => #Species) allInstVarNames
-		indexOf: 'instanceVariables'.
+	index := (source => #Species) allInstVarNames indexOf:
+		         'instanceVariables'.
 	dest speciesIvarsIndex: index.
 	index := (source => #Species) allInstVarNames indexOf: 'superclass'.
 	dest speciesSuperclassIndex: index.
-	index := (source => #Species) allInstVarNames
-		indexOf: 'instanceBehavior'.
+	index := (source => #Species) allInstVarNames indexOf:
+		         'instanceBehavior'.
 	dest speciesInstanceBehaviorIndex: index.
 	index := (source => #Class) allInstVarNames indexOf: 'namespaces'.
 	dest classNamespacesIndex: index.
@@ -283,23 +284,25 @@ RingBasedLMRBootstrapper >> image: aPowertalkRingImage [
 	dest behaviorNextIndex: index.
 	index := (source => #Behavior) allInstVarNames indexOf: 'class'.
 	dest behaviorClassIndex: index.
-	index := (source => #MethodDictionary) allInstVarNames
-		indexOf: 'table'.
+	index := (source => #MethodDictionary) allInstVarNames indexOf:
+		         'table'.
 	dest dictionaryTableIndex: index.
 	index := (source => #Closure) allInstVarNames indexOf: 'block'.
 	dest closureBlockIndex: index.
 	index := (source => #CompiledBlock) allInstVarNames indexOf: 'method'.
 	dest blockMethodIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'format'.
+	index := (source => #CompiledMethod) allInstVarNames indexOf:
+		         'format'.
 	dest methodFlagsIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'astcodes'.
+	index := (source => #CompiledMethod) allInstVarNames indexOf:
+		         'astcodes'.
 	dest methodAstcodesIndex: index.
 	index := (source => #CompiledMethod) allInstVarNames indexOf: 'class'.
 	dest methodClassBindingIndex: index.
-	index := (source => #CompiledMethod) allInstVarNames
-		indexOf: 'optimizedCode'.
+	index := (source => #CompiledMethod) allInstVarNames indexOf: 'selector'.
+	dest methodSelectorIndex: index.
+	index := (source => #CompiledMethod) allInstVarNames indexOf:
+		         'optimizedCode'.
 	dest
 		methodOptimizedCodeIndex: index;
 		methodInstSize: (source => #CompiledMethod) allInstVarNames size
