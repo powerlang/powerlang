@@ -227,7 +227,7 @@ PowertalkEvaluator >> lookup: aSymbol startingAt: aBehavior sendSite: anSMessage
 					^ block ].
 			symbol := runtime symbolFrom: aSymbol.
 			method := runtime lookup: symbol startingAt: aBehavior.
-			self ASSERT: method notNil.
+			method isNil ifTrue: [PowertalkEvaluatorError signal: symbol asString , ' not found in ', aBehavior asString on: context].
 			anSMessage
 				registerCacheWith: runtime;
 				cache: method when: aBehavior ].
