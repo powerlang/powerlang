@@ -12,7 +12,6 @@ Class {
 PowertalkModuleTest >> setUp [
 	| image bootstrapModule |
 	super setUp.
-	PowertalkRingModule resetSpecs.
 	image := PowertalkRingImage fromSpec
 		wordSize: 8;
 		genesis;
