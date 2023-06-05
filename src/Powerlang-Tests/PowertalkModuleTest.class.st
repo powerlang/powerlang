@@ -8,6 +8,11 @@ Class {
 	#category : #'Powerlang-Tests-Bootstrap'
 }
 
+{ #category : #accessing }
+PowertalkModuleTest class >> defaultTimeLimit [
+	^ 1000 seconds
+]
+
 { #category : #running }
 PowertalkModuleTest >> setUp [
 	| image bootstrapModule |
