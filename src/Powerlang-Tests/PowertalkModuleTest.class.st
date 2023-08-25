@@ -62,7 +62,7 @@ A >> a [
 	]
 }' ].
 	module := runtime
-		sendLocal: #loadModule:
+		sendLocal: #load:
 		to: runtime kernel
 		with: {(runtime addSymbol: #A)}.
 	classes := runtime sendLocal: #classes to: module.
@@ -70,4 +70,68 @@ A >> a [
 	a := runtime sendLocal: #new to: class.
 	str := runtime sendLocal: #a to: a.
 	self assert: str asLocalString equals: 'a'
+]
+
+{ #category : #running }
+PowertalkModuleTest >> testLoadClassMethodAndRequire [
+	| st p module classes class b str |
+	(bootstrapper rootDirectory / 'B') ensureCreateDirectory.
+	st := bootstrapper rootDirectory / 'B/B.st'.
+	st
+		createFile;
+		writeStreamDo: [ :s | 
+			s truncate;
+				nextPutAll:
+					'Class {
+	#name : #B,
+	#superclass : #A,
+	#instVars : [],
+	#category : #''B''
+}
+{ #category : #accessing }
+B >> a [
+	^super a, ''b''
+] ' ].
+	st := bootstrapper rootDirectory / 'B/ModuleB.st'.
+	st
+		createFile;
+		writeStreamDo: [ :s | 
+			s truncate;
+				nextPutAll:
+					'Class {
+	#name : #ModuleB,
+	#superclass : #Module,
+	#instVars : [],
+	#category : #''B''
+}
+{ #category : #initializing }
+ModuleB >> initialize [
+	super initialize.
+	requires := #(''A'')
+]
+{ #category : #spec }
+ModuleB >> imports [
+	^{#A -> #A}
+] ' ].
+	p := bootstrapper rootDirectory / 'B/package.st'.
+	p
+		createFile;
+		writeStreamDo: [ :s | 
+			s truncate;
+				nextPutAll:
+					'Package {
+	#name : #B,
+	#classes : [
+		''B''
+	]
+}' ].
+	module := runtime
+		sendLocal: #load:
+		to: runtime kernel
+		with: {(runtime addSymbol: #B)}.
+	classes := runtime sendLocal: #classes to: module.
+	class := runtime sendLocal: #first to: classes.
+	b := runtime sendLocal: #new to: class.
+	str := runtime sendLocal: #a to: b.
+	self assert: str asLocalString equals: 'ab'
 ]

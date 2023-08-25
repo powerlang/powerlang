@@ -636,7 +636,7 @@ PowertalkEvaluator >> underprimitiveByteAtPut [
 
 { #category : #accessing }
 PowertalkEvaluator >> underprimitiveHalt [
-	^ [ :receiver :arguments | self halt ]
+	^ [ :receiver :arguments | receiver halt ]
 ]
 
 { #category : #accessing }
