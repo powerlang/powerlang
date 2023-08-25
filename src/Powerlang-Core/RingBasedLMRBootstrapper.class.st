@@ -36,6 +36,15 @@ RingBasedLMRBootstrapper >> => aSymbol [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> addClasses: classes to: module [
+	classes
+		do: [ :c | 
+			dest
+				sendLocal: #addClass: to: module with: {c};
+				sendLocal: #module: to: c with: {module} ].
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
 	| method index spec species table s selector m |
 	method := anSCompiledBlock method.
@@ -159,6 +168,33 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
+	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
+	supername := spec superclass name.
+	superclass := module 
+		ifNil: [self => supername]
+		ifNotNil: [namespace := dest sendLocal: #namespace to: module.
+		dest sendLocal: #at: to: namespace with: { dest addSymbol: supername }].
+	metaclass := dest
+		sendLocal: #newSubclassOf:
+		to: self => #Class
+		with: {superclass}.
+	class := dest sendLocal: #instanceClass to: metaclass.
+	dest sendLocal: #name: to: class with: {(dest newString: spec name)}.
+	ivars := self transferLiteral: spec instVarNames.
+	dest sendLocal: #instVarNames: to: class with:  { ivars }.
+	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
+	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
+	behaviors
+		at: spec put: instanceBehavior;
+		at: spec metaclass put: classBehavior.
+	spec methods do: [ :m | self createNewMethod: m in: class ].
+	spec metaclass methods
+		do: [ :m | self createNewMethod: m in: metaclass ].
+	^ class
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 
 	| smethod size transferred astcodes selector format tliteral md code |
@@ -191,17 +227,14 @@ RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewModule: spec with: classes [
+RingBasedLMRBootstrapper >> createNewModule: spec [
 	| behavior class module |
 	behavior := behaviors at: spec.
 	class := dest behaviorClass: behavior.
 	module := dest sendLocal: #new to: class.
-	dest sendLocal: #bindKernelExports to: module.
-	classes
-		do: [ :c | 
-			dest
-				sendLocal: #addClass: to: module with: {c};
-				sendLocal: #module: to: c with: {module} ].
+	dest
+		sendLocal: #bindKernelExports to: module;
+		sendLocal: #importRequiredModules to: module.
 	^ module
 ]
 
@@ -408,10 +441,11 @@ RingBasedLMRBootstrapper >> loadBootstrapModule [
 	spec := PowertalkRingModule lmrBootstrapperSpec.
 	classes := spec allClasses.
 	classes := classes
-		collect: [ :classSpec | self createNewClassFrom: classSpec ].
+		collect: [ :classSpec | self createNewClassFrom: classSpec in: nil].
 	moduleSpec := spec at: #BootstrapModule.
-	bootstrapper := self createNewModule: moduleSpec with: classes.
-	dest sendLocal: #loadRequiredModules to: bootstrapper.
+	bootstrapper := self createNewModule: moduleSpec.
+	self addClasses: classes to: bootstrapper.
+	dest sendLocal: #justLoaded to: bootstrapper.
 	^bootstrapper
 ]
 
@@ -420,12 +454,19 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 	| spec classes moduleSpec module |
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
-	classes := classes
-		collect: [ :classSpec | self createNewClassFrom: classSpec ].
 	moduleSpec := spec at: symbol , #Module.
-	moduleSpec ifNil: [moduleSpec := source specs at: #Module].
-	module := self createNewModule: moduleSpec with: classes.
-	dest sendLocal: #loadRequiredModules to: module.
+	moduleSpec
+		ifNil: [moduleSpec := spec at: #Module, symbol].
+	moduleSpec 
+		ifNil: [moduleSpec := source specs at: #Module]
+		ifNotNil: [
+			self createNewClassFrom: moduleSpec in: nil.
+			classes remove: moduleSpec].
+	module := self createNewModule: moduleSpec.
+	classes := classes
+		collect: [ :classSpec | self createNewClassFrom: classSpec in: module].
+	self addClasses: classes to: module.
+	dest sendLocal: #justLoaded to: module.
 	^ module
 ]
 
