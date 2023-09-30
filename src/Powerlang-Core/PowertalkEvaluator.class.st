@@ -172,6 +172,7 @@ PowertalkEvaluator >> initializeUndermessages [
 		at: #_largeSize put: self underprimitiveLargeSize;
 		at: #_basicFlags put: self underprimitiveBasicFlags;
 		at: #_basicAt: put: self underprimitiveBasicAt;
+		at: #_basicAt:put: put: self underprimitiveBasicAtPut;
 		at: #_byteAt: put: self underprimitiveByteAt;
 		at: #_byteAt:put: put: self underprimitiveByteAtPut;
 		at: #_basicHash put: self underprimitiveBasicHash;
@@ -591,6 +592,16 @@ PowertalkEvaluator >> true [
 { #category : #underprimitives }
 PowertalkEvaluator >> underprimitiveBasicAt [
 	^ [ :receiver :arguments | receiver slots at: arguments first value ]
+]
+
+{ #category : #underprimitives }
+PowertalkEvaluator >> underprimitiveBasicAtPut [
+
+	^ [ :receiver :arguments | 
+	  receiver slots
+		  at: arguments first value
+		  put: arguments second.
+	  arguments second ]
 ]
 
 { #category : #accessing }
