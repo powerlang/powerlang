@@ -1,16 +1,22 @@
 # Powerlang
 
-This is Powerlang, a research vehicle to explore implementations of programming
-languages. While focused on Smalltalk, it aims to be a generic language creation
-toolkit, something you can use to either evolve Smalltalk, or otherwise build
-a new language implementation of choice.
-In this repo we provide tools for bootstrapping a Smalltalk image from specs (files
-in a pseudo-tonel format). Originally thought as a native-only project, now we
-also support things like running on top of JavaScript engines. Tools for specific
-platforms can be found on other related repos. 
+This is Powerlang, a framework to bootstrap Smalltalk images from specs (source
+code in files). It aims to be a toolkit you can use to either evolve Smalltalk,
+or otherwise build a new language implementation of choice.
+In this repo we provide tools for bootstrapping  from files
+in a pseudo-tonel format.
 
-For example, for running on a native
-platform you have lmr-cpp which contains a launcher written in C++ and debug scripts.
+Powerlang contains a series of Smalltalk evaluators, which can be used to perform
+the initialization stage of the baby Smalltalk, and also to run code after initialization
+is finished. This is useful when debugging core components or the first steps your
+system does (i.e. when it doesn't load).
+
+Originally thought as a native-only project, now we
+also support things like running on top of JavaScript engines. Tools for specific
+platforms and operation modes can be found on other related repos. 
+
+For example, for running on a fully self-hosted Live Metacircular Runtime (LMR)
+you have `powerlang/lmr-cpp` which contains a launcher written in C++ and debug scripts.
 In `powerlang/powerlang-js` you'll find the things needed to run a Smalltalk image
 on top of JavaScript.
 
