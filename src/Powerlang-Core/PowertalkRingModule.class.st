@@ -78,6 +78,11 @@ PowertalkRingModule class >> readSpec: specName at: path [
 
 { #category : #accessing }
 PowertalkRingModule class >> resetSpecs [
+
+	"
+		self resetSpecs
+	"
+
 	KernelSpec := nil.
 	VMPrimitivesSpec := nil.
 	LMRBootstrapperSpec := nil

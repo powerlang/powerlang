@@ -715,7 +715,7 @@ PowertalkLMR >> override: assoc with: method [
 
 { #category : #initialization }
 PowertalkLMR >> print: anLMRObject on: aStream [
-	| species name |
+	| species name selector |
 	species := self behaviorClass: anLMRObject behavior.
 	name := self speciesLocalName: species.
 	name = 'Symbol'
@@ -723,11 +723,14 @@ PowertalkLMR >> print: anLMRObject on: aStream [
 	name = 'String'
 		ifTrue: [ ^ aStream nextPutAll: '<''' , anLMRObject asLocalString , '''>' ].
 	name = 'CompiledMethod'
-		ifTrue: [ ^ aStream
+		ifTrue: [
+			selector := anLMRObject slotAt: methodSelectorIndex.
+			selector := selector == nilObj ifTrue: ['<nil>'] ifFalse: [ selector asLocalString ].
+			  ^ aStream
 				nextPutAll: '<';
 				print: (self methodClassBinding: anLMRObject);
 				nextPutAll: '>>#';
-				nextPutAll: (anLMRObject slotAt: 5) asLocalString;
+				nextPutAll: selector;
 				nextPutAll: '>' ].
 	aStream
 		nextPut: $<;
