@@ -15,20 +15,29 @@ BaselineOfPowerlang >> baseline: spec [
 		].
 
 		spec package: 'Powerlang-Compatibility-Pharo'.
-
+		spec package: 'Powerlang-SCompiler'.
 		spec package: 'Powerlang-Core' with:[
 			spec requires: 'Powerlang-Compatibility-Pharo'.
+			spec requires: 'Powerlang-SCompiler'.
 			spec requires: 'PetitParser'
 		].
 		spec package: 'Powerlang-Tests'.
 		spec package: 'Powerlang-TestsFailing'.
 		spec package: 'Powerlang-UI'.
 
+		"compiler group: just compiler and compiler tests"
+		spec group: 'base-compiler' with: #(
+											'Powerlang-Compatibility-Pharo'
+											'Powerlang-SCompiler'
+											'Powerlang-SCompiler-Tests').
 		"base group: just core boostrapping code and tests"
-		spec group: 'base' with: #('Powerlang-Compatibility-Pharo'
-								   'Powerlang-Core'
-		                           'Powerlang-Tests'
-		                           'Powerlang-TestsFailing').
+		spec group: 'base' with: #(
+											'Powerlang-Compatibility-Pharo'
+											'Powerlang-SCompiler'
+											'Powerlang-Core'
+											'Powerlang-SCompiler-Tests'
+											'Powerlang-Tests'
+											'Powerlang-TestsFailing').
 
 		"devel group: base, tests and custom dev tools"
 		spec group: 'devel' with: #('base'
