@@ -1,7 +1,7 @@
 Class {
 	#name : #ScriptScopeTest,
 	#superclass : #TestCase,
-	#category : #'Powerlang-Tests-SCompiler'
+	#category : #'Powerlang-SCompiler-Tests'
 }
 
 { #category : #private }

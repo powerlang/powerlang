@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'scanner'
 	],
-	#category : #'Powerlang-Tests-SCompiler'
+	#category : #'Powerlang-SCompiler-Tests'
 }
 
 { #category : #setup }
