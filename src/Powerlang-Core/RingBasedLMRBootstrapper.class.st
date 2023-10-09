@@ -45,6 +45,23 @@ RingBasedLMRBootstrapper >> addClasses: classes to: module [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> classesSortedBySuperclass: anArray [
+
+	| result seen s dfs |
+	result := OrderedCollection new.
+	seen := IdentitySet new.
+	dfs := [ :class | 
+	       s := class superclass.
+	       ((anArray includes: s) andNot: [ seen includes: s ]) ifTrue: [ 
+		       dfs value: s ].	
+	       result add: class.
+	       seen add: class ].
+	anArray do: [ :class | (seen includes: class) ifFalse: [ dfs value: class ] ].
+	self assert: result asSet  = anArray asSet.
+	^ result
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> closureCompiledBlock: anSCompiledBlock [
 	| method index spec species table s selector m |
 	method := anSCompiledBlock method.
@@ -126,6 +143,20 @@ RingBasedLMRBootstrapper >> convertSlotsOf: ringObj in: lmrObj [
 ]
 
 { #category : #initialization }
+RingBasedLMRBootstrapper >> createExtensionMethodsOf: spec in: module [
+
+	| name namespace class metaclass |
+	name := dest addSymbol: spec name.
+	namespace := dest sendLocal: #namespace to: module. 
+	class := dest sendLocal: #at: to: namespace with: { name }.
+	metaclass := dest behaviorClass: class behavior.
+	spec methods do: [ :m | self createNewMethod: m in: class ].
+	spec metaclass methods do: [ :m | 
+		self createNewMethod: m in: metaclass ].
+	^ module
+]
+
+{ #category : #initialization }
 RingBasedLMRBootstrapper >> createNewBlock: sblock [
 	| format transferred method literal tliteral |
 	format := dest newInteger: sblock format.
@@ -169,28 +200,38 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
+
 	| supername superclass namespace metaclass class instanceBehavior classBehavior ivars |
 	supername := spec superclass name.
-	superclass := module 
-		ifNil: [self => supername]
-		ifNotNil: [namespace := dest sendLocal: #namespace to: module.
-		dest sendLocal: #at: to: namespace with: { dest addSymbol: supername }].
+	superclass := module ifNil: [ self => supername ] ifNotNil: [ 
+		              namespace := dest sendLocal: #namespace to: module.
+		              dest
+			              sendLocal: #at:
+			              to: namespace
+			              with: { (dest addSymbol: supername) } ].
 	metaclass := dest
-		sendLocal: #newSubclassOf:
-		to: self => #Class
-		with: {superclass}.
+		             sendLocal: #newSubclassOf:
+		             to: self => #Class
+		             with: { superclass }.
 	class := dest sendLocal: #instanceClass to: metaclass.
-	dest sendLocal: #name: to: class with: {(dest newString: spec name)}.
+	dest
+		sendLocal: #name:
+		to: class
+		with: { (dest newString: spec name) }.
 	ivars := self transferLiteral: spec instVarNames.
-	dest sendLocal: #instVarNames: to: class with:  { ivars }.
+	dest sendLocal: #instVarNames: to: class with: { ivars }.
 	instanceBehavior := dest sendLocal: #instanceBehavior to: class.
 	classBehavior := dest sendLocal: #instanceBehavior to: metaclass.
 	behaviors
 		at: spec put: instanceBehavior;
 		at: spec metaclass put: classBehavior.
 	spec methods do: [ :m | self createNewMethod: m in: class ].
-	spec metaclass methods
-		do: [ :m | self createNewMethod: m in: metaclass ].
+	spec metaclass methods do: [ :m | 
+		self createNewMethod: m in: metaclass ].
+	module ifNotNil: [
+	dest
+		sendLocal: #addClass: to: module with: { class };
+		sendLocal: #module: to: class with: { module }].
 	^ class
 ]
 
@@ -451,21 +492,22 @@ RingBasedLMRBootstrapper >> loadBootstrapModule [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> loadModule: symbol [
-	| spec classes moduleSpec module |
+
+	| spec classes moduleSpec module extensions |
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
 	moduleSpec := spec at: symbol , #Module.
+	moduleSpec ifNil: [ moduleSpec := spec at: #Module , symbol ].
 	moduleSpec
-		ifNil: [moduleSpec := spec at: #Module, symbol].
-	moduleSpec 
-		ifNil: [moduleSpec := source specs at: #Module]
-		ifNotNil: [
+		ifNil: [ moduleSpec := source specs at: #Module ]
+		ifNotNil: [ 
 			self createNewClassFrom: moduleSpec in: nil.
-			classes remove: moduleSpec].
+			classes remove: moduleSpec ].
 	module := self createNewModule: moduleSpec.
-	classes := classes
-		collect: [ :classSpec | self createNewClassFrom: classSpec in: module].
-	self addClasses: classes to: module.
+	classes := self classesSortedBySuperclass: classes.
+	classes := classes collect: [ :classSpec | 
+		           self createNewClassFrom: classSpec in: module ].
+	extensions := spec allExtensionClasses do: [:classSpec | self createExtensionMethodsOf: classSpec in: module].
 	dest sendLocal: #justLoaded to: module.
 	^ module
 ]
