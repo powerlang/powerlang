@@ -21,6 +21,7 @@ BaselineOfPowerlang >> baseline: spec [
 			spec requires: 'Powerlang-SCompiler'.
 			spec requires: 'PetitParser'
 		].
+		spec package: 'Powerlang-SCompiler-Tests'.
 		spec package: 'Powerlang-Tests'.
 		spec package: 'Powerlang-TestsFailing'.
 		spec package: 'Powerlang-UI'.
