@@ -508,7 +508,6 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 	classes := classes collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].
 	extensions := spec allExtensionClasses do: [:classSpec | self createExtensionMethodsOf: classSpec in: module].
-	self halt.
 	dest sendLocal: #justLoaded to: module.
 	^ module
 ]
