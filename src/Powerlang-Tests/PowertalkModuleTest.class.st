@@ -135,3 +135,23 @@ ModuleB >> imports [
 	str := runtime sendLocal: #a to: b.
 	self assert: str asLocalString equals: 'ab'
 ]
+
+{ #category : #running }
+PowertalkModuleTest >> test100LoadCompiler [
+	
+	| symbol module namespace name compiler object code method foo |
+	symbol := (runtime addSymbol: #Compiler).
+	module := runtime
+		sendLocal: #load:
+		to: runtime kernel
+		with: {symbol}.
+	namespace := runtime sendLocal: #namespace to: module.
+	name := runtime addSymbol: #SCompiler. 
+	compiler := runtime sendLocal: #at: to: namespace with: { name }.
+	object := bootstrapper => #Object.
+	code := runtime newString: 'foo ^''foo'''.
+	method := runtime sendLocal: #compile:in: to: compiler with: {code. object}.
+	runtime sendLocal: #install to: method.
+	foo := runtime sendLocal: #foo to: object.
+	self assert: foo asLocalString equals: 'foo'
+]
