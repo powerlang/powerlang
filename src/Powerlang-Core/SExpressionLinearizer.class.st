@@ -245,7 +245,9 @@ SExpressionLinearizer >> inlineAndNot: anSMessage [
 	| branch message |
 	anSMessage receiver acceptVisitor: self.
 	branch := self branchIf: false.
+	"the receiver is added just to have an object that knows to respond isSuper"
 	message := SMessage new
+		receiver: (SInlinerOperation new);
 		selector: not;
 		arguments: #().
 	self
@@ -269,8 +271,10 @@ SExpressionLinearizer >> inlineOr: anSMessage [
 SExpressionLinearizer >> inlineOrNot: anSMessage [
 	| branch message |
 	anSMessage receiver acceptVisitor: self.
-		branch := self branchIf: true.
+	branch := self branchIf: true.
+	"the receiver is added just to have an object that knows to respond isSuper"
 	message := SMessage new
+		receiver: (SInlinerOperation new);
 		selector: not;
 		arguments: #().
 	self
