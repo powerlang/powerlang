@@ -30,7 +30,7 @@ PowertalkModuleTest >> setUp [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> testLoadClassAndMethod [
+PowertalkModuleTest >> test010LoadClassAndMethod [
 	| st p module classes class a str |
 	(bootstrapper rootDirectory / 'A') ensureCreateDirectory.
 	st := bootstrapper rootDirectory / 'A/A.st'.
@@ -73,7 +73,7 @@ A >> a [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> testLoadClassMethodAndRequire [
+PowertalkModuleTest >> test020LoadClassMethodAndRequire [
 	| st p module classes class b str |
 	(bootstrapper rootDirectory / 'B') ensureCreateDirectory.
 	st := bootstrapper rootDirectory / 'B/B.st'.
