@@ -101,6 +101,14 @@ SSemanticVisitor >> visitCascade: aCascadeNode [
 ]
 
 { #category : #visiting }
+SSemanticVisitor >> visitCascadeMessage: aCascadeMessageNode [
+	"we do not inline cascade messages for now"
+	aCascadeMessageNode compiler noticeSend.
+	aCascadeMessageNode receiver acceptVisitor: self.
+	aCascadeMessageNode arguments do: [:arg | arg acceptVisitor: self]
+]
+
+{ #category : #visiting }
 SSemanticVisitor >> visitIdentifier: anIdentifierNode [
 	self analyzeIdentifier: anIdentifierNode
 ]

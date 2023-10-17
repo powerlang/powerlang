@@ -30,7 +30,7 @@ PowertalkModuleTest >> setUp [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> testLoadClassAndMethod [
+PowertalkModuleTest >> test010LoadClassAndMethod [
 	| st p module classes class a str |
 	(bootstrapper rootDirectory / 'A') ensureCreateDirectory.
 	st := bootstrapper rootDirectory / 'A/A.st'.
@@ -73,7 +73,7 @@ A >> a [
 ]
 
 { #category : #running }
-PowertalkModuleTest >> testLoadClassMethodAndRequire [
+PowertalkModuleTest >> test020LoadClassMethodAndRequire [
 	| st p module classes class b str |
 	(bootstrapper rootDirectory / 'B') ensureCreateDirectory.
 	st := bootstrapper rootDirectory / 'B/B.st'.
@@ -134,4 +134,24 @@ ModuleB >> imports [
 	b := runtime sendLocal: #new to: class.
 	str := runtime sendLocal: #a to: b.
 	self assert: str asLocalString equals: 'ab'
+]
+
+{ #category : #running }
+PowertalkModuleTest >> test100LoadCompiler [
+	
+	| symbol module namespace name compiler object code method foo |
+	symbol := (runtime addSymbol: #Compiler).
+	module := runtime
+		sendLocal: #load:
+		to: runtime kernel
+		with: {symbol}.
+	namespace := runtime sendLocal: #namespace to: module.
+	name := runtime addSymbol: #SCompiler. 
+	compiler := runtime sendLocal: #at: to: namespace with: { name }.
+	object := bootstrapper => #Object.
+	code := runtime newString: 'foo ^''foo'''.
+	method := runtime sendLocal: #compile:in: to: compiler with: {code. object}.
+	runtime sendLocal: #install to: method.
+	foo := runtime sendLocal: #foo to: object.
+	self assert: foo asLocalString equals: 'foo'
 ]

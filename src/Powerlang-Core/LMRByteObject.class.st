@@ -13,6 +13,12 @@ LMRByteObject >> asLocalString [
 ]
 
 { #category : #accessing }
+LMRByteObject >> at: index [
+
+	^bytes at: index
+]
+
+{ #category : #accessing }
 LMRByteObject >> at: index put: anLMRObject [
 	| value |
 	value := anLMRObject value.
