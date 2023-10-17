@@ -209,11 +209,11 @@ RingBasedLMRBootstrapper >> createNewClassFrom: spec in: module [
 			              sendLocal: #at:
 			              to: namespace
 			              with: { (dest addSymbol: supername) } ].
-	metaclass := dest
+	class := dest
 		             sendLocal: #newSubclassOf:
 		             to: self => #Class
 		             with: { superclass }.
-	class := dest sendLocal: #instanceClass to: metaclass.
+	metaclass := dest sendLocal: #class to: class.
 	dest
 		sendLocal: #name:
 		to: class
@@ -276,6 +276,7 @@ RingBasedLMRBootstrapper >> createNewModule: spec [
 	dest
 		sendLocal: #bindKernelExports to: module;
 		sendLocal: #importRequiredModules to: module.
+	spec name != #Module ifTrue: [ dest sendLocal: #module: to: class with: { module }].
 	^ module
 ]
 
