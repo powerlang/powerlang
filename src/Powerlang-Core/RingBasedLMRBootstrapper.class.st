@@ -268,14 +268,15 @@ RingBasedLMRBootstrapper >> createNewMethod: m in: species [
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> createNewModule: spec [
+RingBasedLMRBootstrapper >> createNewModule: spec name: aSymbol [
 	| behavior class module |
 	behavior := behaviors at: spec.
 	class := dest behaviorClass: behavior.
 	module := dest sendLocal: #new to: class.
 	dest
 		sendLocal: #bindKernelExports to: module;
-		sendLocal: #importRequiredModules to: module.
+		sendLocal: #importRequiredModules to: module;
+		sendLocal: #name: to: module with: {aSymbol}.
 	spec name != #Module ifTrue: [ dest sendLocal: #module: to: class with: { module }].
 	^ module
 ]
@@ -479,22 +480,24 @@ RingBasedLMRBootstrapper >> instantiateMetaobjects [
 
 { #category : #initialization }
 RingBasedLMRBootstrapper >> loadBootstrapModule [
-	| spec classes moduleSpec bootstrapper |
+	| spec classes moduleSpec bootstrapper symbol |
 	spec := PowertalkRingModule lmrBootstrapperSpec.
 	classes := spec allClasses.
 	classes := classes
 		collect: [ :classSpec | self createNewClassFrom: classSpec in: nil].
 	moduleSpec := spec at: #BootstrapModule.
-	bootstrapper := self createNewModule: moduleSpec.
+	symbol := dest addSymbol: #BootstrapModule.
+	bootstrapper := self createNewModule: moduleSpec name: symbol.
 	self addClasses: classes to: bootstrapper.
 	dest sendLocal: #justLoaded to: bootstrapper.
 	^bootstrapper
 ]
 
 { #category : #initialization }
-RingBasedLMRBootstrapper >> loadModule: symbol [
+RingBasedLMRBootstrapper >> loadModule: aSymbol [
 
-	| spec classes moduleSpec module extensions |
+	| symbol spec classes moduleSpec module extensions |
+	symbol := aSymbol asLocalString.
 	spec := self readModuleSpec: symbol.
 	classes := spec allClasses.
 	moduleSpec := spec at: symbol , #Module.
@@ -504,7 +507,7 @@ RingBasedLMRBootstrapper >> loadModule: symbol [
 		ifNotNil: [ 
 			self createNewClassFrom: moduleSpec in: nil.
 			classes remove: moduleSpec ].
-	module := self createNewModule: moduleSpec.
+	module := self createNewModule: moduleSpec name: aSymbol.
 	classes := self classesSortedBySuperclass: classes.
 	classes := classes collect: [ :classSpec | 
 		           self createNewClassFrom: classSpec in: module ].

@@ -362,7 +362,7 @@ PowertalkLMR >> loadAssociationValue: association [
 
 { #category : #initialization }
 PowertalkLMR >> loadModule: symbol [
-	^ bootstrapper loadModule: symbol asLocalString
+	^ bootstrapper loadModule: symbol
 ]
 
 { #category : #initialization }
