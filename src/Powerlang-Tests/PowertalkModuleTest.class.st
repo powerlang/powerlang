@@ -3,7 +3,8 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'runtime',
-		'bootstrapper'
+		'bootstrapper',
+		'bootstrapModule'
 	],
 	#category : #'Powerlang-Tests-Bootstrap'
 }
@@ -15,7 +16,7 @@ PowertalkModuleTest class >> defaultTimeLimit [
 
 { #category : #running }
 PowertalkModuleTest >> setUp [
-	| image bootstrapModule |
+	| image  |
 	super setUp.
 	image := PowertalkRingImage fromSpec
 		wordSize: 8;
@@ -25,8 +26,7 @@ PowertalkModuleTest >> setUp [
 		fillSymbols.
 	bootstrapper := image generateLMR.
 	runtime := bootstrapper result.
-	bootstrapModule := bootstrapper loadBootstrapModule.
-	runtime sendLocal: #start to: bootstrapModule
+	bootstrapModule := bootstrapper loadBootstrapModule
 ]
 
 { #category : #running }
@@ -154,4 +154,51 @@ PowertalkModuleTest >> test100LoadCompiler [
 	runtime sendLocal: #install to: method.
 	foo := runtime sendLocal: #foo to: object.
 	self assert: foo asLocalString equals: 'foo'
+]
+
+{ #category : #tests }
+PowertalkModuleTest >> testWriteModuleSegment [
+
+	| st p module json output  |
+	(bootstrapper rootDirectory / 'A') ensureCreateDirectory.
+	st := bootstrapper rootDirectory / 'A/A.st'.
+	st
+		createFile;
+		writeStreamDo: [ :s | 
+			s nextPutAll: 'Class {
+	#name : #A,
+	#superclass : #Object,
+	#instVars : [],
+	#category : #''A''
+}
+{ #category : #accessing }
+A >> a [
+	^''a''
+] ' ].
+	p := bootstrapper rootDirectory / 'A/package.st'.
+	p
+		createFile;
+		writeStreamDo: [ :s | 
+			s nextPutAll: 'Package {
+	#name : #A,
+	#classes : [
+		''A''
+	]
+}' ].
+	module := runtime
+		          sendLocal: #load:
+		          to: runtime kernel
+		          with: { (runtime addSymbol: #A) }.
+	json := runtime
+		        sendLocal: #writeJSONModule:
+		        to: bootstrapModule
+		        with: { module }.
+	output := bootstrapper rootDirectory / 'A/A.json'.
+	output
+		ensureCreateFile;
+		writeStreamDo: [ :stream | 
+			| ws |
+			stream truncate.
+			ws := ZnNewLineWriterStream on: stream.
+			ws nextPutAll: json asLocalString ]
 ]
