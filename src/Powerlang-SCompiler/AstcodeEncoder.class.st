@@ -43,20 +43,28 @@ AstcodeEncoder >> encodeArgument: anInteger env: environment [
 
 { #category : #visiting }
 AstcodeEncoder >> encodeClosureElements: aBlockNode [
+
 	| scope parent |
 	scope := aBlockNode scope.
 	parent := aBlockNode realParent.
-	^Array streamContents: [:s |
-		scope capturesSelf ifTrue: [ s nextPut: Self ].
-		scope capturedEnvironments do: [:e | | index |
-			e == parent ifTrue: [s nextPut: Environment] ifFalse: [
-				index := aBlockNode environmentIndexOf: e.
-				self ASSERT: index notNil.
-				s nextPut: EnvironmentValue; nextPut: index]].
-		scope capturedArguments do: [:a | | binding |
-			binding := aBlockNode parent scope resolve: a name.
-			s 	nextPut: binding environmentType; nextPut: binding index]]
-	
+	^ Array streamContents: [ :s |
+		  scope capturesSelf ifTrue: [ s nextPut: Self ].
+		  scope capturedEnvironments do: [ :e |
+			  | index |
+			  e == parent
+				  ifTrue: [ s nextPut: Environment ]
+				  ifFalse: [
+					  index := parent environmentIndexOf: e.
+					  self ASSERT: index notNil.
+					  s
+						  nextPut: EnvironmentValue;
+						  nextPut: index ] ].
+		  scope capturedArguments do: [ :a |
+			  | binding |
+			  binding := aBlockNode parent scope resolve: a name.
+			  s
+				  nextPut: binding environmentType;
+				  nextPut: binding index ] ]
 ]
 
 { #category : #visiting }
